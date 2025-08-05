@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 
 const ministries = [
     {
@@ -51,6 +53,14 @@ const ministries = [
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [autoPlay, setAutoPlay] = useState(true);
+    const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+    const [registrationForm, setRegistrationForm] = useState({
+        name: '',
+        phone: '',
+        congregation: '',
+        ministry: ''
+    });
+    const [phoneError, setPhoneError] = useState('');
     
     
     const cardsPerView = isMobile ? 1 : 4;
@@ -88,6 +98,74 @@ const ministries = [
 
     const nextSlide = () => {
         setCurrentIndex(prev => (prev + 1) % totalSlides);
+    };
+
+    // Validate phone number in real-time
+    useEffect(() => {
+        const phone = registrationForm.phone;
+        if (phone === '') {
+            setPhoneError('');
+            return;
+        }
+        
+        // Check if it starts with +233 or 0
+        if (!phone.startsWith('+233') && !phone.startsWith('0')) {
+            setPhoneError('Please enter correct index (+233 or 0)');
+            return;
+        }
+        
+        // Check length (10 digits for 0 prefix, 13 for +233)
+        if (phone.startsWith('0') && phone.length !== 10) {
+            setPhoneError('Phone number should be 10 digits');
+            return;
+        }
+        
+        if (phone.startsWith('+233') && phone.length !== 13) {
+            setPhoneError('Phone number with +233 should be 13 digits');
+            return;
+        }
+        
+        // If we get here, the phone number is valid
+        setPhoneError('');
+    }, [registrationForm.phone]);
+    
+    const handleRegistrationSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Check if there's a phone error
+        if (phoneError) {
+            return;
+        }
+        
+        // Validate phone number format one more time
+        const phoneRegex = /^(\+233|0)\d{9}$/;
+        if (!phoneRegex.test(registrationForm.phone)) {
+            setPhoneError('Please enter a valid Ghana phone number');
+            return;
+        }
+        
+        try {
+            // In a real implementation, this would send data to your API
+            // For now, we'll just simulate a successful submission
+            console.log('Submitting registration:', registrationForm);
+            
+            // Show success message by closing modal and showing a success message
+            setShowRegistrationModal(false);
+            
+            // Reset form
+            setRegistrationForm({
+                name: '',
+                phone: '',
+                congregation: '',
+                ministry: ''
+            });
+            
+            // Show success message (you could implement a better notification system)
+            alert('Registration submitted successfully! Our team will contact you soon.');
+        } catch (error) {
+            console.error('Error submitting registration:', error);
+            alert('Error submitting registration. Please try again.');
+        }
     };
 
     const prevSlide = () => {
@@ -303,6 +381,7 @@ const ministries = [
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
+                    onClick={() => setShowRegistrationModal(true)}
                     >
                     Register Interest
                     </motion.button>
@@ -311,6 +390,103 @@ const ministries = [
             </div>
             </motion.div>
         </div>
+        
+        {/* Registration Modal */}
+        <Transition.Root show={showRegistrationModal} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={setShowRegistrationModal}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100"
+              leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity" />
+            </Transition.Child>
+            <div className="fixed inset-0 z-50 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
+                    <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900 mb-4">
+                      Ministry Registration
+                    </Dialog.Title>
+                    <form onSubmit={handleRegistrationSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          value={registrationForm.name}
+                          onChange={e => setRegistrationForm({ ...registrationForm, name: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input
+                          type="tel"
+                          required
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                            phoneError ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          value={registrationForm.phone}
+                          onChange={e => setRegistrationForm({ ...registrationForm, phone: e.target.value })}
+                          placeholder="+233XXXXXXXXX or 0XXXXXXXXX"
+                        />
+                        {phoneError ? (
+                          <p className="text-xs text-red-500 mt-1">{phoneError}</p>
+                        ) : (
+                          <p className="text-xs text-gray-500 mt-1">Please enter a valid Ghana phone number</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Congregation</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          value={registrationForm.congregation}
+                          onChange={e => setRegistrationForm({ ...registrationForm, congregation: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ministry of Interest</label>
+                        <select
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          value={registrationForm.ministry}
+                          onChange={e => setRegistrationForm({ ...registrationForm, ministry: e.target.value })}
+                        >
+                          <option value="">Select a ministry</option>
+                          {ministries.map((ministry, index) => (
+                            <option key={index} value={ministry.name}>{ministry.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-6">
+                        <button
+                          type="button"
+                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          onClick={() => setShowRegistrationModal(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                        >
+                          Submit Registration
+                        </button>
+                      </div>
+                    </form>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition.Root>
         </section>
     );
 }

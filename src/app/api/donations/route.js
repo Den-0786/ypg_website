@@ -6,6 +6,7 @@ let donations = [
     id: 1,
     donor: "Anonymous",
     email: "anonymous@example.com",
+    phone: "+1234567890",
     amount: 500,
     currency: "USD",
     date: "2024-03-10",
@@ -19,6 +20,7 @@ let donations = [
     id: 2,
     donor: "John Doe",
     email: "john.doe@example.com",
+    phone: "+1234567891",
     amount: 200,
     currency: "USD",
     date: "2024-03-08",
@@ -32,6 +34,7 @@ let donations = [
     id: 3,
     donor: "Sarah Smith",
     email: "sarah.smith@example.com",
+    phone: "+1234567892",
     amount: 150,
     currency: "USD",
     date: "2024-03-05",
@@ -89,7 +92,7 @@ export async function POST(request) {
       ...body,
       created_at: new Date().toISOString(),
       transaction_id: `TXN_${String(donations.length + 1).padStart(3, '0')}`,
-      status: body.status || 'pending'
+      status: body.status || 'completed'
     };
     
     donations.push(newDonation);

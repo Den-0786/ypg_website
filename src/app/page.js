@@ -19,6 +19,7 @@ import Footer from './components/footer/Footer';
 import DonateSection from './components/donations/DonateSection';
 import QuizList from './components/quiz/QuizList';
 import QuizResults from './components/quiz/QuizResults';
+import CongregationalExecutives from './components/congregations/Congregations';
 
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
       <QuizList/>
       <TeamSection/>
       <YStoreSection/>
+      <CongregationalExecutives/>
       <TestimonialsSection/>
       <MinistriesSection/>
       <JoinUsSection/>
