@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { quizAPI } from "../../../utils/api";
 
 export default function TakeQuiz() {
     const { id } = useParams();
@@ -16,11 +17,14 @@ export default function TakeQuiz() {
         const fetchQuiz = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`http://localhost:8000/api/quizzes/${id}/questions/`);
-            if (!response.ok) throw new Error('Failed to fetch quiz');
-            const data = await response.json();
-            setQuestions(data.questions);
-            setQuizTitle(data.title);
+            const result = await quizAPI.getQuizQuestions(id);
+            if (result.success) {
+                const data = result.data;
+                setQuestions(data.questions);
+                setQuizTitle(data.title);
+            } else {
+                throw new Error('Failed to fetch quiz');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -46,14 +50,10 @@ export default function TakeQuiz() {
             answers: answers,
         };
 
-        const response = await fetch("http://localhost:8000/api/quiz/submit/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) throw new Error('Submission failed');
-        const data = await response.json();
+        const result = await quizAPI.submitQuiz(payload);
+        
+        if (result.success) {
+            const data = result.data;
         navigate(`/quiz-result/${data.result_id}`);
         } catch (err) {
         setError(err.message);

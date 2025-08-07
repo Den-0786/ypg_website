@@ -32,6 +32,7 @@ export default function Home() {
       <EventSection/>
       <PastEvents/>
       <QuizList/>
+      <QuizResults/>
       <TeamSection/>
       <YStoreSection/>
       <CongregationalExecutives/>
@@ -40,7 +41,6 @@ export default function Home() {
       <JoinUsSection/>
       <GallerySection/>
       <BlogSection/>
-      <QuizResults/>
       <DonateSection/>
       <ContactSection/>
       <Footer/>
