@@ -41,14 +41,25 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
     }
 
     try {
-      const response = await fetch("/api/media", {
+      const response = await fetch("http://localhost:8000/api/media/", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: newMedia.title,
+          description: newMedia.description,
+          type: newMedia.type,
+          congregation: newMedia.congregation,
+          date: newMedia.date,
+          youtubeUrl: newMedia.youtubeUrl,
+          tiktokUrl: newMedia.tiktokUrl,
+        }),
       });
 
       if (response.ok) {
         const addedMedia = await response.json();
-        setMedia([...media, addedMedia]);
+        setMedia([...media, addedMedia.media]);
         setShowAddModal(false);
         setNewMedia({
           title: "",
@@ -80,16 +91,27 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
     }
 
     try {
-      const response = await fetch(`/api/media/${editingMedia.id}`, {
+      const response = await fetch(`http://localhost:8000/api/media/${editingMedia.id}/`, {
         method: "PUT",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: editingMedia.title,
+          description: editingMedia.description,
+          type: editingMedia.type,
+          congregation: editingMedia.congregation,
+          date: editingMedia.date,
+          youtubeUrl: editingMedia.youtubeUrl,
+          tiktokUrl: editingMedia.tiktokUrl,
+        }),
       });
 
       if (response.ok) {
         const updatedMedia = await response.json();
         setMedia(
           media.map((item) =>
-            item.id === editingMedia.id ? updatedMedia : item
+            item.id === editingMedia.id ? updatedMedia.media : item
           )
         );
         setEditingMedia(null);
@@ -101,7 +123,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
 
   const handleDeleteMedia = async (id) => {
     try {
-      const response = await fetch(`/api/media/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/media/${id}/`, {
         method: "DELETE",
       });
 
@@ -140,7 +162,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
           >
             <div
-              className={`h-48 ${theme === "dark" ? "bg-gradient-to-r from-orange-600 to-red-600" : "bg-gradient-to-r from-orange-500 to-red-500"} flex items-center justify-center`}
+              className={`h-64 ${theme === "dark" ? "bg-gradient-to-r from-orange-600 to-red-600" : "bg-gradient-to-r from-orange-500 to-red-500"} flex items-center justify-center`}
             >
               <Image className="w-12 h-12 text-white" />
             </div>

@@ -27,14 +27,23 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
     }
 
     try {
-      const response = await fetch("/api/blog", {
+      const response = await fetch("http://localhost:8000/api/blog/", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: newPost.title,
+          content: newPost.content,
+          author: newPost.author,
+          category: newPost.category,
+          image: newPost.image,
+        }),
       });
 
       if (response.ok) {
         const addedPost = await response.json();
-        setBlogPosts([...blogPosts, addedPost]);
+        setBlogPosts([...blogPosts, addedPost.blogPost]);
         setShowAddModal(false);
         setNewPost({
           title: "",
@@ -62,16 +71,25 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
     }
 
     try {
-      const response = await fetch(`/api/blog/${editingPost.id}`, {
+      const response = await fetch(`http://localhost:8000/api/blog/${editingPost.id}/`, {
         method: "PUT",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: editingPost.title,
+          content: editingPost.content,
+          author: editingPost.author,
+          category: editingPost.category,
+          image: editingPost.image,
+        }),
       });
 
       if (response.ok) {
         const updatedPost = await response.json();
         setBlogPosts(
           blogPosts.map((post) =>
-            post.id === editingPost.id ? updatedPost : post
+            post.id === editingPost.id ? updatedPost.blogPost : post
           )
         );
         setEditingPost(null);
@@ -93,7 +111,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
 
     try {
       const response = await fetch(
-        `/api/blog?id=${postToDelete.id}&type=${deleteType}`,
+        `http://localhost:8000/api/blog/?id=${postToDelete.id}&type=${deleteType}`,
         {
           method: "DELETE",
         }
@@ -151,7 +169,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
             className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
           >
             <div
-              className={`h-48 ${theme === "dark" ? "bg-gradient-to-r from-blue-600 to-purple-700" : "bg-gradient-to-r from-blue-500 to-purple-600"} flex items-center justify-center`}
+              className={`h-64 ${theme === "dark" ? "bg-gradient-to-r from-blue-600 to-purple-700" : "bg-gradient-to-r from-blue-500 to-purple-600"} flex items-center justify-center`}
             >
               <FileText className="w-12 h-12 text-white" />
             </div>

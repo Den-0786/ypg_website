@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Lock, Clock, Users, Trophy, CheckCircle, XCircle } from "lucide-react";
 import { quizAPI } from "../../../utils/api";
+import toast from "react-hot-toast";
 
 export default function QuizList() {
   const [quizzes, setQuizzes] = useState([]);
@@ -114,8 +115,10 @@ export default function QuizList() {
       setPassword("");
       setError("");
       setShowQuiz(true);
+      toast.success("Password correct! Quiz interface opened.");
     } else {
       setError("Incorrect password!");
+      toast.error("Incorrect password! Please try again.");
     }
   };
 
@@ -347,7 +350,6 @@ function QuizInterface({ quiz, onClose }) {
     congregation: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState(null);
   const [error, setError] = useState("");
 
   const congregations = [
@@ -419,18 +421,19 @@ function QuizInterface({ quiz, onClose }) {
         const data = result.data;
 
         if (data.success) {
-          setSubmissionResult({
-            success: true,
-            message: data.message,
-            isCorrect: data.is_correct,
-          });
+          toast.success(
+            "Quiz submitted successfully! Results will be available after the quiz ends."
+          );
+          onClose(); // Close the quiz interface
         } else {
           setError(data.error || "Failed to submit quiz.");
+          toast.error(data.error || "Failed to submit quiz.");
         }
       }
     } catch (error) {
       console.error("Error submitting quiz:", error);
       setError("Failed to submit quiz. Please try again.");
+      toast.error("Failed to submit quiz. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -443,51 +446,8 @@ function QuizInterface({ quiz, onClose }) {
       phone_number: "",
       congregation: "",
     });
-    setSubmissionResult(null);
     setError("");
   };
-
-  if (submissionResult) {
-    return (
-      <div className="text-center">
-        {submissionResult.isCorrect ? (
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        ) : (
-          <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-        )}
-
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          {submissionResult.isCorrect ? "Correct Answer!" : "Incorrect Answer"}
-        </h2>
-
-        <p className="text-gray-600 mb-6">{submissionResult.message}</p>
-
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <p className="text-sm text-gray-600">
-            <strong>Your Answer:</strong> {selectedAnswer}
-          </p>
-          <p className="text-sm text-gray-600">
-            <strong>Correct Answer:</strong> {quiz.correct_answer || "A"}
-          </p>
-        </div>
-
-        <div className="flex space-x-4">
-          <button
-            onClick={resetQuiz}
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-          >
-            Take Another Quiz
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

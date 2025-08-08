@@ -96,7 +96,7 @@ export default function TeamSection() {
         
         {!loading && !error && teamMembers.length > 0 && (
           <>
-            <div className="relative h-[300px] sm:h-[400px] lg:h-[350px]">
+            <div className="relative h-[300px] sm:h-[400px] lg:h-[400px]">
               <AnimatePresence mode="wait">
                 {sets.map((set, setIndex) => (
                   currentSet === setIndex && (
@@ -136,7 +136,7 @@ export default function TeamSection() {
                             whileHover={{ y: -10 }}
                             className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                           >
-                            <div className="relative h-48 sm:h-56 lg:h-52 w-full">
+                            <div className="relative h-48 sm:h-56 lg:h-80 w-full">
                               <Image
                                 src={member.image}
                                 alt={member.name}
@@ -148,7 +148,7 @@ export default function TeamSection() {
                               <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />
                               
                               {/* Text overlay with background */}
-                              <div className="absolute bottom-0 top-[8rem] left-0 right-0 p-3 sm:p-4">
+                              <div className="absolute bottom-0 top-[12rem] left-0 right-0 p-3 sm:p-4">
                                 <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
                                   <h3 className="text-sm sm:text-lg font-bold text-gray-800 mb-1">{member.name}</h3>
                                   <p className="text-blue-600 font-medium mb-1 sm:mb-2 text-xs sm:text-sm">{member.role}</p>

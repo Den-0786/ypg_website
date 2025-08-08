@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import LoginScreen from "./components/LoginScreen";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import LoginScreen from "./components/LoginScreen";
+import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
 import OverviewDashboard from "./components/OverviewDashboard";
 import TeamManagement from "./components/TeamManagement";
 import EventsManagement from "./components/EventsManagement";
@@ -14,20 +14,31 @@ import MinistryManagement from "./components/MinistryManagement";
 import BlogManagement from "./components/BlogManagement";
 import TestimonialsManagement from "./components/TestimonialsManagement";
 import MediaManagement from "./components/MediaManagement";
-import CommunicationManagement from "./components/CommunicationManagement";
-import SettingsComponent from "./components/Settings";
+import PeopleManagement from "./components/PeopleManagement";
+import ContentManagement from "./components/ContentManagement";
+import Settings from "./components/Settings";
+import AnalyticsSettings from "./components/AnalyticsSettings";
+import FinancialManagement from "./components/FinancialManagement";
 import TrashManagement from "./components/TrashManagement";
+import CommunicationManagement from "./components/CommunicationManagement";
+import YStoreManagement from "./components/YStoreManagement";
+import BranchPresidentsManagement from "./components/BranchPresidentsManagement";
+import CouncilManagement from "./components/CouncilManagement";
 
 export default function AdminDashboard() {
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  // UI state
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
   const [theme, setTheme] = useState("light");
 
-  // Data states
+  // Data state
   const [teamMembers, setTeamMembers] = useState([]);
   const [events, setEvents] = useState([]);
   const [donations, setDonations] = useState([]);
@@ -35,9 +46,7 @@ export default function AdminDashboard() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [media, setMedia] = useState([]);
-  const [contactMessages, setContactMessages] = useState([]);
-
-  // Stats state
+  const [analytics, setAnalytics] = useState({});
   const [stats, setStats] = useState({
     totalVisitors: 0,
     totalDonations: 0,
@@ -45,29 +54,75 @@ export default function AdminDashboard() {
     totalMedia: 0,
   });
 
-  // Analytics state
-  const [analytics, setAnalytics] = useState(null);
+  // Check authentication on component mount
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
 
-  // Theme management
+  const checkAuthentication = () => {
+    const authenticated = localStorage.getItem("ypg_admin_authenticated");
+    const user = localStorage.getItem("ypg_admin_user");
+    const loginTime = localStorage.getItem("ypg_admin_login_time");
+
+    if (authenticated === "true" && user && loginTime) {
+      // Check if session is still valid (24 hours)
+      const loginDate = new Date(loginTime);
+      const now = new Date();
+      const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
+
+      if (hoursDiff < 24) {
+        setIsAuthenticated(true);
+        setUser(user);
+        setSessionExpired(false);
+      } else {
+        // Session expired
+        handleLogout();
+        setSessionExpired(true);
+        toast.error("Session expired. Please login again.");
+      }
+    } else {
+      setIsAuthenticated(false);
+      setUser(null);
+    }
+  };
+
+  const handleLogin = () => {
+    const user = localStorage.getItem("ypg_admin_user");
+    setIsAuthenticated(true);
+    setUser(user);
+    setSessionExpired(false);
+    toast.success("Welcome back! Dashboard loaded successfully.");
+  };
+
+  const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem("ypg_admin_authenticated");
+    localStorage.removeItem("ypg_admin_user");
+    localStorage.removeItem("ypg_admin_login_time");
+
+    setIsAuthenticated(false);
+    setUser(null);
+    setActiveTab("overview");
+
+    toast.success(
+      "Logged out successfully! Thank you for using YPG Admin Dashboard."
+    );
+  };
+
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    document.documentElement.classList.toggle("dark");
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", newTheme);
+    localStorage.setItem("ypg_theme", newTheme);
   };
 
-  // Initialize theme
+  // Load theme from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.body.classList.add("dark");
+    const savedTheme = localStorage.getItem("ypg_theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
     }
   }, []);
 
-  // Generic fetch function
   const fetchData = async (endpoint, setter) => {
     try {
       console.log(`Fetching ${endpoint}...`);
@@ -124,6 +179,9 @@ export default function AdminDashboard() {
             data.media.length
           );
           setter(data.media);
+        } else if (data.success && data.analytics) {
+          console.log(`${endpoint} - setting analytics data`);
+          setter(data.analytics);
         } else {
           console.log(`${endpoint} - no valid data found, setting empty array`);
           setter([]);
@@ -183,17 +241,6 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    toast.success(
-      "Logged out successfully! Thank you for using YPG Admin Dashboard."
-    );
-    setIsAuthenticated(false);
-  };
-
   // Render login screen if not authenticated
   if (!isAuthenticated) {
     return <LoginScreen onLogin={handleLogin} />;
@@ -202,7 +249,9 @@ export default function AdminDashboard() {
   // Render main dashboard
   return (
     <div
-      className={`min-h-screen transition-colors duration-200 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}
+      className={`min-h-screen transition-colors duration-200 ${
+        theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
     >
       {/* Header - Fixed at top */}
       <div className="fixed top-0 left-0 right-0 z-50">
@@ -211,6 +260,7 @@ export default function AdminDashboard() {
           setSidebarOpen={setSidebarOpen}
           onLogout={handleLogout}
           theme={theme}
+          user={user}
         />
       </div>
 
@@ -233,99 +283,144 @@ export default function AdminDashboard() {
 
         {/* Main content - With left margin for sidebar */}
         <div
-          className={`flex-1 min-w-0 transition-all duration-300 ease-in-out lg:${
-            sidebarCollapsed ? "ml-16" : "ml-64"
+          className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${
+            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
           }`}
         >
-          {/* Main content area */}
-          <main
-            className={`p-6 min-w-0 transition-colors duration-200 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                {activeTab === "overview" && (
-                  <OverviewDashboard
-                    stats={stats}
-                    teamMembers={teamMembers}
-                    events={events}
-                    donations={donations}
-                    media={media}
-                    theme={theme}
-                    setActiveTab={setActiveTab}
-                  />
-                )}
-                {activeTab === "team" && (
-                  <TeamManagement
-                    teamMembers={teamMembers}
-                    setTeamMembers={setTeamMembers}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "events" && (
-                  <EventsManagement
-                    events={events}
-                    setEvents={setEvents}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "donations" && (
-                  <DonationsManagement
-                    donations={donations}
-                    setDonations={setDonations}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "ministry" && (
-                  <MinistryManagement
-                    ministryRegistrations={ministryRegistrations}
-                    setMinistryRegistrations={setMinistryRegistrations}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "blog" && (
-                  <BlogManagement
-                    blogPosts={blogPosts}
-                    setBlogPosts={setBlogPosts}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "testimonials" && (
-                  <TestimonialsManagement
-                    testimonials={testimonials}
-                    setTestimonials={setTestimonials}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "media" && (
-                  <MediaManagement
-                    media={media}
-                    setMedia={setMedia}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "communication" && (
-                  <CommunicationManagement
-                    contactMessages={contactMessages}
-                    setContactMessages={setContactMessages}
-                    theme={theme}
-                  />
-                )}
-                {activeTab === "trash" && <TrashManagement theme={theme} />}
-              </motion.div>
-            </AnimatePresence>
-          </main>
+          {/* Content Area */}
+          <div className="p-6 w-full max-w-full">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeTab === "overview" && (
+                <OverviewDashboard
+                  stats={stats}
+                  theme={theme}
+                  setActiveTab={setActiveTab}
+                  teamMembers={teamMembers}
+                  events={events}
+                  donations={donations}
+                  media={media}
+                />
+              )}
+              {activeTab === "team" && (
+                <TeamManagement
+                  teamMembers={teamMembers}
+                  setTeamMembers={setTeamMembers}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "events" && (
+                <EventsManagement
+                  events={events}
+                  setEvents={setEvents}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "donations" && (
+                <DonationsManagement
+                  donations={donations}
+                  setDonations={setDonations}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "ministry" && (
+                <MinistryManagement
+                  ministryRegistrations={ministryRegistrations}
+                  setMinistryRegistrations={setMinistryRegistrations}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "council" && <CouncilManagement theme={theme} />}
+              {activeTab === "ystore" && <YStoreManagement theme={theme} />}
+              {activeTab === "blog" && (
+                <BlogManagement
+                  blogPosts={blogPosts}
+                  setBlogPosts={setBlogPosts}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "testimonials" && (
+                <TestimonialsManagement
+                  testimonials={testimonials}
+                  setTestimonials={setTestimonials}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "media" && (
+                <MediaManagement
+                  media={media}
+                  setMedia={setMedia}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "people" && (
+                <PeopleManagement
+                  teamMembers={teamMembers}
+                  setTeamMembers={setTeamMembers}
+                  testimonials={testimonials}
+                  setTestimonials={setTestimonials}
+                  ministryRegistrations={ministryRegistrations}
+                  setMinistryRegistrations={setMinistryRegistrations}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "content" && (
+                <ContentManagement
+                  blogPosts={blogPosts}
+                  setBlogPosts={setBlogPosts}
+                  media={media}
+                  setMedia={setMedia}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "financial" && (
+                <FinancialManagement
+                  donations={donations}
+                  setDonations={setDonations}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "communication" && (
+                <CommunicationManagement theme={theme} />
+              )}
+              {activeTab === "trash" && <TrashManagement theme={theme} />}
+              {activeTab === "analytics" && (
+                <AnalyticsSettings
+                  analytics={analytics}
+                  setAnalytics={setAnalytics}
+                  theme={theme}
+                />
+              )}
+              {activeTab === "branch-presidents" && (
+                <BranchPresidentsManagement theme={theme} />
+              )}
+
+              {activeTab === "Settings" && (
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                    Settings
+                  </h2>
+                  <p className="text-gray-600">
+                    Settings configuration will be added here.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Settings Modal */}
       {settingsOpen && (
-        <SettingsComponent onClose={() => setSettingsOpen(false)} />
+        <Settings
+          onClose={() => setSettingsOpen(false)}
+          theme={theme}
+          setTheme={setTheme}
+        />
       )}
     </div>
   );

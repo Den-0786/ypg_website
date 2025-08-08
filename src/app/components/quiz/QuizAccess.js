@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Lock, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { quizAPI } from "../../../utils/api";
+import toast from "react-hot-toast";
 
 export default function QuizAccess() {
   const [activeQuiz, setActiveQuiz] = useState(null);
@@ -16,7 +17,6 @@ export default function QuizAccess() {
     congregation: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -51,8 +51,10 @@ export default function QuizAccess() {
     if (password === activeQuiz.password) {
       setShowQuiz(true);
       setError("");
+      toast.success("Password correct! Quiz interface opened.");
     } else {
       setError("Incorrect password. Please try again.");
+      toast.error("Incorrect password. Please try again.");
     }
   };
 
@@ -83,17 +85,16 @@ export default function QuizAccess() {
         const data = result.data;
 
       if (data.success) {
-        setSubmissionResult({
-          success: true,
-          message: data.message,
-          isCorrect: data.is_correct,
-        });
+        toast.success("Quiz submitted successfully! Results will be available after the quiz ends.");
+        setShowQuiz(false); // Close the quiz interface
       } else {
         setError(data.error || "Failed to submit quiz.");
+        toast.error(data.error || "Failed to submit quiz.");
       }
     } catch (error) {
       console.error("Error submitting quiz:", error);
       setError("Failed to submit quiz. Please try again.");
+      toast.error("Failed to submit quiz. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -103,7 +104,6 @@ export default function QuizAccess() {
     setShowQuiz(false);
     setSelectedAnswer("");
     setParticipantInfo({ name: "", phone_number: "", congregation: "" });
-    setSubmissionResult(null);
     setError("");
   };
 
@@ -134,47 +134,7 @@ export default function QuizAccess() {
     );
   }
 
-  if (submissionResult) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4 text-center"
-        >
-          {submissionResult.isCorrect ? (
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          ) : (
-            <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          )}
 
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {submissionResult.isCorrect
-              ? "Correct Answer!"
-              : "Incorrect Answer"}
-          </h2>
-
-          <p className="text-gray-600 mb-6">{submissionResult.message}</p>
-
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600">
-              <strong>Your Answer:</strong> {selectedAnswer}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Correct Answer:</strong> {activeQuiz.correct_answer}
-            </p>
-          </div>
-
-          <button
-            onClick={resetQuiz}
-            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-          >
-            Take Another Quiz
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
 
   if (!showQuiz) {
     return (

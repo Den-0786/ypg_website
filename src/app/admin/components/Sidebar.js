@@ -4,7 +4,6 @@ import {
   Calendar,
   DollarSign,
   Settings,
-  X,
   Sun,
   Moon,
   BookOpen,
@@ -16,6 +15,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Trash2,
+  ShoppingCart,
+  UserCheck,
+  Crown,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -36,28 +38,30 @@ const Sidebar = ({
     { id: "events", name: "Events", icon: Calendar },
     { id: "donations", name: "Donations", icon: DollarSign },
     { id: "ministry", name: "Ministry", icon: BookOpen },
+    { id: "council", name: "Council Members", icon: Crown },
+    { id: "ystore", name: "Y-Store", icon: ShoppingCart },
     { id: "blog", name: "Blog", icon: FileText },
     { id: "testimonials", name: "Testimonials", icon: MessageCircle },
     { id: "media", name: "Media", icon: Image },
     { id: "communication", name: "Contact Messages", icon: Mail },
     { id: "trash", name: "Trash", icon: Trash2 },
+    { id: "branch-presidents", name: "Branch Presidents", icon: UserCheck },
   ];
 
-  
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const sidebar = document.querySelector('aside');
+      const sidebar = document.querySelector("aside");
       if (sidebarOpen && !sidebar.contains(event.target)) {
         setSidebarOpen(false);
       }
     };
 
     if (sidebarOpen) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [sidebarOpen, setSidebarOpen]);
 
@@ -71,43 +75,21 @@ const Sidebar = ({
         />
       )}
 
-      
       <aside
-        className={`fixed lg:relative top-4 lg:translate-x-0 z-50 h-full transition-all duration-300 ease-in-out ${
-          sidebarCollapsed ? "w-16" : "w-64"
+        className={`fixed lg:relative lg:top-60px top-0 lg:translate-x-0 z-50 h-full transition-all duration-300 ease-in-out ${
+          sidebarOpen ? "w-64" : sidebarCollapsed ? "w-16" : "w-64"
         } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} ${
           theme === "dark"
             ? "bg-gray-800 border-gray-700"
             : "bg-white border-gray-200"
         } border-r shadow-xl lg:shadow-lg`}
+        style={{
+          height: "calc(100vh - 60px)",
+          top: "10px",
+          maxHeight: "calc(100vh - 60px)",
+        }}
       >
         <div className="flex flex-col h-full">
-          {/* Close button for mobile */}
-          <div
-            className={`flex items-center justify-between p-4 border-b lg:hidden ${
-              theme === "dark" ? "border-gray-700" : "border-gray-200"
-            }`}
-          >
-            <h2
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-800"
-              }`}
-            >
-              Navigation
-            </h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className={`p-2 rounded-lg transition-colors ${
-                theme === "dark"
-                  ? "hover:bg-gray-700 text-white"
-                  : "hover:bg-gray-100 text-gray-800"
-              }`}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Toggle button for desktop */}
           <div
             className={`hidden lg:flex items-center justify-end p-2 border-b ${
               theme === "dark" ? "border-gray-700" : "border-gray-200"
@@ -134,7 +116,7 @@ const Sidebar = ({
           <nav
             className="flex-1 p-4 space-y-2 overflow-y-auto"
             style={{
-              height: "calc(100vh - 240px)",
+              height: "calc(100vh - 280px)",
               overflowY: "auto",
             }}
           >
@@ -144,7 +126,7 @@ const Sidebar = ({
                 <button
                   key={item.id}
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent event bubbling
+                    e.stopPropagation();
                     setActiveTab(item.id);
                     if (window.innerWidth < 1024) {
                       setSidebarOpen(false);
@@ -156,13 +138,13 @@ const Sidebar = ({
                         ? "bg-blue-900 text-blue-300 border border-blue-700"
                         : "bg-blue-50 text-blue-600 border border-blue-200"
                       : theme === "dark"
-                      ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                        ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                   }`}
                   title={sidebarCollapsed ? item.name : ""}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  {!sidebarCollapsed && (
+                  {(sidebarOpen || !sidebarCollapsed) && (
                     <span className="font-medium truncate text-base">
                       {item.name}
                     </span>
@@ -174,7 +156,7 @@ const Sidebar = ({
 
           {/* Bottom section */}
           <div
-            className={`p-4 border-t space-y-3 flex-shrink-0 ${
+            className={`p-4 border-t space-y-3 flex-shrink-0 mt-auto ${
               theme === "dark"
                 ? "border-gray-700 bg-gray-900"
                 : "border-gray-200 bg-gray-50"
@@ -193,7 +175,7 @@ const Sidebar = ({
               }`}
               title={sidebarCollapsed ? "Theme" : ""}
             >
-              {!sidebarCollapsed && (
+              {(sidebarOpen || !sidebarCollapsed) && (
                 <span className="font-medium text-base">Theme</span>
               )}
               {theme === "dark" ? (
@@ -220,7 +202,7 @@ const Sidebar = ({
               title={sidebarCollapsed ? "Settings" : ""}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
-              {!sidebarCollapsed && (
+              {(sidebarOpen || !sidebarCollapsed) && (
                 <span className="font-medium text-base">Settings</span>
               )}
             </button>

@@ -198,12 +198,15 @@ export default function SettingsComponent({ onClose }) {
         errors.confirmPassword = "Passwords do not match";
       }
     } else {
-      if (security.newPin && !validatePin(security.newPin)) {
-        errors.newPin = "PIN must be 4-6 digits";
-      }
+      // PIN validation - only validate if PIN is provided (since it's optional)
+      if (security.newPin) {
+        if (!validatePin(security.newPin)) {
+          errors.newPin = "PIN must be 4-6 digits";
+        }
 
-      if (security.newPin !== security.confirmPin) {
-        errors.confirmPin = "PINs do not match";
+        if (security.newPin !== security.confirmPin) {
+          errors.confirmPin = "PINs do not match";
+        }
       }
     }
 
@@ -258,12 +261,73 @@ export default function SettingsComponent({ onClose }) {
         return;
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Make actual API calls
+      let response;
+      switch (section) {
+        case "profile":
+          response = await fetch("http://localhost:8000/api/settings/profile/", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(profile),
+          });
+          break;
 
+        case "security":
+          response = await fetch("http://localhost:8000/api/settings/security/", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ...security,
+              securityMethod,
+            }),
+          });
+          break;
+
+        case "website":
+          response = await fetch("http://localhost:8000/api/settings/website/", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              websiteTitle: generalSettings.websiteTitle,
+              contactEmail: generalSettings.contactEmail,
+              phoneNumber: generalSettings.phoneNumber,
+              address: generalSettings.address,
+              description: generalSettings.description,
+              socialMedia,
+              appearance,
+            }),
+          });
+          break;
+
+        default:
+          throw new Error("Invalid section");
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.errors) {
+          setValidationErrors(errorData.errors);
+          setSaveStatus({
+            type: "error",
+            message: "Please fix the validation errors",
+          });
+          return;
+        }
+        throw new Error(errorData.error || "Failed to save settings");
+      }
+
+      const result = await response.json();
       setSaveStatus({
         type: "success",
-        message: `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully!`,
+        message:
+          result.message ||
+          `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully!`,
       });
 
       // Clear form fields for security
@@ -279,9 +343,10 @@ export default function SettingsComponent({ onClose }) {
         });
       }
     } catch (error) {
+      console.error("Error saving settings:", error);
       setSaveStatus({
         type: "error",
-        message: "Failed to save settings. Please try again.",
+        message: error.message || "Failed to save settings. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -667,6 +732,9 @@ export default function SettingsComponent({ onClose }) {
                       >
                         <Smartphone className="w-4 h-4 inline mr-2" />
                         PIN Authentication
+                        <span className="ml-1 text-xs opacity-75">
+                          (Optional)
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -810,8 +878,9 @@ export default function SettingsComponent({ onClose }) {
                         PIN Settings
                       </h4>
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        PIN authentication is used for quick actions and
-                        sensitive operations.
+                        PIN authentication is optional and can be used for quick
+                        actions and sensitive operations. Leave blank if you
+                        don't want to use PIN.
                       </p>
                       <div>
                         <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">

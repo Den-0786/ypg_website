@@ -197,6 +197,73 @@ export default function QuizResults() {
             </div>
           </div>
 
+          {/* Congregation Leaderboard */}
+          {quizResult.congregation_leaderboard &&
+            quizResult.congregation_leaderboard.length > 0 && (
+              <div className="mb-8">
+                <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <Trophy className="w-6 h-6 text-yellow-500 mr-2" />
+                  Top 3 Congregations by Participants
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {quizResult.congregation_leaderboard.map(
+                    (congregation, idx) => (
+                      <div
+                        key={congregation.congregation}
+                        className={`p-4 rounded-lg border-2 transform transition-all hover:scale-105 ${
+                          congregation.rank === 1
+                            ? "border-yellow-400 bg-gradient-to-br from-yellow-50 to-yellow-100 shadow-lg"
+                            : congregation.rank === 2
+                              ? "border-gray-400 bg-gradient-to-br from-gray-50 to-gray-100 shadow-md"
+                              : "border-orange-300 bg-gradient-to-br from-orange-50 to-orange-100 shadow-sm"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <span
+                            className={`text-lg font-bold ${
+                              congregation.rank === 1
+                                ? "text-yellow-600"
+                                : congregation.rank === 2
+                                  ? "text-gray-600"
+                                  : "text-orange-600"
+                            }`}
+                          >
+                            {congregation.rank === 1
+                              ? "🥇"
+                              : congregation.rank === 2
+                                ? "🥈"
+                                : "🥉"}
+                          </span>
+                          <span
+                            className={`text-xs font-medium px-2 py-1 rounded-full ${
+                              congregation.success_rate >= 80
+                                ? "bg-green-100 text-green-700"
+                                : congregation.success_rate >= 60
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {congregation.success_rate}% success
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-gray-800 mb-3 text-center">
+                          {congregation.congregation}
+                        </h5>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-blue-600 mb-1">
+                            {congregation.participants}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {congregation.correct_answers} correct answers
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative">
@@ -211,14 +278,18 @@ export default function QuizResults() {
             </div>
           </div>
 
-          {/* All Participants Section */}
+          {/* Correct Participants Section */}
           {quizResult.all_participants &&
             quizResult.all_participants.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-xl font-bold text-gray-800 flex items-center">
-                    <Users className="w-6 h-6 text-blue-500 mr-2" />
-                    All Participants ({quizResult.all_participants.length}{" "}
+                    <CheckCircle className="w-6 h-6 text-green-500 mr-2" />
+                    Correct Participants (
+                    {
+                      quizResult.all_participants.filter((p) => p.is_correct)
+                        .length
+                    }{" "}
                     correct answers)
                   </h4>
                   <div className="flex space-x-2">
@@ -417,6 +488,54 @@ export default function QuizResults() {
               </div>
             </div>
           )}
+
+          {/* Correct Participants Display */}
+          {quizResult.all_participants &&
+            quizResult.all_participants.length > 0 && (
+              <div className="mb-8">
+                <h4 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                  <CheckCircle className="w-6 h-6 text-green-500 mr-2" />
+                  Correct Answers - Participant Names
+                </h4>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {quizResult.all_participants
+                      .filter((participant) => participant.is_correct)
+                      .map((participant, index) => (
+                        <div
+                          key={`${participant.phone_number}-${index}`}
+                          className="bg-white rounded-lg p-4 border border-green-200 shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="font-bold text-gray-800 text-lg">
+                                {participant.name}
+                              </p>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {participant.congregation}
+                              </p>
+                              <p className="text-xs text-green-600 mt-1 font-medium">
+                                Correct Answer ✅
+                              </p>
+                            </div>
+                            <div className="ml-3">
+                              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-md">
+                                <CheckCircle className="w-5 h-5 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                  {quizResult.all_participants.filter((p) => p.is_correct)
+                    .length === 0 && (
+                    <p className="text-center text-gray-500 py-4">
+                      No correct answers for this quiz yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
           {/* Congregations Performance */}
           {quizResult.congregations && quizResult.congregations.length > 0 && (
