@@ -16,10 +16,8 @@ import {
   X,
   Check,
   AlertCircle,
-  AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { ystoreAPI } from "../../../utils/api";
 
 export default function YStoreManagement({ theme }) {
   const [storeItems, setStoreItems] = useState([]);
@@ -48,22 +46,59 @@ export default function YStoreManagement({ theme }) {
   });
 
   useEffect(() => {
-    const fetchStoreItems = async () => {
-      try {
-        const response = await ystoreAPI.getAdminItems();
-        if (response.success) {
-          setStoreItems(response.data.items);
-        } else {
-          console.error("Failed to fetch store items:", response.error);
-          toast.error("Failed to load store items");
-        }
-      } catch (error) {
-        console.error("Error fetching store items:", error);
-        toast.error("Error loading store items");
-      }
-    };
-
-    fetchStoreItems();
+    setStoreItems([
+      {
+        id: 1,
+        name: "Youth T-Shirt",
+        price: "GHC 35",
+        image: "/t-shirt.jpeg",
+        description: "Premium cotton t-shirt with church logo",
+        rating: 4.5,
+        stock: 50,
+        isOutOfStock: false,
+        treasurer: {
+          name: "Elder Kwame Boateng",
+          phone: "+233201234567",
+          email: "treasurer@ypg.com",
+        },
+        category: "Clothing",
+        tags: ["t-shirt", "youth", "branded"],
+      },
+      {
+        id: 2,
+        name: "Branded Cap",
+        price: "GHC 20",
+        image: "/style.jpeg",
+        description: "Adjustable snapback cap with embroidery",
+        rating: 4.2,
+        stock: 25,
+        isOutOfStock: false,
+        treasurer: {
+          name: "Elder Kwame Boateng",
+          phone: "+233201234567",
+          email: "treasurer@ypg.com",
+        },
+        category: "Accessories",
+        tags: ["cap", "branded", "accessory"],
+      },
+      {
+        id: 3,
+        name: "Wristband",
+        price: "GHC 5",
+        image: "/cloth and hymn.jpeg",
+        description: "Silicone wristband with inspirational message",
+        rating: 4.8,
+        stock: 0,
+        isOutOfStock: true,
+        treasurer: {
+          name: "Elder Kwame Boateng",
+          phone: "+233201234567",
+          email: "treasurer@ypg.com",
+        },
+        category: "Accessories",
+        tags: ["wristband", "inspirational"],
+      },
+    ]);
   }, []);
 
   const resetForm = () => {
@@ -124,46 +159,27 @@ export default function YStoreManagement({ theme }) {
         return;
       }
 
-      const itemData = {
-        name: formData.name,
-        price: formData.price,
-        description: formData.description,
-        rating: formData.rating,
-        stock: formData.stock,
-        category: formData.category,
-        tags: formData.tags,
-        treasurer_name: formData.treasurer.name,
-        treasurer_phone: formData.treasurer.phone,
-        treasurer_email: formData.treasurer.email,
-      };
-
       if (editingItem) {
         // Update existing item
-        const response = await ystoreAPI.updateItem(editingItem.id, itemData);
-        if (response.success) {
-          setStoreItems(
-            storeItems.map((item) =>
-              item.id === editingItem.id ? response.data.item : item
-            )
-          );
-          toast.success("Store item updated successfully!");
-        } else {
-          toast.error(response.error || "Failed to update item");
-        }
+        const updatedItems = storeItems.map((item) =>
+          item.id === editingItem.id
+            ? { ...item, ...formData, id: item.id }
+            : item
+        );
+        setStoreItems(updatedItems);
+        toast.success("Store item updated successfully!");
       } else {
         // Add new item
-        const response = await ystoreAPI.createItem(itemData);
-        if (response.success) {
-          setStoreItems([...storeItems, response.data.item]);
-          toast.success("Store item added successfully!");
-        } else {
-          toast.error(response.error || "Failed to create item");
-        }
+        const newItem = {
+          ...formData,
+          id: Date.now(),
+        };
+        setStoreItems([...storeItems, newItem]);
+        toast.success("Store item added successfully!");
       }
 
       closeModal();
     } catch (error) {
-      console.error("Error submitting form:", error);
       toast.error("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -180,33 +196,17 @@ export default function YStoreManagement({ theme }) {
 
     try {
       if (deleteType === "both") {
-        // Permanently delete from database
-        const response = await ystoreAPI.deleteItem(itemToDelete.id);
-        if (response.success) {
-          setStoreItems(
-            storeItems.filter((item) => item.id !== itemToDelete.id)
-          );
-          toast.success("Store item permanently deleted!");
-        } else {
-          toast.error(response.error || "Failed to delete item");
-        }
+        setStoreItems(storeItems.filter((item) => item.id !== itemToDelete.id));
+        toast.success("Store item permanently deleted!");
       } else {
-        // Hide from dashboard only (soft delete)
-        const response = await ystoreAPI.updateItem(itemToDelete.id, {
-          dashboard_deleted: true,
-        });
-        if (response.success) {
-          setStoreItems(
-            storeItems.map((item) =>
-              item.id === itemToDelete.id
-                ? { ...item, dashboard_deleted: true }
-                : item
-            )
-          );
-          toast.success("Store item removed from dashboard!");
-        } else {
-          toast.error(response.error || "Failed to hide item");
-        }
+        setStoreItems(
+          storeItems.map((item) =>
+            item.id === itemToDelete.id
+              ? { ...item, dashboard_deleted: true }
+              : item
+          )
+        );
+        toast.success("Store item removed from dashboard!");
       }
       setShowDeleteModal(false);
       setItemToDelete(null);
@@ -216,65 +216,32 @@ export default function YStoreManagement({ theme }) {
     }
   };
 
-  const toggleStockStatus = async (id) => {
-    try {
-      const item = storeItems.find((item) => item.id === id);
-      if (!item) return;
-
-      const response = await ystoreAPI.updateItem(id, {
-        is_out_of_stock: !item.is_out_of_stock,
-      });
-
-      if (response.success) {
-        setStoreItems(
-          storeItems.map((item) =>
-            item.id === id
-              ? { ...item, is_out_of_stock: !item.is_out_of_stock }
-              : item
-          )
-        );
-        toast.success("Stock status updated!");
-      } else {
-        toast.error(response.error || "Failed to update stock status");
-      }
-    } catch (error) {
-      console.error("Error updating stock status:", error);
-      toast.error("Failed to update stock status");
-    }
+  const toggleStockStatus = (id) => {
+    setStoreItems(
+      storeItems.map((item) =>
+        item.id === id ? { ...item, isOutOfStock: !item.isOutOfStock } : item
+      )
+    );
+    toast.success("Stock status updated!");
   };
 
-  const updateStock = async (id, newStock) => {
-    try {
-      const response = await ystoreAPI.updateItem(id, {
-        stock: newStock,
-      });
-
-      if (response.success) {
-        setStoreItems(
-          storeItems.map((item) =>
-            item.id === id
-              ? {
-                  ...item,
-                  stock: newStock,
-                  is_out_of_stock: newStock === 0,
-                }
-              : item
-          )
-        );
-        toast.success("Stock updated successfully!");
-      } else {
-        toast.error(response.error || "Failed to update stock");
-      }
-    } catch (error) {
-      console.error("Error updating stock:", error);
-      toast.error("Failed to update stock");
-    }
+  const updateStock = (id, newStock) => {
+    setStoreItems(
+      storeItems.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              stock: newStock,
+              isOutOfStock: newStock === 0,
+            }
+          : item
+      )
+    );
+    toast.success("Stock updated successfully!");
   };
 
   return (
-    <div
-      className={`w-full ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-    >
+    <div className={`p-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
         <div className="flex-1">
@@ -306,16 +273,16 @@ export default function YStoreManagement({ theme }) {
             theme === "dark" ? "bg-gray-800" : "bg-white"
           }`}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Package className="w-8 h-8 text-blue-600 mr-3" />
-              <span
-                className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+          <div className="flex items-center">
+            <Package className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
               >
                 Total Items
-              </span>
+              </p>
+              <p className="text-2xl font-bold">{storeItems.length}</p>
             </div>
-            <span className="text-2xl font-bold">{storeItems.length}</span>
           </div>
         </motion.div>
 
@@ -327,18 +294,18 @@ export default function YStoreManagement({ theme }) {
             theme === "dark" ? "bg-gray-800" : "bg-white"
           }`}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Check className="w-8 h-8 text-green-600 mr-3" />
-              <span
-                className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+          <div className="flex items-center">
+            <Check className="w-8 h-8 text-green-600 mr-3" />
+            <div>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
               >
                 In Stock
-              </span>
+              </p>
+              <p className="text-2xl font-bold">
+                {storeItems.filter((item) => !item.isOutOfStock).length}
+              </p>
             </div>
-            <span className="text-2xl font-bold">
-              {storeItems.filter((item) => !item.isOutOfStock).length}
-            </span>
           </div>
         </motion.div>
 
@@ -350,18 +317,18 @@ export default function YStoreManagement({ theme }) {
             theme === "dark" ? "bg-gray-800" : "bg-white"
           }`}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <AlertCircle className="w-8 h-8 text-red-600 mr-3" />
-              <span
-                className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+          <div className="flex items-center">
+            <AlertCircle className="w-8 h-8 text-red-600 mr-3" />
+            <div>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
               >
                 Out of Stock
-              </span>
+              </p>
+              <p className="text-2xl font-bold">
+                {storeItems.filter((item) => item.isOutOfStock).length}
+              </p>
             </div>
-            <span className="text-2xl font-bold">
-              {storeItems.filter((item) => item.isOutOfStock).length}
-            </span>
           </div>
         </motion.div>
 
@@ -373,28 +340,28 @@ export default function YStoreManagement({ theme }) {
             theme === "dark" ? "bg-gray-800" : "bg-white"
           }`}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <DollarSign className="w-8 h-8 text-yellow-600 mr-3" />
-              <span
-                className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+          <div className="flex items-center">
+            <DollarSign className="w-8 h-8 text-yellow-600 mr-3" />
+            <div>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
               >
                 Total Value
-              </span>
+              </p>
+              <p className="text-2xl font-bold">
+                GHC{" "}
+                {storeItems.reduce((sum, item) => {
+                  const price = parseInt(item.price.replace(/\D/g, ""));
+                  return sum + price * item.stock;
+                }, 0)}
+              </p>
             </div>
-            <span className="text-2xl font-bold">
-              GHC{" "}
-              {storeItems.reduce((sum, item) => {
-                const price = parseInt(item.price.replace(/\D/g, ""));
-                return sum + price * item.stock;
-              }, 0)}
-            </span>
           </div>
         </motion.div>
       </div>
 
       {/* Store Items Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {storeItems.map((item, index) => (
           <motion.div
             key={item.id}
@@ -406,7 +373,7 @@ export default function YStoreManagement({ theme }) {
             }`}
           >
             {/* Item Image */}
-            <div className="relative h-56 bg-gray-200">
+            <div className="relative h-48 bg-gray-200">
               <img
                 src={item.image}
                 alt={item.name}
@@ -414,7 +381,7 @@ export default function YStoreManagement({ theme }) {
               />
               {item.isOutOfStock && (
                 <div className="absolute inset-0 bg-red-500 bg-opacity-75 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">
+                  <span className="text-white font-bold text-lg">
                     OUT OF STOCK
                   </span>
                 </div>
@@ -429,12 +396,12 @@ export default function YStoreManagement({ theme }) {
             </div>
 
             {/* Item Details */}
-            <div className="p-4">
+            <div className="p-6">
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1">
-                  <h3 className="font-bold text-base">{item.name}</h3>
+                  <h3 className="font-bold text-lg">{item.name}</h3>
                   <p
-                    className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-600"} line-clamp-2`}
+                    className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
                   >
                     {item.description}
                   </p>
@@ -445,8 +412,8 @@ export default function YStoreManagement({ theme }) {
               </div>
 
               {/* Stock Information */}
-              <div className="mb-3">
-                <div className="flex items-center justify-between text-xs">
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-sm">
                   <span
                     className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
                   >
@@ -465,7 +432,7 @@ export default function YStoreManagement({ theme }) {
               </div>
 
               {/* Treasurer Info */}
-              <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                 <p
                   className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
                 >
@@ -480,17 +447,17 @@ export default function YStoreManagement({ theme }) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-1">
+              <div className="flex space-x-2">
                 <button
                   onClick={() => openModal(item)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1.5 rounded text-xs transition-colors"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors"
                 >
-                  <Edit className="w-3 h-3 mr-1 inline" />
+                  <Edit className="w-4 h-4 mr-1 inline" />
                   Edit
                 </button>
                 <button
                   onClick={() => toggleStockStatus(item.id)}
-                  className={`flex-1 px-2 py-1.5 rounded text-xs transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm transition-colors ${
                     item.isOutOfStock
                       ? "bg-green-600 hover:bg-green-700 text-white"
                       : "bg-yellow-600 hover:bg-yellow-700 text-white"
@@ -500,9 +467,9 @@ export default function YStoreManagement({ theme }) {
                 </button>
                 <button
                   onClick={() => handleDeleteClick(item)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded text-xs transition-colors"
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -976,98 +943,6 @@ export default function YStoreManagement({ theme }) {
                     </button>
                   </div>
                 </form>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {showDeleteModal && itemToDelete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-xl p-6 w-full max-w-md`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3
-                  className={`text-lg font-semibold flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                >
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                  Confirm Deletion
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setItemToDelete(null);
-                  }}
-                  className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700" : ""}`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="mb-6">
-                <p
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
-                >
-                  Are you sure you want to delete{" "}
-                  <strong>&quot;{itemToDelete.name}&quot;</strong>?
-                </p>
-                <p
-                  className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-                >
-                  Choose your deletion option:
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleDeleteItem("dashboard")}
-                  className="w-full px-4 py-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors border border-yellow-300"
-                >
-                  <div className="font-semibold">
-                    Delete from Dashboard Only
-                  </div>
-                  <div className="text-sm">
-                    Item will be hidden from admin but remain on main website
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleDeleteItem("both")}
-                  className="w-full px-4 py-3 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors border border-red-300"
-                >
-                  <div className="font-semibold">Delete from Both</div>
-                  <div className="text-sm">
-                    Item will be permanently deleted from dashboard and main
-                    website
-                  </div>
-                </button>
-              </div>
-
-              <div className="mt-6">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setItemToDelete(null);
-                  }}
-                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors ${
-                    theme === "dark"
-                      ? "text-gray-300 border-gray-600 hover:bg-gray-700"
-                      : "text-gray-700"
-                  }`}
-                >
-                  Cancel
-                </button>
               </div>
             </motion.div>
           </motion.div>

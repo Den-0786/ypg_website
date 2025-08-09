@@ -10,6 +10,7 @@ export default function BlogSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [slidesPerView, setSlidesPerView] = useState(4);
+  const [expandedPosts, setExpandedPosts] = useState({});
 
   // Fallback data if API fails
   const fallbackBlogPosts = [
@@ -194,6 +195,18 @@ export default function BlogSection() {
     return displayPosts.slice(startIndex, startIndex + slidesPerView);
   };
 
+  const togglePostExpansion = (postId) => {
+    setExpandedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+
+  const getTruncatedExcerpt = (excerpt, isExpanded) => {
+    if (isExpanded) return excerpt;
+    return excerpt.length > 100 ? excerpt.substring(0, 100) + "..." : excerpt;
+  };
+
   return (
     <section id="blog" className="py-20 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -289,14 +302,17 @@ export default function BlogSection() {
                             {post.title}
                           </a>
                         </h3>
-                        <p className="text-gray-600 mb-4 line-clamp-3">
-                          {post.excerpt}
+                        <p className="text-gray-600 mb-4">
+                          {getTruncatedExcerpt(
+                            post.excerpt,
+                            expandedPosts[post.id]
+                          )}
                         </p>
-                        <a
-                          href="#"
+                        <button
+                          onClick={() => togglePostExpansion(post.id)}
                           className="inline-flex items-center text-blue-600 font-medium group-hover:text-blue-700 transition-colors"
                         >
-                          Read more
+                          {expandedPosts[post.id] ? "Read Less" : "Read More"}
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1"
@@ -309,7 +325,7 @@ export default function BlogSection() {
                               clipRule="evenodd"
                             />
                           </svg>
-                        </a>
+                        </button>
                       </div>
                     </motion.article>
                   ))}
