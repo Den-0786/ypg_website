@@ -1,43 +1,7 @@
 import { NextResponse } from "next/server";
 
-// Mock database - in production, this would be a real database
-let ministryRegistrations = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+233 24 123 4567",
-    congregation: "Emmanuel Congregation Ahinsan",
-    ministry: "Y-Singers 🎤",
-    age: 25,
-    message:
-      "I'm passionate about working with young people and leading worship through music",
-    created_at: "2024-03-10T14:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Sarah Smith",
-    email: "sarah.smith@example.com",
-    phone: "+233 20 987 6543",
-    congregation: "Grace Presbyterian Church",
-    ministry: "Y-Media 🎥",
-    age: 28,
-    message:
-      "I love creating visual content and managing social media for the church",
-    created_at: "2024-03-08T10:15:00Z",
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    email: "mike.johnson@example.com",
-    phone: "+233 26 555 1234",
-    congregation: "Bethel Congregation",
-    ministry: "Evangelism & Prayer Team 🙏",
-    age: 32,
-    message: "I have experience in outreach and prayer ministry",
-    created_at: "2024-03-05T16:45:00Z",
-  },
-];
+// Ministry registrations data (empty initially)
+let ministryRegistrations = [];
 
 export async function GET(request) {
   try {

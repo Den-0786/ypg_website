@@ -549,66 +549,109 @@ export default function PeopleManagement({
 
         {/* Team Members Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {teamMembers.map((member) => (
-            <div
-              key={member.id}
-              className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
-            >
-              <div className={`aspect-square ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} flex items-center justify-center`}>
-                {member.image ? (
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Users className={`w-12 h-12 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
-                )}
+          {teamMembers.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Users className="w-10 h-10 text-gray-400" />
               </div>
-              <div className="p-4">
-                <h3 className={`font-bold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{member.name}</h3>
-                <p className={`${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} font-medium mb-2`}>{member.role}</p>
-                {member.phone && (
-                  <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Phone: {member.phone}
-                  </p>
-                )}
-                {member.quote && (
-                  <p className={`text-sm italic line-clamp-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    &quot;{member.quote}&quot;
-                  </p>
-                )}
-                <div className="flex space-x-2 mt-3">
-                  <button
-                    className="text-blue-600 hover:text-blue-900"
-                    onClick={() => {
-                      setEditingTeamMember(member);
-                      setNewTeamMember({
-                        name: member.name,
-                        role: member.role,
-                        phone: member.phone || "",
-                        quote: member.quote || "",
-                        image: member.image || null,
-                      });
-                      setShowAddTeamMember(true);
-                    }}
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No Team Members Yet
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Start building your team by adding the first team member. They
+                will appear here once added.
+              </p>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={() => {
+                  setEditingTeamMember(null);
+                  setNewTeamMember({
+                    name: "",
+                    role: "",
+                    phone: "",
+                    quote: "",
+                    image: null,
+                  });
+                  setShowAddTeamMember(true);
+                }}
+              >
+                <Plus className="w-4 h-4 inline mr-2" />
+                Add First Team Member
+              </button>
+            </div>
+          ) : (
+            teamMembers.map((member) => (
+              <div
+                key={member.id}
+                className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
+              >
+                <div
+                  className={`aspect-square ${theme === "dark" ? "bg-gray-700" : "bg-gray-200"} flex items-center justify-center`}
+                >
+                  {member.image ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Users
+                      className={`w-12 h-12 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
+                    />
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3
+                    className={`font-bold mb-1 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                   >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    className="text-red-600 hover:text-red-900"
-                    onClick={() => handleDeleteTeamMemberClick(member)}
+                    {member.name}
+                  </h3>
+                  <p
+                    className={`${theme === "dark" ? "text-blue-400" : "text-blue-600"} font-medium mb-2`}
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    {member.role}
+                  </p>
+                  {member.phone && (
+                    <p
+                      className={`text-sm mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                    >
+                      Phone: {member.phone}
+                    </p>
+                  )}
+                  {member.quote && (
+                    <p
+                      className={`text-sm italic line-clamp-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                    >
+                      &quot;{member.quote}&quot;
+                    </p>
+                  )}
+                  <div className="flex space-x-2 mt-3">
+                    <button
+                      className="text-blue-600 hover:text-blue-900"
+                      onClick={() => {
+                        setEditingTeamMember(member);
+                        setNewTeamMember({
+                          name: member.name,
+                          role: member.role,
+                          phone: member.phone || "",
+                          quote: member.quote || "",
+                          image: member.image || null,
+                        });
+                        setShowAddTeamMember(true);
+                      }}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDeleteTeamMemberClick(member)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          {teamMembers.length === 0 && (
-            <div className="text-gray-400 text-center col-span-full">
-              No team members added yet.
-            </div>
+            ))
           )}
         </div>
       </motion.div>
@@ -817,74 +860,103 @@ export default function PeopleManagement({
 
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.id}
-              className="bg-white rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden"
-            >
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  {testimonial.image ? (
-                    <img
-                      src={
-                        typeof testimonial.image === "string"
-                          ? testimonial.image
-                          : URL.createObjectURL(testimonial.image)
-                      }
-                      alt={testimonial.name}
-                      className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-md"
-                    />
-                  ) : (
-                    <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-                      <MessageCircle className="w-6 h-6 text-gray-400" />
+          {testimonials.length === 0 ? (
+            <div className="text-center py-12 col-span-full">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <MessageCircle className="w-10 h-10 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No Testimonials Yet
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Start collecting testimonials from your youth members. Their
+                stories can inspire others to join your community.
+              </p>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={() => {
+                  setEditingTestimonial(null);
+                  setNewTestimonial({
+                    name: "",
+                    role: "",
+                    quote: "",
+                    highlight: "",
+                    image: null,
+                  });
+                  setShowAddTestimonial(true);
+                }}
+              >
+                <Plus className="w-4 h-4 inline mr-2" />
+                Add First Testimonial
+              </button>
+            </div>
+          ) : (
+            testimonials.map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="bg-white rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden"
+              >
+                <div className="p-4">
+                  <div className="flex items-center mb-4">
+                    {testimonial.image ? (
+                      <img
+                        src={
+                          typeof testimonial.image === "string"
+                            ? testimonial.image
+                            : URL.createObjectURL(testimonial.image)
+                        }
+                        alt={testimonial.name}
+                        className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-md"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
+                        <MessageCircle className="w-6 h-6 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="ml-4">
+                      <h3 className="font-bold text-gray-900">
+                        {testimonial.name}
+                      </h3>
+                      <p className="text-blue-600 text-sm">
+                        {testimonial.role}
+                      </p>
                     </div>
-                  )}
-                  <div className="ml-4">
-                    <h3 className="font-bold text-gray-900">
-                      {testimonial.name}
-                    </h3>
-                    <p className="text-blue-600 text-sm">{testimonial.role}</p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="text-gray-700 text-sm italic line-clamp-3">
+                      &quot;{testimonial.quote}&quot;
+                    </p>
+                    <p className="text-blue-600 font-medium text-sm mt-2">
+                      &quot;{testimonial.highlight}&quot;
+                    </p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      className="text-blue-600 hover:text-blue-900"
+                      onClick={() => {
+                        setEditingTestimonial(testimonial);
+                        setNewTestimonial({
+                          name: testimonial.name,
+                          role: testimonial.role,
+                          quote: testimonial.quote,
+                          highlight: testimonial.highlight,
+                          image: testimonial.image || null,
+                        });
+                        setShowAddTestimonial(true);
+                      }}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDeleteTestimonialClick(testimonial)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-                <div className="mb-4">
-                  <p className="text-gray-700 text-sm italic line-clamp-3">
-                    &quot;{testimonial.quote}&quot;
-                  </p>
-                  <p className="text-blue-600 font-medium text-sm mt-2">
-                    &quot;{testimonial.highlight}&quot;
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    className="text-blue-600 hover:text-blue-900"
-                    onClick={() => {
-                      setEditingTestimonial(testimonial);
-                      setNewTestimonial({
-                        name: testimonial.name,
-                        role: testimonial.role,
-                        quote: testimonial.quote,
-                        highlight: testimonial.highlight,
-                        image: testimonial.image || null,
-                      });
-                      setShowAddTestimonial(true);
-                    }}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    className="text-red-600 hover:text-red-900"
-                    onClick={() => handleDeleteTestimonialClick(testimonial)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
-          {testimonials.length === 0 && (
-            <div className="text-gray-400 text-center col-span-full">
-              No testimonials added yet.
-            </div>
+            ))
           )}
         </div>
       </motion.div>

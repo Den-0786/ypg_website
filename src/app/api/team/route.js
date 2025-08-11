@@ -2,81 +2,46 @@ import { NextResponse } from "next/server";
 import { writeFile, readFile, unlink } from "fs/promises";
 import { join } from "path";
 
-// Mock database - in production, this would be a real database
-let teamMembers = [
-  {
-    id: 1,
-    name: "Dennis Opoku A",
-    role: "President",
-    image: "/hero.jpg",
-    phone: "xxxxxxxxxxx",
-    quote: "Leading with vision and purpose.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 2,
-    name: "Priscilla Amoako",
-    role: "Secretary",
-    image: "/rita.jpg",
-    phone: "xxxxxxxxxxx",
-    quote: "Serving with excellence.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 3,
-    name: "Samuel Owusu",
-    role: "Organizer",
-    image: "/jy.jpeg",
-    phone: "xxxxxxxxxxx",
-    quote: "Organizing for impact.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 4,
-    name: "Irene A. Sarkodie",
-    role: "Assistant Secretary",
-    image: "/mission.jpg",
-    phone: "xxxxxxxxxxx",
-    quote: "Interceding faithfully.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 5,
-    name: "Grace Nyarko",
-    role: "Prayer Secretary",
-    image: "/images.jpeg",
-    phone: "xxxxxxxxxxx",
-    quote: "Interceding faithfully.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 6,
-    name: "Kwabena Asante",
-    role: "Treasurer",
-    image: "/images (1).jpeg",
-    phone: "xxxxxxxxxxx",
-    quote: "Stewardship with integrity.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 7,
-    name: "Lydia Boateng",
-    role: "Music Director",
-    image: "/cloth and hymn.jpeg",
-    phone: "xxxxxxxxxxx",
-    quote: "Leading worship with passion.",
-    social: { twitter: "#", facebook: "#" },
-  },
-  {
-    id: 8,
-    name: "John Mensah",
-    role: "Vice President",
-    image: "/style.jpeg",
-    phone: "xxxxxxxxxxx",
-    quote: "Supporting with strength and grace.",
-    social: { twitter: "#", facebook: "#" },
-  },
-];
+// Database - in production, this would be a real database
+let teamMembers = [];
+
+// Helper function to sort team members by hierarchy
+function sortTeamMembersByHierarchy(members) {
+  const hierarchyOrder = [
+    "President",
+    "President's Representative",
+    "President's Rep",
+    "Secretary",
+    "Assistant Secretary",
+    "Treasurer",
+    "Financial Secretary",
+    "Organizing Secretary",
+    "Public Relations Officer",
+    "Welfare Officer",
+    "Member",
+  ];
+
+  return members.sort((a, b) => {
+    const aIndex = hierarchyOrder.findIndex((role) =>
+      a.role.toLowerCase().includes(role.toLowerCase())
+    );
+    const bIndex = hierarchyOrder.findIndex((role) =>
+      b.role.toLowerCase().includes(role.toLowerCase())
+    );
+
+    // If both roles are found in hierarchy, sort by hierarchy order
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex;
+    }
+
+    // If only one role is found, prioritize it
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+
+    // If neither role is in hierarchy, sort alphabetically
+    return a.role.localeCompare(b.role);
+  });
+}
 
 // Helper function to save team members to a file
 async function saveTeamMembers() {
@@ -116,9 +81,12 @@ export async function GET(request) {
       );
     }
 
+    // Sort team members by hierarchy order
+    const sortedMembers = sortTeamMembersByHierarchy(filteredMembers);
+
     return NextResponse.json({
       success: true,
-      teamMembers: filteredMembers,
+      teamMembers: sortedMembers,
     });
   } catch (error) {
     return NextResponse.json(
@@ -153,12 +121,22 @@ export async function POST(request) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // In a real application, you would save the image to a storage service
-      // For now, we'll just use a placeholder
-      imagePath = `/uploads/team/${Date.now()}-${image.name}`;
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/team/${fileName}`;
 
-      // Save the image file (in a real app, you'd use a proper storage solution)
-      // await writeFile(join(process.cwd(), 'public', imagePath), buffer);
+      // Save the image file to local storage
+      try {
+        await writeFile(join(process.cwd(), "public", imagePath), buffer);
+      } catch (error) {
+        console.error("Error saving image:", error);
+        return NextResponse.json(
+          { success: false, error: "Failed to save image" },
+          { status: 500 }
+        );
+      }
     }
 
     const newTeamMember = {
@@ -229,21 +207,24 @@ export async function PUT(request) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // In a real application, you would save the image to a storage service
-      // For now, we'll just use a placeholder
-      imagePath = `/uploads/team/${Date.now()}-${image.name}`;
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/team/${fileName}`;
 
-      // Save the image file (in a real app, you'd use a proper storage solution)
-      // await writeFile(join(process.cwd(), 'public', imagePath), buffer);
+      // Save the new image file to local storage
+      try {
+        await writeFile(join(process.cwd(), "public", imagePath), buffer);
+      } catch (error) {
+        console.error("Error saving new image:", error);
+        return NextResponse.json(
+          { success: false, error: "Failed to save new image" },
+          { status: 500 }
+        );
+      }
 
-      // Delete the old image if it exists (in a real app)
-      // if (teamMembers[teamMemberIndex].image) {
-      //   try {
-      //     await unlink(join(process.cwd(), 'public', teamMembers[teamMemberIndex].image));
-      //   } catch (error) {
-      //     console.error('Error deleting old image:', error);
-      //   }
-      // }
+      // Keep old images - admin will manually delete when needed
     }
 
     const updatedTeamMember = {

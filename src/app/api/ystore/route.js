@@ -1,126 +1,59 @@
 import { NextResponse } from "next/server";
+import { writeFile, readFile, access } from "fs/promises";
+import { join } from "path";
 
-// Mock Y-Store items data (in production, this would come from a database)
-let storeItems = [
-  {
-    id: 1,
-    name: "YPG T-Shirt",
-    description: "Official YPG branded cotton t-shirt in various sizes",
-    price: 45.0,
-    originalPrice: 60.0,
-    category: "Clothing",
-    image: "/images/ystore/ypg-tshirt.jpg",
-    images: [
-      "/images/ystore/ypg-tshirt-1.jpg",
-      "/images/ystore/ypg-tshirt-2.jpg",
-      "/images/ystore/ypg-tshirt-3.jpg",
-    ],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Black", "White", "Navy Blue"],
-    stock: 25,
-    rating: 4.8,
-    reviews: 12,
-    featured: true,
-    status: "active",
-    tags: ["clothing", "apparel", "branded"],
-    createdAt: "2024-01-15T10:00:00.000Z",
-    updatedAt: "2024-01-15T10:00:00.000Z",
-  },
-  {
-    id: 2,
-    name: "YPG Water Bottle",
-    description:
-      "Stainless steel water bottle with YPG logo, keeps drinks hot/cold",
-    price: 25.0,
-    originalPrice: 35.0,
-    category: "Accessories",
-    image: "/images/ystore/ypg-bottle.jpg",
-    images: [
-      "/images/ystore/ypg-bottle-1.jpg",
-      "/images/ystore/ypg-bottle-2.jpg",
-    ],
-    sizes: ["500ml", "750ml"],
-    colors: ["Silver", "Black", "Blue"],
-    stock: 40,
-    rating: 4.9,
-    reviews: 8,
-    featured: true,
-    status: "active",
-    tags: ["accessories", "drinkware", "branded"],
-    createdAt: "2024-01-10T14:30:00.000Z",
-    updatedAt: "2024-01-10T14:30:00.000Z",
-  },
-  {
-    id: 3,
-    name: "YPG Notebook Set",
-    description: "Set of 3 premium notebooks with YPG branding for Bible study",
-    price: 18.0,
-    originalPrice: 25.0,
-    category: "Stationery",
-    image: "/images/ystore/ypg-notebook.jpg",
-    images: [
-      "/images/ystore/ypg-notebook-1.jpg",
-      "/images/ystore/ypg-notebook-2.jpg",
-    ],
-    sizes: ["A5", "A4"],
-    colors: ["Brown", "Black", "Blue"],
-    stock: 30,
-    rating: 4.7,
-    reviews: 15,
-    featured: false,
-    status: "active",
-    tags: ["stationery", "notebooks", "study"],
-    createdAt: "2024-01-08T16:45:00.000Z",
-    updatedAt: "2024-01-08T16:45:00.000Z",
-  },
-  {
-    id: 4,
-    name: "YPG Cap",
-    description: "Adjustable baseball cap with embroidered YPG logo",
-    price: 20.0,
-    originalPrice: 28.0,
-    category: "Clothing",
-    image: "/images/ystore/ypg-cap.jpg",
-    images: ["/images/ystore/ypg-cap-1.jpg", "/images/ystore/ypg-cap-2.jpg"],
-    sizes: ["One Size"],
-    colors: ["Black", "Navy", "Red"],
-    stock: 20,
-    rating: 4.6,
-    reviews: 6,
-    featured: false,
-    status: "active",
-    tags: ["clothing", "accessories", "cap"],
-    createdAt: "2024-01-05T12:20:00.000Z",
-    updatedAt: "2024-01-05T12:20:00.000Z",
-  },
-  {
-    id: 5,
-    name: "YPG Devotional Book",
-    description: "Daily devotional book written by YPG leadership team",
-    price: 15.0,
-    originalPrice: 20.0,
-    category: "Books",
-    image: "/images/ystore/ypg-devotional.jpg",
-    images: [
-      "/images/ystore/ypg-devotional-1.jpg",
-      "/images/ystore/ypg-devotional-2.jpg",
-    ],
-    sizes: ["Standard"],
-    colors: ["Multi-color"],
-    stock: 50,
-    rating: 5.0,
-    reviews: 20,
-    featured: true,
-    status: "active",
-    tags: ["books", "devotional", "spiritual"],
-    createdAt: "2024-01-01T08:00:00.000Z",
-    updatedAt: "2024-01-01T08:00:00.000Z",
-  },
-];
+// File path for persistent storage
+const DATA_FILE_PATH = join(process.cwd(), "data", "ystore-items.json");
+
+// Y-Store items data (in production, this would come from a database)
+let storeItems = [];
+
+// Load data from file
+async function loadStoreItems() {
+  try {
+    await access(DATA_FILE_PATH);
+    const data = await readFile(DATA_FILE_PATH, "utf8");
+    const parsed = JSON.parse(data);
+    if (Array.isArray(parsed)) {
+      storeItems = parsed;
+    } else {
+      console.warn(
+        "Invalid data format in ystore-items.json, starting with empty array"
+      );
+      storeItems = [];
+    }
+  } catch (error) {
+    // File doesn't exist or is invalid, start with empty array
+    console.log("No existing ystore data found, starting with empty array");
+    storeItems = [];
+  }
+}
+
+// Save data to file
+async function saveStoreItems() {
+  try {
+    // Ensure data directory exists
+    const dataDir = join(process.cwd(), "data");
+    try {
+      await access(dataDir);
+    } catch {
+      // Create data directory if it doesn't exist
+      const { mkdir } = await import("fs/promises");
+      await mkdir(dataDir, { recursive: true });
+    }
+
+    await writeFile(DATA_FILE_PATH, JSON.stringify(storeItems, null, 2));
+  } catch (error) {
+    console.error("Error saving store items:", error);
+  }
+}
 
 // GET - Fetch store items
 export async function GET(request) {
   try {
+    // Load data from file
+    await loadStoreItems();
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const featured = searchParams.get("featured");
@@ -152,6 +85,8 @@ export async function GET(request) {
         rating: item.rating,
         reviews: item.reviews,
         featured: item.featured,
+        pricingUnit: item.pricingUnit || "",
+        contact: item.contact || "+233244123456", // Include contact number
         stock: item.stock > 0 ? "In Stock" : "Out of Stock",
       }));
     }
@@ -213,10 +148,29 @@ export async function POST(request) {
     }
 
     // Handle image upload if provided
-    let imagePath = "/images/ystore/default-item.jpg";
+    let imagePath = "/placeholder-item.jpg";
     if (itemData.image && itemData.image.size > 0) {
-      // In production, you would save to cloud storage
-      imagePath = `/uploads/ystore/${Date.now()}-${itemData.image.name}`;
+      const bytes = await itemData.image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = itemData.image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/ystore/${fileName}`;
+
+      // Save the image file to local storage
+      try {
+        const uploadDir = join(process.cwd(), "public", "uploads", "ystore");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
+      } catch (error) {
+        console.error("Error saving YStore image:", error);
+        return NextResponse.json(
+          { success: false, error: "Failed to save image" },
+          { status: 500 }
+        );
+      }
     }
 
     const newItem = {
@@ -231,16 +185,28 @@ export async function POST(request) {
       sizes: itemData.sizes || ["One Size"],
       colors: itemData.colors || ["Default"],
       stock: itemData.stock,
-      rating: 0,
-      reviews: 0,
+      rating: itemData.rating || 4.5,
+      reviews: itemData.reviews || 0,
       featured: itemData.featured || false,
       status: "active",
       tags: itemData.tags || [],
+      pricingUnit: itemData.pricingUnit || "",
+      contact: itemData.contact || "+233244123456", // Default contact number
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
+    // Check for duplicate IDs before adding
+    const existingIds = storeItems.map((item) => item.id);
+    if (existingIds.includes(newItem.id)) {
+      // Generate a new unique ID
+      newItem.id = Math.max(...existingIds) + 1;
+    }
+
     storeItems.push(newItem);
+
+    // Save to file
+    await saveStoreItems();
 
     return NextResponse.json({
       success: true,
@@ -259,13 +225,22 @@ export async function POST(request) {
 // PUT - Update store item
 export async function PUT(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Item ID is required" },
+        { status: 400 }
+      );
+    }
+
     const contentType = request.headers.get("content-type");
     let updateData;
 
     if (contentType && contentType.includes("multipart/form-data")) {
       const formData = await request.formData();
       updateData = {
-        id: parseInt(formData.get("id")),
         name: formData.get("name"),
         description: formData.get("description"),
         price: parseFloat(formData.get("price")),
@@ -276,13 +251,12 @@ export async function PUT(request) {
         stock: parseInt(formData.get("stock")),
         featured: formData.get("featured") === "true",
         tags: JSON.parse(formData.get("tags") || "[]"),
+        contact: formData.get("contact") || "+233244123456",
         image: formData.get("image"),
       };
     } else {
       updateData = await request.json();
     }
-
-    const { id, ...itemData } = updateData;
 
     const itemIndex = storeItems.findIndex((item) => item.id === id);
     if (itemIndex === -1) {
@@ -294,17 +268,45 @@ export async function PUT(request) {
 
     // Handle image upload if a new image is provided
     let imagePath = storeItems[itemIndex].image;
-    if (itemData.image && itemData.image.size > 0) {
-      imagePath = `/uploads/ystore/${Date.now()}-${itemData.image.name}`;
+    if (updateData.image && updateData.image.size > 0) {
+      const bytes = await updateData.image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = updateData.image.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
+      );
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/ystore/${fileName}`;
+
+      // Save the new image file to local storage
+      try {
+        const uploadDir = join(process.cwd(), "public", "uploads", "ystore");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
+      } catch (error) {
+        console.error("Error saving new YStore image:", error);
+        return NextResponse.json(
+          { success: false, error: "Failed to save new image" },
+          { status: 500 }
+        );
+      }
+
+      // Keep old images for YStore items - admin can manually delete if needed
     }
 
     // Update the item
     storeItems[itemIndex] = {
       ...storeItems[itemIndex],
-      ...itemData,
+      ...updateData,
       image: imagePath,
       updatedAt: new Date().toISOString(),
     };
+
+    // Save to file
+    await saveStoreItems();
 
     return NextResponse.json({
       success: true,
@@ -351,6 +353,9 @@ export async function DELETE(request) {
       storeItems[itemIndex].updatedAt = new Date().toISOString();
     }
 
+    // Save to file
+    await saveStoreItems();
+
     return NextResponse.json({
       success: true,
       message: `Store item ${deleteType === "hard" ? "permanently deleted" : "marked as deleted"}`,
@@ -363,5 +368,3 @@ export async function DELETE(request) {
     );
   }
 }
-
-

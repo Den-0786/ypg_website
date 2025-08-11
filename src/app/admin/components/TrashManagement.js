@@ -44,47 +44,18 @@ export default function TrashManagement({ theme }) {
   const fetchDeletedItems = async () => {
     setLoading(true);
     try {
-      // For now, we'll use mock data to demonstrate the functionality
       // In a real application, this would fetch from the API
-      const mockDeletedItems = {
-        team: [
-          {
-            id: 9,
-            name: "Deleted Team Member",
-            role: "Former Member",
-            category: "team",
-            deleted_at: "2024-03-10T14:30:00Z",
-            deleted_by: "admin",
-          },
-        ],
-        events: [
-          {
-            id: 3,
-            title: "Cancelled Event",
-            description: "This event was cancelled",
-            category: "events",
-            deleted_at: "2024-03-09T10:15:00Z",
-            deleted_by: "admin",
-          },
-        ],
-        donations: [
-          {
-            id: 6,
-            donor: "Anonymous",
-            amount: 100,
-            category: "donations",
-            deleted_at: "2024-03-08T16:45:00Z",
-            deleted_by: "admin",
-          },
-        ],
+      // For now, return empty data
+      setDeletedItems({
+        team: [],
+        events: [],
+        donations: [],
         blog: [],
         media: [],
         testimonials: [],
         ministry: [],
         contact: [],
-      };
-
-      setDeletedItems(mockDeletedItems);
+      });
     } catch (error) {
       console.error("Error fetching deleted items:", error);
       toast.error("Failed to load deleted items");

@@ -1,4 +1,3 @@
-
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -10,14 +9,20 @@ import {
   Plus,
   Upload,
   FileText,
-  TrendingUp,
   Users,
   Activity,
   ArrowUpRight,
-  ArrowDownRight,
 } from "lucide-react";
 
-export default function OverviewDashboard({ stats, theme, setActiveTab, teamMembers, events, donations, media }) {
+export default function OverviewDashboard({
+  stats,
+  theme,
+  setActiveTab,
+  teamMembers,
+  events,
+  donations,
+  media,
+}) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -40,8 +45,6 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
       icon: Eye,
       gradient: "from-blue-500 to-cyan-500",
       bgGradient: "from-blue-50 to-cyan-50",
-      change: "+12%",
-      changeType: "increase",
     },
     {
       title: "Total Donations",
@@ -49,8 +52,6 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
       icon: DollarSign,
       gradient: "from-emerald-500 to-green-500",
       bgGradient: "from-emerald-50 to-green-50",
-      change: "+8%",
-      changeType: "increase",
     },
     {
       title: "Total Events",
@@ -58,8 +59,6 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
       icon: Calendar,
       gradient: "from-purple-500 to-pink-500",
       bgGradient: "from-purple-50 to-pink-50",
-      change: "+5%",
-      changeType: "increase",
     },
     {
       title: "Media Files",
@@ -67,8 +66,6 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
       icon: Image,
       gradient: "from-orange-500 to-red-500",
       bgGradient: "from-orange-50 to-red-50",
-      change: "+15%",
-      changeType: "increase",
     },
   ];
 
@@ -130,7 +127,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
             <motion.div
               key={card.title}
               variants={cardVariants}
-              className={`bg-gradient-to-br ${theme === 'dark' ? 'from-gray-800 to-gray-900' : card.bgGradient} p-6 rounded-2xl border ${theme === 'dark' ? 'border-gray-700' : 'border-white/50'} shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer`}
+              className={`bg-gradient-to-br ${theme === "dark" ? "from-gray-800 to-gray-900" : card.bgGradient} p-6 rounded-2xl border ${theme === "dark" ? "border-gray-700" : "border-white/50"} shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div
@@ -138,34 +135,18 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 >
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex items-center space-x-1">
-                  {card.changeType === "increase" ? (
-                    <ArrowUpRight className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4 text-red-600" />
-                  )}
-                  <span
-                    className={`text-sm font-semibold ${
-                      card.changeType === "increase"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {card.change}
-                  </span>
-                </div>
               </div>
               <div>
-                <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p
+                  className={`text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                >
                   {card.title}
                 </p>
-                <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{card.value}</p>
-              </div>
-              <div className={`mt-4 pt-4 border-t ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200/50'}`}>
-                <div className={`flex items-center text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  <TrendingUp className="w-3 h-3 mr-1" />
-                  <span>From last month</span>
-                </div>
+                <p
+                  className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                >
+                  {card.value}
+                </p>
               </div>
             </motion.div>
           );
@@ -175,12 +156,18 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
       {/* Quick Actions */}
       <motion.div
         variants={cardVariants}
-        className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl shadow-lg border p-8 transition-colors duration-200`}
+        className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} rounded-2xl shadow-lg border p-8 transition-colors duration-200`}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h3>
-            <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            <h3
+              className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            >
+              Quick Actions
+            </h3>
+            <p
+              className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+            >
               Common tasks to manage your ministry
             </p>
           </div>
@@ -195,7 +182,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={action.action}
-                className={`group relative overflow-hidden bg-gradient-to-br ${theme === 'dark' ? 'from-gray-700 to-gray-800' : 'from-gray-50 to-gray-100'} p-6 rounded-xl border ${theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-200 hover:border-gray-300'} transition-all duration-300 text-left`}
+                className={`group relative overflow-hidden bg-gradient-to-br ${theme === "dark" ? "from-gray-700 to-gray-800" : "from-gray-50 to-gray-100"} p-6 rounded-xl border ${theme === "dark" ? "border-gray-600 hover:border-gray-500" : "border-gray-200 hover:border-gray-300"} transition-all duration-300 text-left`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div
@@ -204,13 +191,21 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowUpRight className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <ArrowUpRight
+                      className={`w-5 h-5 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
+                    />
                   </div>
                 </div>
-                <h4 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                <h4
+                  className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                >
                   {action.title}
                 </h4>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{action.description}</p>
+                <p
+                  className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                >
+                  {action.description}
+                </p>
               </motion.button>
             );
           })}
@@ -220,12 +215,20 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
       {/* Recent Activity */}
       <motion.div
         variants={cardVariants}
-        className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl shadow-lg border p-8 transition-colors duration-200`}
+        className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} rounded-2xl shadow-lg border p-8 transition-colors duration-200`}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Recent Activity</h3>
-            <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Latest updates from your ministry</p>
+            <h3
+              className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            >
+              Recent Activity
+            </h3>
+            <p
+              className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+            >
+              Latest updates from your ministry
+            </p>
           </div>
         </div>
 
@@ -233,7 +236,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
           {(() => {
             // Generate real activity data from actual data
             const activities = [];
-            
+
             // Add recent team members
             if (teamMembers && teamMembers.length > 0) {
               const latestMember = teamMembers[0];
@@ -244,7 +247,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 color: "blue",
               });
             }
-            
+
             // Add recent events
             if (events && events.length > 0) {
               const latestEvent = events[0];
@@ -255,7 +258,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 color: "purple",
               });
             }
-            
+
             // Add recent donations
             if (donations && donations.length > 0) {
               const latestDonation = donations[0];
@@ -266,7 +269,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 color: "green",
               });
             }
-            
+
             // Add recent media
             if (media && media.length > 0) {
               const latestMedia = media[0];
@@ -277,7 +280,7 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 color: "orange",
               });
             }
-            
+
             // If no real data, show placeholder activities
             if (activities.length === 0) {
               activities.push(
@@ -307,21 +310,29 @@ export default function OverviewDashboard({ stats, theme, setActiveTab, teamMemb
                 }
               );
             }
-            
+
             return activities.slice(0, 4); // Show max 4 activities
           })().map((activity, index) => {
             const Icon = activity.icon;
             return (
               <div
                 key={index}
-                className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
+                className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}
               >
                 <div className={`p-2 rounded-lg bg-${activity.color}-100`}>
                   <Icon className={`w-5 h-5 text-${activity.color}-600`} />
                 </div>
                 <div className="flex-1">
-                  <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activity.text}</p>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{activity.time}</p>
+                  <p
+                    className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  >
+                    {activity.text}
+                  </p>
+                  <p
+                    className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                  >
+                    {activity.time}
+                  </p>
                 </div>
               </div>
             );

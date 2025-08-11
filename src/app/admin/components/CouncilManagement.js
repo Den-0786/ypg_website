@@ -46,7 +46,7 @@ export default function CouncilManagement({ theme }) {
   useEffect(() => {
     const fetchCouncilMembers = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/council/");
+        const response = await fetch("/api/council");
         const data = await response.json();
         if (data.success) {
           setCouncilMembers(data.councilMembers);

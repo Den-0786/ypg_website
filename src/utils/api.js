@@ -191,7 +191,7 @@ export const ystoreAPI = {
 export const branchPresidentAPI = {
   getPresidents: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/branch-presidents/`);
+      const response = await fetch(`/api/branch-presidents?active=true`);
       return await response.json();
     } catch (error) {
       console.error("Error fetching branch presidents:", error);
@@ -201,7 +201,7 @@ export const branchPresidentAPI = {
 
   getAdminPresidents: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/branch-presidents/admin/`);
+      const response = await fetch(`/api/branch-presidents`);
       return await response.json();
     } catch (error) {
       console.error("Error fetching admin branch presidents:", error);
@@ -211,16 +211,13 @@ export const branchPresidentAPI = {
 
   createPresident: async (data) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/branch-presidents/create/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`/api/branch-presidents`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
       return await response.json();
     } catch (error) {
       console.error("Error creating branch president:", error);
@@ -230,16 +227,13 @@ export const branchPresidentAPI = {
 
   updatePresident: async (presidentId, data) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/branch-presidents/${presidentId}/update/`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`/api/branch-presidents?id=${presidentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
       return await response.json();
     } catch (error) {
       console.error("Error updating branch president:", error);
@@ -249,15 +243,12 @@ export const branchPresidentAPI = {
 
   deletePresident: async (presidentId) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/branch-presidents/${presidentId}/delete/`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/branch-presidents?id=${presidentId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       return await response.json();
     } catch (error) {
       console.error("Error deleting branch president:", error);

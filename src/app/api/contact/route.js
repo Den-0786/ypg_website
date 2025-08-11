@@ -1,31 +1,7 @@
 import { NextResponse } from "next/server";
 
-// Mock contact messages data (in production, this would come from a database)
-let contactMessages = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+233 24 123 4567",
-    subject: "Inquiry about Youth Ministry",
-    message:
-      "I'm interested in joining the youth ministry. Can you provide more information?",
-    status: "new",
-    createdAt: "2024-01-15T10:00:00.000Z",
-    updatedAt: "2024-01-15T10:00:00.000Z",
-  },
-  {
-    id: 2,
-    name: "Sarah Smith",
-    email: "sarah.smith@example.com",
-    phone: "+233 20 987 6543",
-    subject: "Event Inquiry",
-    message: "When is the next youth event? I'd like to participate.",
-    status: "responded",
-    createdAt: "2024-01-10T14:30:00.000Z",
-    updatedAt: "2024-01-12T09:15:00.000Z",
-  },
-];
+// Contact messages data (empty initially)
+let contactMessages = [];
 
 // GET - Fetch contact messages (for admin)
 export async function GET(request) {
@@ -211,5 +187,3 @@ export async function DELETE(request) {
     );
   }
 }
-
-

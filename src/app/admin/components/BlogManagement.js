@@ -11,35 +11,49 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
   const [newPost, setNewPost] = useState({
     title: "",
     content: "",
+    excerpt: "",
     author: "",
     category: "",
+    date: new Date().toISOString().split("T")[0],
     image: null,
   });
 
   const handleAddPost = async () => {
-    const formData = new FormData();
-    formData.append("title", newPost.title);
-    formData.append("content", newPost.content);
-    formData.append("author", newPost.author);
-    formData.append("category", newPost.category);
-    if (newPost.image) {
-      formData.append("image", newPost.image);
-    }
-
     try {
-      const response = await fetch("http://localhost:8000/api/blog/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: newPost.title,
-          content: newPost.content,
-          author: newPost.author,
-          category: newPost.category,
-          image: newPost.image,
-        }),
-      });
+      let response;
+
+      if (newPost.image) {
+        // If there's an image, use FormData
+        const formData = new FormData();
+        formData.append("title", newPost.title);
+        formData.append("content", newPost.content);
+        formData.append("excerpt", newPost.excerpt);
+        formData.append("author", newPost.author);
+        formData.append("category", newPost.category);
+        formData.append("date", newPost.date);
+        formData.append("image", newPost.image);
+
+        response = await fetch("/api/blog", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // If no image, use JSON
+        response = await fetch("/api/blog", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: newPost.title,
+            content: newPost.content,
+            excerpt: newPost.excerpt,
+            author: newPost.author,
+            category: newPost.category,
+            date: newPost.date,
+          }),
+        });
+      }
 
       if (response.ok) {
         const addedPost = await response.json();
@@ -48,8 +62,10 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         setNewPost({
           title: "",
           content: "",
+          excerpt: "",
           author: "",
           category: "",
+          date: new Date().toISOString().split("T")[0],
           image: null,
         });
         toast.success("Blog post added successfully!");
@@ -61,29 +77,41 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
   };
 
   const handleUpdatePost = async () => {
-    const formData = new FormData();
-    formData.append("title", editingPost.title);
-    formData.append("content", editingPost.content);
-    formData.append("author", editingPost.author);
-    formData.append("category", editingPost.category);
-    if (editingPost.image) {
-      formData.append("image", editingPost.image);
-    }
-
     try {
-      const response = await fetch(`http://localhost:8000/api/blog/${editingPost.id}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: editingPost.title,
-          content: editingPost.content,
-          author: editingPost.author,
-          category: editingPost.category,
-          image: editingPost.image,
-        }),
-      });
+      let response;
+
+      if (editingPost.image) {
+        // If there's an image, use FormData
+        const formData = new FormData();
+        formData.append("title", editingPost.title);
+        formData.append("content", editingPost.content);
+        formData.append("excerpt", editingPost.excerpt);
+        formData.append("author", editingPost.author);
+        formData.append("category", editingPost.category);
+        formData.append("date", editingPost.date);
+        formData.append("image", editingPost.image);
+
+        response = await fetch(`/api/blog?id=${editingPost.id}`, {
+          method: "PUT",
+          body: formData,
+        });
+      } else {
+        // If no image, use JSON
+        response = await fetch(`/api/blog?id=${editingPost.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: editingPost.title,
+            content: editingPost.content,
+            excerpt: editingPost.excerpt,
+            author: editingPost.author,
+            category: editingPost.category,
+            date: editingPost.date,
+          }),
+        });
+      }
 
       if (response.ok) {
         const updatedPost = await response.json();
@@ -111,7 +139,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/blog/?id=${postToDelete.id}&type=${deleteType}`,
+        `/api/blog?id=${postToDelete.id}&type=${deleteType}`,
         {
           method: "DELETE",
         }
@@ -272,6 +300,22 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
                   />
                 </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                  >
+                    Excerpt *
+                  </label>
+                  <textarea
+                    value={newPost.excerpt}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, excerpt: e.target.value })
+                    }
+                    rows={3}
+                    placeholder="Enter a short excerpt for the blog post"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
@@ -303,6 +347,21 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
                     />
                   </div>
+                </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                  >
+                    Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={newPost.date}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, date: e.target.value })
+                    }
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                  />
                 </div>
                 <div>
                   <label

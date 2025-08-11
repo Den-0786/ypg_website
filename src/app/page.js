@@ -22,6 +22,7 @@ import QuizResults from "./components/quiz/QuizResults";
 import CongregationLeaderboard from "./components/quiz/CongregationLeaderboard";
 import CongregationalExecutives from "./components/congregations/Congregations";
 import CouncilSection from "./components/council/CouncilSection";
+import PastExecutives from "./components/past-executives/PastExecutives";
 
 export default function Home() {
   return (
@@ -39,6 +40,7 @@ export default function Home() {
       <YStoreSection />
       <CongregationalExecutives />
       <TestimonialsSection />
+      <PastExecutives />
       <MinistriesSection />
       <CouncilSection />
       <JoinUsSection />

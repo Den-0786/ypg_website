@@ -1,23 +1,23 @@
 from django.contrib import admin
 from .models import (
-    Quiz, QuizSubmission, Event, TeamMember, Donation, ContactMessage,
+    Supervisor, Quiz, QuizSubmission, Event, TeamMember, Donation, ContactMessage,
     MinistryRegistration, BlogPost, Testimonial, GalleryItem, 
     Congregation, Analytics
 )
 
+@admin.register(Supervisor)
+class SupervisorAdmin(admin.ModelAdmin):
+    list_display = ['user', 'is_supervisor', 'last_login_ip', 'created_at', 'updated_at']
+    list_filter = ['is_supervisor', 'created_at']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['session_token', 'created_at', 'updated_at']
+
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ['title', 'is_active', 'start_time', 'end_time', 'submissions_count', 'correct_submissions_count']
+    list_display = ['title', 'is_active', 'start_time', 'end_time', 'created_at']
     list_filter = ['is_active', 'start_time', 'end_time']
     search_fields = ['title', 'description']
-    readonly_fields = ['submissions_count', 'correct_submissions_count', 'has_ended', 'is_currently_active']
-    actions = ['generate_password']
-
-    def generate_password(self, request, queryset):
-        for quiz in queryset:
-            quiz.generate_password()
-        self.message_user(request, f"Generated passwords for {queryset.count()} quiz(zes)")
-    generate_password.short_description = "Generate random password"
+    readonly_fields = ['created_at']
 
 @admin.register(QuizSubmission)
 class QuizSubmissionAdmin(admin.ModelAdmin):
@@ -44,13 +44,7 @@ class DonationAdmin(admin.ModelAdmin):
     list_display = ['donor_name', 'amount', 'payment_method', 'payment_status', 'receipt_code', 'created_at']
     list_filter = ['payment_method', 'payment_status', 'created_at']
     search_fields = ['donor_name', 'email', 'phone', 'receipt_code']
-    readonly_fields = ['receipt_code', 'created_at']
-    actions = ['mark_verified']
-
-    def mark_verified(self, request, queryset):
-        updated = queryset.update(payment_status='verified')
-        self.message_user(request, f"Marked {updated} donation(s) as verified")
-    mark_verified.short_description = "Mark selected donations as verified"
+    readonly_fields = ['created_at']
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
@@ -58,12 +52,6 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_filter = ['is_read', 'created_at']
     search_fields = ['name', 'email', 'subject', 'message']
     readonly_fields = ['created_at']
-    actions = ['mark_as_read']
-
-    def mark_as_read(self, request, queryset):
-        updated = queryset.update(is_read=True)
-        self.message_user(request, f"Marked {updated} message(s) as read")
-    mark_as_read.short_description = "Mark selected messages as read"
 
 @admin.register(MinistryRegistration)
 class MinistryRegistrationAdmin(admin.ModelAdmin):
@@ -71,12 +59,6 @@ class MinistryRegistrationAdmin(admin.ModelAdmin):
     list_filter = ['ministry', 'is_approved', 'created_at']
     search_fields = ['name', 'email', 'congregation']
     readonly_fields = ['created_at']
-    actions = ['approve_registrations']
-
-    def approve_registrations(self, request, queryset):
-        updated = queryset.update(is_approved=True)
-        self.message_user(request, f"Approved {updated} registration(s)")
-    approve_registrations.short_description = "Approve selected registrations"
 
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
@@ -85,17 +67,6 @@ class BlogPostAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content', 'excerpt']
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['views', 'created_at', 'updated_at']
-    actions = ['publish_posts', 'unpublish_posts']
-
-    def publish_posts(self, request, queryset):
-        updated = queryset.update(is_published=True)
-        self.message_user(request, f"Published {updated} post(s)")
-    publish_posts.short_description = "Publish selected posts"
-
-    def unpublish_posts(self, request, queryset):
-        updated = queryset.update(is_published=False)
-        self.message_user(request, f"Unpublished {updated} post(s)")
-    unpublish_posts.short_description = "Unpublish selected posts"
 
 @admin.register(Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):

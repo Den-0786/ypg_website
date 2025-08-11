@@ -3,73 +3,31 @@ import { writeFile, readFile, unlink } from "fs/promises";
 import { join } from "path";
 
 // Mock database - in production, this would be a real database
-let testimonials = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    position: "Youth Leader",
-    congregation: "Ahinsan Presbyterian Church",
-    content:
-      "The YPG has transformed my spiritual journey. The community and support here are incredible.",
-    image: "/testimonials/sarah.jpg",
-    rating: 5,
-    is_featured: true,
-    is_active: true,
-    created_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Michael Osei",
-    position: "Student",
-    congregation: "Kumasi Central Presbyterian",
-    content:
-      "Being part of YPG has helped me grow in faith and leadership. The events are always inspiring.",
-    image: "/testimonials/michael.jpg",
-    rating: 5,
-    is_featured: true,
-    is_active: true,
-    created_at: "2024-02-20T14:15:00Z",
-  },
-  {
-    id: 3,
-    name: "Grace Addo",
-    position: "Teacher",
-    congregation: "Adum Presbyterian Church",
-    content:
-      "The ministry programs are well-organized and impactful. I've seen many lives changed.",
-    image: "/testimonials/grace.jpg",
-    rating: 4,
-    is_featured: false,
-    is_active: true,
-    created_at: "2024-03-10T09:45:00Z",
-  },
-  {
-    id: 4,
-    name: "David Mensah",
-    position: "Engineer",
-    congregation: "Santasi Presbyterian Church",
-    content:
-      "The outreach programs have given me a new perspective on serving others. Highly recommended!",
-    image: "/testimonials/david.jpg",
-    rating: 5,
-    is_featured: true,
-    is_active: true,
-    created_at: "2024-04-05T16:20:00Z",
-  },
-  {
-    id: 5,
-    name: "Abena Ofori",
-    position: "Nurse",
-    congregation: "Bantama Presbyterian Church",
-    content:
-      "The prayer meetings and Bible study sessions have strengthened my faith tremendously.",
-    image: "/testimonials/abena.jpg",
-    rating: 4,
-    is_featured: false,
-    is_active: true,
-    created_at: "2024-05-12T11:30:00Z",
-  },
-];
+let testimonials = [];
+
+// Helper function to handle image uploads
+async function handleImageUpload(image) {
+  if (!image || image.size === 0) return null;
+
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Generate unique filename
+  const timestamp = Date.now();
+  const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+  const fileName = `${timestamp}-${sanitizedName}`;
+  const imagePath = `/uploads/testimonials/${fileName}`;
+
+  // Save the image file to local storage
+  try {
+    await writeFile(join(process.cwd(), "public", imagePath), buffer);
+    console.log(`Testimonial image saved: ${imagePath}`);
+    return imagePath;
+  } catch (error) {
+    console.error("Error saving testimonial image:", error);
+    throw new Error("Failed to save image");
+  }
+}
 
 // Helper function to save testimonials to a file
 async function saveTestimonials() {
@@ -220,10 +178,31 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    let testimonialData;
+
+    // Check if the request is FormData or JSON
+    const contentType = request.headers.get("content-type");
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      // Handle FormData (for image uploads)
+      const formData = await request.formData();
+      testimonialData = {
+        name: formData.get("name"),
+        position: formData.get("position"),
+        congregation: formData.get("congregation"),
+        content: formData.get("content"),
+        rating: parseInt(formData.get("rating")) || 5,
+        is_featured: formData.get("is_featured") === "true",
+        is_active: formData.get("is_active") !== "false",
+        image: formData.get("image"),
+      };
+    } else {
+      // Handle JSON
+      testimonialData = await request.json();
+    }
 
     // Validate required fields
-    if (!body.name || !body.content) {
+    if (!testimonialData.name || !testimonialData.content) {
       return NextResponse.json(
         {
           success: false,
@@ -233,19 +212,35 @@ export async function POST(request) {
       );
     }
 
+    // Handle image upload if provided
+    let imagePath = null;
+    if (testimonialData.image && testimonialData.image.size > 0) {
+      try {
+        imagePath = await handleImageUpload(testimonialData.image);
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: "Failed to save image" },
+          { status: 500 }
+        );
+      }
+    }
+
     // Generate new ID
     const newId = Math.max(...testimonials.map((t) => t.id), 0) + 1;
 
     const newTestimonial = {
       id: newId,
-      name: body.name,
-      position: body.position || "",
-      congregation: body.congregation || "",
-      content: body.content,
-      image: body.image || "",
-      rating: body.rating || 5,
-      is_featured: body.is_featured || false,
-      is_active: body.is_active !== undefined ? body.is_active : true,
+      name: testimonialData.name,
+      position: testimonialData.position || "",
+      congregation: testimonialData.congregation || "",
+      content: testimonialData.content,
+      image: imagePath,
+      rating: testimonialData.rating || 5,
+      is_featured: testimonialData.is_featured || false,
+      is_active:
+        testimonialData.is_active !== undefined
+          ? testimonialData.is_active
+          : true,
       created_at: new Date().toISOString(),
     };
 
@@ -274,9 +269,34 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
-    const body = await request.json();
+    let updateData;
+    let testimonialId;
 
-    if (!body.id) {
+    // Check if the request is FormData or JSON
+    const contentType = request.headers.get("content-type");
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      // Handle FormData (for image uploads)
+      const formData = await request.formData();
+      testimonialId = parseInt(formData.get("id"));
+      updateData = {
+        name: formData.get("name"),
+        position: formData.get("position"),
+        congregation: formData.get("congregation"),
+        content: formData.get("content"),
+        rating: parseInt(formData.get("rating")) || 5,
+        is_featured: formData.get("is_featured") === "true",
+        is_active: formData.get("is_active") !== "false",
+        image: formData.get("image"),
+      };
+    } else {
+      // Handle JSON
+      const body = await request.json();
+      testimonialId = body.id;
+      updateData = body;
+    }
+
+    if (!testimonialId) {
       return NextResponse.json(
         {
           success: false,
@@ -286,7 +306,7 @@ export async function PUT(request) {
       );
     }
 
-    const index = testimonials.findIndex((t) => t.id === parseInt(body.id));
+    const index = testimonials.findIndex((t) => t.id === testimonialId);
     if (index === -1) {
       return NextResponse.json(
         {
@@ -297,28 +317,45 @@ export async function PUT(request) {
       );
     }
 
+    // Handle image upload if a new image is provided
+    let imagePath = testimonials[index].image;
+    if (updateData.image && updateData.image.size > 0) {
+      try {
+        imagePath = await handleImageUpload(updateData.image);
+
+        // Keep old images for testimonials - admin can manually delete if needed
+        console.log(`New testimonial image saved: ${imagePath}`);
+        console.log(`Old testimonial image kept: ${testimonials[index].image}`);
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: "Failed to save new image" },
+          { status: 500 }
+        );
+      }
+    }
+
     // Update testimonial
     testimonials[index] = {
       ...testimonials[index],
-      name: body.name || testimonials[index].name,
+      name: updateData.name || testimonials[index].name,
       position:
-        body.position !== undefined
-          ? body.position
+        updateData.position !== undefined
+          ? updateData.position
           : testimonials[index].position,
       congregation:
-        body.congregation !== undefined
-          ? body.congregation
+        updateData.congregation !== undefined
+          ? updateData.congregation
           : testimonials[index].congregation,
-      content: body.content || testimonials[index].content,
-      image: body.image !== undefined ? body.image : testimonials[index].image,
-      rating: body.rating || testimonials[index].rating,
+      content: updateData.content || testimonials[index].content,
+      image: imagePath,
+      rating: updateData.rating || testimonials[index].rating,
       is_featured:
-        body.is_featured !== undefined
-          ? body.is_featured
+        updateData.is_featured !== undefined
+          ? updateData.is_featured
           : testimonials[index].is_featured,
       is_active:
-        body.is_active !== undefined
-          ? body.is_active
+        updateData.is_active !== undefined
+          ? updateData.is_active
           : testimonials[index].is_active,
     };
 
@@ -399,4 +436,3 @@ export async function DELETE(request) {
     );
   }
 }
-

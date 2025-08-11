@@ -36,6 +36,8 @@ export default function YStoreManagement({ theme }) {
     rating: 4.5,
     stock: 0,
     isOutOfStock: false,
+    pricingUnit: "",
+    contact: "+233244123456", // Default contact number
     treasurer: {
       name: "",
       phone: "",
@@ -46,60 +48,43 @@ export default function YStoreManagement({ theme }) {
   });
 
   useEffect(() => {
-    setStoreItems([
-      {
-        id: 1,
-        name: "Youth T-Shirt",
-        price: "GHC 35",
-        image: "/t-shirt.jpeg",
-        description: "Premium cotton t-shirt with church logo",
-        rating: 4.5,
-        stock: 50,
-        isOutOfStock: false,
-        treasurer: {
-          name: "Elder Kwame Boateng",
-          phone: "+233201234567",
-          email: "treasurer@ypg.com",
-        },
-        category: "Clothing",
-        tags: ["t-shirt", "youth", "branded"],
-      },
-      {
-        id: 2,
-        name: "Branded Cap",
-        price: "GHC 20",
-        image: "/style.jpeg",
-        description: "Adjustable snapback cap with embroidery",
-        rating: 4.2,
-        stock: 25,
-        isOutOfStock: false,
-        treasurer: {
-          name: "Elder Kwame Boateng",
-          phone: "+233201234567",
-          email: "treasurer@ypg.com",
-        },
-        category: "Accessories",
-        tags: ["cap", "branded", "accessory"],
-      },
-      {
-        id: 3,
-        name: "Wristband",
-        price: "GHC 5",
-        image: "/cloth and hymn.jpeg",
-        description: "Silicone wristband with inspirational message",
-        rating: 4.8,
-        stock: 0,
-        isOutOfStock: true,
-        treasurer: {
-          name: "Elder Kwame Boateng",
-          phone: "+233201234567",
-          email: "treasurer@ypg.com",
-        },
-        category: "Accessories",
-        tags: ["wristband", "inspirational"],
-      },
-    ]);
+    fetchStoreItems();
   }, []);
+
+  const fetchStoreItems = async () => {
+    try {
+      const response = await fetch("/api/ystore");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          // Transform API data to match dashboard format
+          const transformedItems = data.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            description: item.description,
+            rating: item.rating,
+            stock: item.stock,
+            isOutOfStock: item.stock === 0,
+            pricingUnit: item.pricingUnit || "",
+            contact: item.contact || "+233244123456",
+            treasurer: {
+              name: "",
+              phone: "",
+              email: "",
+            },
+            category: item.category,
+            tags: item.tags || [],
+          }));
+          setStoreItems(transformedItems);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching store items:", error);
+      toast.error("Failed to load store items");
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -110,6 +95,8 @@ export default function YStoreManagement({ theme }) {
       rating: 4.5,
       stock: 0,
       isOutOfStock: false,
+      pricingUnit: "",
+      contact: "+233244123456",
       treasurer: {
         name: "",
         phone: "",
@@ -131,6 +118,8 @@ export default function YStoreManagement({ theme }) {
         rating: item.rating,
         stock: item.stock,
         isOutOfStock: item.isOutOfStock,
+        pricingUnit: item.pricingUnit || "",
+        contact: item.contact || "+233244123456",
         treasurer: { ...item.treasurer },
         category: item.category,
         tags: [...item.tags],
@@ -159,27 +148,102 @@ export default function YStoreManagement({ theme }) {
         return;
       }
 
+      // Prepare data for API
+      const apiData = {
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        stock: formData.stock,
+        rating: formData.rating,
+        pricingUnit: formData.pricingUnit,
+        contact: formData.contact,
+        tags: formData.tags,
+      };
+
       if (editingItem) {
         // Update existing item
-        const updatedItems = storeItems.map((item) =>
-          item.id === editingItem.id
-            ? { ...item, ...formData, id: item.id }
-            : item
-        );
-        setStoreItems(updatedItems);
-        toast.success("Store item updated successfully!");
+        let response;
+
+        if (formData.image) {
+          // If there's an image, use FormData
+          const formDataToSend = new FormData();
+          formDataToSend.append("name", apiData.name);
+          formDataToSend.append("description", apiData.description);
+          formDataToSend.append("price", apiData.price);
+          formDataToSend.append("category", apiData.category);
+          formDataToSend.append("stock", apiData.stock);
+          formDataToSend.append("rating", apiData.rating);
+          formDataToSend.append("pricingUnit", apiData.pricingUnit);
+          formDataToSend.append("contact", apiData.contact);
+          formDataToSend.append("tags", JSON.stringify(apiData.tags));
+          formDataToSend.append("image", formData.image);
+
+          response = await fetch(`/api/ystore?id=${editingItem.id}`, {
+            method: "PUT",
+            body: formDataToSend,
+          });
+        } else {
+          // If no image, use JSON
+          response = await fetch(`/api/ystore?id=${editingItem.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(apiData),
+          });
+        }
+
+        if (response.ok) {
+          toast.success("Store item updated successfully!");
+          fetchStoreItems(); // Refresh data
+        } else {
+          toast.error("Failed to update item");
+        }
       } else {
         // Add new item
-        const newItem = {
-          ...formData,
-          id: Date.now(),
-        };
-        setStoreItems([...storeItems, newItem]);
-        toast.success("Store item added successfully!");
+        let response;
+
+        if (formData.image) {
+          // If there's an image, use FormData
+          const formDataToSend = new FormData();
+          formDataToSend.append("name", apiData.name);
+          formDataToSend.append("description", apiData.description);
+          formDataToSend.append("price", apiData.price);
+          formDataToSend.append("category", apiData.category);
+          formDataToSend.append("stock", apiData.stock);
+          formDataToSend.append("rating", apiData.rating);
+          formDataToSend.append("pricingUnit", apiData.pricingUnit);
+          formDataToSend.append("contact", apiData.contact);
+          formDataToSend.append("tags", JSON.stringify(apiData.tags));
+          formDataToSend.append("image", formData.image);
+
+          response = await fetch("/api/ystore", {
+            method: "POST",
+            body: formDataToSend,
+          });
+        } else {
+          // If no image, use JSON
+          response = await fetch("/api/ystore", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(apiData),
+          });
+        }
+
+        if (response.ok) {
+          toast.success("Store item added successfully!");
+          fetchStoreItems(); // Refresh data
+        } else {
+          toast.error("Failed to add item");
+        }
       }
 
       closeModal();
     } catch (error) {
+      console.error("Error saving item:", error);
       toast.error("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -195,18 +259,22 @@ export default function YStoreManagement({ theme }) {
     if (!itemToDelete) return;
 
     try {
-      if (deleteType === "both") {
-        setStoreItems(storeItems.filter((item) => item.id !== itemToDelete.id));
-        toast.success("Store item permanently deleted!");
+      const response = await fetch(
+        `/api/ystore?id=${itemToDelete.id}&type=${deleteType}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        if (deleteType === "both") {
+          toast.success("Store item permanently deleted!");
+        } else {
+          toast.success("Store item removed from dashboard!");
+        }
+        fetchStoreItems(); // Refresh data
       } else {
-        setStoreItems(
-          storeItems.map((item) =>
-            item.id === itemToDelete.id
-              ? { ...item, dashboard_deleted: true }
-              : item
-          )
-        );
-        toast.success("Store item removed from dashboard!");
+        toast.error("Failed to delete item");
       }
       setShowDeleteModal(false);
       setItemToDelete(null);
@@ -216,28 +284,62 @@ export default function YStoreManagement({ theme }) {
     }
   };
 
-  const toggleStockStatus = (id) => {
-    setStoreItems(
-      storeItems.map((item) =>
-        item.id === id ? { ...item, isOutOfStock: !item.isOutOfStock } : item
-      )
-    );
-    toast.success("Stock status updated!");
+  const toggleStockStatus = async (id) => {
+    try {
+      const item = storeItems.find((item) => item.id === id);
+      if (!item) return;
+
+      const newStock = item.isOutOfStock ? 10 : 0; // Set to 10 if out of stock, 0 if in stock
+
+      const response = await fetch(`/api/ystore?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...item,
+          stock: newStock,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Stock status updated!");
+        fetchStoreItems(); // Refresh data
+      } else {
+        toast.error("Failed to update stock status");
+      }
+    } catch (error) {
+      console.error("Error updating stock status:", error);
+      toast.error("Failed to update stock status");
+    }
   };
 
-  const updateStock = (id, newStock) => {
-    setStoreItems(
-      storeItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              stock: newStock,
-              isOutOfStock: newStock === 0,
-            }
-          : item
-      )
-    );
-    toast.success("Stock updated successfully!");
+  const updateStock = async (id, newStock) => {
+    try {
+      const item = storeItems.find((item) => item.id === id);
+      if (!item) return;
+
+      const response = await fetch(`/api/ystore?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...item,
+          stock: newStock,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Stock updated successfully!");
+        fetchStoreItems(); // Refresh data
+      } else {
+        toast.error("Failed to update stock");
+      }
+    } catch (error) {
+      console.error("Error updating stock:", error);
+      toast.error("Failed to update stock");
+    }
   };
 
   return (
@@ -407,7 +509,8 @@ export default function YStoreManagement({ theme }) {
                   </p>
                 </div>
                 <span className="text-blue-600 font-bold text-sm ml-2">
-                  {item.price}
+                  ₵{item.price}
+                  {item.pricingUnit ? ` ${item.pricingUnit}` : ""}
                 </span>
               </div>
 
@@ -573,7 +676,54 @@ export default function YStoreManagement({ theme }) {
                         onChange={(e) =>
                           setFormData({ ...formData, price: e.target.value })
                         }
-                        placeholder="GHC 35"
+                        placeholder="70"
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                        }`}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                      >
+                        Pricing Unit
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.pricingUnit || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pricingUnit: e.target.value,
+                          })
+                        }
+                        placeholder="per yard, per piece, etc."
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                      >
+                        Contact Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.contact || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            contact: e.target.value,
+                          })
+                        }
+                        placeholder="+233244123456"
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"

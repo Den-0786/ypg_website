@@ -21,9 +21,9 @@ export default function BranchPresidentsManagement({ theme }) {
   const [editingPresident, setEditingPresident] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
+    president_name: "",
     congregation: "",
     location: "",
-    president_name: "",
     phone_number: "",
     email: "",
     is_active: true,
@@ -49,9 +49,9 @@ export default function BranchPresidentsManagement({ theme }) {
 
   const resetForm = () => {
     setFormData({
+      president_name: "",
       congregation: "",
       location: "",
-      president_name: "",
       phone_number: "",
       email: "",
       is_active: true,
@@ -63,9 +63,9 @@ export default function BranchPresidentsManagement({ theme }) {
     if (president) {
       setEditingPresident(president);
       setFormData({
+        president_name: president.president_name,
         congregation: president.congregation,
         location: president.location,
-        president_name: president.president_name,
         phone_number: president.phone_number,
         email: president.email,
         is_active: president.is_active,
@@ -243,6 +243,13 @@ export default function BranchPresidentsManagement({ theme }) {
                     theme === "dark" ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
+                  Name
+                </th>
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-500"
+                  }`}
+                >
                   Congregation
                 </th>
                 <th
@@ -251,13 +258,6 @@ export default function BranchPresidentsManagement({ theme }) {
                   }`}
                 >
                   Location
-                </th>
-                <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-500"
-                  }`}
-                >
-                  President Name
                 </th>
                 <th
                   className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
@@ -273,13 +273,7 @@ export default function BranchPresidentsManagement({ theme }) {
                 >
                   Email
                 </th>
-                <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-500"
-                  }`}
-                >
-                  Status
-                </th>
+
                 <th
                   className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                     theme === "dark" ? "text-gray-300" : "text-gray-500"
@@ -308,6 +302,15 @@ export default function BranchPresidentsManagement({ theme }) {
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div
+                      className={`text-sm ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {president.president_name}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div
                       className={`text-sm font-medium ${
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
@@ -325,15 +328,6 @@ export default function BranchPresidentsManagement({ theme }) {
                       >
                         {president.location}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div
-                      className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {president.president_name}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -358,17 +352,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       </a>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        president.is_active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {president.is_active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
+
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
@@ -408,43 +392,116 @@ export default function BranchPresidentsManagement({ theme }) {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-3xl shadow-2xl border p-8 w-full max-w-lg mx-4 relative overflow-hidden`}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">
-                {editingPresident ? "Edit President" : "Add New President"}
+            {/* Decorative gradient background */}
+            <div
+              className={`absolute inset-0 bg-gradient-to-br ${theme === "dark" ? "from-blue-900/20 to-purple-900/20" : "from-blue-50 to-purple-50"} opacity-50`}
+            ></div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center space-x-3">
+                  <div
+                    className={`p-3 rounded-2xl ${theme === "dark" ? "bg-blue-600/20" : "bg-blue-100"}`}
+                  >
+                    <UserCheck
+                      className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                    >
+                      {editingPresident
+                        ? "Edit President"
+                        : "Add New President"}
               </h3>
+                    <p
+                      className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+                    >
+                      {editingPresident
+                        ? "Update president information"
+                        : "Add a new branch president to the system"}
+                    </p>
+                  </div>
+                </div>
               <button
                 onClick={closeModal}
-                className="text-gray-400 hover:text-gray-600"
+                  className={`p-2 rounded-xl transition-all duration-200 ${theme === "dark" ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
               >
-                <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <label
+                      className={`block text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-3`}
+                    >
+                  President Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.president_name}
+                  onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          president_name: e.target.value,
+                        })
+                  }
+                      className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      placeholder="Enter president's full name"
+                  required
+                />
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <label
+                      className={`block text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-3`}
+                    >
                   Congregation Name
                 </label>
                 <input
                   type="text"
                   value={formData.congregation}
                   onChange={(e) =>
-                    setFormData({ ...formData, congregation: e.target.value })
+                        setFormData({
+                          ...formData,
+                          congregation: e.target.value,
+                        })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      placeholder="Enter congregation name"
                   required
                 />
+                  </motion.div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <label
+                      className={`block text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-3`}
+                    >
                   Location
                 </label>
                 <input
@@ -453,44 +510,47 @@ export default function BranchPresidentsManagement({ theme }) {
                   onChange={(e) =>
                     setFormData({ ...formData, location: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      placeholder="Enter location"
                   required
                 />
-              </div>
+                  </motion.div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  President Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.president_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, president_name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <label
+                      className={`block text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-3`}
+                    >
                   Phone Number
                 </label>
                 <input
                   type="tel"
                   value={formData.phone_number}
                   onChange={(e) =>
-                    setFormData({ ...formData, phone_number: e.target.value })
+                        setFormData({
+                          ...formData,
+                          phone_number: e.target.value,
+                        })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      placeholder="Enter phone number"
                   required
                 />
+                  </motion.div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <label
+                    className={`block text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-3`}
+                  >
+                    Email Address
                 </label>
                 <input
                   type="email"
@@ -498,48 +558,63 @@ export default function BranchPresidentsManagement({ theme }) {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                    placeholder="Enter email address"
                   required
                 />
-              </div>
+                </motion.div>
 
               {editingPresident && (
-                <div className="flex items-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50"
+                  >
                   <input
                     type="checkbox"
                     id="is_active"
                     checked={formData.is_active}
                     onChange={(e) =>
-                      setFormData({ ...formData, is_active: e.target.checked })
+                        setFormData({
+                          ...formData,
+                          is_active: e.target.checked,
+                        })
                     }
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label
                     htmlFor="is_active"
-                    className="ml-2 block text-sm text-gray-900"
+                      className={`ml-3 block text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                   >
-                    Active
+                      Mark as Active President
                   </label>
-                </div>
-              )}
+                  </motion.div>
+                )}
 
-              <div className="flex gap-3 pt-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="flex gap-4 pt-6"
+                >
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
-                  <Save className="w-4 h-4" />
-                  {editingPresident ? "Update" : "Create"}
+                    <Save className="w-5 h-5" />
+                    {editingPresident ? "Update President" : "Create President"}
                 </button>
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
+                    className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-700"}`}
                 >
                   Cancel
                 </button>
+                </motion.div>
+              </form>
               </div>
-            </form>
           </motion.div>
         </div>
       )}
@@ -551,14 +626,18 @@ export default function BranchPresidentsManagement({ theme }) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4"
+            className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4`}
           >
             <div className="text-center">
               <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3
+                className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}
+              >
                 Delete President
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p
+                className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}
+              >
                 Are you sure you want to delete &quot;
                 {presidentToDelete?.president_name}&quot; from &quot;
                 {presidentToDelete?.congregation}&quot;? This action cannot be
@@ -573,7 +652,7 @@ export default function BranchPresidentsManagement({ theme }) {
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-400 text-gray-700"}`}
                 >
                   Cancel
                 </button>

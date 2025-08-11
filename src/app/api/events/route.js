@@ -1,34 +1,33 @@
 import { NextResponse } from "next/server";
+import { writeFile, readFile, unlink } from "fs/promises";
+import { join } from "path";
 
 // Mock database - in production, this would be a real database
-let events = [
-  {
-    id: 1,
-    title: "Youth Conference 2024",
-    description: "Annual youth conference with workshops and activities",
-    date: "2024-03-15",
-    time: "09:00",
-    location: "Main Church Hall",
-    type: "upcoming",
-    attendees: 150,
-    status: "active",
-    image: "/hero/youth.jpeg",
-    created_at: "2024-01-15T10:00:00Z",
-  },
-  {
-    id: 2,
-    title: "Bible Study Workshop",
-    description: "Interactive bible study session for youth",
-    date: "2024-02-20",
-    time: "18:00",
-    location: "Youth Center",
-    type: "past",
-    attendees: 75,
-    status: "completed",
-    image: "/hero/database.jpeg",
-    created_at: "2024-01-10T14:30:00Z",
-  },
-];
+let events = [];
+
+// Helper function to handle image uploads
+async function handleImageUpload(image, eventType) {
+  if (!image || image.size === 0) return null;
+
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Generate unique filename
+  const timestamp = Date.now();
+  const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+  const fileName = `${timestamp}-${sanitizedName}`;
+  const imagePath = `/uploads/events/${eventType}/${fileName}`;
+
+  // Save the image file to local storage
+  try {
+    await writeFile(join(process.cwd(), "public", imagePath), buffer);
+
+    return imagePath;
+  } catch (error) {
+    console.error("Error saving event image:", error);
+    throw new Error("Failed to save image");
+  }
+}
 
 // Helper function to check if event is past and update type
 function updateEventType(event) {
@@ -97,15 +96,64 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    let eventData;
+
+    // Check if the request is FormData or JSON
+    const contentType = request.headers.get("content-type");
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      // Handle FormData (for image uploads)
+      const formData = await request.formData();
+      eventData = {
+        title: formData.get("title"),
+        description: formData.get("description"),
+        date: formData.get("date"),
+        time: formData.get("time"),
+        location: formData.get("location"),
+        type: formData.get("type") || "upcoming",
+        image: formData.get("image"),
+      };
+    } else {
+      // Handle JSON
+      eventData = await request.json();
+    }
+
+    // Validate required fields
+    if (!eventData.title || !eventData.description || !eventData.date) {
+      return NextResponse.json(
+        { success: false, error: "Title, description, and date are required" },
+        { status: 400 }
+      );
+    }
+
+    // Handle image upload if provided
+    let imagePath = null;
+    if (eventData.image && eventData.image.size > 0) {
+      try {
+        imagePath = await handleImageUpload(
+          eventData.image,
+          eventData.type || "upcoming"
+        );
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: "Failed to save image" },
+          { status: 500 }
+        );
+      }
+    }
 
     const newEvent = {
       id: events.length + 1,
-      ...body,
+      title: eventData.title,
+      description: eventData.description,
+      date: eventData.date,
+      time: eventData.time || "",
+      location: eventData.location || "",
+      type: eventData.type || "upcoming",
+      image: imagePath,
       created_at: new Date().toISOString(),
       attendees: 0,
       status: "active",
-      type: "upcoming",
     };
 
     // Check if event is already past
@@ -119,6 +167,7 @@ export async function POST(request) {
       message: "Event created successfully",
     });
   } catch (error) {
+    console.error("Error creating event:", error);
     return NextResponse.json(
       { success: false, error: "Failed to create event" },
       { status: 500 }
@@ -128,10 +177,41 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
-    const body = await request.json();
-    const { id, ...updateData } = body;
+    let updateData;
+    let eventId;
 
-    const eventIndex = events.findIndex((event) => event.id === id);
+    // Check if the request is FormData or JSON
+    const contentType = request.headers.get("content-type");
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      // Handle FormData (for image uploads)
+      const formData = await request.formData();
+      eventId = parseInt(formData.get("id"));
+      updateData = {
+        title: formData.get("title"),
+        description: formData.get("description"),
+        date: formData.get("date"),
+        time: formData.get("time"),
+        location: formData.get("location"),
+        type: formData.get("type"),
+        image: formData.get("image"),
+      };
+    } else {
+      // Handle JSON
+      const body = await request.json();
+      const { id, ...data } = body;
+      eventId = id;
+      updateData = data;
+    }
+
+    if (!eventId) {
+      return NextResponse.json(
+        { success: false, error: "Event ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const eventIndex = events.findIndex((event) => event.id === eventId);
     if (eventIndex === -1) {
       return NextResponse.json(
         { success: false, error: "Event not found" },
@@ -139,7 +219,30 @@ export async function PUT(request) {
       );
     }
 
-    events[eventIndex] = { ...events[eventIndex], ...updateData };
+    // Handle image upload if a new image is provided
+    let imagePath = events[eventIndex].image;
+    if (updateData.image && updateData.image.size > 0) {
+      try {
+        imagePath = await handleImageUpload(
+          updateData.image,
+          updateData.type || events[eventIndex].type
+        );
+
+        // Keep old images for events - admin can manually delete if needed
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: "Failed to save new image" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Update the event
+    events[eventIndex] = {
+      ...events[eventIndex],
+      ...updateData,
+      image: imagePath,
+    };
 
     // Update event type based on new date
     updateEventType(events[eventIndex]);
@@ -150,6 +253,7 @@ export async function PUT(request) {
       message: "Event updated successfully",
     });
   } catch (error) {
+    console.error("Error updating event:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update event" },
       { status: 500 }

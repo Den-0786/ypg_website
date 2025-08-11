@@ -7,10 +7,13 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q, Count, Sum
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from .models import Supervisor
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics
+    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident
 )
 from .serializers import (
     QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer, 
@@ -20,6 +23,205 @@ from .serializers import (
     CongregationSerializer, AnalyticsSerializer
 )
 import json
+
+# Authentication API endpoints
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_supervisor_login(request):
+    """Supervisor login endpoint"""
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            return Response({
+                'success': False,
+                'error': 'Username and password are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            # Check if user is a supervisor
+            try:
+                supervisor = Supervisor.objects.get(user=user)
+            except Supervisor.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'error': 'Access denied. Supervisor privileges required.'
+                }, status=status.HTTP_403_FORBIDDEN)
+            
+            # Log in the user
+            login(request, user)
+            
+            # Update supervisor info
+            supervisor.last_login_ip = get_client_ip(request)
+            session_token = supervisor.generate_session_token()
+            
+            return Response({
+                'success': True,
+                'user': {
+                    'username': user.username,
+                    'role': 'supervisor',
+                    'loginTime': timezone.now().isoformat(),
+                    'session_token': session_token
+                },
+                'message': 'Login successful'
+            })
+        else:
+            return Response({
+                'success': False,
+                'error': 'Invalid credentials'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_supervisor_logout(request):
+    """Supervisor logout endpoint"""
+    try:
+        if request.user.is_authenticated:
+            try:
+                supervisor = Supervisor.objects.get(user=request.user)
+                supervisor.clear_session()
+            except Supervisor.DoesNotExist:
+                pass
+            
+            logout(request)
+        
+        return Response({
+            'success': True,
+            'message': 'Logged out successfully'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_supervisor_status(request):
+    """Check supervisor authentication status"""
+    try:
+        if request.user.is_authenticated:
+            try:
+                supervisor = Supervisor.objects.get(user=request.user)
+                return Response({
+                    'success': True,
+                    'authenticated': True,
+                    'user': {
+                        'username': request.user.username,
+                        'role': 'supervisor',
+                        'loginTime': supervisor.updated_at.isoformat()
+                    }
+                })
+            except Supervisor.DoesNotExist:
+                return Response({
+                    'success': True,
+                    'authenticated': False
+                })
+        else:
+            return Response({
+                'success': True,
+                'authenticated': False
+            })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_supervisor_change_credentials(request):
+    """Change supervisor credentials"""
+    try:
+        if not request.user.is_authenticated:
+            return Response({
+                'success': False,
+                'error': 'Authentication required'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            supervisor = Supervisor.objects.get(user=request.user)
+        except Supervisor.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Supervisor access required'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        data = json.loads(request.body)
+        current_password = data.get('currentPassword')
+        new_username = data.get('newUsername')
+        new_password = data.get('newPassword')
+        
+        if not current_password:
+            return Response({
+                'success': False,
+                'error': 'Current password is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify current password
+        if not request.user.check_password(current_password):
+            return Response({
+                'success': False,
+                'error': 'Current password is incorrect'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Update username if provided
+        if new_username and new_username.strip():
+            # Check if username already exists
+            if User.objects.filter(username=new_username.strip()).exclude(id=request.user.id).exists():
+                return Response({
+                    'success': False,
+                    'error': 'Username already exists'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            request.user.username = new_username.strip()
+        
+        # Update password if provided
+        if new_password and new_password.strip():
+            request.user.set_password(new_password.strip())
+        
+        request.user.save()
+        supervisor.updated_at = timezone.now()
+        supervisor.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Credentials updated successfully',
+            'credentials': {
+                'username': request.user.username,
+                'hasPassword': True
+            }
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def get_client_ip(request):
+    """Get client IP address"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 # Quiz API endpoints
 @csrf_exempt
@@ -1169,6 +1371,139 @@ def api_track_analytics(request):
             'success': True,
             'message': 'Analytics tracked successfully'
         })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Branch President API Views
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_branch_presidents(request):
+    """Get all branch presidents for main website"""
+    try:
+        presidents = BranchPresident.objects.filter(is_active=True).order_by('congregation')
+        data = []
+        for president in presidents:
+            data.append({
+                'id': president.id,
+                'name': president.name,
+                'congregation': president.congregation,
+                'phone': president.phone,
+                'email': president.email,
+                'position': president.position,
+                'is_active': president.is_active,
+                'created_at': president.created_at.isoformat(),
+            })
+        return Response(data)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_branch_presidents_admin(request):
+    """Get all branch presidents for admin dashboard"""
+    try:
+        presidents = BranchPresident.objects.all().order_by('congregation')
+        data = []
+        for president in presidents:
+            data.append({
+                'id': president.id,
+                'name': president.name,
+                'congregation': president.congregation,
+                'phone': president.phone,
+                'email': president.email,
+                'position': president.position,
+                'is_active': president.is_active,
+                'created_at': president.created_at.isoformat(),
+                'updated_at': president.updated_at.isoformat(),
+            })
+        return Response(data)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_branch_president_create(request):
+    """Create new branch president"""
+    try:
+        data = json.loads(request.body)
+        president = BranchPresident.objects.create(
+            name=data.get('name'),
+            congregation=data.get('congregation'),
+            phone=data.get('phone'),
+            email=data.get('email', ''),
+            position=data.get('position', 'Branch President'),
+            is_active=data.get('is_active', True)
+        )
+        return Response({
+            'success': True,
+            'message': 'Branch president created successfully',
+            'id': president.id
+        }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_branch_president_update(request, president_id):
+    """Update branch president"""
+    try:
+        data = json.loads(request.body)
+        president = BranchPresident.objects.get(id=president_id)
+        president.name = data.get('name', president.name)
+        president.congregation = data.get('congregation', president.congregation)
+        president.phone = data.get('phone', president.phone)
+        president.email = data.get('email', president.email)
+        president.position = data.get('position', president.position)
+        president.is_active = data.get('is_active', president.is_active)
+        president.save()
+        return Response({
+            'success': True,
+            'message': 'Branch president updated successfully'
+        }, status=status.HTTP_200_OK)
+    except BranchPresident.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Branch president not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_branch_president_delete(request, president_id):
+    """Delete branch president"""
+    try:
+        president = BranchPresident.objects.get(id=president_id)
+        president.delete()
+        return Response({
+            'success': True,
+            'message': 'Branch president deleted successfully'
+        }, status=status.HTTP_200_OK)
+    except BranchPresident.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Branch president not found'
+        }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({
             'success': False,

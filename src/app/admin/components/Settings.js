@@ -65,6 +65,31 @@ export default function SettingsComponent({ onClose }) {
     }
   }, [saveStatus]);
 
+  // Load current credentials on component mount
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/api/auth/credentials/",
+          {
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        if (data.success) {
+          setCurrentCredentials(data.credentials);
+          setSecurity((prev) => ({
+            ...prev,
+            newUsername: data.credentials.username,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load credentials:", error);
+      }
+    };
+    loadCredentials();
+  }, []);
+
   // Form states
   const [profile, setProfile] = useState({
     fullName: "Admin User",
@@ -95,11 +120,17 @@ export default function SettingsComponent({ onClose }) {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+    newUsername: "",
     currentPin: "",
     newPin: "",
     confirmPin: "",
     twoFactorAuth: false,
     requirePinForActions: true,
+  });
+
+  const [currentCredentials, setCurrentCredentials] = useState({
+    username: "",
+    hasPassword: false,
   });
 
   const [appearance, setAppearance] = useState({
@@ -265,44 +296,55 @@ export default function SettingsComponent({ onClose }) {
       let response;
       switch (section) {
         case "profile":
-          response = await fetch("http://localhost:8000/api/settings/profile/", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(profile),
-          });
+          response = await fetch(
+            "http://localhost:8000/api/settings/profile/",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(profile),
+            }
+          );
           break;
 
         case "security":
-          response = await fetch("http://localhost:8000/api/settings/security/", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              ...security,
-              securityMethod,
-            }),
-          });
+          response = await fetch(
+            "http://localhost:8000/api/auth/credentials/",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify({
+                currentPassword: security.currentPassword,
+                newUsername: security.newUsername,
+                newPassword: security.newPassword,
+              }),
+            }
+          );
           break;
 
         case "website":
-          response = await fetch("http://localhost:8000/api/settings/website/", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              websiteTitle: generalSettings.websiteTitle,
-              contactEmail: generalSettings.contactEmail,
-              phoneNumber: generalSettings.phoneNumber,
-              address: generalSettings.address,
-              description: generalSettings.description,
-              socialMedia,
-              appearance,
-            }),
-          });
+          response = await fetch(
+            "http://localhost:8000/api/settings/website/",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                websiteTitle: generalSettings.websiteTitle,
+                contactEmail: generalSettings.contactEmail,
+                phoneNumber: generalSettings.phoneNumber,
+                address: generalSettings.address,
+                description: generalSettings.description,
+                socialMedia,
+                appearance,
+              }),
+            }
+          );
           break;
 
         default:
@@ -705,309 +747,160 @@ export default function SettingsComponent({ onClose }) {
                     Security Settings
                   </h3>
 
-                  {/* Authentication Method Toggle */}
+                  {/* Authentication Info */}
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white mb-3">
+                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white mb-2">
                       Authentication Method
                     </h4>
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setSecurityMethod("password")}
-                        className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                          securityMethod === "password"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-500"
-                        }`}
-                      >
-                        <Key className="w-4 h-4 inline mr-2" />
-                        Username & Password
-                      </button>
-                      <button
-                        onClick={() => setSecurityMethod("pin")}
-                        className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                          securityMethod === "pin"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-500"
-                        }`}
-                      >
-                        <Smartphone className="w-4 h-4 inline mr-2" />
-                        PIN Authentication
-                        <span className="ml-1 text-xs opacity-75">
-                          (Optional)
-                        </span>
-                      </button>
+                    <div className="flex items-center">
+                      <Key className="w-4 h-4 mr-2 text-blue-600" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        Username & Password Authentication
+                      </span>
                     </div>
                   </div>
 
                   {/* Password Authentication */}
-                  {securityMethod === "password" && (
-                    <div className="space-y-3 sm:space-y-4">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                        Password Settings
-                      </h4>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Current Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            value={security.currentPassword}
-                            onChange={(e) =>
-                              setSecurity({
-                                ...security,
-                                currentPassword: e.target.value,
-                              })
-                            }
-                            className={getInputClassName("currentPassword")}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-gray-400" />
-                            ) : (
-                              <Eye className="h-4 w-4 text-gray-400" />
-                            )}
-                          </button>
-                        </div>
-                        {getFieldError("currentPassword") && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {getFieldError("currentPassword")}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          New Password
-                        </label>
-                        <input
-                          type="password"
-                          value={security.newPassword}
-                          onChange={(e) =>
-                            setSecurity({
-                              ...security,
-                              newPassword: e.target.value,
-                            })
-                          }
-                          className={getInputClassName("newPassword")}
-                          placeholder="Enter new password (min 8 characters)"
-                        />
-                        {getFieldError("newPassword") && (
-                          <p className="mt-1 text-xs text-red-600">
-                            {getFieldError("newPassword")}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Confirm New Password
-                        </label>
-                        <input
-                          type="password"
-                          value={security.confirmPassword}
-                          onChange={(e) =>
-                            setSecurity({
-                              ...security,
-                              confirmPassword: e.target.value,
-                            })
-                          }
-                          className={getInputClassName("confirmPassword")}
-                          placeholder="Confirm new password"
-                        />
-                        {getFieldError("confirmPassword") && (
-                          <p className="mt-1 text-xs text-red-600">
-                            {getFieldError("confirmPassword")}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={security.twoFactorAuth}
-                          onChange={(e) =>
-                            setSecurity({
-                              ...security,
-                              twoFactorAuth: e.target.checked,
-                            })
-                          }
-                          className="rounded"
-                        />
-                        <label className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                          Enable Two-Factor Authentication
-                        </label>
-                      </div>
-                      <button
-                        onClick={() => handleSave("security")}
-                        disabled={isLoading}
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4 mr-2" />
-                            Update Password Settings
-                          </>
-                        )}
-                      </button>
-                      {saveStatus.type === "success" && (
-                        <p className="text-green-600 text-xs mt-2 flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          {saveStatus.message}
-                        </p>
-                      )}
-                      {saveStatus.type === "error" && (
-                        <p className="text-red-600 text-xs mt-2 flex items-center">
-                          <AlertCircle className="w-4 h-4 mr-1" />
-                          {saveStatus.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* PIN Authentication */}
-                  {securityMethod === "pin" && (
-                    <div className="space-y-3 sm:space-y-4">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                        PIN Settings
-                      </h4>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        PIN authentication is optional and can be used for quick
-                        actions and sensitive operations. Leave blank if you
-                        don't want to use PIN.
+                  <div className="space-y-3 sm:space-y-4">
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                      Supervisor Credentials
+                    </h4>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-blue-800 dark:text-blue-200">
+                        Current Username:{" "}
+                        <strong>{currentCredentials.username}</strong>
                       </p>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Current PIN
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPin ? "text" : "password"}
-                            maxLength="6"
-                            placeholder="Enter 4-6 digit PIN"
-                            value={security.currentPin}
-                            onChange={(e) =>
-                              setSecurity({
-                                ...security,
-                                currentPin: e.target.value,
-                              })
-                            }
-                            className={getInputClassName("currentPin")}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPin(!showPin)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                          >
-                            {showPin ? (
-                              <EyeOff className="h-4 w-4 text-gray-400" />
-                            ) : (
-                              <Eye className="h-4 w-4 text-gray-400" />
-                            )}
-                          </button>
-                        </div>
-                        {getFieldError("currentPin") && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {getFieldError("currentPin")}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          New PIN
-                        </label>
-                        <input
-                          type="password"
-                          maxLength="6"
-                          placeholder="Enter 4-6 digit PIN"
-                          value={security.newPin}
-                          onChange={(e) =>
-                            setSecurity({ ...security, newPin: e.target.value })
-                          }
-                          className={getInputClassName("newPin")}
-                        />
-                        {getFieldError("newPin") && (
-                          <p className="mt-1 text-xs text-red-600">
-                            {getFieldError("newPin")}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Confirm New PIN
-                        </label>
-                        <input
-                          type="password"
-                          maxLength="6"
-                          placeholder="Confirm 4-6 digit PIN"
-                          value={security.confirmPin}
-                          onChange={(e) =>
-                            setSecurity({
-                              ...security,
-                              confirmPin: e.target.value,
-                            })
-                          }
-                          className={getInputClassName("confirmPin")}
-                        />
-                        {getFieldError("confirmPin") && (
-                          <p className="mt-1 text-xs text-red-600">
-                            {getFieldError("confirmPin")}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={security.requirePinForActions}
-                          onChange={(e) =>
-                            setSecurity({
-                              ...security,
-                              requirePinForActions: e.target.checked,
-                            })
-                          }
-                          className="rounded"
-                        />
-                        <label className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                          Require PIN for sensitive actions
-                        </label>
-                      </div>
-                      <button
-                        onClick={() => handleSave("security")}
-                        disabled={isLoading}
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4 inline mr-2" />
-                            Update PIN Settings
-                          </>
-                        )}
-                      </button>
-                      {saveStatus.type === "success" && (
-                        <p className="text-green-600 text-xs mt-2 flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          {saveStatus.message}
-                        </p>
-                      )}
-                      {saveStatus.type === "error" && (
-                        <p className="text-red-600 text-xs mt-2 flex items-center">
-                          <AlertCircle className="w-4 h-4 mr-1" />
-                          {saveStatus.message}
+                    </div>
+                    <div>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        New Username (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={security.newUsername}
+                        onChange={(e) =>
+                          setSecurity({
+                            ...security,
+                            newUsername: e.target.value,
+                          })
+                        }
+                        className={getInputClassName("newUsername")}
+                        placeholder="Leave blank to keep current username"
+                      />
+                      {getFieldError("newUsername") && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {getFieldError("newUsername")}
                         </p>
                       )}
                     </div>
-                  )}
+                    <div>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        Current Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={security.currentPassword}
+                          onChange={(e) =>
+                            setSecurity({
+                              ...security,
+                              currentPassword: e.target.value,
+                            })
+                          }
+                          className={getInputClassName("currentPassword")}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                      {getFieldError("currentPassword") && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {getFieldError("currentPassword")}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        New Password (optional)
+                      </label>
+                      <input
+                        type="password"
+                        value={security.newPassword}
+                        onChange={(e) =>
+                          setSecurity({
+                            ...security,
+                            newPassword: e.target.value,
+                          })
+                        }
+                        className={getInputClassName("newPassword")}
+                        placeholder="Leave blank to keep current password"
+                      />
+                      {getFieldError("newPassword") && (
+                        <p className="mt-1 text-xs text-red-600">
+                          {getFieldError("newPassword")}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={security.confirmPassword}
+                        onChange={(e) =>
+                          setSecurity({
+                            ...security,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        className={getInputClassName("confirmPassword")}
+                        placeholder="Confirm new password"
+                      />
+                      {getFieldError("confirmPassword") && (
+                        <p className="mt-1 text-xs text-red-600">
+                          {getFieldError("confirmPassword")}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleSave("security")}
+                      disabled={isLoading}
+                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Update Supervisor Credentials
+                        </>
+                      )}
+                    </button>
+                    {saveStatus.type === "success" && (
+                      <p className="text-green-600 text-xs mt-2 flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        {saveStatus.message}
+                      </p>
+                    )}
+                    {saveStatus.type === "error" && (
+                      <p className="text-red-600 text-xs mt-2 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1" />
+                        {saveStatus.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 

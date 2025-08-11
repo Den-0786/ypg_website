@@ -1,9 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable react-hooks/exhaustive-deps */
+
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import LoginScreen from "./components/LoginScreen";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import OverviewDashboard from "./components/OverviewDashboard";
@@ -24,12 +25,17 @@ import CommunicationManagement from "./components/CommunicationManagement";
 import YStoreManagement from "./components/YStoreManagement";
 import BranchPresidentsManagement from "./components/BranchPresidentsManagement";
 import CouncilManagement from "./components/CouncilManagement";
+import PastExecutivesManagement from "./components/PastExecutivesManagement";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // UI state
   const [activeTab, setActiveTab] = useState("overview");
@@ -46,6 +52,7 @@ export default function AdminDashboard() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [media, setMedia] = useState([]);
+  const [contactMessages, setContactMessages] = useState([]);
   const [analytics, setAnalytics] = useState({});
   const [stats, setStats] = useState({
     totalVisitors: 0,
@@ -74,15 +81,31 @@ export default function AdminDashboard() {
         setIsAuthenticated(true);
         setUser(user);
         setSessionExpired(false);
+        setIsLoading(false);
+
+        const isFromLogin = sessionStorage.getItem("ypg_fresh_login");
+        if (isFromLogin) {
+          sessionStorage.removeItem("ypg_fresh_login");
+          // Show welcome message after a brief delay to ensure smooth transition
+          setTimeout(() => {
+            toast.success(
+              `Welcome back, ${user}! Dashboard loaded successfully.`
+            );
+          }, 500);
+        }
       } else {
         // Session expired
         handleLogout();
         setSessionExpired(true);
         toast.error("Session expired. Please login again.");
+        router.push("/admin/login");
       }
     } else {
       setIsAuthenticated(false);
       setUser(null);
+      setIsLoading(false);
+      // Redirect to login page
+      router.push("/admin/login");
     }
   };
 
@@ -91,22 +114,32 @@ export default function AdminDashboard() {
     setIsAuthenticated(true);
     setUser(user);
     setSessionExpired(false);
-    toast.success("Welcome back! Dashboard loaded successfully.");
   };
 
-  const handleLogout = () => {
-    // Clear authentication data
-    localStorage.removeItem("ypg_admin_authenticated");
-    localStorage.removeItem("ypg_admin_user");
-    localStorage.removeItem("ypg_admin_login_time");
+  const handleLogout = async () => {
+    try {
+      // Call logout API (Next.js route)
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Logout API error:", error);
+    } finally {
+      localStorage.removeItem("ypg_admin_authenticated");
+      localStorage.removeItem("ypg_admin_user");
+      localStorage.removeItem("ypg_admin_login_time");
 
-    setIsAuthenticated(false);
-    setUser(null);
-    setActiveTab("overview");
+      setIsAuthenticated(false);
+      setUser(null);
+      setActiveTab("overview");
 
-    toast.success(
-      "Logged out successfully! Thank you for using YPG Admin Dashboard."
-    );
+      toast.success(
+        "Logged out successfully! Thank you for using YPG Admin Dashboard."
+      );
+
+      // Redirect to login page immediately
+      router.push("/admin/login");
+    }
   };
 
   const toggleTheme = () => {
@@ -115,7 +148,6 @@ export default function AdminDashboard() {
     localStorage.setItem("ypg_theme", newTheme);
   };
 
-  // Load theme from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("ypg_theme");
     if (savedTheme) {
@@ -133,7 +165,6 @@ export default function AdminDashboard() {
         const data = await response.json();
         console.log(`${endpoint} response data:`, data);
 
-        // Handle different API response formats
         if (Array.isArray(data)) {
           console.log(`${endpoint} - setting array data, length:`, data.length);
           setter(data);
@@ -173,6 +204,12 @@ export default function AdminDashboard() {
             data.testimonials.length
           );
           setter(data.testimonials);
+        } else if (data.success && Array.isArray(data.messages)) {
+          console.log(
+            `${endpoint} - setting contact messages data, length:`,
+            data.messages.length
+          );
+          setter(data.messages);
         } else if (data.success && Array.isArray(data.media)) {
           console.log(
             `${endpoint} - setting media data, length:`,
@@ -196,7 +233,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Fetch data on component mount
   useEffect(() => {
     if (isAuthenticated) {
       fetchData("/api/team", setTeamMembers);
@@ -206,12 +242,12 @@ export default function AdminDashboard() {
       fetchData("/api/blog", setBlogPosts);
       fetchData("/api/testimonials", setTestimonials);
       fetchData("/api/media", setMedia);
+      fetchData("/api/contact", setContactMessages);
       fetchData("/api/analytics", setAnalytics);
       updateStats();
     }
   }, [isAuthenticated]);
 
-  // Update stats when data changes
   useEffect(() => {
     if (isAuthenticated) {
       updateStats();
@@ -241,9 +277,21 @@ export default function AdminDashboard() {
     });
   };
 
-  // Render login screen if not authenticated
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, the useEffect will redirect to login
   if (!isAuthenticated) {
-    return <LoginScreen onLogin={handleLogin} />;
+    return null;
   }
 
   // Render main dashboard
@@ -266,7 +314,6 @@ export default function AdminDashboard() {
 
       {/* Main layout with top padding for header */}
       <div className="flex pt-16">
-        {/* Sidebar - Fixed on left */}
         <div className="fixed left-0 top-16 bottom-0 z-[60]">
           <Sidebar
             sidebarOpen={sidebarOpen}
@@ -335,6 +382,9 @@ export default function AdminDashboard() {
                 />
               )}
               {activeTab === "council" && <CouncilManagement theme={theme} />}
+              {activeTab === "past-executives" && (
+                <PastExecutivesManagement theme={theme} />
+              )}
               {activeTab === "ystore" && <YStoreManagement theme={theme} />}
               {activeTab === "blog" && (
                 <BlogManagement
@@ -385,7 +435,11 @@ export default function AdminDashboard() {
                 />
               )}
               {activeTab === "communication" && (
-                <CommunicationManagement theme={theme} />
+                <CommunicationManagement
+                  contactMessages={contactMessages}
+                  setContactMessages={setContactMessages}
+                  theme={theme}
+                />
               )}
               {activeTab === "trash" && <TrashManagement theme={theme} />}
               {activeTab === "analytics" && (

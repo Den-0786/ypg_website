@@ -56,79 +56,8 @@ const MinistryManagement = ({
     useState(false);
   const [registrationToDelete, setRegistrationToDelete] = useState(null);
 
-  // Mock ministries data - in production this would come from API
-  const [ministries, setMinistries] = useState([
-    {
-      id: 1,
-      name: "Y-Singers 🎤",
-      description: "Youth choir focused on gospel music and worship leading.",
-      leaderName: "Sarah Addo",
-      leaderPhone: "+233 24 123 4567",
-      color: "from-purple-500 to-pink-500",
-    },
-    {
-      id: 2,
-      name: "Y-Jama Troop 🪘",
-      description:
-        "Cultural dance and traditional praise group showcasing Ghanaian heritage.",
-      leaderName: "Kwame Mensah",
-      leaderPhone: "+233 20 987 6543",
-      color: "from-amber-500 to-orange-500",
-    },
-    {
-      id: 3,
-      name: "Choreography Group 💃",
-      description: "Creative expression of worship through dance and movement.",
-      leaderName: "Grace Osei",
-      leaderPhone: "+233 26 555 1234",
-      color: "from-blue-500 to-teal-500",
-    },
-    {
-      id: 4,
-      name: "Evangelism & Prayer Team 🙏",
-      description:
-        "Leads outreach, prayer meetings, and spiritual growth programs.",
-      leaderName: "Daniel Kofi",
-      leaderPhone: "+233 27 888 9999",
-      color: "from-green-500 to-emerald-500",
-    },
-    {
-      id: 5,
-      name: "Y-Media 🎥",
-      description:
-        "Manages visual content, social media, and church media coverage.",
-      leaderName: "Michael Asante",
-      leaderPhone: "+233 25 777 6666",
-      color: "from-red-500 to-rose-500",
-    },
-    {
-      id: 6,
-      name: "Dancing Group 🕺",
-      description:
-        "Contemporary dance ministry expressing joy and praise through movement.",
-      leaderName: "Abena Poku",
-      leaderPhone: "+233 23 444 3333",
-      color: "from-indigo-500 to-purple-600",
-    },
-    {
-      id: 7,
-      name: "Ushering Wing 👥",
-      description:
-        "Welcomes and guides worshippers, maintains order during services.",
-      leaderName: "John Owusu",
-      leaderPhone: "+233 28 222 1111",
-      color: "from-emerald-500 to-green-600",
-    },
-    {
-      id: 8,
-      name: "Youth Bible Study 📖",
-      description:
-        "Deep dive into scripture, theological discussions, and spiritual growth.",
-      leaderName: "Esther Boateng",
-      leaderPhone: "+233 29 333 4444",
-      color: "from-orange-500 to-red-500",
-    },
-  ]);
+  // Ministries data - in production this would come from API
+  const [ministries, setMinistries] = useState([]);
 
   const handleAddRegistration = async () => {
     try {
@@ -197,7 +126,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `/api/ministry?id=${registrationToDelete.id}&type=${deleteType}`,
+        `/api/ministry?id=${registrationToDelete.id}`,
         {
           method: "DELETE",
         }
@@ -475,7 +404,9 @@ const MinistryManagement = ({
       {/* Ministry Management Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+          >
             Ministry Management
           </h2>
           <button
@@ -494,7 +425,7 @@ const MinistryManagement = ({
               key={ministry.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition overflow-hidden"
+              className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
             >
               <div
                 className={`h-32 bg-gradient-to-r ${ministry.color} flex items-center justify-center`}
@@ -504,13 +435,19 @@ const MinistryManagement = ({
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-gray-800 mb-2 line-clamp-1">
+                <h3
+                  className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"} mb-2 line-clamp-1`}
+                >
                   {ministry.name}
                 </h3>
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                <p
+                  className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-3 line-clamp-2`}
+                >
                   {ministry.description}
                 </p>
-                <div className="space-y-1 text-xs text-gray-500 mb-4">
+                <div
+                  className={`space-y-1 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"} mb-4`}
+                >
                   <p>
                     <span className="font-medium">Leader:</span>{" "}
                     {ministry.leaderName}
@@ -545,7 +482,9 @@ const MinistryManagement = ({
       {/* Registration Management Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+          >
             Ministry Registrations
           </h2>
           <button
@@ -558,68 +497,106 @@ const MinistryManagement = ({
         </div>
 
         {/* Ministry Registrations Table */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div
+          className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border overflow-hidden`}
+        >
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead
+                className={theme === "dark" ? "bg-gray-700" : "bg-gray-50"}
+              >
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Phone
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Congregation
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Ministry
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Age
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                  >
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody
+                className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} divide-y ${theme === "dark" ? "divide-gray-700" : "divide-gray-200"}`}
+              >
                 {ministryRegistrations.map((registration) => (
                   <motion.tr
                     key={registration.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="hover:bg-gray-50"
+                    className={
+                      theme === "dark"
+                        ? "hover:bg-gray-700"
+                        : "hover:bg-gray-50"
+                    }
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div
+                          className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                        >
                           {registration.name}
                         </div>
                         {registration.message && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                          <div
+                            className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"} truncate max-w-xs`}
+                          >
                             {registration.message}
                           </div>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
                       {registration.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
                       {registration.phone}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
                       {registration.congregation}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
                       {registration.ministry}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
                       {registration.age}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -632,7 +609,7 @@ const MinistryManagement = ({
                         </button>
                         <button
                           onClick={() =>
-                            handleDeleteRegistration(registration.id)
+                            handleDeleteRegistrationClick(registration)
                           }
                           className="text-red-600 hover:text-red-900"
                         >
@@ -650,15 +627,23 @@ const MinistryManagement = ({
           <div className="md:hidden">
             {!Array.isArray(ministryRegistrations) ? (
               <div className="text-center py-8">
-                <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">
+                <BookOpen
+                  className={`w-12 h-12 ${theme === "dark" ? "text-gray-500" : "text-gray-400"} mx-auto mb-4`}
+                />
+                <p
+                  className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                >
                   Loading ministry registrations...
                 </p>
               </div>
             ) : ministryRegistrations.length === 0 ? (
               <div className="text-center py-8">
-                <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">
+                <BookOpen
+                  className={`w-12 h-12 ${theme === "dark" ? "text-gray-500" : "text-gray-400"} mx-auto mb-4`}
+                />
+                <p
+                  className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                >
                   No ministry registrations found. Add your first registration!
                 </p>
               </div>
@@ -669,17 +654,21 @@ const MinistryManagement = ({
                     key={registration.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                    className={`${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} rounded-lg p-4 border`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">
+                      <h3
+                        className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                      >
                         {registration.name}
                       </h3>
                       <span className="text-sm font-semibold text-blue-600">
                         {registration.ministry}
                       </span>
                     </div>
-                    <div className="space-y-1 text-sm text-gray-600">
+                    <div
+                      className={`space-y-1 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                    >
                       <p>
                         <span className="font-medium">Email:</span>{" "}
                         {registration.email}
@@ -742,15 +731,17 @@ const MinistryManagement = ({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+              className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3
+                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                >
                   Add Ministry Registration
                 </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -758,7 +749,9 @@ const MinistryManagement = ({
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Name
                   </label>
                   <input
@@ -770,11 +763,13 @@ const MinistryManagement = ({
                         name: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Email
                   </label>
                   <input
@@ -786,11 +781,13 @@ const MinistryManagement = ({
                         email: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Phone Number
                   </label>
                   <input
@@ -803,11 +800,13 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="Enter phone number"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Congregation
                   </label>
                   <input
@@ -820,11 +819,13 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="e.g., Emmanuel Congregation Ahinsan"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Ministry of Interest
                   </label>
                   <select
@@ -835,7 +836,7 @@ const MinistryManagement = ({
                         ministry: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   >
                     <option value="">Select a ministry</option>
                     <option value="Y-Singers 🎤">Y-Singers 🎤</option>
@@ -855,7 +856,9 @@ const MinistryManagement = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Age
                   </label>
                   <input
@@ -870,11 +873,13 @@ const MinistryManagement = ({
                     placeholder="Enter age"
                     min="13"
                     max="35"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Additional Message (Optional)
                   </label>
                   <textarea
@@ -887,7 +892,7 @@ const MinistryManagement = ({
                     }
                     rows={3}
                     placeholder="Any additional information or special requests..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
               </div>
@@ -895,7 +900,7 @@ const MinistryManagement = ({
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
                 >
                   Cancel
                 </button>
@@ -924,15 +929,17 @@ const MinistryManagement = ({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+              className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3
+                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                >
                   Edit Ministry Registration
                 </h3>
                 <button
                   onClick={() => setEditingRegistration(null)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -940,7 +947,9 @@ const MinistryManagement = ({
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Name
                   </label>
                   <input
@@ -952,11 +961,13 @@ const MinistryManagement = ({
                         name: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Email
                   </label>
                   <input
@@ -968,11 +979,13 @@ const MinistryManagement = ({
                         email: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Phone Number
                   </label>
                   <input
@@ -985,11 +998,13 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="Enter phone number"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Congregation
                   </label>
                   <input
@@ -1002,11 +1017,13 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="e.g., Emmanuel Congregation Ahinsan"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Ministry of Interest
                   </label>
                   <select
@@ -1017,7 +1034,7 @@ const MinistryManagement = ({
                         ministry: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   >
                     <option value="">Select a ministry</option>
                     <option value="Y-Singers 🎤">Y-Singers 🎤</option>
@@ -1037,7 +1054,9 @@ const MinistryManagement = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Age
                   </label>
                   <input
@@ -1052,11 +1071,13 @@ const MinistryManagement = ({
                     placeholder="Enter age"
                     min="13"
                     max="35"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                  >
                     Additional Message (Optional)
                   </label>
                   <textarea
@@ -1069,7 +1090,7 @@ const MinistryManagement = ({
                     }
                     rows={3}
                     placeholder="Any additional information or special requests..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   />
                 </div>
               </div>
@@ -1077,7 +1098,7 @@ const MinistryManagement = ({
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={() => setEditingRegistration(null)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
                 >
                   Cancel
                 </button>
@@ -1106,15 +1127,17 @@ const MinistryManagement = ({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+              className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3
+                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                >
                   Add Ministry
                 </h3>
                 <button
                   onClick={() => setShowAddMinistryModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1574,10 +1597,12 @@ const MinistryManagement = ({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 w-full max-w-md"
+              className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-xl p-6 w-full max-w-md`}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} flex items-center gap-2`}
+                >
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1586,18 +1611,22 @@ const MinistryManagement = ({
                     setShowDeleteRegistrationModal(false);
                     setRegistrationToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="mb-6">
-                <p className="text-gray-700 mb-2">
+                <p
+                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
+                >
                   Are you sure you want to delete{" "}
                   <strong>&ldquo;{registrationToDelete.name}&rdquo;</strong>?
                 </p>
-                <p className="text-sm text-gray-500">
+                <p
+                  className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                >
                   Choose your deletion option:
                 </p>
               </div>
@@ -1634,7 +1663,7 @@ const MinistryManagement = ({
                     setShowDeleteRegistrationModal(false);
                     setRegistrationToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className={`w-full px-4 py-2 border ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"} rounded-lg transition-colors`}
                 >
                   Cancel
                 </button>

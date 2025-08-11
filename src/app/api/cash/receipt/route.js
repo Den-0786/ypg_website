@@ -1,26 +1,35 @@
 import { NextResponse } from "next/server";
+import { readFile, writeFile } from "fs/promises";
+import { join } from "path";
 
-// Mock cash receipt system - in production, this would integrate with a receipt printer or digital receipt system
-let cashReceipts = [
-  {
-    receiptNumber: "CR_001",
-    donorName: "John Doe",
-    amount: 200,
-    date: "2024-03-08",
-    issuedBy: "Priscilla Asante",
-    verified: true,
-    timestamp: "2024-03-08T10:15:00Z",
-  },
-  {
-    receiptNumber: "CR_002",
-    donorName: "Sarah Smith",
-    amount: 75,
-    date: "2024-03-11",
-    issuedBy: "Priscilla Asante",
-    verified: false,
-    timestamp: "2024-03-11T15:45:00Z",
-  },
-];
+let cashReceipts = [];
+
+// Load cash receipts from file
+const loadCashReceipts = async () => {
+  try {
+    const filePath = join(process.cwd(), "cash-receipts.json");
+    const data = await readFile(filePath, "utf8");
+    cashReceipts = JSON.parse(data);
+  } catch (error) {
+    console.error("Error loading cash receipts:", error);
+    cashReceipts = [];
+  }
+};
+
+// Save cash receipts to file
+const saveCashReceipts = async () => {
+  try {
+    const filePath = join(process.cwd(), "cash-receipts.json");
+    await writeFile(filePath, JSON.stringify(cashReceipts, null, 2));
+  } catch (error) {
+    console.error("Error saving cash receipts:", error);
+  }
+};
+
+// Initialize data on first load
+if (cashReceipts.length === 0) {
+  loadCashReceipts();
+}
 
 export async function POST(request) {
   try {
@@ -51,6 +60,7 @@ export async function POST(request) {
     };
 
     cashReceipts.push(newReceipt);
+    await saveCashReceipts();
 
     return NextResponse.json({
       success: true,
@@ -72,6 +82,7 @@ export async function POST(request) {
 // GET endpoint for verifying cash receipts
 export async function GET(request) {
   try {
+    await loadCashReceipts();
     const { searchParams } = new URL(request.url);
     const receiptNumber = searchParams.get("receiptNumber");
 
@@ -145,6 +156,8 @@ export async function PUT(request) {
       verifiedAt: new Date().toISOString(),
     };
 
+    await saveCashReceipts();
+
     return NextResponse.json({
       success: true,
       receipt: cashReceipts[receiptIndex],
@@ -161,4 +174,3 @@ export async function PUT(request) {
     );
   }
 }
-

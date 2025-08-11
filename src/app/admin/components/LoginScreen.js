@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const LoginScreen = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({
@@ -9,17 +9,39 @@ const LoginScreen = ({ onLogin }) => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      credentials.username === "admin" &&
-      credentials.password === "password"
-    ) {
-      toast.success("Login successful! Welcome to YPG Admin Dashboard.");
-      onLogin();
-    } else {
-      toast.error("Invalid credentials. Please try again.");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Store authentication data in localStorage
+        localStorage.setItem("ypg_admin_authenticated", "true");
+        localStorage.setItem("ypg_admin_user", data.user.username);
+        localStorage.setItem("ypg_admin_login_time", data.user.loginTime);
+
+        toast.success("Login successful! Welcome to YPG Admin Dashboard.");
+        onLogin();
+      } else {
+        toast.error(data.error || "Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please check your connection and try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,14 +106,22 @@ const LoginScreen = ({ onLogin }) => {
 
             <button
               type="submit"
-              className="w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white py-3 px-4 rounded-lg font-medium hover:bg-white/30 transition-all duration-200"
+              disabled={isLoading}
+              className="w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white py-3 px-4 rounded-lg font-medium hover:bg-white/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-white/80">
-            <p>Demo credentials: admin / password</p>
+            <p>Default credentials: supervisor / admin123</p>
           </div>
         </div>
       </motion.div>

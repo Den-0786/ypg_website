@@ -62,13 +62,13 @@ export default function CongregationalExecutives() {
             <thead className="bg-blue-600 text-white">
               <tr>
                 <th className="py-3 px-4 text-left min-w-[180px] whitespace-nowrap">
+                  Name
+                </th>
+                <th className="py-3 px-4 text-left min-w-[180px] whitespace-nowrap">
                   Congregation
                 </th>
                 <th className="py-3 px-4 text-left min-w-[140px] whitespace-nowrap">
                   Location
-                </th>
-                <th className="py-3 px-4 text-left min-w-[180px] whitespace-nowrap">
-                  President
                 </th>
                 <th className="py-3 px-4 text-left min-w-[160px] whitespace-nowrap">
                   Contact
@@ -85,13 +85,13 @@ export default function CongregationalExecutives() {
                   className={`hover:bg-blue-50 transition-colors ${index % 2 === 1 ? "bg-gray-50" : ""}`}
                 >
                   <td className="py-4 px-4 font-medium text-gray-700 min-w-[180px] whitespace-nowrap">
+                    {president.president_name}
+                  </td>
+                  <td className="py-4 px-4 text-gray-700 min-w-[180px] whitespace-nowrap">
                     {president.congregation}
                   </td>
                   <td className="py-4 px-4 text-gray-700 min-w-[140px] whitespace-nowrap">
                     {president.location}
-                  </td>
-                  <td className="py-4 px-4 text-gray-700 min-w-[180px] whitespace-nowrap">
-                    {president.president_name}
                   </td>
                   <td className="py-4 px-4 min-w-[160px] whitespace-nowrap">
                     <a

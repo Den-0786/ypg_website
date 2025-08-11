@@ -1,47 +1,33 @@
 import { NextResponse } from "next/server";
+import { writeFile, readFile, unlink } from "fs/promises";
+import { join } from "path";
 
-// Mock database - in production, this would be a real database
-let blogPosts = [
-  {
-    id: 1,
-    title: "Welcome to YPG Ministry",
-    excerpt:
-      "We are excited to welcome everyone to our youth ministry. This is a place where young people can grow in their faith and build meaningful relationships.",
-    content:
-      "We are excited to welcome everyone to our youth ministry. This is a place where young people can grow in their faith and build meaningful relationships. Our ministry focuses on spiritual growth, community building, and service to others.",
-    author: "Pastor John",
-    category: "Announcements",
-    date: "2024-03-10",
-    image: "/hero.jpg",
-    created_at: "2024-03-10T14:30:00Z",
-  },
-  {
-    id: 2,
-    title: "Upcoming Events",
-    excerpt:
-      "Join us for our upcoming youth events including Bible study, worship nights, and community service projects.",
-    content:
-      "Join us for our upcoming youth events including Bible study, worship nights, and community service projects. We have an exciting lineup of activities planned for the coming months.",
-    author: "Youth Leader Sarah",
-    category: "Events",
-    date: "2024-03-08",
-    image: "/hero/attendance.jpeg",
-    created_at: "2024-03-08T10:15:00Z",
-  },
-  {
-    id: 3,
-    title: "Faith and Technology",
-    excerpt:
-      "How can we use technology to spread the gospel and connect with our community? Let's explore this together.",
-    content:
-      "How can we use technology to spread the gospel and connect with our community? Let's explore this together. In today's digital age, we have unprecedented opportunities to share our faith.",
-    author: "Tech Minister Mike",
-    category: "Technology",
-    date: "2024-03-05",
-    image: "/hero/database.jpeg",
-    created_at: "2024-03-05T16:45:00Z",
-  },
-];
+// Database - in production, this would be a real database
+let blogPosts = [];
+
+// Helper function to handle image uploads
+async function handleImageUpload(image, category) {
+  if (!image || image.size === 0) return null;
+
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Generate unique filename
+  const timestamp = Date.now();
+  const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+  const fileName = `${timestamp}-${sanitizedName}`;
+  const imagePath = `/uploads/${category}/${fileName}`;
+
+  // Save the image file to local storage
+  try {
+    await writeFile(join(process.cwd(), "public", imagePath), buffer);
+
+    return imagePath;
+  } catch (error) {
+    console.error("Error saving blog image:", error);
+    throw new Error("Failed to save image");
+  }
+}
 
 export async function GET(request) {
   try {
@@ -86,7 +72,7 @@ export async function POST(request) {
         category: formData.get("category"),
         date: formData.get("date"),
         image: formData.get("image")
-          ? `/uploads/${formData.get("image").name}`
+          ? await handleImageUpload(formData.get("image"), "blog")
           : null,
       };
     } else {
@@ -152,7 +138,7 @@ export async function PUT(request) {
         category: formData.get("category"),
         date: formData.get("date"),
         image: formData.get("image")
-          ? `/uploads/${formData.get("image").name}`
+          ? await handleImageUpload(formData.get("image"), "blog")
           : null,
       };
     } else {

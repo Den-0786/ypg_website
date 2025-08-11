@@ -28,34 +28,43 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
   });
 
   const handleAddMedia = async () => {
-    const formData = new FormData();
-    formData.append("title", newMedia.title);
-    formData.append("description", newMedia.description);
-    formData.append("type", newMedia.type);
-    formData.append("congregation", newMedia.congregation);
-    formData.append("date", newMedia.date);
-    formData.append("youtubeUrl", newMedia.youtubeUrl);
-    formData.append("tiktokUrl", newMedia.tiktokUrl);
-    if (newMedia.file) {
-      formData.append("file", newMedia.file);
-    }
-
     try {
-      const response = await fetch("http://localhost:8000/api/media/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: newMedia.title,
-          description: newMedia.description,
-          type: newMedia.type,
-          congregation: newMedia.congregation,
-          date: newMedia.date,
-          youtubeUrl: newMedia.youtubeUrl,
-          tiktokUrl: newMedia.tiktokUrl,
-        }),
-      });
+      let response;
+
+      if (newMedia.file) {
+        // If there's a file, use FormData
+        const formData = new FormData();
+        formData.append("title", newMedia.title);
+        formData.append("description", newMedia.description);
+        formData.append("type", newMedia.type);
+        formData.append("congregation", newMedia.congregation);
+        formData.append("date", newMedia.date);
+        formData.append("youtubeUrl", newMedia.youtubeUrl);
+        formData.append("tiktokUrl", newMedia.tiktokUrl);
+        formData.append("image", newMedia.file);
+
+        response = await fetch("/api/media", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // If no file, use JSON
+        response = await fetch("/api/media", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: newMedia.title,
+            description: newMedia.description,
+            type: newMedia.type,
+            congregation: newMedia.congregation,
+            date: newMedia.date,
+            youtubeUrl: newMedia.youtubeUrl,
+            tiktokUrl: newMedia.tiktokUrl,
+          }),
+        });
+      }
 
       if (response.ok) {
         const addedMedia = await response.json();
@@ -78,34 +87,43 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
   };
 
   const handleUpdateMedia = async () => {
-    const formData = new FormData();
-    formData.append("title", editingMedia.title);
-    formData.append("description", editingMedia.description);
-    formData.append("type", editingMedia.type);
-    formData.append("congregation", editingMedia.congregation);
-    formData.append("date", editingMedia.date);
-    formData.append("youtubeUrl", editingMedia.youtubeUrl);
-    formData.append("tiktokUrl", editingMedia.tiktokUrl);
-    if (editingMedia.file) {
-      formData.append("file", editingMedia.file);
-    }
-
     try {
-      const response = await fetch(`http://localhost:8000/api/media/${editingMedia.id}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: editingMedia.title,
-          description: editingMedia.description,
-          type: editingMedia.type,
-          congregation: editingMedia.congregation,
-          date: editingMedia.date,
-          youtubeUrl: editingMedia.youtubeUrl,
-          tiktokUrl: editingMedia.tiktokUrl,
-        }),
-      });
+      let response;
+
+      if (editingMedia.file) {
+        // If there's a file, use FormData
+        const formData = new FormData();
+        formData.append("title", editingMedia.title);
+        formData.append("description", editingMedia.description);
+        formData.append("type", editingMedia.type);
+        formData.append("congregation", editingMedia.congregation);
+        formData.append("date", editingMedia.date);
+        formData.append("youtubeUrl", editingMedia.youtubeUrl);
+        formData.append("tiktokUrl", editingMedia.tiktokUrl);
+        formData.append("image", editingMedia.file);
+
+        response = await fetch(`/api/media?id=${editingMedia.id}`, {
+          method: "PUT",
+          body: formData,
+        });
+      } else {
+        // If no file, use JSON
+        response = await fetch(`/api/media?id=${editingMedia.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: editingMedia.title,
+            description: editingMedia.description,
+            type: editingMedia.type,
+            congregation: editingMedia.congregation,
+            date: editingMedia.date,
+            youtubeUrl: editingMedia.youtubeUrl,
+            tiktokUrl: editingMedia.tiktokUrl,
+          }),
+        });
+      }
 
       if (response.ok) {
         const updatedMedia = await response.json();
@@ -123,7 +141,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
 
   const handleDeleteMedia = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/media/${id}/`, {
+      const response = await fetch(`/api/media?id=${id}&type=${deleteType}`, {
         method: "DELETE",
       });
 

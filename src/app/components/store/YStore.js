@@ -19,15 +19,20 @@ export default function YStoreSection() {
       try {
         const response = await ystoreAPI.getItems();
         if (response.success) {
-          
           const items = response.data?.items || response.items || [];
+
+          // Check for duplicate IDs
+          const ids = items.map((item) => item.id);
+          const duplicateIds = ids.filter(
+            (id, index) => ids.indexOf(id) !== index
+          );
+          if (duplicateIds.length > 0) {
+          }
+
           setStoreItems(items);
         } else {
-          console.error("Failed to fetch store items:", response.error);
         }
       } catch (error) {
-        console.error("Error fetching store items:", error);
-        
         setStoreItems([]);
       } finally {
         setLoading(false);
@@ -67,9 +72,21 @@ export default function YStoreSection() {
   };
 
   const visibleItems = [];
-  for (let i = 0; i < itemsPerPage; i++) {
-    const itemIndex = (currentIndex * itemsPerPage + i) % storeItems.length;
-    visibleItems.push(storeItems[itemIndex]);
+  if (storeItems.length > 0) {
+    const startIndex = currentIndex * itemsPerPage;
+    for (
+      let i = 0;
+      i < itemsPerPage && startIndex + i < storeItems.length;
+      i++
+    ) {
+      const item = storeItems[startIndex + i];
+      if (item) {
+        visibleItems.push({
+          ...item,
+          uniqueKey: `ystore-${item.id}-${startIndex + i}-${currentIndex}`,
+        });
+      }
+    }
   }
 
   if (loading) {
@@ -170,9 +187,9 @@ export default function YStoreSection() {
                 transition={{ duration: 0.3 }}
                 className="flex justify-center gap-6 px-2"
               >
-                {visibleItems.map((item) => (
+                {visibleItems.map((item, index) => (
                   <motion.div
-                    key={item.id}
+                    key={item.uniqueKey}
                     whileHover={{ y: -5 }}
                     className="w-full max-w-xs bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0"
                   >
@@ -183,6 +200,9 @@ export default function YStoreSection() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        onError={(e) => {
+                          e.target.src = "/placeholder-item.jpg";
+                        }}
                       />
                       {item.stock === "Out of Stock" && (
                         <div className="absolute inset-0 bg-red-500 bg-opacity-75 flex items-center justify-center">
@@ -210,7 +230,8 @@ export default function YStoreSection() {
                           </p>
                         </div>
                         <span className="text-blue-600 font-bold text-sm ml-2">
-                          {item.price}
+                          ₵{item.price}
+                          {item.pricingUnit ? ` ${item.pricingUnit}` : ""}
                         </span>
                       </div>
 
@@ -223,7 +244,7 @@ export default function YStoreSection() {
                           {item.stock !== "Out of Stock" ? (
                             <>
                               <a
-                                href="https://wa.me/233244123456"
+                                href={`https://wa.me/${item.contact?.replace(/[^0-9]/g, "")}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex-1 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
@@ -238,7 +259,7 @@ export default function YStoreSection() {
                                 WhatsApp
                               </a>
                               <a
-                                href="tel:+233244123456"
+                                href={`tel:${item.contact}`}
                                 className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
                               >
                                 <svg

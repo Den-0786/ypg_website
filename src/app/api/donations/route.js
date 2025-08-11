@@ -1,106 +1,39 @@
 import { NextResponse } from "next/server";
+import { readFile, writeFile } from "fs/promises";
+import { join } from "path";
 
-// Mock database - in production, this would be a real database
-let donations = [
-  {
-    id: 1,
-    donor: "Anonymous",
-    email: "anonymous@example.com",
-    phone: "+1234567890",
-    amount: 500,
-    currency: "USD",
-    date: "2024-03-10",
-    purpose: "Youth Ministry",
-    payment_method: "momo",
-    status: "confirmed", // pending, confirmed, failed, cancelled
-    verification_status: "verified", // pending, verified, rejected
-    transaction_id: "TXN_001",
-    receipt_code: "RC_001",
-    momo_transaction_id: "MTN_123456789",
-    admin_verified_by: "admin",
-    admin_verified_at: "2024-03-10T14:30:00Z",
-    created_at: "2024-03-10T14:30:00Z",
-  },
-  {
-    id: 2,
-    donor: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+1234567891",
-    amount: 200,
-    currency: "USD",
-    date: "2024-03-08",
-    purpose: "General Fund",
-    payment_method: "cash",
-    status: "confirmed",
-    verification_status: "verified",
-    transaction_id: "TXN_002",
-    receipt_code: "RC_002",
-    cash_receipt_number: "CR_001",
-    admin_verified_by: "admin",
-    admin_verified_at: "2024-03-08T10:15:00Z",
-    created_at: "2024-03-08T10:15:00Z",
-  },
-  {
-    id: 3,
-    donor: "Sarah Smith",
-    email: "sarah.smith@example.com",
-    phone: "+1234567892",
-    amount: 150,
-    currency: "USD",
-    date: "2024-03-05",
-    purpose: "Event Sponsorship",
-    payment_method: "bank",
-    status: "confirmed",
-    verification_status: "verified",
-    transaction_id: "TXN_003",
-    receipt_code: "RC_003",
-    bank_reference: "BR_001",
-    admin_verified_by: "admin",
-    admin_verified_at: "2024-03-05T16:45:00Z",
-    created_at: "2024-03-05T16:45:00Z",
-  },
-  {
-    id: 4,
-    donor: "Michael Johnson",
-    email: "michael.j@example.com",
-    phone: "+1234567893",
-    amount: 300,
-    currency: "USD",
-    date: "2024-03-12",
-    purpose: "Building Fund",
-    payment_method: "momo",
-    status: "pending",
-    verification_status: "pending",
-    transaction_id: "TXN_004",
-    receipt_code: "RC_004",
-    momo_transaction_id: null,
-    admin_verified_by: null,
-    admin_verified_at: null,
-    created_at: "2024-03-12T09:20:00Z",
-  },
-  {
-    id: 5,
-    donor: "Emily Davis",
-    email: "emily.d@example.com",
-    phone: "+1234567894",
-    amount: 75,
-    currency: "USD",
-    date: "2024-03-11",
-    purpose: "General Fund",
-    payment_method: "cash",
-    status: "pending",
-    verification_status: "pending",
-    transaction_id: "TXN_005",
-    receipt_code: "RC_005",
-    cash_receipt_number: null,
-    admin_verified_by: null,
-    admin_verified_at: null,
-    created_at: "2024-03-11T15:45:00Z",
-  },
-];
+let donations = [];
+
+// Load donations from file
+const loadDonations = async () => {
+  try {
+    const filePath = join(process.cwd(), "donations.json");
+    const data = await readFile(filePath, "utf8");
+    donations = JSON.parse(data);
+  } catch (error) {
+    console.error("Error loading donations:", error);
+    donations = [];
+  }
+};
+
+// Save donations to file
+const saveDonations = async () => {
+  try {
+    const filePath = join(process.cwd(), "donations.json");
+    await writeFile(filePath, JSON.stringify(donations, null, 2));
+  } catch (error) {
+    console.error("Error saving donations:", error);
+  }
+};
+
+// Initialize data on first load
+if (donations.length === 0) {
+  loadDonations();
+}
 
 export async function GET(request) {
   try {
+    await loadDonations();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const purpose = searchParams.get("purpose");
@@ -135,7 +68,7 @@ export async function GET(request) {
 
     // Calculate totals
     const totalAmount = filteredDonations.reduce(
-      (sum, donation) => sum + donation.amount,
+      (sum, donation) => sum + (donation.amount || 0),
       0
     );
     const totalCount = filteredDonations.length;
@@ -143,7 +76,7 @@ export async function GET(request) {
     // Calculate verified amounts only
     const verifiedAmount = filteredDonations
       .filter((donation) => donation.verification_status === "verified")
-      .reduce((sum, donation) => sum + donation.amount, 0);
+      .reduce((sum, donation) => sum + (donation.amount || 0), 0);
 
     return NextResponse.json({
       success: true,
@@ -176,7 +109,7 @@ export async function POST(request) {
     const receiptCode = `RC_${String(donations.length + 1).padStart(3, "0")}`;
 
     const newDonation = {
-      id: donations.length + 1,
+      id: Date.now().toString(),
       ...body,
       status: "pending", // Always start as pending
       verification_status: "pending", // Always start as pending
@@ -191,6 +124,7 @@ export async function POST(request) {
     };
 
     donations.push(newDonation);
+    await saveDonations();
 
     return NextResponse.json({
       success: true,
@@ -228,6 +162,7 @@ export async function PUT(request) {
     }
 
     donations[donationIndex] = { ...donations[donationIndex], ...updateData };
+    await saveDonations();
 
     return NextResponse.json({
       success: true,
@@ -245,7 +180,7 @@ export async function PUT(request) {
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = parseInt(searchParams.get("id"));
+    const id = searchParams.get("id");
 
     const donationIndex = donations.findIndex((donation) => donation.id === id);
     if (donationIndex === -1) {
@@ -256,6 +191,7 @@ export async function DELETE(request) {
     }
 
     donations.splice(donationIndex, 1);
+    await saveDonations();
 
     return NextResponse.json({
       success: true,

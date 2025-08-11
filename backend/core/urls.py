@@ -2,6 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Authentication API endpoints
+    path('api/auth/login/', views.api_supervisor_login, name='api_supervisor_login'),
+    path('api/auth/logout/', views.api_supervisor_logout, name='api_supervisor_logout'),
+    path('api/auth/status/', views.api_supervisor_status, name='api_supervisor_status'),
+    path('api/auth/credentials/', views.api_supervisor_change_credentials, name='api_supervisor_change_credentials'),
+    
     # Quiz API endpoints
     path('api/quizzes/active/', views.api_active_quiz, name='api_active_quiz'),
     path('api/quizzes/', views.api_quizzes, name='api_quizzes'),
@@ -71,6 +77,13 @@ urlpatterns = [
     # Analytics API endpoints
     path('api/analytics/', views.api_analytics, name='api_analytics'),
     path('api/analytics/track/', views.api_track_analytics, name='api_track_analytics'),
+    
+    # Branch President API endpoints
+    path('branch-presidents/', views.api_branch_presidents, name='api_branch_presidents'),
+    path('branch-presidents/admin/', views.api_branch_presidents_admin, name='api_branch_presidents_admin'),
+    path('branch-presidents/create/', views.api_branch_president_create, name='api_branch_president_create'),
+    path('branch-presidents/<int:president_id>/update/', views.api_branch_president_update, name='api_branch_president_update'),
+    path('branch-presidents/<int:president_id>/delete/', views.api_branch_president_delete, name='api_branch_president_delete'),
 ]
 
 

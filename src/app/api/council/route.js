@@ -3,53 +3,12 @@ import { writeFile, readFile, unlink } from "fs/promises";
 import { join } from "path";
 
 // Mock database - in production, this would be a real database
-let councilMembers = [
-  {
-    id: 1,
-    name: "Rev. Emmanuel Asante",
-    position: "Branch President",
-    congregation: "Kumasi Central",
-    image: "/hero.jpg",
-    phone: "0244123456",
-    email: "emmanuel.asante@ypg.com",
-    description: "Leading with wisdom and spiritual guidance.",
-  },
-  {
-    id: 2,
-    name: "Sister Grace Osei",
-    position: "Branch Secretary",
-    congregation: "Kumasi Central",
-    image: "/rita.jpg",
-    phone: "0244234567",
-    email: "grace.osei@ypg.com",
-    description: "Serving with dedication and excellence.",
-  },
-  {
-    id: 3,
-    name: "Elder Samuel Boateng",
-    position: "Branch President",
-    congregation: "Accra North",
-    image: "/jy.jpeg",
-    phone: "0244345678",
-    email: "samuel.boateng@ypg.com",
-    description: "Committed to youth development and spiritual growth.",
-  },
-  {
-    id: 4,
-    name: "Sister Mary Adjei",
-    position: "Branch Secretary",
-    congregation: "Accra North",
-    image: "/mission.jpg",
-    phone: "0244456789",
-    email: "mary.adjei@ypg.com",
-    description: "Organizing with passion and commitment.",
-  },
-];
+let councilMembers = [];
 
 // Helper function to save council members to a file
 async function saveCouncilMembers() {
   try {
-    const filePath = join(process.cwd(), "data", "council-members.json");
+    const filePath = join(process.cwd(), "council-members.json");
     await writeFile(filePath, JSON.stringify(councilMembers, null, 2));
   } catch (error) {
     console.error("Error saving council members:", error);
@@ -58,7 +17,7 @@ async function saveCouncilMembers() {
 
 async function loadCouncilMembers() {
   try {
-    const filePath = join(process.cwd(), "data", "council-members.json");
+    const filePath = join(process.cwd(), "council-members.json");
     const data = await readFile(filePath, "utf8");
     councilMembers = JSON.parse(data);
   } catch (error) {
@@ -123,12 +82,23 @@ export async function POST(request) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // In a real application, you would save the image to a storage service
-      // For now, we'll just use a placeholder
-      imagePath = `/uploads/council/${Date.now()}-${image.name}`;
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/council/${fileName}`;
 
-      // Save the image file (in a real app, you'd use a proper storage solution)
-      // await writeFile(join(process.cwd(), 'public', imagePath), buffer);
+      // Save the image file to local storage
+      try {
+        await writeFile(join(process.cwd(), "public", imagePath), buffer);
+        console.log(`Council image saved: ${imagePath}`);
+      } catch (error) {
+        console.error("Error saving council image:", error);
+        return NextResponse.json(
+          { success: false, error: "Failed to save image" },
+          { status: 500 }
+        );
+      }
     }
 
     const newCouncilMember = {
@@ -147,8 +117,7 @@ export async function POST(request) {
 
     councilMembers.push(newCouncilMember);
 
-    // In a real application, you would save to a database
-    // await saveCouncilMembers();
+    await saveCouncilMembers();
 
     return NextResponse.json({
       success: true,
@@ -202,12 +171,29 @@ export async function PUT(request) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // In a real application, you would save the image to a storage service
-      // For now, we'll just use a placeholder
-      imagePath = `/uploads/council/${Date.now()}-${image.name}`;
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/council/${fileName}`;
 
-      // Save the image file (in a real app, you'd use a proper storage solution)
-      // await writeFile(join(process.cwd(), 'public', imagePath), buffer);
+      // Save the new image file to local storage
+      try {
+        await writeFile(join(process.cwd(), "public", imagePath), buffer);
+        console.log(`New council image saved: ${imagePath}`);
+      } catch (error) {
+        console.error("Error saving new council image:", error);
+        return NextResponse.json(
+          { success: false, error: "Failed to save new image" },
+          { status: 500 }
+        );
+      }
+
+      // Keep old images - admin will manually delete when needed
+      console.log(`New council member image saved: ${imagePath}`);
+      console.log(
+        `Old council member image kept: ${councilMembers[councilMemberIndex].image}`
+      );
     }
 
     const updatedCouncilMember = {
@@ -223,8 +209,7 @@ export async function PUT(request) {
 
     councilMembers[councilMemberIndex] = updatedCouncilMember;
 
-    // In a real application, you would save to a database
-    // await saveCouncilMembers();
+    await saveCouncilMembers();
 
     return NextResponse.json({
       success: true,
@@ -256,7 +241,28 @@ export async function DELETE(request) {
     }
 
     if (deleteType === "both") {
+      // Delete the image file if it exists
+      if (
+        councilMembers[councilMemberIndex].image &&
+        councilMembers[councilMemberIndex].image.startsWith("/uploads/council/")
+      ) {
+        try {
+          await unlink(
+            join(
+              process.cwd(),
+              "public",
+              councilMembers[councilMemberIndex].image
+            )
+          );
+          console.log(
+            `Council member image deleted: ${councilMembers[councilMemberIndex].image}`
+          );
+        } catch (error) {
+          console.error("Error deleting council member image:", error);
+        }
+      }
       councilMembers.splice(councilMemberIndex, 1);
+      await saveCouncilMembers();
       return NextResponse.json({
         success: true,
         message:
@@ -264,15 +270,13 @@ export async function DELETE(request) {
       });
     } else {
       councilMembers[councilMemberIndex].dashboard_deleted = true;
+      await saveCouncilMembers();
       return NextResponse.json({
         success: true,
         message:
           "Council member deleted from dashboard only (hidden from admin)",
       });
     }
-
-    // In a real application, you would save to a database
-    // await saveCouncilMembers();
   } catch (error) {
     return NextResponse.json(
       { success: false, error: "Failed to delete council member" },
@@ -281,4 +285,5 @@ export async function DELETE(request) {
   }
 }
 
-
+// Load council members on startup
+loadCouncilMembers();
