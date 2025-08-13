@@ -1,54 +1,72 @@
 import { NextResponse } from "next/server";
-
-// Mock website settings data (in production, this would come from a database)
-let websiteSettings = {
-  id: 1,
-  // General Settings
-  websiteTitle: "PCG Ahinsan District YPG",
-  contactEmail: "youth@presbyterian.org",
-  phoneNumber: "+233 20 123 4567",
-  address: "Ahinsan District, Kumasi, Ghana",
-  description: "Presbyterian Church of Ghana Youth Ministry - Ahinsan District",
-
-  // Social Media Links
-  socialMedia: {
-    facebook: "https://facebook.com/presbyterianyouth",
-    instagram: "https://instagram.com/presbyterianyouth",
-    twitter: "https://twitter.com/presbyterianyouth",
-    youtube: "https://youtube.com/presbyterianyouth",
-    linkedin: "https://linkedin.com/company/presbyterianyouth",
-  },
-
-  // Appearance Settings
-  appearance: {
-    theme: "light",
-    language: "English",
-    primaryColor: "#3B82F6",
-    borderRadius: "medium",
-  },
-
-  // Privacy Settings
-  privacy: {
-    showMemberCount: true,
-    allowPublicRegistration: true,
-    requireApprovalForPosts: false,
-    enableComments: true,
-    showLastSeen: false,
-  },
-
-  createdAt: "2024-01-01T00:00:00.000Z",
-  updatedAt: "2024-01-01T00:00:00.000Z",
-};
+import pool from "@/lib/database.js";
 
 // GET - Fetch website settings
 export async function GET() {
   try {
+    const result = await pool.query(
+      "SELECT setting_key, setting_value, setting_type FROM settings WHERE setting_key LIKE 'website_%'"
+    );
+
+    // Convert database rows to settings object
+    const settings = {};
+    result.rows.forEach((row) => {
+      const key = row.setting_key.replace("website_", "");
+      let value = row.setting_value;
+
+      // Parse JSON values
+      if (row.setting_type === "json") {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          value = {};
+        }
+      } else if (row.setting_type === "boolean") {
+        value = value === "true";
+      } else if (row.setting_type === "number") {
+        value = parseFloat(value);
+      }
+
+      settings[key] = value;
+    });
+
+    // Set defaults if no settings exist
+    const defaultSettings = {
+      websiteTitle: "PCG Ahinsan District YPG",
+      contactEmail: "youth@presbyterian.org",
+      phoneNumber: "+233 20 123 4567",
+      address: "Ahinsan District, Kumasi, Ghana",
+      description:
+        "Presbyterian Church of Ghana Ahinsan District YPG - Ahinsan District",
+      socialMedia: {
+        facebook: "https://facebook.com/presbyterianyouth",
+        instagram: "https://instagram.com/presbyterianyouth",
+        twitter: "https://twitter.com/presbyterianyouth",
+        youtube: "https://youtube.com/presbyterianyouth",
+        linkedin: "https://linkedin.com/company/presbyterianyouth",
+      },
+      appearance: {
+        theme: "light",
+        language: "English",
+        primaryColor: "#3B82F6",
+        borderRadius: "medium",
+      },
+      privacy: {
+        showMemberCount: true,
+        allowPublicRegistration: true,
+        requireApprovalForPosts: false,
+        enableComments: true,
+        showLastSeen: false,
+      },
+    };
+
+    const mergedSettings = { ...defaultSettings, ...settings };
+
     return NextResponse.json({
       success: true,
-      settings: websiteSettings,
+      settings: mergedSettings,
     });
   } catch (error) {
-    console.error("Error fetching website settings:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch website settings" },
       { status: 500 }
@@ -117,43 +135,48 @@ export async function PUT(request) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
-    // Update settings
-    const updates = {
-      updatedAt: new Date().toISOString(),
-    };
+    // Prepare settings to update
+    const settingsToUpdate = [];
 
-    // Update general settings
-    if (websiteTitle !== undefined) updates.websiteTitle = websiteTitle;
-    if (contactEmail !== undefined) updates.contactEmail = contactEmail;
-    if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
-    if (address !== undefined) updates.address = address;
-    if (description !== undefined) updates.description = description;
+    if (websiteTitle !== undefined)
+      settingsToUpdate.push(["websiteTitle", websiteTitle, "string"]);
+    if (contactEmail !== undefined)
+      settingsToUpdate.push(["contactEmail", contactEmail, "string"]);
+    if (phoneNumber !== undefined)
+      settingsToUpdate.push(["phoneNumber", phoneNumber, "string"]);
+    if (address !== undefined)
+      settingsToUpdate.push(["address", address, "string"]);
+    if (description !== undefined)
+      settingsToUpdate.push(["description", description, "string"]);
+    if (socialMedia !== undefined)
+      settingsToUpdate.push([
+        "socialMedia",
+        JSON.stringify(socialMedia),
+        "json",
+      ]);
+    if (appearance !== undefined)
+      settingsToUpdate.push(["appearance", JSON.stringify(appearance), "json"]);
+    if (privacy !== undefined)
+      settingsToUpdate.push(["privacy", JSON.stringify(privacy), "json"]);
 
-    // Update social media
-    if (socialMedia) {
-      updates.socialMedia = { ...websiteSettings.socialMedia, ...socialMedia };
+    // Update settings in database
+    for (const [key, value, type] of settingsToUpdate) {
+      await pool.query(
+        `
+        INSERT INTO settings (setting_key, setting_value, setting_type) 
+        VALUES ($1, $2, $3)
+        ON CONFLICT (setting_key) 
+        DO UPDATE SET setting_value = $2, setting_type = $3, updated_at = CURRENT_TIMESTAMP
+      `,
+        [`website_${key}`, value, type]
+      );
     }
-
-    // Update appearance
-    if (appearance) {
-      updates.appearance = { ...websiteSettings.appearance, ...appearance };
-    }
-
-    // Update privacy
-    if (privacy) {
-      updates.privacy = { ...websiteSettings.privacy, ...privacy };
-    }
-
-    // Apply updates
-    websiteSettings = { ...websiteSettings, ...updates };
 
     return NextResponse.json({
       success: true,
-      settings: websiteSettings,
       message: "Website settings updated successfully",
     });
   } catch (error) {
-    console.error("Error updating website settings:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update website settings" },
       { status: 500 }
@@ -173,29 +196,31 @@ export async function PATCH(request) {
       );
     }
 
-    const updates = {
-      updatedAt: new Date().toISOString(),
-    };
+    let settingKey, settingValue, settingType;
 
     switch (section) {
       case "general":
-        if (data.websiteTitle) updates.websiteTitle = data.websiteTitle;
-        if (data.contactEmail) updates.contactEmail = data.contactEmail;
-        if (data.phoneNumber) updates.phoneNumber = data.phoneNumber;
-        if (data.address) updates.address = data.address;
-        if (data.description) updates.description = data.description;
+        settingKey = "website_general";
+        settingValue = JSON.stringify(data);
+        settingType = "json";
         break;
 
       case "socialMedia":
-        updates.socialMedia = { ...websiteSettings.socialMedia, ...data };
+        settingKey = "website_socialMedia";
+        settingValue = JSON.stringify(data);
+        settingType = "json";
         break;
 
       case "appearance":
-        updates.appearance = { ...websiteSettings.appearance, ...data };
+        settingKey = "website_appearance";
+        settingValue = JSON.stringify(data);
+        settingType = "json";
         break;
 
       case "privacy":
-        updates.privacy = { ...websiteSettings.privacy, ...data };
+        settingKey = "website_privacy";
+        settingValue = JSON.stringify(data);
+        settingType = "json";
         break;
 
       default:
@@ -205,25 +230,25 @@ export async function PATCH(request) {
         );
     }
 
-    // Apply updates
-    websiteSettings = { ...websiteSettings, ...updates };
+    // Update setting in database
+    await pool.query(
+      `
+      INSERT INTO settings (setting_key, setting_value, setting_type) 
+      VALUES ($1, $2, $3)
+      ON CONFLICT (setting_key) 
+      DO UPDATE SET setting_value = $2, setting_type = $3, updated_at = CURRENT_TIMESTAMP
+    `,
+      [settingKey, settingValue, settingType]
+    );
 
     return NextResponse.json({
       success: true,
-      settings: websiteSettings,
       message: `${section} settings updated successfully`,
     });
   } catch (error) {
-    console.error("Error updating website settings:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update website settings" },
       { status: 500 }
     );
   }
 }
-
-
-
-
-
-

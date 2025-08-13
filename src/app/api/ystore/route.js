@@ -1,76 +1,38 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, access } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
-
-// File path for persistent storage
-const DATA_FILE_PATH = join(process.cwd(), "data", "ystore-items.json");
-
-// Y-Store items data (in production, this would come from a database)
-let storeItems = [];
-
-// Load data from file
-async function loadStoreItems() {
-  try {
-    await access(DATA_FILE_PATH);
-    const data = await readFile(DATA_FILE_PATH, "utf8");
-    const parsed = JSON.parse(data);
-    if (Array.isArray(parsed)) {
-      storeItems = parsed;
-    } else {
-      console.warn(
-        "Invalid data format in ystore-items.json, starting with empty array"
-      );
-      storeItems = [];
-    }
-  } catch (error) {
-    // File doesn't exist or is invalid, start with empty array
-    console.log("No existing ystore data found, starting with empty array");
-    storeItems = [];
-  }
-}
-
-// Save data to file
-async function saveStoreItems() {
-  try {
-    // Ensure data directory exists
-    const dataDir = join(process.cwd(), "data");
-    try {
-      await access(dataDir);
-    } catch {
-      // Create data directory if it doesn't exist
-      const { mkdir } = await import("fs/promises");
-      await mkdir(dataDir, { recursive: true });
-    }
-
-    await writeFile(DATA_FILE_PATH, JSON.stringify(storeItems, null, 2));
-  } catch (error) {
-    console.error("Error saving store items:", error);
-  }
-}
+import pool from "@/lib/database.js";
 
 // GET - Fetch store items
 export async function GET(request) {
   try {
-    // Load data from file
-    await loadStoreItems();
-
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const featured = searchParams.get("featured");
     const status = searchParams.get("status") || "active";
     const forWebsite = searchParams.get("forWebsite") === "true";
 
-    let filteredItems = storeItems.filter((item) => item.status === status);
+    let query = `
+      SELECT * FROM ystore_items 
+      WHERE status = $1
+    `;
+    let params = [status];
+    let paramIndex = 2;
 
     if (category) {
-      filteredItems = filteredItems.filter(
-        (item) => item.category.toLowerCase() === category.toLowerCase()
-      );
+      query += ` AND LOWER(category) = LOWER($${paramIndex})`;
+      params.push(category);
+      paramIndex++;
     }
 
     if (featured === "true") {
-      filteredItems = filteredItems.filter((item) => item.featured);
+      query += ` AND featured = true`;
     }
+
+    query += ` ORDER BY created_at DESC`;
+
+    const result = await pool.query(query, params);
+    let filteredItems = result.rows;
 
     // For website, return only necessary fields
     if (forWebsite) {
@@ -78,15 +40,15 @@ export async function GET(request) {
         id: item.id,
         name: item.name,
         description: item.description,
-        price: item.price,
-        originalPrice: item.originalPrice,
+        price: parseFloat(item.price),
+        originalPrice: parseFloat(item.original_price || item.price),
         category: item.category,
         image: item.image,
-        rating: item.rating,
+        rating: parseFloat(item.rating),
         reviews: item.reviews,
         featured: item.featured,
-        pricingUnit: item.pricingUnit || "",
-        contact: item.contact || "+233244123456", // Include contact number
+        pricingUnit: item.pricing_unit || "",
+        contact: item.contact || "+233244123456",
         stock: item.stock > 0 ? "In Stock" : "Out of Stock",
       }));
     }
@@ -97,7 +59,6 @@ export async function GET(request) {
       total: filteredItems.length,
     });
   } catch (error) {
-    console.error("Error fetching store items:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch store items" },
       { status: 500 }
@@ -125,6 +86,8 @@ export async function POST(request) {
         stock: parseInt(formData.get("stock")),
         featured: formData.get("featured") === "true",
         tags: JSON.parse(formData.get("tags") || "[]"),
+        pricingUnit: formData.get("pricingUnit") || "",
+        contact: formData.get("contact") || "+233244123456",
         image: formData.get("image"),
       };
     } else {
@@ -165,7 +128,6 @@ export async function POST(request) {
         const filePath = join(uploadDir, fileName);
         await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving YStore image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save image" },
           { status: 500 }
@@ -173,40 +135,37 @@ export async function POST(request) {
       }
     }
 
-    const newItem = {
-      id: Math.max(...storeItems.map((item) => item.id), 0) + 1,
-      name: itemData.name,
-      description: itemData.description,
-      price: itemData.price,
-      originalPrice: itemData.originalPrice || itemData.price,
-      category: itemData.category,
-      image: imagePath,
-      images: [imagePath],
-      sizes: itemData.sizes || ["One Size"],
-      colors: itemData.colors || ["Default"],
-      stock: itemData.stock,
-      rating: itemData.rating || 4.5,
-      reviews: itemData.reviews || 0,
-      featured: itemData.featured || false,
-      status: "active",
-      tags: itemData.tags || [],
-      pricingUnit: itemData.pricingUnit || "",
-      contact: itemData.contact || "+233244123456", // Default contact number
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    // Insert into database
+    const insertQuery = `
+      INSERT INTO ystore_items (
+        name, description, price, original_price, category, image, 
+        sizes, colors, stock, rating, reviews, featured, status, 
+        tags, pricing_unit, contact
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      RETURNING *
+    `;
 
-    // Check for duplicate IDs before adding
-    const existingIds = storeItems.map((item) => item.id);
-    if (existingIds.includes(newItem.id)) {
-      // Generate a new unique ID
-      newItem.id = Math.max(...existingIds) + 1;
-    }
+    const insertParams = [
+      itemData.name,
+      itemData.description,
+      itemData.price,
+      itemData.originalPrice || itemData.price,
+      itemData.category,
+      imagePath,
+      JSON.stringify(itemData.sizes || ["One Size"]),
+      JSON.stringify(itemData.colors || ["Default"]),
+      itemData.stock,
+      itemData.rating || 4.5,
+      itemData.reviews || 0,
+      itemData.featured || false,
+      "active",
+      JSON.stringify(itemData.tags || []),
+      itemData.pricingUnit || "",
+      itemData.contact || "+233244123456",
+    ];
 
-    storeItems.push(newItem);
-
-    // Save to file
-    await saveStoreItems();
+    const result = await pool.query(insertQuery, insertParams);
+    const newItem = result.rows[0];
 
     return NextResponse.json({
       success: true,
@@ -214,7 +173,6 @@ export async function POST(request) {
       message: "Store item created successfully",
     });
   } catch (error) {
-    console.error("Error creating store item:", error);
     return NextResponse.json(
       { success: false, error: "Failed to create store item" },
       { status: 500 }
@@ -251,6 +209,7 @@ export async function PUT(request) {
         stock: parseInt(formData.get("stock")),
         featured: formData.get("featured") === "true",
         tags: JSON.parse(formData.get("tags") || "[]"),
+        pricingUnit: formData.get("pricingUnit") || "",
         contact: formData.get("contact") || "+233244123456",
         image: formData.get("image"),
       };
@@ -258,16 +217,23 @@ export async function PUT(request) {
       updateData = await request.json();
     }
 
-    const itemIndex = storeItems.findIndex((item) => item.id === id);
-    if (itemIndex === -1) {
+    // Check if item exists
+    const checkResult = await pool.query(
+      "SELECT * FROM ystore_items WHERE id = $1",
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Store item not found" },
         { status: 404 }
       );
     }
 
+    const existingItem = checkResult.rows[0];
+
     // Handle image upload if a new image is provided
-    let imagePath = storeItems[itemIndex].image;
+    let imagePath = existingItem.image;
     if (updateData.image && updateData.image.size > 0) {
       const bytes = await updateData.image.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -287,34 +253,60 @@ export async function PUT(request) {
         const filePath = join(uploadDir, fileName);
         await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving new YStore image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save new image" },
           { status: 500 }
         );
       }
-
-      // Keep old images for YStore items - admin can manually delete if needed
     }
 
-    // Update the item
-    storeItems[itemIndex] = {
-      ...storeItems[itemIndex],
-      ...updateData,
-      image: imagePath,
-      updatedAt: new Date().toISOString(),
-    };
+    // Update in database
+    const updateQuery = `
+      UPDATE ystore_items SET
+        name = $1,
+        description = $2,
+        price = $3,
+        original_price = $4,
+        category = $5,
+        image = $6,
+        sizes = $7,
+        colors = $8,
+        stock = $9,
+        featured = $10,
+        tags = $11,
+        pricing_unit = $12,
+        contact = $13,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $14
+      RETURNING *
+    `;
 
-    // Save to file
-    await saveStoreItems();
+    const updateParams = [
+      updateData.name,
+      updateData.description,
+      updateData.price,
+      updateData.originalPrice || updateData.price,
+      updateData.category,
+      imagePath,
+      JSON.stringify(updateData.sizes || ["One Size"]),
+      JSON.stringify(updateData.colors || ["Default"]),
+      updateData.stock,
+      updateData.featured || false,
+      JSON.stringify(updateData.tags || []),
+      updateData.pricingUnit || "",
+      updateData.contact || "+233244123456",
+      id,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedItem = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      item: storeItems[itemIndex],
+      item: updatedItem,
       message: "Store item updated successfully",
     });
   } catch (error) {
-    console.error("Error updating store item:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update store item" },
       { status: 500 }
@@ -336,32 +328,39 @@ export async function DELETE(request) {
       );
     }
 
-    const itemIndex = storeItems.findIndex((item) => item.id === id);
-    if (itemIndex === -1) {
-      return NextResponse.json(
-        { success: false, error: "Store item not found" },
-        { status: 404 }
-      );
-    }
-
     if (deleteType === "hard") {
       // Permanently delete the item
-      storeItems.splice(itemIndex, 1);
+      const result = await pool.query(
+        "DELETE FROM ystore_items WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Store item not found" },
+          { status: 404 }
+        );
+      }
     } else {
       // Soft delete - mark as deleted
-      storeItems[itemIndex].status = "deleted";
-      storeItems[itemIndex].updatedAt = new Date().toISOString();
-    }
+      const result = await pool.query(
+        "UPDATE ystore_items SET status = 'deleted', updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id",
+        [id]
+      );
 
-    // Save to file
-    await saveStoreItems();
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Store item not found" },
+          { status: 404 }
+        );
+      }
+    }
 
     return NextResponse.json({
       success: true,
       message: `Store item ${deleteType === "hard" ? "permanently deleted" : "marked as deleted"}`,
     });
   } catch (error) {
-    console.error("Error deleting store item:", error);
     return NextResponse.json(
       { success: false, error: "Failed to delete store item" },
       { status: 500 }

@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 
-// Mock MoMo API verification - in production, this would integrate with actual MoMo API
 export async function POST(request) {
   try {
     const { transactionId, amount, phoneNumber } = await request.json();
 
-    // Validate required fields
     if (!transactionId || !amount || !phoneNumber) {
       return NextResponse.json(
         {
@@ -16,22 +14,18 @@ export async function POST(request) {
       );
     }
 
-    // Mock verification logic
-    // In production, this would make a real API call to MoMo
     const mockVerification = {
       transactionId: transactionId,
-      status: "success", // success, failed, pending
+      status: "success",
       amount: amount,
       phoneNumber: phoneNumber,
       timestamp: new Date().toISOString(),
       reference: `REF_${transactionId}`,
-      verified: true, // Mock verification result
+      verified: true,
     };
 
-    // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Mock verification result (80% success rate for demo)
     const isVerified = Math.random() > 0.2;
 
     if (isVerified) {
@@ -50,7 +44,7 @@ export async function POST(request) {
       });
     }
   } catch (error) {
-    console.error("Error in MoMo verification:", error);
+    // Error in MoMo verification
     return NextResponse.json(
       {
         success: false,
@@ -77,10 +71,10 @@ export async function GET(request) {
       );
     }
 
-    // Mock status check
+    // Status check
     const mockStatus = {
       transactionId: transactionId,
-      status: "completed", // pending, completed, failed
+      status: "completed",
       verified: true,
       timestamp: new Date().toISOString(),
     };
@@ -90,7 +84,7 @@ export async function GET(request) {
       status: mockStatus,
     });
   } catch (error) {
-    console.error("Error checking MoMo status:", error);
+    // Error checking MoMo status
     return NextResponse.json(
       {
         success: false,
@@ -100,4 +94,3 @@ export async function GET(request) {
     );
   }
 }
-

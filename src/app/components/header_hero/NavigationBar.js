@@ -28,6 +28,7 @@ export default function NavigationBar() {
     { name: "Testimonials", href: "#testimonials" },
     { name: "Ministries", href: "#ministries" },
     { name: "Team", href: "#team" },
+    { name: "Welfare", href: "#welfare" },
     { name: "Join Us", href: "#join" },
   ];
 
@@ -103,7 +104,7 @@ export default function NavigationBar() {
   return (
     <>
       <nav
-        className={`w-full sticky top-0 z-50 transition-all duration-300 ${
+        className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled ? "bg-white shadow-md" : "bg-white/90 backdrop-blur-sm"
         }`}
       >
@@ -171,7 +172,7 @@ export default function NavigationBar() {
                   setDropdownOpen(true);
                 }}
                 onMouseLeave={() => {
-                  const timeout = setTimeout(() => setDropdownOpen(false), 150);
+                  const timeout = setTimeout(() => setDropdownOpen(false), 500);
                   setDropdownTimeout(timeout);
                 }}
                 className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 border-2 flex items-center space-x-1 ${
@@ -200,7 +201,7 @@ export default function NavigationBar() {
                   onMouseLeave={() => {
                     const timeout = setTimeout(
                       () => setDropdownOpen(false),
-                      150
+                      500
                     );
                     setDropdownTimeout(timeout);
                   }}

@@ -121,7 +121,7 @@ const LoginScreen = ({ onLogin }) => {
           </form>
 
           <div className="mt-6 text-center text-sm text-white/80">
-            <p>Default credentials: supervisor / admin123</p>
+            <p>Please contact the system administrator for login credentials</p>
           </div>
         </div>
       </motion.div>

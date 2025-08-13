@@ -1,66 +1,77 @@
 import { NextResponse } from "next/server";
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+import pool from "@/lib/database.js";
 
-let cashReceipts = [];
-
-// Load cash receipts from file
-const loadCashReceipts = async () => {
+// GET - Fetch cash receipts
+export async function GET(request) {
   try {
-    const filePath = join(process.cwd(), "cash-receipts.json");
-    const data = await readFile(filePath, "utf8");
-    cashReceipts = JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading cash receipts:", error);
-    cashReceipts = [];
-  }
-};
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
 
-// Save cash receipts to file
-const saveCashReceipts = async () => {
-  try {
-    const filePath = join(process.cwd(), "cash-receipts.json");
-    await writeFile(filePath, JSON.stringify(cashReceipts, null, 2));
-  } catch (error) {
-    console.error("Error saving cash receipts:", error);
-  }
-};
+    let query = "SELECT * FROM cash_receipts";
+    let params = [];
 
-// Initialize data on first load
-if (cashReceipts.length === 0) {
-  loadCashReceipts();
-}
-
-export async function POST(request) {
-  try {
-    const { donorName, amount, issuedBy } = await request.json();
-
-    // Validate required fields
-    if (!donorName || !amount || !issuedBy) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Missing required fields: donorName, amount, issuedBy",
-        },
-        { status: 400 }
-      );
+    if (status) {
+      query += " WHERE status = $1";
+      params.push(status);
     }
 
-    // Generate unique receipt number
-    const receiptNumber = `CR_${String(cashReceipts.length + 1).padStart(3, "0")}`;
+    query += " ORDER BY created_at DESC";
 
-    const newReceipt = {
-      receiptNumber: receiptNumber,
-      donorName: donorName,
-      amount: parseFloat(amount),
-      date: new Date().toISOString().split("T")[0],
-      issuedBy: issuedBy,
-      verified: false,
-      timestamp: new Date().toISOString(),
-    };
+    const result = await pool.query(query, params);
 
-    cashReceipts.push(newReceipt);
-    await saveCashReceipts();
+    return NextResponse.json({
+      success: true,
+      receipts: result.rows,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch cash receipts" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Generate cash receipt
+export async function POST(request) {
+  try {
+    const data = await request.json();
+
+    // Validation
+    const errors = {};
+    if (!data.donor_name?.trim()) errors.donor_name = "Donor name is required";
+    if (!data.amount || data.amount <= 0)
+      errors.amount = "Valid amount is required";
+    if (!data.purpose?.trim()) errors.purpose = "Purpose is required";
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ success: false, errors }, { status: 400 });
+    }
+
+    // Generate receipt number
+    const receiptNumber = `CR${Date.now()}`;
+
+    const insertQuery = `
+      INSERT INTO cash_receipts (
+        receipt_number, donor_name, amount, currency, purpose, 
+        phone, email, message, status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `;
+
+    const insertParams = [
+      receiptNumber,
+      data.donor_name.trim(),
+      data.amount,
+      data.currency || "GHS",
+      data.purpose.trim(),
+      data.phone?.trim() || "",
+      data.email?.trim() || "",
+      data.message?.trim() || "",
+      "pending",
+    ];
+
+    const result = await pool.query(insertQuery, insertParams);
+    const newReceipt = result.rows[0];
 
     return NextResponse.json({
       success: true,
@@ -68,108 +79,105 @@ export async function POST(request) {
       message: "Cash receipt generated successfully",
     });
   } catch (error) {
-    console.error("Error generating cash receipt:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Failed to generate cash receipt" },
       { status: 500 }
     );
   }
 }
 
-// GET endpoint for verifying cash receipts
-export async function GET(request) {
-  try {
-    await loadCashReceipts();
-    const { searchParams } = new URL(request.url);
-    const receiptNumber = searchParams.get("receiptNumber");
-
-    if (!receiptNumber) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Receipt number is required",
-        },
-        { status: 400 }
-      );
-    }
-
-    const receipt = cashReceipts.find((r) => r.receiptNumber === receiptNumber);
-
-    if (!receipt) {
-      return NextResponse.json({
-        success: false,
-        verified: false,
-        error: "Receipt not found",
-      });
-    }
-
-    return NextResponse.json({
-      success: true,
-      verified: receipt.verified,
-      receipt: receipt,
-    });
-  } catch (error) {
-    console.error("Error verifying cash receipt:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
-      { status: 500 }
-    );
-  }
-}
-
-// PUT endpoint for updating receipt verification status
+// PUT - Verify cash receipt
 export async function PUT(request) {
   try {
-    const { receiptNumber, verified, verifiedBy } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
 
-    if (!receiptNumber) {
+    if (!id) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Receipt number is required",
-        },
+        { success: false, error: "Receipt ID is required" },
         { status: 400 }
       );
     }
 
-    const receiptIndex = cashReceipts.findIndex(
-      (r) => r.receiptNumber === receiptNumber
+    const data = await request.json();
+
+    // Check if receipt exists
+    const checkResult = await pool.query(
+      "SELECT * FROM cash_receipts WHERE id = $1",
+      [id]
     );
 
-    if (receiptIndex === -1) {
-      return NextResponse.json({
-        success: false,
-        error: "Receipt not found",
-      });
+    if (checkResult.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Cash receipt not found" },
+        { status: 404 }
+      );
     }
 
-    cashReceipts[receiptIndex] = {
-      ...cashReceipts[receiptIndex],
-      verified: verified,
-      verifiedBy: verifiedBy,
-      verifiedAt: new Date().toISOString(),
-    };
+    const updateQuery = `
+      UPDATE cash_receipts SET
+        status = $1,
+        verified_by = $2,
+        verified_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $3
+      RETURNING *
+    `;
 
-    await saveCashReceipts();
+    const updateParams = [
+      data.status || "verified",
+      data.verified_by || "admin",
+      id,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedReceipt = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      receipt: cashReceipts[receiptIndex],
-      message: "Receipt verification status updated",
+      receipt: updatedReceipt,
+      message: "Cash receipt verified successfully",
     });
   } catch (error) {
-    console.error("Error updating receipt:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Failed to verify cash receipt" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Delete cash receipt
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Receipt ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const result = await pool.query(
+      "DELETE FROM cash_receipts WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Cash receipt not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Cash receipt deleted successfully",
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Failed to delete cash receipt" },
       { status: 500 }
     );
   }

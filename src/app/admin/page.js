@@ -24,6 +24,7 @@ import TrashManagement from "./components/TrashManagement";
 import CommunicationManagement from "./components/CommunicationManagement";
 import YStoreManagement from "./components/YStoreManagement";
 import BranchPresidentsManagement from "./components/BranchPresidentsManagement";
+import WelfareCommittee from "./components/WelfareCommittee";
 import CouncilManagement from "./components/CouncilManagement";
 import PastExecutivesManagement from "./components/PastExecutivesManagement";
 
@@ -123,7 +124,7 @@ export default function AdminDashboard() {
         method: "POST",
       });
     } catch (error) {
-      console.error("Logout API error:", error);
+      // Logout error handled silently
     } finally {
       localStorage.removeItem("ypg_admin_authenticated");
       localStorage.removeItem("ypg_admin_user");
@@ -157,78 +158,38 @@ export default function AdminDashboard() {
 
   const fetchData = async (endpoint, setter) => {
     try {
-      console.log(`Fetching ${endpoint}...`);
       const response = await fetch(endpoint);
-      console.log(`${endpoint} response status:`, response.status);
 
       if (response.ok) {
         const data = await response.json();
-        console.log(`${endpoint} response data:`, data);
 
         if (Array.isArray(data)) {
-          console.log(`${endpoint} - setting array data, length:`, data.length);
           setter(data);
         } else if (data.success && Array.isArray(data.donations)) {
-          console.log(
-            `${endpoint} - setting donations data, length:`,
-            data.donations.length
-          );
           setter(data.donations);
         } else if (data.success && Array.isArray(data.events)) {
-          console.log(
-            `${endpoint} - setting events data, length:`,
-            data.events.length
-          );
           setter(data.events);
         } else if (data.success && Array.isArray(data.team)) {
-          console.log(
-            `${endpoint} - setting team data, length:`,
-            data.team.length
-          );
           setter(data.team);
         } else if (data.success && Array.isArray(data.ministry)) {
-          console.log(
-            `${endpoint} - setting ministry data, length:`,
-            data.ministry.length
-          );
           setter(data.ministry);
         } else if (data.success && Array.isArray(data.blog)) {
-          console.log(
-            `${endpoint} - setting blog data, length:`,
-            data.blog.length
-          );
           setter(data.blog);
         } else if (data.success && Array.isArray(data.testimonials)) {
-          console.log(
-            `${endpoint} - setting testimonials data, length:`,
-            data.testimonials.length
-          );
           setter(data.testimonials);
         } else if (data.success && Array.isArray(data.messages)) {
-          console.log(
-            `${endpoint} - setting contact messages data, length:`,
-            data.messages.length
-          );
           setter(data.messages);
         } else if (data.success && Array.isArray(data.media)) {
-          console.log(
-            `${endpoint} - setting media data, length:`,
-            data.media.length
-          );
           setter(data.media);
         } else if (data.success && data.analytics) {
-          console.log(`${endpoint} - setting analytics data`);
           setter(data.analytics);
         } else {
-          console.log(`${endpoint} - no valid data found, setting empty array`);
           setter([]);
         }
       } else {
-        console.log(`${endpoint} - response not ok, setting empty array`);
         setter([]);
       }
     } catch (error) {
-      console.error(`Error fetching ${endpoint}:`, error);
       setter([]);
     }
   };
@@ -451,6 +412,9 @@ export default function AdminDashboard() {
               )}
               {activeTab === "branch-presidents" && (
                 <BranchPresidentsManagement theme={theme} />
+              )}
+              {activeTab === "welfare-committee" && (
+                <WelfareCommittee theme={theme} />
               )}
 
               {activeTab === "Settings" && (

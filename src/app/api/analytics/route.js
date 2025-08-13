@@ -1,140 +1,204 @@
 import { NextResponse } from "next/server";
+import pool from "@/lib/database.js";
 
-// Mock analytics data - in production, this would come from a real analytics service
-const analyticsData = {
-  visitors: {
-    total: 1247,
-    this_month: 342,
-    this_week: 89,
-    today: 12,
-    growth_rate: 15.2,
-  },
-  page_views: {
-    total: 4567,
-    this_month: 1234,
-    this_week: 234,
-    today: 45,
-  },
-  top_pages: [
-    { page: "/", views: 1234, percentage: 27.1 },
-    { page: "/events", views: 987, percentage: 21.6 },
-    { page: "/about", views: 654, percentage: 14.3 },
-    { page: "/gallery", views: 543, percentage: 11.9 },
-    { page: "/contact", views: 432, percentage: 9.5 },
-  ],
-  traffic_sources: [
-    { source: "Direct", visits: 2345, percentage: 51.4 },
-    { source: "Google", visits: 1234, percentage: 27.1 },
-    { source: "Facebook", visits: 567, percentage: 12.4 },
-    { source: "Instagram", visits: 234, percentage: 5.1 },
-    { source: "Other", visits: 187, percentage: 4.1 },
-  ],
-  device_types: [
-    { device: "Mobile", visits: 2345, percentage: 51.4 },
-    { device: "Desktop", visits: 1876, percentage: 41.1 },
-    { device: "Tablet", visits: 346, percentage: 7.6 },
-  ],
-  engagement: {
-    average_session_duration: "4m 32s",
-    bounce_rate: 23.4,
-    pages_per_session: 2.8,
-    return_visitors: 34.2,
-  },
-  recent_activity: [
-    {
-      time: "2024-03-10T14:30:00Z",
-      action: "New visitor",
-      details: "From Google search",
-    },
-    {
-      time: "2024-03-10T14:25:00Z",
-      action: "Event registration",
-      details: "Youth Conference 2024",
-    },
-    {
-      time: "2024-03-10T14:20:00Z",
-      action: "Donation received",
-      details: "$200 from John Doe",
-    },
-    {
-      time: "2024-03-10T14:15:00Z",
-      action: "Contact form submission",
-      details: "Inquiry about volunteering",
-    },
-  ],
-};
-
+// GET - Fetch analytics data
 export async function GET(request) {
   try {
+    // First check if table exists
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'analytics'
+      );
+    `);
+
+    if (!tableCheck.rows[0].exists) {
+      // Create table if it doesn't exist
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS analytics (
+          id SERIAL PRIMARY KEY,
+          event_type VARCHAR(50) NOT NULL,
+          page VARCHAR(255),
+          user_agent TEXT,
+          ip_address VARCHAR(45),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      // Create indexes
+      await pool.query(
+        "CREATE INDEX IF NOT EXISTS idx_analytics_event_type ON analytics(event_type);"
+      );
+      await pool.query(
+        "CREATE INDEX IF NOT EXISTS idx_analytics_date ON analytics(created_at);"
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const period = searchParams.get("period") || "all";
 
-    // In a real implementation, you would filter data based on the period
-    let data = analyticsData;
+    let data = {};
 
-    if (period === "month") {
-      data = {
-        ...analyticsData,
-        visitors: {
-          total: analyticsData.visitors.this_month,
-          this_month: analyticsData.visitors.this_month,
-          this_week: Math.floor(analyticsData.visitors.this_month / 4),
-          today: Math.floor(analyticsData.visitors.this_month / 30),
-          growth_rate: 12.5,
-        },
-      };
-    } else if (period === "week") {
-      data = {
-        ...analyticsData,
-        visitors: {
-          total: analyticsData.visitors.this_week,
-          this_month: analyticsData.visitors.this_week,
-          this_week: analyticsData.visitors.this_week,
-          today: Math.floor(analyticsData.visitors.this_week / 7),
-          growth_rate: 8.7,
-        },
-      };
-    }
+    // Get basic analytics data
+    const basicStats = await pool.query(
+      `
+      SELECT 
+        COUNT(*) as total_events,
+        COUNT(CASE WHEN event_type = 'page_view' THEN 1 END) as page_views,
+        COUNT(CASE WHEN event_type = 'donation' THEN 1 END) as donations,
+        COUNT(CASE WHEN event_type = 'contact' THEN 1 END) as contacts
+      FROM analytics
+      WHERE created_at >= CASE 
+        WHEN $1 = 'today' THEN CURRENT_DATE
+        WHEN $1 = 'week' THEN CURRENT_DATE - INTERVAL '7 days'
+        WHEN $1 = 'month' THEN CURRENT_DATE - INTERVAL '30 days'
+        ELSE '1970-01-01'
+      END
+    `,
+      [period]
+    );
+
+    // Get top pages
+    const topPages = await pool.query(
+      `
+      SELECT page, COUNT(*) as views
+      FROM analytics 
+      WHERE event_type = 'page_view'
+      AND created_at >= CASE 
+        WHEN $1 = 'today' THEN CURRENT_DATE
+        WHEN $1 = 'week' THEN CURRENT_DATE - INTERVAL '7 days'
+        WHEN $1 = 'month' THEN CURRENT_DATE - INTERVAL '30 days'
+        ELSE '1970-01-01'
+      END
+      GROUP BY page 
+      ORDER BY views DESC 
+      LIMIT 10
+    `,
+      [period]
+    );
+
+    // Get user agents (browser/device stats)
+    const userAgents = await pool.query(
+      `
+      SELECT 
+        CASE 
+          WHEN user_agent LIKE '%Chrome%' THEN 'Chrome'
+          WHEN user_agent LIKE '%Firefox%' THEN 'Firefox'
+          WHEN user_agent LIKE '%Safari%' THEN 'Safari'
+          WHEN user_agent LIKE '%Edge%' THEN 'Edge'
+          ELSE 'Other'
+        END as browser,
+        COUNT(*) as count
+      FROM analytics 
+      WHERE created_at >= CASE 
+        WHEN $1 = 'today' THEN CURRENT_DATE
+        WHEN $1 = 'week' THEN CURRENT_DATE - INTERVAL '7 days'
+        WHEN $1 = 'month' THEN CURRENT_DATE - INTERVAL '30 days'
+        ELSE '1970-01-01'
+      END
+      GROUP BY browser
+      ORDER BY count DESC
+    `,
+      [period]
+    );
+
+    data = {
+      period,
+      stats: basicStats.rows[0] || {
+        total_events: 0,
+        page_views: 0,
+        donations: 0,
+        contacts: 0,
+      },
+      topPages: topPages.rows,
+      browsers: userAgents.rows,
+    };
 
     return NextResponse.json({
       success: true,
       analytics: data,
     });
   } catch (error) {
+    console.error("Error fetching analytics:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch analytics" },
+      { success: false, error: `Failed to fetch analytics: ${error.message}` },
       { status: 500 }
     );
   }
 }
 
+// POST - Track analytics event
 export async function POST(request) {
   try {
+    // First check if table exists
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'analytics'
+      );
+    `);
+
+    if (!tableCheck.rows[0].exists) {
+      // Create table if it doesn't exist
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS analytics (
+          id SERIAL PRIMARY KEY,
+          event_type VARCHAR(50) NOT NULL,
+          page VARCHAR(255),
+          user_agent TEXT,
+          ip_address VARCHAR(45),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      // Create indexes
+      await pool.query(
+        "CREATE INDEX IF NOT EXISTS idx_analytics_event_type ON analytics(event_type);"
+      );
+      await pool.query(
+        "CREATE INDEX IF NOT EXISTS idx_analytics_date ON analytics(created_at);"
+      );
+    }
+
     const body = await request.json();
 
-    // In a real implementation, this would track a new page view or event
     const { event_type, page, user_agent, ip_address } = body;
 
-    // Mock tracking logic
     const trackingEvent = {
-      id: Date.now(),
-      event_type,
-      page,
-      user_agent,
-      ip_address,
+      event_type: event_type || "page_view",
+      page: page || "/",
+      user_agent: user_agent || "",
+      ip_address: ip_address || "",
       timestamp: new Date().toISOString(),
     };
 
-    // In production, you would save this to a database
-    console.log("Tracking event:", trackingEvent);
+    // Insert tracking event into database
+    const insertQuery = `
+      INSERT INTO analytics (
+        event_type, page, user_agent, ip_address
+      ) VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `;
+
+    const insertParams = [
+      trackingEvent.event_type,
+      trackingEvent.page,
+      trackingEvent.user_agent,
+      trackingEvent.ip_address,
+    ];
+
+    await pool.query(insertQuery, insertParams);
 
     return NextResponse.json({
       success: true,
       message: "Event tracked successfully",
     });
   } catch (error) {
+    console.error("Error tracking analytics event:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to track event" },
+      { success: false, error: `Failed to track event: ${error.message}` },
       { status: 500 }
     );
   }

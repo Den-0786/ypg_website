@@ -1,67 +1,30 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, unlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
+import pool from "@/lib/database.js";
 
-// Mock database - in production, this would be a real database
-let pastExecutives = [];
-
-// Helper function to sort past executives by year (newest first)
-function sortPastExecutivesByYear(members) {
-  return members.sort((a, b) => {
-    // Extract the end year from reign period (e.g., "2019 - 2022" -> 2022)
-    const aEndYear = parseInt(a.reignPeriod.split("-")[1]?.trim()) || 0;
-    const bEndYear = parseInt(b.reignPeriod.split("-")[1]?.trim()) || 0;
-    return bEndYear - aEndYear; // Newest first
-  });
-}
-
-// Helper function to save past executives to a file
-async function savePastExecutives() {
-  try {
-    const filePath = join(process.cwd(), "past-executives.json");
-    await writeFile(filePath, JSON.stringify(pastExecutives, null, 2));
-  } catch (error) {
-    console.error("Error saving past executives:", error);
-  }
-}
-
-// Helper function to load past executives from a file
-async function loadPastExecutives() {
-  try {
-    const filePath = join(process.cwd(), "past-executives.json");
-    const data = await readFile(filePath, "utf8");
-    pastExecutives = JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading past executives:", error);
-  }
-}
-
-// Load past executives on startup
-loadPastExecutives();
-
+// GET - Fetch past executives
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const deleted = searchParams.get("deleted") === "true";
 
-    // Filter based on deleted status
-    let filteredExecutives = pastExecutives;
+    let query = "SELECT * FROM past_executives";
+    let params = [];
+
     if (deleted) {
-      filteredExecutives = pastExecutives.filter(
-        (executive) => executive.dashboard_deleted
-      );
+      query += " WHERE dashboard_deleted = true";
     } else {
-      filteredExecutives = pastExecutives.filter(
-        (executive) => !executive.dashboard_deleted
-      );
+      query += " WHERE dashboard_deleted = false";
     }
 
-    // Sort past executives by year (newest first)
-    const sortedExecutives = sortPastExecutivesByYear(filteredExecutives);
+    query += " ORDER BY reign_period DESC, created_at DESC";
+
+    const result = await pool.query(query, params);
 
     return NextResponse.json({
       success: true,
-      pastExecutives: sortedExecutives,
+      pastExecutives: result.rows,
     });
   } catch (error) {
     return NextResponse.json(
@@ -71,6 +34,7 @@ export async function GET(request) {
   }
 }
 
+// POST - Create new past executive
 export async function POST(request) {
   try {
     const formData = await request.formData();
@@ -104,10 +68,15 @@ export async function POST(request) {
 
       // Save the image file to local storage
       try {
-        await writeFile(join(process.cwd(), "public", imagePath), buffer);
-        console.log(`Past executive image saved: ${imagePath}`);
+        const uploadDir = join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "past-executives"
+        );
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving past executive image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save image" },
           { status: 500 }
@@ -115,34 +84,32 @@ export async function POST(request) {
       }
     }
 
-    const newPastExecutive = {
-      id:
-        pastExecutives.length > 0
-          ? Math.max(...pastExecutives.map((e) => e.id)) + 1
-          : 1,
-      name,
-      position,
-      reignPeriod,
-      image: imagePath,
-      created_at: new Date().toISOString(),
-    };
+    const insertQuery = `
+      INSERT INTO past_executives (
+        name, position, reign_period, image
+      ) VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `;
 
-    pastExecutives.push(newPastExecutive);
-    await savePastExecutives();
+    const insertParams = [name, position, reignPeriod, imagePath];
+
+    const result = await pool.query(insertQuery, insertParams);
+    const newPastExecutive = result.rows[0];
 
     return NextResponse.json({
       success: true,
       pastExecutive: newPastExecutive,
-      message: "Past executive added successfully",
+      message: "Past executive created successfully",
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: "Failed to add past executive" },
+      { success: false, error: "Failed to create past executive" },
       { status: 500 }
     );
   }
 }
 
+// PUT - Update past executive
 export async function PUT(request) {
   try {
     const formData = await request.formData();
@@ -163,18 +130,23 @@ export async function PUT(request) {
       );
     }
 
-    const executiveIndex = pastExecutives.findIndex(
-      (executive) => executive.id === id
+    // Check if past executive exists
+    const checkResult = await pool.query(
+      "SELECT * FROM past_executives WHERE id = $1",
+      [id]
     );
-    if (executiveIndex === -1) {
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Past executive not found" },
         { status: 404 }
       );
     }
 
+    const existingExecutive = checkResult.rows[0];
+
     // Handle image upload if a new image is provided
-    let imagePath = pastExecutives[executiveIndex].image;
+    let imagePath = existingExecutive.image;
     if (image && image.size > 0) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -187,33 +159,37 @@ export async function PUT(request) {
 
       // Save the new image file to local storage
       try {
-        await writeFile(join(process.cwd(), "public", imagePath), buffer);
-        console.log(`New past executive image saved: ${imagePath}`);
+        const uploadDir = join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "past-executives"
+        );
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving new past executive image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save new image" },
           { status: 500 }
         );
       }
-
-      // Keep old images - admin will manually delete when needed
-      console.log(`New past executive image saved: ${imagePath}`);
-      console.log(
-        `Old past executive image kept: ${pastExecutives[executiveIndex].image}`
-      );
     }
 
-    const updatedPastExecutive = {
-      ...pastExecutives[executiveIndex],
-      name,
-      position,
-      reignPeriod,
-      image: imagePath,
-    };
+    const updateQuery = `
+      UPDATE past_executives SET
+        name = $1,
+        position = $2,
+        reign_period = $3,
+        image = $4,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $5
+      RETURNING *
+    `;
 
-    pastExecutives[executiveIndex] = updatedPastExecutive;
-    await savePastExecutives();
+    const updateParams = [name, position, reignPeriod, imagePath, id];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedPastExecutive = result.rows[0];
 
     return NextResponse.json({
       success: true,
@@ -228,52 +204,53 @@ export async function PUT(request) {
   }
 }
 
+// DELETE - Delete past executive
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id"));
     const deleteType = searchParams.get("type") || "both";
 
-    const executiveIndex = pastExecutives.findIndex(
-      (executive) => executive.id === id
-    );
-    if (executiveIndex === -1) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "Past executive not found" },
-        { status: 404 }
+        { success: false, error: "Past executive ID is required" },
+        { status: 400 }
       );
     }
 
     if (deleteType === "both") {
-      // Delete the image file if it exists
-      if (
-        pastExecutives[executiveIndex].image &&
-        pastExecutives[executiveIndex].image.startsWith(
-          "/uploads/past-executives/"
-        )
-      ) {
-        try {
-          await unlink(
-            join(process.cwd(), "public", pastExecutives[executiveIndex].image)
-          );
-          console.log(
-            `Past executive image deleted: ${pastExecutives[executiveIndex].image}`
-          );
-        } catch (error) {
-          console.error("Error deleting past executive image:", error);
-        }
+      // Permanently delete the past executive
+      const result = await pool.query(
+        "DELETE FROM past_executives WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Past executive not found" },
+          { status: 404 }
+        );
       }
 
-      pastExecutives.splice(executiveIndex, 1);
-      await savePastExecutives();
       return NextResponse.json({
         success: true,
         message:
           "Past executive permanently deleted from both dashboard and main website",
       });
     } else {
-      pastExecutives[executiveIndex].dashboard_deleted = true;
-      await savePastExecutives();
+      // Soft delete - mark as deleted
+      const result = await pool.query(
+        "UPDATE past_executives SET dashboard_deleted = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Past executive not found" },
+          { status: 404 }
+        );
+      }
+
       return NextResponse.json({
         success: true,
         message:
@@ -287,5 +264,3 @@ export async function DELETE(request) {
     );
   }
 }
-
-

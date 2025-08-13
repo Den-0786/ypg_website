@@ -280,7 +280,7 @@ export default function ContactSection() {
                     href="tel:+233541107445"
                     className="text-blue-600 hover:underline flex items-center gap-1"
                   >
-                    +233 54 110 7445
+                    +233531427671
                   </a>
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function ContactSection() {
                 <div>
                   <h4 className="font-semibold text-gray-800">WhatsApp</h4>
                   <a
-                    href="https://wa.me/233541107445"
+                    href="https://wa.me/233531427671"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition"
@@ -312,7 +312,7 @@ export default function ContactSection() {
                     href="mailto:ypg.ahinsan@gmail.com"
                     className="text-blue-600 hover:underline"
                   >
-                    ypg.ahinsan@gmail.com
+                    ahinsandistrictypg@gmail.com
                   </a>
                 </div>
               </div>

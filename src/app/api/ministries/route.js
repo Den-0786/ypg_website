@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, unlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
+import pool from "@/lib/database.js";
 
-// Mock database - in production, this would be a real database
-let ministries = [];
-
-// Helper function to handle image uploads
+// Helper function to handle image upload
 async function handleImageUpload(image) {
-  if (!image || image.size === 0) return null;
-
   const bytes = await image.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
@@ -19,24 +15,24 @@ async function handleImageUpload(image) {
   const imagePath = `/uploads/ministries/${fileName}`;
 
   // Save the image file to local storage
-  try {
-    await writeFile(join(process.cwd(), "public", imagePath), buffer);
-    console.log(`Ministry image saved: ${imagePath}`);
-    return imagePath;
-  } catch (error) {
-    console.error("Error saving ministry image:", error);
-    throw new Error("Failed to save image");
-  }
+  const uploadDir = join(process.cwd(), "public", "uploads", "ministries");
+  const filePath = join(uploadDir, fileName);
+  await writeFile(filePath, buffer);
+  return imagePath;
 }
 
+// GET - Fetch ministries
 export async function GET(request) {
   try {
+    const result = await pool.query(
+      "SELECT * FROM ministries ORDER BY created_at DESC"
+    );
+
     return NextResponse.json({
       success: true,
-      ministries: ministries,
+      ministries: result.rows,
     });
   } catch (error) {
-    console.error("Error in ministries GET:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch ministries" },
       { status: 500 }
@@ -44,6 +40,7 @@ export async function GET(request) {
   }
 }
 
+// POST - Create new ministry
 export async function POST(request) {
   try {
     let ministryData;
@@ -88,37 +85,43 @@ export async function POST(request) {
       }
     }
 
-    const newMinistry = {
-      id: ministries.length + 1,
-      name: ministryData.name,
-      description: ministryData.description,
-      leaderName: ministryData.leaderName || "",
-      leaderPhone: ministryData.leaderPhone || "",
-      color: ministryData.color || "from-blue-500 to-purple-500",
-      image: imagePath,
-      created_at: new Date().toISOString(),
-    };
+    const insertQuery = `
+      INSERT INTO ministries (
+        name, description, leader_name, leader_phone, color, image
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
 
-    ministries.push(newMinistry);
+    const insertParams = [
+      ministryData.name,
+      ministryData.description,
+      ministryData.leaderName || "",
+      ministryData.leaderPhone || "",
+      ministryData.color || "from-blue-500 to-purple-500",
+      imagePath,
+    ];
+
+    const result = await pool.query(insertQuery, insertParams);
+    const newMinistry = result.rows[0];
 
     return NextResponse.json({
       success: true,
       ministry: newMinistry,
-      message: "Ministry added successfully",
+      message: "Ministry created successfully",
     });
   } catch (error) {
-    console.error("Error adding ministry:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to add ministry" },
+      { success: false, error: "Failed to create ministry" },
       { status: 500 }
     );
   }
 }
 
+// PUT - Update ministry
 export async function PUT(request) {
   try {
-    let updateData;
     let ministryId;
+    let updateData;
 
     // Check if the request is FormData or JSON
     const contentType = request.headers.get("content-type");
@@ -150,27 +153,26 @@ export async function PUT(request) {
       );
     }
 
-    const ministryIndex = ministries.findIndex(
-      (ministry) => ministry.id === ministryId
+    // Check if ministry exists
+    const checkResult = await pool.query(
+      "SELECT * FROM ministries WHERE id = $1",
+      [ministryId]
     );
-    if (ministryIndex === -1) {
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Ministry not found" },
         { status: 404 }
       );
     }
 
+    const existingMinistry = checkResult.rows[0];
+
     // Handle image upload if a new image is provided
-    let imagePath = ministries[ministryIndex].image;
+    let imagePath = existingMinistry.image;
     if (updateData.image && updateData.image.size > 0) {
       try {
         imagePath = await handleImageUpload(updateData.image);
-
-        // Keep old images for ministries - admin can manually delete if needed
-        console.log(`New ministry image saved: ${imagePath}`);
-        console.log(
-          `Old ministry image kept: ${ministries[ministryIndex].image}`
-        );
       } catch (error) {
         return NextResponse.json(
           { success: false, error: "Failed to save new image" },
@@ -179,20 +181,38 @@ export async function PUT(request) {
       }
     }
 
-    // Update the ministry
-    ministries[ministryIndex] = {
-      ...ministries[ministryIndex],
-      ...updateData,
-      image: imagePath,
-    };
+    const updateQuery = `
+      UPDATE ministries SET
+        name = $1,
+        description = $2,
+        leader_name = $3,
+        leader_phone = $4,
+        color = $5,
+        image = $6,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $7
+      RETURNING *
+    `;
+
+    const updateParams = [
+      updateData.name,
+      updateData.description,
+      updateData.leaderName || "",
+      updateData.leaderPhone || "",
+      updateData.color || "from-blue-500 to-purple-500",
+      imagePath,
+      ministryId,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedMinistry = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      ministry: ministries[ministryIndex],
+      ministry: updatedMinistry,
       message: "Ministry updated successfully",
     });
   } catch (error) {
-    console.error("Error updating ministry:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update ministry" },
       { status: 500 }
@@ -200,22 +220,30 @@ export async function PUT(request) {
   }
 }
 
+// DELETE - Delete ministry
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id"));
 
-    const ministryIndex = ministries.findIndex(
-      (ministry) => ministry.id === id
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Ministry ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const result = await pool.query(
+      "DELETE FROM ministries WHERE id = $1 RETURNING id",
+      [id]
     );
-    if (ministryIndex === -1) {
+
+    if (result.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Ministry not found" },
         { status: 404 }
       );
     }
-
-    ministries.splice(ministryIndex, 1);
 
     return NextResponse.json({
       success: true,

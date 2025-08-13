@@ -19,6 +19,7 @@ import {
   UserCheck,
   Crown,
   History,
+  Heart,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -41,6 +42,7 @@ const Sidebar = ({
     { id: "ministry", name: "Ministry", icon: BookOpen },
     { id: "council", name: "Council Members", icon: Crown },
     { id: "past-executives", name: "Past Executives", icon: History },
+    { id: "welfare-committee", name: "Welfare Committee", icon: Heart },
     { id: "ystore", name: "Y-Store", icon: ShoppingCart },
     { id: "blog", name: "Blog", icon: FileText },
     { id: "testimonials", name: "Testimonials", icon: MessageCircle },

@@ -1,40 +1,30 @@
 import { NextResponse } from "next/server";
+import pool from "@/lib/database.js";
 
-// Contact messages data (empty initially)
-let contactMessages = [];
-
-// GET - Fetch contact messages (for admin)
+// GET - Fetch contact messages
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
-    const limit = parseInt(searchParams.get("limit")) || 50;
 
-    let filteredMessages = contactMessages;
+    let query = "SELECT * FROM contact_messages";
+    let params = [];
 
     if (status) {
-      filteredMessages = filteredMessages.filter(
-        (msg) => msg.status === status
-      );
+      query += " WHERE status = $1";
+      params.push(status);
     }
 
-    // Sort by newest first
-    filteredMessages.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
+    query += " ORDER BY created_at DESC";
 
-    // Apply limit
-    if (limit > 0) {
-      filteredMessages = filteredMessages.slice(0, limit);
-    }
+    const result = await pool.query(query, params);
 
     return NextResponse.json({
       success: true,
-      messages: filteredMessages,
-      total: filteredMessages.length,
+      messages: result.rows,
+      total: result.rows.length,
     });
   } catch (error) {
-    console.error("Error fetching contact messages:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch contact messages" },
       { status: 500 }
@@ -42,117 +32,107 @@ export async function GET(request) {
   }
 }
 
-// POST - Submit new contact message
+// POST - Create new contact message
 export async function POST(request) {
   try {
-    const messageData = await request.json();
-    const { name, email, phone, subject, message } = messageData;
+    const data = await request.json();
 
     // Validation
     const errors = {};
-    if (!name?.trim()) errors.name = "Name is required";
-    if (!email?.trim()) errors.email = "Email is required";
-    if (!subject?.trim()) errors.subject = "Subject is required";
-    if (!message?.trim()) errors.message = "Message is required";
-
-    // Email validation
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email address";
-    }
-
-    // Phone validation (optional, but if provided should be valid)
-    if (phone && !/^(\+233|0)[0-9]{9}$/.test(phone)) {
-      errors.phone = "Please enter a valid Ghanaian phone number";
-    }
+    if (!data.name?.trim()) errors.name = "Name is required";
+    if (!data.email?.trim()) errors.email = "Email is required";
+    if (!data.message?.trim()) errors.message = "Message is required";
 
     if (Object.keys(errors).length > 0) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
-    const newMessage = {
-      id: Math.max(...contactMessages.map((msg) => msg.id), 0) + 1,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone?.trim() || null,
-      subject: subject.trim(),
-      message: message.trim(),
-      status: "new",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    const insertQuery = `
+      INSERT INTO contact_messages (
+        name, email, subject, message, status
+      ) VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `;
 
-    contactMessages.push(newMessage);
+    const insertParams = [
+      data.name.trim(),
+      data.email.trim().toLowerCase(),
+      data.subject?.trim() || "",
+      data.message.trim(),
+      "unread",
+    ];
 
-    // In production, you would also:
-    // 1. Send email notification to admins
-    // 2. Send auto-reply to user
-    // 3. Log the submission
+    const result = await pool.query(insertQuery, insertParams);
+    const newMessage = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      message: "Thank you for your message! We'll get back to you soon.",
-      id: newMessage.id,
+      message: newMessage,
+      message: "Contact message sent successfully",
     });
   } catch (error) {
-    console.error("Error submitting contact message:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to submit message. Please try again." },
+      { success: false, error: "Failed to send contact message" },
       { status: 500 }
     );
   }
 }
 
-// PUT - Update contact message status (for admin)
+// PUT - Update contact message (mark as read, etc.)
 export async function PUT(request) {
   try {
-    const updateData = await request.json();
-    const { id, status, adminNotes } = updateData;
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
 
-    const messageIndex = contactMessages.findIndex((msg) => msg.id === id);
-    if (messageIndex === -1) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "Message not found" },
-        { status: 404 }
-      );
-    }
-
-    // Valid statuses
-    const validStatuses = [
-      "new",
-      "in_progress",
-      "responded",
-      "resolved",
-      "archived",
-    ];
-    if (status && !validStatuses.includes(status)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid status" },
+        { success: false, error: "Message ID is required" },
         { status: 400 }
       );
     }
 
-    // Update the message
-    contactMessages[messageIndex] = {
-      ...contactMessages[messageIndex],
-      status: status || contactMessages[messageIndex].status,
-      adminNotes: adminNotes || contactMessages[messageIndex].adminNotes,
-      updatedAt: new Date().toISOString(),
-    };
+    const data = await request.json();
+
+    // Check if message exists
+    const checkResult = await pool.query(
+      "SELECT * FROM contact_messages WHERE id = $1",
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Contact message not found" },
+        { status: 404 }
+      );
+    }
+
+    const updateQuery = `
+      UPDATE contact_messages SET
+        status = $1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+      RETURNING *
+    `;
+
+    const updateParams = [data.status || "read", id];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedMessage = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      message: contactMessages[messageIndex],
+      message: updatedMessage,
+      message: "Contact message updated successfully",
     });
   } catch (error) {
-    console.error("Error updating contact message:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to update message" },
+      { success: false, error: "Failed to update contact message" },
       { status: 500 }
     );
   }
 }
 
-// DELETE - Delete contact message (for admin)
+// DELETE - Delete contact message
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -165,24 +145,25 @@ export async function DELETE(request) {
       );
     }
 
-    const messageIndex = contactMessages.findIndex((msg) => msg.id === id);
-    if (messageIndex === -1) {
+    const result = await pool.query(
+      "DELETE FROM contact_messages WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
       return NextResponse.json(
-        { success: false, error: "Message not found" },
+        { success: false, error: "Contact message not found" },
         { status: 404 }
       );
     }
-
-    contactMessages.splice(messageIndex, 1);
 
     return NextResponse.json({
       success: true,
       message: "Contact message deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting contact message:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to delete message" },
+      { success: false, error: "Failed to delete contact message" },
       { status: 500 }
     );
   }

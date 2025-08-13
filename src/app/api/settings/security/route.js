@@ -1,35 +1,52 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs"; // You'll need to install this: npm install bcryptjs
-
-// Mock user security data (in production, this would come from a database)
-let userSecurity = {
-  id: 1,
-  hashedPassword: "$2a$10$example.hashed.password.here", // This would be properly hashed
-  hashedPin: null, // PIN is optional
-  twoFactorAuth: false,
-  requirePinForActions: false, // Made PIN optional
-  lastPasswordChange: "2024-01-01T00:00:00.000Z",
-  lastPinChange: null,
-  updatedAt: "2024-01-01T00:00:00.000Z",
-};
+import bcrypt from "bcryptjs";
+import pool from "@/lib/database.js";
 
 // GET - Fetch security settings (without sensitive data)
 export async function GET() {
   try {
-    const securityInfo = {
-      twoFactorAuth: userSecurity.twoFactorAuth,
-      requirePinForActions: userSecurity.requirePinForActions,
-      hasPin: !!userSecurity.hashedPin,
-      lastPasswordChange: userSecurity.lastPasswordChange,
-      lastPinChange: userSecurity.lastPinChange,
+    const result = await pool.query(
+      "SELECT setting_key, setting_value, setting_type FROM settings WHERE setting_key LIKE 'security_%'"
+    );
+
+    // Convert database rows to security object
+    const security = {};
+    result.rows.forEach((row) => {
+      const key = row.setting_key.replace("security_", "");
+      let value = row.setting_value;
+
+      // Parse JSON values
+      if (row.setting_type === "json") {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          value = {};
+        }
+      } else if (row.setting_type === "boolean") {
+        value = value === "true";
+      } else if (row.setting_type === "number") {
+        value = parseFloat(value);
+      }
+
+      security[key] = value;
+    });
+
+    // Set defaults if no security settings exist
+    const defaultSecurity = {
+      twoFactorAuth: false,
+      requirePinForActions: false,
+      hasPin: false,
+      lastPasswordChange: "2024-01-01T00:00:00.000Z",
+      lastPinChange: null,
     };
+
+    const mergedSecurity = { ...defaultSecurity, ...security };
 
     return NextResponse.json({
       success: true,
-      security: securityInfo,
+      security: mergedSecurity,
     });
   } catch (error) {
-    console.error("Error fetching security settings:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch security settings" },
       { status: 500 }
@@ -70,12 +87,6 @@ export async function PUT(request) {
       if (newPassword !== confirmPassword) {
         errors.confirmPassword = "Passwords do not match";
       }
-
-      // In production, you would verify the current password:
-      // const isValidPassword = await bcrypt.compare(currentPassword, userSecurity.hashedPassword);
-      // if (!isValidPassword) {
-      //   errors.currentPassword = "Current password is incorrect";
-      // }
     }
 
     // PIN validation (optional)
@@ -91,7 +102,12 @@ export async function PUT(request) {
       }
 
       // Verify current PIN if user has one
-      if (userSecurity.hashedPin && !currentPin) {
+      const currentPinResult = await pool.query(
+        "SELECT setting_value FROM settings WHERE setting_key = 'security_hasPin'"
+      );
+      const hasPin = currentPinResult.rows[0]?.setting_value === "true";
+
+      if (hasPin && !currentPin) {
         errors.currentPin = "Current PIN is required";
       }
     }
@@ -100,46 +116,70 @@ export async function PUT(request) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
-    // Update security settings
-    const updates = {
-      updatedAt: new Date().toISOString(),
-    };
+    // Prepare security data to update
+    const securityUpdates = [];
 
     // Update password if provided
     if (newPassword) {
-      // In production, hash the password:
-      // updates.hashedPassword = await bcrypt.hash(newPassword, 10);
-      updates.hashedPassword = `hashed_${newPassword}`; // Mock for demo
-      updates.lastPasswordChange = new Date().toISOString();
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      securityUpdates.push(["hashedPassword", hashedPassword, "string"]);
+      securityUpdates.push([
+        "lastPasswordChange",
+        new Date().toISOString(),
+        "string",
+      ]);
     }
 
     // Update PIN if provided (PIN is optional)
     if (newPin) {
-      // In production, hash the PIN:
-      // updates.hashedPin = await bcrypt.hash(newPin, 10);
-      updates.hashedPin = `hashed_${newPin}`; // Mock for demo
-      updates.lastPinChange = new Date().toISOString();
+      const hashedPin = await bcrypt.hash(newPin, 10);
+      securityUpdates.push(["hashedPin", hashedPin, "string"]);
+      securityUpdates.push(["hasPin", "true", "boolean"]);
+      securityUpdates.push([
+        "lastPinChange",
+        new Date().toISOString(),
+        "string",
+      ]);
     }
 
     // Update boolean settings
     if (typeof twoFactorAuth === "boolean") {
-      updates.twoFactorAuth = twoFactorAuth;
+      securityUpdates.push([
+        "twoFactorAuth",
+        twoFactorAuth.toString(),
+        "boolean",
+      ]);
     }
 
     if (typeof requirePinForActions === "boolean") {
-      updates.requirePinForActions = requirePinForActions;
+      securityUpdates.push([
+        "requirePinForActions",
+        requirePinForActions.toString(),
+        "boolean",
+      ]);
     }
 
-    // Apply updates
-    userSecurity = { ...userSecurity, ...updates };
+    // Update security settings in database
+    for (const [key, value, type] of securityUpdates) {
+      await pool.query(
+        `
+        INSERT INTO settings (setting_key, setting_value, setting_type) 
+        VALUES ($1, $2, $3)
+        ON CONFLICT (setting_key) 
+        DO UPDATE SET setting_value = $2, setting_type = $3, updated_at = CURRENT_TIMESTAMP
+      `,
+        [`security_${key}`, value, type]
+      );
+    }
 
     // Return success response (without sensitive data)
     const responseData = {
-      twoFactorAuth: userSecurity.twoFactorAuth,
-      requirePinForActions: userSecurity.requirePinForActions,
-      hasPin: !!userSecurity.hashedPin,
-      lastPasswordChange: userSecurity.lastPasswordChange,
-      lastPinChange: userSecurity.lastPinChange,
+      twoFactorAuth: twoFactorAuth !== undefined ? twoFactorAuth : false,
+      requirePinForActions:
+        requirePinForActions !== undefined ? requirePinForActions : false,
+      hasPin: newPin ? true : false,
+      lastPasswordChange: newPassword ? new Date().toISOString() : null,
+      lastPinChange: newPin ? new Date().toISOString() : null,
     };
 
     return NextResponse.json({
@@ -148,7 +188,6 @@ export async function PUT(request) {
       message: "Security settings updated successfully",
     });
   } catch (error) {
-    console.error("Error updating security settings:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update security settings" },
       { status: 500 }
@@ -164,22 +203,41 @@ export async function POST(request) {
     const errors = {};
 
     if (action === "verify-password" && password) {
-      // In production, verify against hashed password:
-      // const isValid = await bcrypt.compare(password, userSecurity.hashedPassword);
-      const isValid = password === "admin123"; // Mock verification
+      // Get hashed password from database
+      const passwordResult = await pool.query(
+        "SELECT setting_value FROM settings WHERE setting_key = 'security_hashedPassword'"
+      );
 
-      if (!isValid) {
-        errors.password = "Incorrect password";
+      if (passwordResult.rows.length > 0) {
+        const hashedPassword = passwordResult.rows[0].setting_value;
+        const isValid = await bcrypt.compare(password, hashedPassword);
+
+        if (!isValid) {
+          errors.password = "Incorrect password";
+        }
+      } else {
+        // No password configured - require setup
+        errors.password =
+          "No password configured. Please set up admin credentials first.";
       }
     }
 
     if (action === "verify-pin" && pin) {
-      // In production, verify against hashed PIN:
-      // const isValid = await bcrypt.compare(pin, userSecurity.hashedPin);
-      const isValid = userSecurity.hashedPin && pin === "1234"; // Mock verification
+      // Get hashed PIN from database
+      const pinResult = await pool.query(
+        "SELECT setting_value FROM settings WHERE setting_key = 'security_hashedPin'"
+      );
 
-      if (!isValid) {
-        errors.pin = "Incorrect PIN";
+      if (pinResult.rows.length > 0) {
+        const hashedPin = pinResult.rows[0].setting_value;
+        const isValid = await bcrypt.compare(pin, hashedPin);
+
+        if (!isValid) {
+          errors.pin = "Incorrect PIN";
+        }
+      } else {
+        // No PIN configured - require setup
+        errors.pin = "No PIN configured. Please set up admin PIN first.";
       }
     }
 
@@ -192,16 +250,9 @@ export async function POST(request) {
       message: "Credentials verified successfully",
     });
   } catch (error) {
-    console.error("Error verifying credentials:", error);
     return NextResponse.json(
       { success: false, error: "Failed to verify credentials" },
       { status: 500 }
     );
   }
 }
-
-
-
-
-
-

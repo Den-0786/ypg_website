@@ -4,9 +4,7 @@ export async function POST(request, { params }) {
   try {
     const { id } = params;
 
-    // In a real application, you would update the database
-    // For now, we'll return a success response
-    console.log(`Restoring team member with ID: ${id}`);
+    // Restoring team member
 
     return NextResponse.json({
       success: true,

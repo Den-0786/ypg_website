@@ -1,99 +1,63 @@
 import { NextResponse } from "next/server";
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+import pool from "@/lib/database.js";
 
-let donations = [];
-
-// Load donations from file
-const loadDonations = async () => {
-  try {
-    const filePath = join(process.cwd(), "donations.json");
-    const data = await readFile(filePath, "utf8");
-    donations = JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading donations:", error);
-    donations = [];
-  }
-};
-
-// Save donations to file
-const saveDonations = async () => {
-  try {
-    const filePath = join(process.cwd(), "donations.json");
-    await writeFile(filePath, JSON.stringify(donations, null, 2));
-  } catch (error) {
-    console.error("Error saving donations:", error);
-  }
-};
-
-// Initialize data on first load
-if (donations.length === 0) {
-  loadDonations();
-}
-
+// GET - Fetch donations
 export async function GET(request) {
   try {
-    await loadDonations();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const purpose = searchParams.get("purpose");
-    const verification_status = searchParams.get("verification_status");
     const payment_method = searchParams.get("payment_method");
+    const limit = parseInt(searchParams.get("limit")) || 10;
 
-    let filteredDonations = donations;
+    let query = "SELECT * FROM donations";
+    let params = [];
+    let paramIndex = 1;
 
     if (status) {
-      filteredDonations = filteredDonations.filter(
-        (donation) => donation.status === status
-      );
+      query += ` WHERE status = $${paramIndex}`;
+      params.push(status);
+      paramIndex++;
     }
 
     if (purpose) {
-      filteredDonations = filteredDonations.filter(
-        (donation) => donation.purpose === purpose
-      );
-    }
-
-    if (verification_status) {
-      filteredDonations = filteredDonations.filter(
-        (donation) => donation.verification_status === verification_status
-      );
+      const whereClause = status ? "AND" : "WHERE";
+      query += ` ${whereClause} purpose = $${paramIndex}`;
+      params.push(purpose);
+      paramIndex++;
     }
 
     if (payment_method) {
-      filteredDonations = filteredDonations.filter(
-        (donation) => donation.payment_method === payment_method
-      );
+      const whereClause = status || purpose ? "AND" : "WHERE";
+      query += ` ${whereClause} payment_method = $${paramIndex}`;
+      params.push(payment_method);
+      paramIndex++;
     }
 
+    query += " ORDER BY created_at DESC LIMIT $1";
+    params.push(limit);
+
+    const result = await pool.query(query, params);
+
     // Calculate totals
-    const totalAmount = filteredDonations.reduce(
-      (sum, donation) => sum + (donation.amount || 0),
+    const totalAmount = result.rows.reduce(
+      (sum, donation) => sum + (parseFloat(donation.amount) || 0),
       0
     );
-    const totalCount = filteredDonations.length;
-
-    // Calculate verified amounts only
-    const verifiedAmount = filteredDonations
-      .filter((donation) => donation.verification_status === "verified")
-      .reduce((sum, donation) => sum + (donation.amount || 0), 0);
+    const totalCount = result.rows.length;
 
     return NextResponse.json({
       success: true,
-      donations: filteredDonations,
+      donations: result.rows,
+      total: result.rows.length,
       summary: {
         total_amount: totalAmount,
         total_count: totalCount,
-        verified_amount: verifiedAmount,
-        verified_count: filteredDonations.filter(
-          (d) => d.verification_status === "verified"
-        ).length,
         average_amount:
           totalCount > 0 ? Math.round(totalAmount / totalCount) : 0,
       },
     });
   } catch (error) {
-    console.error("Error in donations GET:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch donations" },
       { status: 500 }
@@ -101,37 +65,49 @@ export async function GET(request) {
   }
 }
 
+// POST - Create new donation
 export async function POST(request) {
   try {
-    const body = await request.json();
+    const data = await request.json();
 
-    // Generate unique receipt code
-    const receiptCode = `RC_${String(donations.length + 1).padStart(3, "0")}`;
+    // Validation
+    const errors = {};
+    if (!data.donor_name?.trim()) errors.donor_name = "Donor name is required";
+    if (!data.amount || data.amount <= 0)
+      errors.amount = "Valid amount is required";
 
-    const newDonation = {
-      id: Date.now().toString(),
-      ...body,
-      status: "pending", // Always start as pending
-      verification_status: "pending", // Always start as pending
-      transaction_id: `TXN_${String(donations.length + 1).padStart(3, "0")}`,
-      receipt_code: receiptCode,
-      momo_transaction_id: null,
-      cash_receipt_number: null,
-      bank_reference: null,
-      admin_verified_by: null,
-      admin_verified_at: null,
-      created_at: new Date().toISOString(),
-    };
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ success: false, errors }, { status: 400 });
+    }
 
-    donations.push(newDonation);
-    await saveDonations();
+    const insertQuery = `
+      INSERT INTO donations (
+        donor_name, email, phone, amount, currency, payment_method, 
+        purpose, message, status, transaction_id
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *
+    `;
+
+    const insertParams = [
+      data.donor_name,
+      data.email || "",
+      data.phone || "",
+      data.amount,
+      data.currency || "GHS",
+      data.payment_method || "",
+      data.purpose || "",
+      data.message || "",
+      "pending",
+      data.transaction_id || "",
+    ];
+
+    const result = await pool.query(insertQuery, insertParams);
+    const newDonation = result.rows[0];
 
     return NextResponse.json({
       success: true,
       donation: newDonation,
-      message:
-        "Donation submitted successfully. Please complete payment verification.",
-      receipt_code: receiptCode,
+      message: "Donation recorded successfully",
     });
   } catch (error) {
     return NextResponse.json(
@@ -141,32 +117,70 @@ export async function POST(request) {
   }
 }
 
+// PUT - Update donation
 export async function PUT(request) {
   try {
-    const body = await request.json();
-    const { id, ...updateData } = body;
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
 
-    const donationIndex = donations.findIndex((donation) => donation.id === id);
-    if (donationIndex === -1) {
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Donation ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const data = await request.json();
+
+    const checkResult = await pool.query(
+      "SELECT * FROM donations WHERE id = $1",
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Donation not found" },
         { status: 404 }
       );
     }
 
-    // If verifying a donation, update verification details
-    if (updateData.verification_status === "verified") {
-      updateData.admin_verified_by = "admin"; // In real app, get from session
-      updateData.admin_verified_at = new Date().toISOString();
-      updateData.status = "confirmed";
-    }
+    const updateQuery = `
+      UPDATE donations SET
+        donor_name = $1,
+        email = $2,
+        phone = $3,
+        amount = $4,
+        currency = $5,
+        payment_method = $6,
+        purpose = $7,
+        message = $8,
+        status = $9,
+        transaction_id = $10,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $11
+      RETURNING *
+    `;
 
-    donations[donationIndex] = { ...donations[donationIndex], ...updateData };
-    await saveDonations();
+    const updateParams = [
+      data.donor_name,
+      data.email || "",
+      data.phone || "",
+      data.amount,
+      data.currency || "GHS",
+      data.payment_method || "",
+      data.purpose || "",
+      data.message || "",
+      data.status || "pending",
+      data.transaction_id || "",
+      id,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedDonation = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      donation: donations[donationIndex],
+      donation: updatedDonation,
       message: "Donation updated successfully",
     });
   } catch (error) {
@@ -177,21 +191,30 @@ export async function PUT(request) {
   }
 }
 
+// DELETE - Delete donation
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    const id = parseInt(searchParams.get("id"));
 
-    const donationIndex = donations.findIndex((donation) => donation.id === id);
-    if (donationIndex === -1) {
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Donation ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const result = await pool.query(
+      "DELETE FROM donations WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Donation not found" },
         { status: 404 }
       );
     }
-
-    donations.splice(donationIndex, 1);
-    await saveDonations();
 
     return NextResponse.json({
       success: true,

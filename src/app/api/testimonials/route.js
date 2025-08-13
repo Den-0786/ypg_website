@@ -1,222 +1,88 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, unlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
+import pool from "@/lib/database.js";
 
-// Mock database - in production, this would be a real database
-let testimonials = [];
-
-// Helper function to handle image uploads
-async function handleImageUpload(image) {
-  if (!image || image.size === 0) return null;
-
-  const bytes = await image.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  // Generate unique filename
-  const timestamp = Date.now();
-  const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-  const fileName = `${timestamp}-${sanitizedName}`;
-  const imagePath = `/uploads/testimonials/${fileName}`;
-
-  // Save the image file to local storage
-  try {
-    await writeFile(join(process.cwd(), "public", imagePath), buffer);
-    console.log(`Testimonial image saved: ${imagePath}`);
-    return imagePath;
-  } catch (error) {
-    console.error("Error saving testimonial image:", error);
-    throw new Error("Failed to save image");
-  }
-}
-
-// Helper function to save testimonials to a file
-async function saveTestimonials() {
-  try {
-    const filePath = join(process.cwd(), "testimonials.json");
-    await writeFile(filePath, JSON.stringify(testimonials, null, 2));
-  } catch (error) {
-    console.error("Error saving testimonials:", error);
-  }
-}
-
-// Helper function to load testimonials from a file
-async function loadTestimonials() {
-  try {
-    const filePath = join(process.cwd(), "testimonials.json");
-    const data = await readFile(filePath, "utf8");
-    testimonials = JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading testimonials:", error);
-  }
-}
-
-// Load testimonials on startup
-loadTestimonials();
-
+// GET - Fetch testimonials
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const type = searchParams.get("type");
-    const featured = searchParams.get("featured");
-    const active = searchParams.get("active");
+    const limit = parseInt(searchParams.get("limit")) || 10;
 
-    // Handle soft delete recovery
-    if (type === "recover" && id) {
-      const testimonial = testimonials.find(
-        (t) => t.id === parseInt(id) && t.deleted_at
-      );
-      if (testimonial) {
-        delete testimonial.deleted_at;
-        await saveTestimonials();
-        return NextResponse.json({
-          success: true,
-          message: "Testimonial recovered successfully",
-          testimonial,
-        });
-      }
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial not found or not deleted",
-        },
-        { status: 404 }
-      );
-    }
+    const query = `
+      SELECT * FROM testimonials 
+      WHERE dashboard_deleted = false 
+      ORDER BY created_at DESC 
+      LIMIT $1
+    `;
 
-    // Handle permanent delete
-    if (type === "permanent" && id) {
-      const index = testimonials.findIndex((t) => t.id === parseInt(id));
-      if (index !== -1) {
-        testimonials.splice(index, 1);
-        await saveTestimonials();
-        return NextResponse.json({
-          success: true,
-          message: "Testimonial permanently deleted",
-        });
-      }
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial not found",
-        },
-        { status: 404 }
-      );
-    }
-
-    // Handle soft delete
-    if (type === "delete" && id) {
-      const testimonial = testimonials.find((t) => t.id === parseInt(id));
-      if (testimonial) {
-        testimonial.deleted_at = new Date().toISOString();
-        await saveTestimonials();
-        return NextResponse.json({
-          success: true,
-          message: "Testimonial moved to trash",
-        });
-      }
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial not found",
-        },
-        { status: 404 }
-      );
-    }
-
-    // Get single testimonial by ID
-    if (id) {
-      const testimonial = testimonials.find(
-        (t) => t.id === parseInt(id) && !t.deleted_at
-      );
-      if (testimonial) {
-        return NextResponse.json({
-          success: true,
-          testimonial,
-        });
-      }
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial not found",
-        },
-        { status: 404 }
-      );
-    }
-
-    // Filter testimonials
-    let filteredTestimonials = testimonials.filter((t) => !t.deleted_at);
-
-    if (featured === "true") {
-      filteredTestimonials = filteredTestimonials.filter((t) => t.is_featured);
-    }
-
-    if (active === "true") {
-      filteredTestimonials = filteredTestimonials.filter((t) => t.is_active);
-    }
-
-    // Sort by creation date (newest first)
-    filteredTestimonials.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
+    const result = await pool.query(query, [limit]);
 
     return NextResponse.json({
       success: true,
-      testimonials: filteredTestimonials,
+      testimonials: result.rows,
+      total: result.rows.length,
     });
   } catch (error) {
-    console.error("Error in GET /api/testimonials:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Failed to fetch testimonials" },
       { status: 500 }
     );
   }
 }
 
+// POST - Create new testimonial
 export async function POST(request) {
   try {
+    const contentType = request.headers.get("content-type");
     let testimonialData;
 
-    // Check if the request is FormData or JSON
-    const contentType = request.headers.get("content-type");
-
     if (contentType && contentType.includes("multipart/form-data")) {
-      // Handle FormData (for image uploads)
       const formData = await request.formData();
       testimonialData = {
         name: formData.get("name"),
-        position: formData.get("position"),
-        congregation: formData.get("congregation"),
+        role: formData.get("role"),
         content: formData.get("content"),
         rating: parseInt(formData.get("rating")) || 5,
-        is_featured: formData.get("is_featured") === "true",
-        is_active: formData.get("is_active") !== "false",
         image: formData.get("image"),
       };
     } else {
-      // Handle JSON
       testimonialData = await request.json();
     }
 
-    // Validate required fields
-    if (!testimonialData.name || !testimonialData.content) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Name and content are required",
-        },
-        { status: 400 }
-      );
+    // Validation
+    const errors = {};
+    if (!testimonialData.name?.trim()) errors.name = "Name is required";
+    if (!testimonialData.content?.trim())
+      errors.content = "Content is required";
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
     // Handle image upload if provided
-    let imagePath = null;
+    let imagePath = "/placeholder-testimonial.jpg";
     if (testimonialData.image && testimonialData.image.size > 0) {
+      const bytes = await testimonialData.image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const timestamp = Date.now();
+      const sanitizedName = testimonialData.image.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
+      );
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/testimonials/${fileName}`;
+
       try {
-        imagePath = await handleImageUpload(testimonialData.image);
+        const uploadDir = join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "testimonials"
+        );
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
         return NextResponse.json(
           { success: false, error: "Failed to save image" },
@@ -225,107 +91,103 @@ export async function POST(request) {
       }
     }
 
-    // Generate new ID
-    const newId = Math.max(...testimonials.map((t) => t.id), 0) + 1;
+    const insertQuery = `
+      INSERT INTO testimonials (
+        name, role, content, image, rating
+      ) VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `;
 
-    const newTestimonial = {
-      id: newId,
-      name: testimonialData.name,
-      position: testimonialData.position || "",
-      congregation: testimonialData.congregation || "",
-      content: testimonialData.content,
-      image: imagePath,
-      rating: testimonialData.rating || 5,
-      is_featured: testimonialData.is_featured || false,
-      is_active:
-        testimonialData.is_active !== undefined
-          ? testimonialData.is_active
-          : true,
-      created_at: new Date().toISOString(),
-    };
+    const insertParams = [
+      testimonialData.name,
+      testimonialData.role || "",
+      testimonialData.content,
+      imagePath,
+      testimonialData.rating || 5,
+    ];
 
-    testimonials.push(newTestimonial);
-    await saveTestimonials();
+    const result = await pool.query(insertQuery, insertParams);
+    const newTestimonial = result.rows[0];
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Testimonial created successfully",
-        testimonial: newTestimonial,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      success: true,
+      testimonial: newTestimonial,
+      message: "Testimonial created successfully",
+    });
   } catch (error) {
-    console.error("Error in POST /api/testimonials:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Failed to create testimonial" },
       { status: 500 }
     );
   }
 }
 
+// PUT - Update testimonial
 export async function PUT(request) {
   try {
-    let updateData;
-    let testimonialId;
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
 
-    // Check if the request is FormData or JSON
-    const contentType = request.headers.get("content-type");
-
-    if (contentType && contentType.includes("multipart/form-data")) {
-      // Handle FormData (for image uploads)
-      const formData = await request.formData();
-      testimonialId = parseInt(formData.get("id"));
-      updateData = {
-        name: formData.get("name"),
-        position: formData.get("position"),
-        congregation: formData.get("congregation"),
-        content: formData.get("content"),
-        rating: parseInt(formData.get("rating")) || 5,
-        is_featured: formData.get("is_featured") === "true",
-        is_active: formData.get("is_active") !== "false",
-        image: formData.get("image"),
-      };
-    } else {
-      // Handle JSON
-      const body = await request.json();
-      testimonialId = body.id;
-      updateData = body;
-    }
-
-    if (!testimonialId) {
+    if (!id) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial ID is required",
-        },
+        { success: false, error: "Testimonial ID is required" },
         { status: 400 }
       );
     }
 
-    const index = testimonials.findIndex((t) => t.id === testimonialId);
-    if (index === -1) {
+    const contentType = request.headers.get("content-type");
+    let updateData;
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      updateData = {
+        name: formData.get("name"),
+        role: formData.get("role"),
+        content: formData.get("content"),
+        rating: parseInt(formData.get("rating")) || 5,
+        image: formData.get("image"),
+      };
+    } else {
+      updateData = await request.json();
+    }
+
+    const checkResult = await pool.query(
+      "SELECT * FROM testimonials WHERE id = $1",
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial not found",
-        },
+        { success: false, error: "Testimonial not found" },
         { status: 404 }
       );
     }
 
-    // Handle image upload if a new image is provided
-    let imagePath = testimonials[index].image;
-    if (updateData.image && updateData.image.size > 0) {
-      try {
-        imagePath = await handleImageUpload(updateData.image);
+    const existingTestimonial = checkResult.rows[0];
 
-        // Keep old images for testimonials - admin can manually delete if needed
-        console.log(`New testimonial image saved: ${imagePath}`);
-        console.log(`Old testimonial image kept: ${testimonials[index].image}`);
+    // Handle image upload if a new image is provided
+    let imagePath = existingTestimonial.image;
+    if (updateData.image && updateData.image.size > 0) {
+      const bytes = await updateData.image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const timestamp = Date.now();
+      const sanitizedName = updateData.image.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
+      );
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/testimonials/${fileName}`;
+
+      try {
+        const uploadDir = join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "testimonials"
+        );
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
         return NextResponse.json(
           { success: false, error: "Failed to save new image" },
@@ -334,104 +196,90 @@ export async function PUT(request) {
       }
     }
 
-    // Update testimonial
-    testimonials[index] = {
-      ...testimonials[index],
-      name: updateData.name || testimonials[index].name,
-      position:
-        updateData.position !== undefined
-          ? updateData.position
-          : testimonials[index].position,
-      congregation:
-        updateData.congregation !== undefined
-          ? updateData.congregation
-          : testimonials[index].congregation,
-      content: updateData.content || testimonials[index].content,
-      image: imagePath,
-      rating: updateData.rating || testimonials[index].rating,
-      is_featured:
-        updateData.is_featured !== undefined
-          ? updateData.is_featured
-          : testimonials[index].is_featured,
-      is_active:
-        updateData.is_active !== undefined
-          ? updateData.is_active
-          : testimonials[index].is_active,
-    };
+    const updateQuery = `
+      UPDATE testimonials SET
+        name = $1,
+        role = $2,
+        content = $3,
+        image = $4,
+        rating = $5,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $6
+      RETURNING *
+    `;
 
-    await saveTestimonials();
+    const updateParams = [
+      updateData.name,
+      updateData.role || "",
+      updateData.content,
+      imagePath,
+      updateData.rating || 5,
+      id,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedTestimonial = result.rows[0];
 
     return NextResponse.json({
       success: true,
+      testimonial: updatedTestimonial,
       message: "Testimonial updated successfully",
-      testimonial: testimonials[index],
     });
   } catch (error) {
-    console.error("Error in PUT /api/testimonials:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Failed to update testimonial" },
       { status: 500 }
     );
   }
 }
 
+// DELETE - Delete testimonial
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const type = searchParams.get("type");
+    const id = parseInt(searchParams.get("id"));
+    const deleteType = searchParams.get("type") || "soft";
 
     if (!id) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial ID is required",
-        },
+        { success: false, error: "Testimonial ID is required" },
         { status: 400 }
       );
     }
 
-    const testimonial = testimonials.find((t) => t.id === parseInt(id));
-    if (!testimonial) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Testimonial not found",
-        },
-        { status: 404 }
+    if (deleteType === "hard") {
+      const result = await pool.query(
+        "DELETE FROM testimonials WHERE id = $1 RETURNING id",
+        [id]
       );
-    }
 
-    if (type === "permanent") {
-      // Permanent delete
-      const index = testimonials.findIndex((t) => t.id === parseInt(id));
-      testimonials.splice(index, 1);
-      await saveTestimonials();
-
-      return NextResponse.json({
-        success: true,
-        message: "Testimonial permanently deleted",
-      });
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Testimonial not found" },
+          { status: 404 }
+        );
+      }
     } else {
-      // Soft delete
-      testimonial.deleted_at = new Date().toISOString();
-      await saveTestimonials();
+      const result = await pool.query(
+        "UPDATE testimonials SET dashboard_deleted = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id",
+        [id]
+      );
 
-      return NextResponse.json({
-        success: true,
-        message: "Testimonial moved to trash",
-      });
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Testimonial not found" },
+          { status: 404 }
+        );
+      }
     }
+
+    return NextResponse.json({
+      success: true,
+      message: `Testimonial ${deleteType === "hard" ? "permanently deleted" : "marked as deleted"}`,
+    });
   } catch (error) {
-    console.error("Error in DELETE /api/testimonials:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Failed to delete testimonial" },
       { status: 500 }
     );
   }

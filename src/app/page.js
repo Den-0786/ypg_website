@@ -23,32 +23,36 @@ import CongregationLeaderboard from "./components/quiz/CongregationLeaderboard";
 import CongregationalExecutives from "./components/congregations/Congregations";
 import CouncilSection from "./components/council/CouncilSection";
 import PastExecutives from "./components/past-executives/PastExecutives";
+import WelfareSection from "./components/welfare/WelfareSection";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
       <NavigationBar />
-      <HeroCarousel />
-      <FeatureCards />
-      <AboutSection />
-      <EventSection />
-      <PastEvents />
-      <QuizList />
-      <QuizResults />
-      <CongregationLeaderboard />
-      <TeamSection />
-      <YStoreSection />
-      <CongregationalExecutives />
-      <TestimonialsSection />
-      <PastExecutives />
-      <MinistriesSection />
-      <CouncilSection />
-      <JoinUsSection />
-      <GallerySection />
-      <BlogSection />
-      <DonateSection />
-      <ContactSection />
-      <Footer />
+      <div className="pt-20">
+        <HeroCarousel />
+        <FeatureCards />
+        <AboutSection />
+        <EventSection />
+        <PastEvents />
+        <QuizList />
+        <QuizResults />
+        <CongregationLeaderboard />
+        <TeamSection />
+        <YStoreSection />
+        <CongregationalExecutives />
+        <TestimonialsSection />
+        <PastExecutives />
+        <MinistriesSection />
+        <CouncilSection />
+        <WelfareSection />
+        <JoinUsSection />
+        <GallerySection />
+        <BlogSection />
+        <DonateSection />
+        <ContactSection />
+        <Footer />
+      </div>
     </main>
   );
 }

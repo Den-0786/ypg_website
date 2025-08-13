@@ -34,12 +34,14 @@ import {
 export default function SettingsComponent({ onClose }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPin, setShowPin] = useState(false);
   const [theme, setTheme] = useState("light");
   const [securityMethod, setSecurityMethod] = useState("password");
 
   // Loading and feedback states
   const [isLoading, setIsLoading] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState({ type: "", message: "" });
   const [validationErrors, setValidationErrors] = useState({});
 
@@ -69,12 +71,10 @@ export default function SettingsComponent({ onClose }) {
   useEffect(() => {
     const loadCredentials = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/api/auth/credentials/",
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch("/api/auth/credentials");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         if (data.success) {
           setCurrentCredentials(data.credentials);
@@ -82,6 +82,11 @@ export default function SettingsComponent({ onClose }) {
             ...prev,
             newUsername: data.credentials.username,
           }));
+        } else {
+          console.error(
+            "Failed to load credentials:",
+            data.message || "Unknown error"
+          );
         }
       } catch (error) {
         console.error("Failed to load credentials:", error);
@@ -92,12 +97,89 @@ export default function SettingsComponent({ onClose }) {
 
   // Form states
   const [profile, setProfile] = useState({
-    fullName: "Admin User",
-    email: "admin@ypg.com",
-    phone: "+233 20 123 4567",
+    fullName: "",
+    email: "",
+    phone: "",
     role: "System Administrator",
     avatar: null,
   });
+
+  // Load profile data from database
+  useEffect(() => {
+    const loadProfile = async () => {
+      setIsProfileLoading(true);
+      try {
+        const response = await fetch("/api/settings/profile");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.success && data.profile) {
+          setProfile(data.profile);
+        } else {
+          console.error(
+            "Failed to load profile:",
+            data.message || "Unknown error"
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+      } finally {
+        setIsProfileLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
+
+  // Load website settings from database
+  useEffect(() => {
+    const loadWebsiteSettings = async () => {
+      try {
+        const response = await fetch("/api/settings/website");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.success && data.settings) {
+          // Update general settings
+          if (data.settings.websiteTitle) {
+            setGeneralSettings((prev) => ({
+              ...prev,
+              websiteTitle: data.settings.websiteTitle,
+              contactEmail: data.settings.contactEmail || prev.contactEmail,
+              phoneNumber: data.settings.phoneNumber || prev.phoneNumber,
+              address: data.settings.address || prev.address,
+              description: data.settings.description || prev.description,
+            }));
+          }
+
+          // Update social media settings
+          if (data.settings.socialMedia) {
+            setSocialMedia((prev) => ({
+              ...prev,
+              ...data.settings.socialMedia,
+            }));
+          }
+
+          // Update appearance settings
+          if (data.settings.appearance) {
+            setAppearance((prev) => ({
+              ...prev,
+              ...data.settings.appearance,
+            }));
+          }
+        } else {
+          console.error(
+            "Failed to load website settings:",
+            data.message || "Unknown error"
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load website settings:", error);
+      }
+    };
+    loadWebsiteSettings();
+  }, []);
 
   const [generalSettings, setGeneralSettings] = useState({
     websiteTitle: "PCG Ahinsan District YPG",
@@ -141,29 +223,7 @@ export default function SettingsComponent({ onClose }) {
   });
 
   // Additional states for new features
-  const [settingsHistory, setSettingsHistory] = useState([
-    {
-      id: 1,
-      action: "Profile Updated",
-      timestamp: "2024-01-15 14:30",
-      user: "Admin User",
-      details: "Updated email and phone number",
-    },
-    {
-      id: 2,
-      action: "Security Settings Changed",
-      timestamp: "2024-01-14 09:15",
-      user: "Admin User",
-      details: "Enabled two-factor authentication",
-    },
-    {
-      id: 3,
-      action: "Website Content Updated",
-      timestamp: "2024-01-13 16:45",
-      user: "Admin User",
-      details: "Updated social media links",
-    },
-  ]);
+  const [settingsHistory, setSettingsHistory] = useState([]);
 
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupData, setBackupData] = useState(null);
@@ -262,6 +322,24 @@ export default function SettingsComponent({ onClose }) {
     return errors;
   };
 
+  const validateAppearance = () => {
+    const errors = {};
+
+    if (!appearance.theme) {
+      errors.theme = "Theme is required";
+    }
+
+    if (!appearance.language) {
+      errors.language = "Language is required";
+    }
+
+    if (!appearance.primaryColor) {
+      errors.primaryColor = "Primary color is required";
+    }
+
+    return errors;
+  };
+
   const handleSave = async (section) => {
     setIsLoading(true);
     setValidationErrors({});
@@ -278,6 +356,9 @@ export default function SettingsComponent({ onClose }) {
           break;
         case "website":
           errors = validateWebsite();
+          break;
+        case "appearance":
+          errors = validateAppearance();
           break;
         default:
           break;
@@ -296,55 +377,57 @@ export default function SettingsComponent({ onClose }) {
       let response;
       switch (section) {
         case "profile":
-          response = await fetch(
-            "http://localhost:8000/api/settings/profile/",
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(profile),
-            }
-          );
+          response = await fetch("/api/settings/profile", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(profile),
+          });
           break;
 
         case "security":
-          response = await fetch(
-            "http://localhost:8000/api/auth/credentials/",
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                currentPassword: security.currentPassword,
-                newUsername: security.newUsername,
-                newPassword: security.newPassword,
-              }),
-            }
-          );
+          response = await fetch("/api/auth/credentials", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              currentPassword: security.currentPassword,
+              newUsername: security.newUsername,
+              newPassword: security.newPassword,
+            }),
+          });
           break;
 
         case "website":
-          response = await fetch(
-            "http://localhost:8000/api/settings/website/",
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                websiteTitle: generalSettings.websiteTitle,
-                contactEmail: generalSettings.contactEmail,
-                phoneNumber: generalSettings.phoneNumber,
-                address: generalSettings.address,
-                description: generalSettings.description,
-                socialMedia,
-                appearance,
-              }),
-            }
-          );
+          response = await fetch("/api/settings/website", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              websiteTitle: generalSettings.websiteTitle,
+              contactEmail: generalSettings.contactEmail,
+              phoneNumber: generalSettings.phoneNumber,
+              address: generalSettings.address,
+              description: generalSettings.description,
+              socialMedia,
+              appearance,
+            }),
+          });
+          break;
+
+        case "appearance":
+          response = await fetch("/api/settings/website", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              appearance,
+            }),
+          });
           break;
 
         default:
@@ -361,7 +444,14 @@ export default function SettingsComponent({ onClose }) {
           });
           return;
         }
-        throw new Error(errorData.error || "Failed to save settings");
+        // Show specific error message from server
+        const errorMessage =
+          errorData.error || errorData.message || "Failed to save settings";
+        setSaveStatus({
+          type: "error",
+          message: errorMessage,
+        });
+        return;
       }
 
       const result = await response.json();
@@ -371,6 +461,33 @@ export default function SettingsComponent({ onClose }) {
           result.message ||
           `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully!`,
       });
+
+      // Add history entry based on section
+      switch (section) {
+        case "profile":
+          addHistoryEntry("Profile Updated", "Updated profile information");
+          break;
+        case "security":
+          addHistoryEntry(
+            "Security Settings Changed",
+            "Updated login credentials"
+          );
+          break;
+        case "website":
+          addHistoryEntry(
+            "Website Content Updated",
+            "Updated website settings and content"
+          );
+          break;
+        case "appearance":
+          addHistoryEntry(
+            "Appearance Settings Changed",
+            "Updated theme and appearance settings"
+          );
+          break;
+        default:
+          break;
+      }
 
       // Clear form fields for security
       if (section === "security") {
@@ -385,7 +502,6 @@ export default function SettingsComponent({ onClose }) {
         });
       }
     } catch (error) {
-      console.error("Error saving settings:", error);
       setSaveStatus({
         type: "error",
         message: error.message || "Failed to save settings. Please try again.",
@@ -400,82 +516,237 @@ export default function SettingsComponent({ onClose }) {
     setAppearance({ ...appearance, theme: newTheme });
   };
 
-  // Backup and Restore functions
-  const handleBackup = () => {
-    const backup = {
-      profile,
-      generalSettings,
-      socialMedia,
-      security: {
-        twoFactorAuth: security.twoFactorAuth,
-        requirePinForActions: security.requirePinForActions,
-      },
-      appearance,
-      timestamp: new Date().toISOString(),
-      version: "2.0.0",
+  // Function to add history entry
+  const addHistoryEntry = (action, details) => {
+    const newEntry = {
+      id: Date.now(),
+      action,
+      timestamp: new Date().toLocaleString(),
+      user: profile.fullName || "Admin User",
+      details,
     };
-
-    const blob = new Blob([JSON.stringify(backup, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ypg-settings-backup-${new Date().toISOString().split("T")[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    setSaveStatus({
-      type: "success",
-      message: "Settings backup created successfully!",
-    });
+    setSettingsHistory((prev) => [newEntry, ...prev.slice(0, 19)]); // Keep only last 20 entries
   };
 
-  const handleRestore = (event) => {
+  // Function to delete history entry
+  const deleteHistoryEntry = (id) => {
+    setSettingsHistory((prev) => prev.filter((entry) => entry.id !== id));
+  };
+
+  // Backup and Restore functions
+  const handleBackup = async () => {
+    try {
+      setIsLoading(true);
+
+      // Create comprehensive backup with all current settings
+      const backup = {
+        profile,
+        generalSettings,
+        socialMedia,
+        security: {
+          twoFactorAuth: security.twoFactorAuth,
+          requirePinForActions: security.requirePinForActions,
+        },
+        appearance,
+        metadata: {
+          timestamp: new Date().toISOString(),
+          version: "2.0.0",
+          system: "YPG Website Settings",
+          exportedBy: profile.fullName || "Admin User",
+        },
+      };
+
+      // Validate backup data
+      if (!backup.profile || !backup.generalSettings || !backup.appearance) {
+        throw new Error("Invalid backup data structure");
+      }
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ypg-settings-backup-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setSaveStatus({
+        type: "success",
+        message: "Settings backup created and downloaded successfully!",
+      });
+      addHistoryEntry("Backup Created", "Settings backup file downloaded");
+    } catch (error) {
+      setSaveStatus({
+        type: "error",
+        message: `Failed to create backup: ${error.message}`,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRestore = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Validate file type
+    if (!file.name.endsWith(".json")) {
+      setSaveStatus({
+        type: "error",
+        message: "Please select a valid JSON backup file",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveStatus({
+        type: "error",
+        message: "Backup file is too large. Maximum size is 5MB.",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const backup = JSON.parse(e.target.result);
 
-        // Validate backup structure
-        if (backup.profile && backup.generalSettings && backup.appearance) {
-          setProfile(backup.profile);
-          setGeneralSettings(backup.generalSettings);
-          setSocialMedia(backup.socialMedia || socialMedia);
-          setAppearance(backup.appearance);
-          setSecurity((prev) => ({
-            ...prev,
-            twoFactorAuth: backup.security?.twoFactorAuth || false,
-            requirePinForActions: backup.security?.requirePinForActions || true,
-          }));
+        // Validate backup structure and version
+        if (!backup.profile || !backup.generalSettings || !backup.appearance) {
+          throw new Error("Invalid backup file structure");
+        }
+
+        // Check if it's a YPG settings backup
+        if (backup.metadata?.system !== "YPG Website Settings") {
+          throw new Error("This is not a valid YPG settings backup file");
+        }
+
+        // Restore settings with validation
+        const restoredProfile = {
+          fullName: backup.profile.fullName || "",
+          email: backup.profile.email || "",
+          phone: backup.profile.phone || "",
+          role: backup.profile.role || "System Administrator",
+          avatar: backup.profile.avatar || null,
+        };
+
+        const restoredGeneralSettings = {
+          websiteTitle:
+            backup.generalSettings.websiteTitle || "PCG Ahinsan District YPG",
+          contactEmail:
+            backup.generalSettings.contactEmail || "youth@presbyterian.org",
+          phoneNumber: backup.generalSettings.phoneNumber || "+233 20 123 4567",
+          address:
+            backup.generalSettings.address || "Ahinsan District, Kumasi, Ghana",
+          description:
+            backup.generalSettings.description ||
+            "Presbyterian Church of Ghana Youth Ministry - Ahinsan District",
+        };
+
+        const restoredSocialMedia = {
+          facebook:
+            backup.socialMedia?.facebook ||
+            "https://facebook.com/presbyterianyouth",
+          instagram:
+            backup.socialMedia?.instagram ||
+            "https://instagram.com/presbyterianyouth",
+          twitter:
+            backup.socialMedia?.twitter ||
+            "https://twitter.com/presbyterianyouth",
+          youtube:
+            backup.socialMedia?.youtube ||
+            "https://youtube.com/presbyterianyouth",
+          linkedin:
+            backup.socialMedia?.linkedin ||
+            "https://linkedin.com/company/presbyterianyouth",
+        };
+
+        const restoredAppearance = {
+          theme: backup.appearance?.theme || "light",
+          language: backup.appearance?.language || "English",
+          primaryColor: backup.appearance?.primaryColor || "#3B82F6",
+          borderRadius: backup.appearance?.borderRadius || "medium",
+        };
+
+        // Update state with restored settings
+        setProfile(restoredProfile);
+        setGeneralSettings(restoredGeneralSettings);
+        setSocialMedia(restoredSocialMedia);
+        setAppearance(restoredAppearance);
+        setSecurity((prev) => ({
+          ...prev,
+          twoFactorAuth: backup.security?.twoFactorAuth || false,
+          requirePinForActions: backup.security?.requirePinForActions || true,
+        }));
+
+        // Save restored settings to database
+        try {
+          // Save profile settings
+          await fetch("/api/settings/profile", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(restoredProfile),
+          });
+
+          // Save website settings
+          await fetch("/api/settings/website", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              websiteTitle: restoredGeneralSettings.websiteTitle,
+              contactEmail: restoredGeneralSettings.contactEmail,
+              phoneNumber: restoredGeneralSettings.phoneNumber,
+              address: restoredGeneralSettings.address,
+              description: restoredGeneralSettings.description,
+              socialMedia: restoredSocialMedia,
+              appearance: restoredAppearance,
+            }),
+          });
 
           setSaveStatus({
             type: "success",
-            message: "Settings restored successfully!",
+            message: `Settings restored and saved to database successfully from backup created on ${new Date(backup.metadata?.timestamp).toLocaleDateString()}`,
           });
-        } else {
+          addHistoryEntry(
+            "Settings Restored",
+            `Settings restored from backup file (${backup.metadata?.exportedBy || "Unknown"})`
+          );
+        } catch (dbError) {
           setSaveStatus({
-            type: "error",
-            message: "Invalid backup file format",
+            type: "warning",
+            message: `Settings restored but failed to save to database: ${dbError.message}. Please save manually.`,
           });
+          addHistoryEntry(
+            "Settings Restore Failed",
+            `Failed to save restored settings to database`
+          );
         }
+
+        // Clear the file input
+        event.target.value = "";
       } catch (error) {
         setSaveStatus({
           type: "error",
-          message: "Failed to restore settings. Invalid file.",
+          message: `Failed to restore settings: ${error.message}`,
         });
+      } finally {
+        setIsLoading(false);
       }
     };
     reader.readAsText(file);
   };
 
   // Profile picture upload function
-  const handleAvatarUpload = (event) => {
+  const handleAvatarUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -497,15 +768,56 @@ export default function SettingsComponent({ onClose }) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setProfile({ ...profile, avatar: e.target.result });
+    setIsLoading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const avatarData = e.target.result;
+
+        // Save the avatar to the database
+        const response = await fetch("/api/settings/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: profile.fullName,
+            email: profile.email,
+            phone: profile.phone,
+            role: profile.role,
+            avatar: avatarData,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error ||
+              errorData.message ||
+              "Failed to save profile picture"
+          );
+        }
+
+        const result = await response.json();
+        setProfile({ ...profile, avatar: avatarData });
+        setSaveStatus({
+          type: "success",
+          message: "Profile picture updated successfully!",
+        });
+        addHistoryEntry(
+          "Profile Picture Updated",
+          "Uploaded new profile picture"
+        );
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
       setSaveStatus({
-        type: "success",
-        message: "Profile picture updated successfully!",
+        type: "error",
+        message: error.message || "Failed to save profile picture",
       });
-    };
-    reader.readAsDataURL(file);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getFieldError = (fieldName) => {
@@ -600,143 +912,154 @@ export default function SettingsComponent({ onClose }) {
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                     Profile Settings
                   </h3>
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Profile Picture
-                      </label>
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                          {profile.avatar ? (
-                            <img
-                              src={profile.avatar}
-                              alt="Profile"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <User className="w-8 h-8 text-gray-400" />
-                          )}
-                        </div>
-                        <div>
-                          <label className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm flex items-center cursor-pointer">
-                            <Save className="w-4 h-4 mr-2" />
-                            Upload Photo
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleAvatarUpload}
-                              className="hidden"
-                            />
-                          </label>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            JPG, PNG or GIF. Max 5MB.
-                          </p>
-                        </div>
+                  {isProfileLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="text-center">
+                        <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Loading profile data...
+                        </p>
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={profile.fullName}
-                        onChange={(e) =>
-                          setProfile({ ...profile, fullName: e.target.value })
-                        }
-                        className={getInputClassName("fullName")}
-                        placeholder="Enter your full name"
-                      />
-                      {getFieldError("fullName") && (
-                        <p className="mt-1 text-xs text-red-600">
-                          {getFieldError("fullName")}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        value={profile.email}
-                        onChange={(e) =>
-                          setProfile({ ...profile, email: e.target.value })
-                        }
-                        className={getInputClassName("email")}
-                        placeholder="Enter your email address"
-                      />
-                      {getFieldError("email") && (
-                        <p className="mt-1 text-xs text-red-600">
-                          {getFieldError("email")}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Phone *
-                      </label>
-                      <input
-                        type="tel"
-                        value={profile.phone}
-                        onChange={(e) =>
-                          setProfile({ ...profile, phone: e.target.value })
-                        }
-                        className={getInputClassName("phone")}
-                        placeholder="+233 20 123 4567"
-                      />
-                      {getFieldError("phone") && (
-                        <p className="mt-1 text-xs text-red-600">
-                          {getFieldError("phone")}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Role
-                      </label>
-                      <select
-                        value={profile.role}
-                        onChange={(e) =>
-                          setProfile({ ...profile, role: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base"
+                  ) : (
+                    <div className="space-y-3 sm:space-y-4">
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          Profile Picture
+                        </label>
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                            {profile.avatar ? (
+                              <img
+                                src={profile.avatar}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <User className="w-8 h-8 text-gray-400" />
+                            )}
+                          </div>
+                          <div>
+                            <label className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm flex items-center cursor-pointer">
+                              <Save className="w-4 h-4 mr-2" />
+                              Upload Photo
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleAvatarUpload}
+                                className="hidden"
+                              />
+                            </label>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              JPG, PNG or GIF. Max 5MB.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={profile.fullName}
+                          onChange={(e) =>
+                            setProfile({ ...profile, fullName: e.target.value })
+                          }
+                          className={getInputClassName("fullName")}
+                          placeholder="Enter your full name"
+                        />
+                        {getFieldError("fullName") && (
+                          <p className="mt-1 text-xs text-red-600">
+                            {getFieldError("fullName")}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          Email *
+                        </label>
+                        <input
+                          type="email"
+                          value={profile.email}
+                          onChange={(e) =>
+                            setProfile({ ...profile, email: e.target.value })
+                          }
+                          className={getInputClassName("email")}
+                          placeholder="Enter your email address"
+                        />
+                        {getFieldError("email") && (
+                          <p className="mt-1 text-xs text-red-600">
+                            {getFieldError("email")}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          Phone *
+                        </label>
+                        <input
+                          type="tel"
+                          value={profile.phone}
+                          onChange={(e) =>
+                            setProfile({ ...profile, phone: e.target.value })
+                          }
+                          className={getInputClassName("phone")}
+                          placeholder="+233 20 123 4567"
+                        />
+                        {getFieldError("phone") && (
+                          <p className="mt-1 text-xs text-red-600">
+                            {getFieldError("phone")}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          Role
+                        </label>
+                        <select
+                          value={profile.role}
+                          onChange={(e) =>
+                            setProfile({ ...profile, role: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base"
+                        >
+                          <option>System Administrator</option>
+                          <option>Data Manager</option>
+                          <option>Viewer</option>
+                        </select>
+                      </div>
+                      <button
+                        onClick={() => handleSave("profile")}
+                        disabled={isLoading}
+                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                       >
-                        <option>System Administrator</option>
-                        <option>Data Manager</option>
-                        <option>Viewer</option>
-                      </select>
-                    </div>
-                    <button
-                      onClick={() => handleSave("profile")}
-                      disabled={isLoading}
-                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-2" />
-                          Update Profile
-                        </>
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-2" />
+                            Update Profile
+                          </>
+                        )}
+                      </button>
+                      {saveStatus.type === "success" && (
+                        <p className="text-green-600 text-xs mt-2 flex items-center">
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          {saveStatus.message}
+                        </p>
                       )}
-                    </button>
-                    {saveStatus.type === "success" && (
-                      <p className="text-green-600 text-xs mt-2 flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {saveStatus.message}
-                      </p>
-                    )}
-                    {saveStatus.type === "error" && (
-                      <p className="text-red-600 text-xs mt-2 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {saveStatus.message}
-                      </p>
-                    )}
-                  </div>
+                      {saveStatus.type === "error" && (
+                        <p className="text-red-600 text-xs mt-2 flex items-center">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {saveStatus.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -768,12 +1091,14 @@ export default function SettingsComponent({ onClose }) {
                     <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
                       <p className="text-sm text-blue-800 dark:text-blue-200">
                         Current Username:{" "}
-                        <strong>{currentCredentials.username}</strong>
+                        <strong>
+                          {currentCredentials.username || "Loading..."}
+                        </strong>
                       </p>
                     </div>
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        New Username (optional)
+                        New Username
                       </label>
                       <input
                         type="text"
@@ -829,20 +1154,33 @@ export default function SettingsComponent({ onClose }) {
                     </div>
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        New Password (optional)
+                        New Password
                       </label>
-                      <input
-                        type="password"
-                        value={security.newPassword}
-                        onChange={(e) =>
-                          setSecurity({
-                            ...security,
-                            newPassword: e.target.value,
-                          })
-                        }
-                        className={getInputClassName("newPassword")}
-                        placeholder="Leave blank to keep current password"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={security.newPassword}
+                          onChange={(e) =>
+                            setSecurity({
+                              ...security,
+                              newPassword: e.target.value,
+                            })
+                          }
+                          className={getInputClassName("newPassword")}
+                          placeholder="Leave blank to keep current password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
                       {getFieldError("newPassword") && (
                         <p className="mt-1 text-xs text-red-600">
                           {getFieldError("newPassword")}
@@ -853,18 +1191,33 @@ export default function SettingsComponent({ onClose }) {
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
                         Confirm New Password
                       </label>
-                      <input
-                        type="password"
-                        value={security.confirmPassword}
-                        onChange={(e) =>
-                          setSecurity({
-                            ...security,
-                            confirmPassword: e.target.value,
-                          })
-                        }
-                        className={getInputClassName("confirmPassword")}
-                        placeholder="Confirm new password"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={security.confirmPassword}
+                          onChange={(e) =>
+                            setSecurity({
+                              ...security,
+                              confirmPassword: e.target.value,
+                            })
+                          }
+                          className={getInputClassName("confirmPassword")}
+                          placeholder="Confirm new password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
                       {getFieldError("confirmPassword") && (
                         <p className="mt-1 text-xs text-red-600">
                           {getFieldError("confirmPassword")}
@@ -1034,16 +1387,16 @@ export default function SettingsComponent({ onClose }) {
                   <div className="space-y-4">
                     <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                       <h4 className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
-                        YPG Management System
+                        YPG Official Website
                       </h4>
                       <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mb-2">
-                        Version: 2.0.0
+                        Version: 1.1.0
                       </p>
                       <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mb-2">
-                        Built for PCG Ahinsan District
+                        Built for PCG Ahinsan District YPG
                       </p>
                       <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200">
-                        © 2024 Presbyterian Church of Ghana
+                        © 2025 PCG Ahinsan District YPG
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -1051,11 +1404,12 @@ export default function SettingsComponent({ onClose }) {
                         Features
                       </h4>
                       <ul className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>• Member Management</li>
+                        <li>• Members Management</li>
                         <li>• Event Planning</li>
                         <li>• Attendance Tracking</li>
                         <li>• Communication Tools</li>
                         <li>• Analytics Dashboard</li>
+                        <li>• Guilders Support System</li>
                       </ul>
                     </div>
                   </div>
@@ -1185,7 +1539,7 @@ export default function SettingsComponent({ onClose }) {
                       </h4>
                       <div className="grid grid-cols-1 gap-3 sm:gap-4">
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
                             <Facebook className="w-4 h-4 mr-2 text-blue-600" />
                             Facebook URL
                           </label>
@@ -1207,7 +1561,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
                             <Instagram className="w-4 h-4 mr-2 text-pink-600" />
                             Instagram URL
                           </label>
@@ -1229,7 +1583,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
                             <Twitter className="w-4 h-4 mr-2 text-blue-400" />
                             Twitter URL
                           </label>
@@ -1251,7 +1605,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
                             <Youtube className="w-4 h-4 mr-2 text-red-600" />
                             YouTube URL
                           </label>
@@ -1378,26 +1732,55 @@ export default function SettingsComponent({ onClose }) {
                     Settings History
                   </h3>
                   <div className="space-y-3">
-                    {settingsHistory.map((item) => (
-                      <div
-                        key={item.id}
-                        className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                              {item.action}
-                            </h4>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                              {item.details}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                              By: {item.user} • {item.timestamp}
-                            </p>
+                    {settingsHistory.length === 0 ? (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 border border-gray-200 dark:border-gray-600 text-center">
+                        <Info className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          No settings changes recorded yet.
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          Changes will appear here after you save settings.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {settingsHistory.map((item) => (
+                          <div
+                            key={item.id}
+                            className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                                  {item.action}
+                                </h4>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                  {item.details}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                                  By: {item.user} • {item.timestamp}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => deleteHistoryEntry(item.id)}
+                                className="ml-2 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                title="Delete this entry"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
+                        ))}
+                        <div className="text-center pt-2">
+                          <button
+                            onClick={() => setSettingsHistory([])}
+                            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:underline"
+                          >
+                            Clear All History
+                          </button>
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               )}

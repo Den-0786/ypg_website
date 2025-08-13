@@ -582,19 +582,6 @@ export default function DonateSection() {
               — Mr Bright Asenso., Donor since 2020
             </p>
           </div>
-
-          <div className="mt-6 pt-4 border-t border-blue-200">
-            <h4 className="font-semibold text-blue-700 mb-2">Monthly Goal</h4>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{ width: "75%" }}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-600 mt-1">
-              GHS 7,500 of GHS 10,000 (75%)
-            </p>
-          </div>
         </div>
       </div>
     </section>

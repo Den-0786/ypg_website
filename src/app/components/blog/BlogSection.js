@@ -24,7 +24,7 @@ export default function BlogSection() {
         const response = await fetch("/api/blog?forWebsite=true");
         const data = await response.json();
         if (data.success) {
-          setBlogPosts(data.blog);
+          setBlogPosts(data.posts);
         }
       } catch (error) {
         console.error("Error fetching blog posts:", error);
@@ -40,11 +40,11 @@ export default function BlogSection() {
   useEffect(() => {
     const updateSlidesPerView = () => {
       if (window.innerWidth >= 1024) {
-        setSlidesPerView(4); // Large screens: 4 per slide
+        setSlidesPerView(4); 
       } else if (window.innerWidth >= 768) {
-        setSlidesPerView(3); // Medium screens: 3 per slide
+        setSlidesPerView(3); 
       } else {
-        setSlidesPerView(2); // Small screens: 2 per slide
+        setSlidesPerView(2); 
       }
     };
 
@@ -61,7 +61,7 @@ export default function BlogSection() {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 5000); // Change slide every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, [isAutoPlaying, totalSlides]);

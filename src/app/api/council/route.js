@@ -1,50 +1,30 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, unlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
+import pool from "@/lib/database.js";
 
-// Mock database - in production, this would be a real database
-let councilMembers = [];
-
-// Helper function to save council members to a file
-async function saveCouncilMembers() {
-  try {
-    const filePath = join(process.cwd(), "council-members.json");
-    await writeFile(filePath, JSON.stringify(councilMembers, null, 2));
-  } catch (error) {
-    console.error("Error saving council members:", error);
-  }
-}
-
-async function loadCouncilMembers() {
-  try {
-    const filePath = join(process.cwd(), "council-members.json");
-    const data = await readFile(filePath, "utf8");
-    councilMembers = JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading council members:", error);
-  }
-}
-
+// GET - Fetch council members
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const deleted = searchParams.get("deleted") === "true";
 
-    // Filter based on deleted status
-    let filteredMembers = councilMembers;
+    let query = "SELECT * FROM council_members";
+    let params = [];
+
     if (deleted) {
-      filteredMembers = councilMembers.filter(
-        (member) => member.dashboard_deleted
-      );
+      query += " WHERE dashboard_deleted = true";
     } else {
-      filteredMembers = councilMembers.filter(
-        (member) => !member.dashboard_deleted
-      );
+      query += " WHERE dashboard_deleted = false";
     }
+
+    query += " ORDER BY created_at DESC";
+
+    const result = await pool.query(query, params);
 
     return NextResponse.json({
       success: true,
-      councilMembers: filteredMembers,
+      councilMembers: result.rows,
     });
   } catch (error) {
     return NextResponse.json(
@@ -54,6 +34,7 @@ export async function GET(request) {
   }
 }
 
+// POST - Create new council member
 export async function POST(request) {
   try {
     const formData = await request.formData();
@@ -90,10 +71,10 @@ export async function POST(request) {
 
       // Save the image file to local storage
       try {
-        await writeFile(join(process.cwd(), "public", imagePath), buffer);
-        console.log(`Council image saved: ${imagePath}`);
+        const uploadDir = join(process.cwd(), "public", "uploads", "council");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving council image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save image" },
           { status: 500 }
@@ -101,37 +82,40 @@ export async function POST(request) {
       }
     }
 
-    const newCouncilMember = {
-      id:
-        councilMembers.length > 0
-          ? Math.max(...councilMembers.map((m) => m.id)) + 1
-          : 1,
+    const insertQuery = `
+      INSERT INTO council_members (
+        name, position, congregation, phone, email, description, image
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+    `;
+
+    const insertParams = [
       name,
       position,
       congregation,
-      phone: phone || "",
-      email: email || "",
-      description: description || "",
-      image: imagePath,
-    };
+      phone || "",
+      email || "",
+      description || "",
+      imagePath,
+    ];
 
-    councilMembers.push(newCouncilMember);
-
-    await saveCouncilMembers();
+    const result = await pool.query(insertQuery, insertParams);
+    const newCouncilMember = result.rows[0];
 
     return NextResponse.json({
       success: true,
       councilMember: newCouncilMember,
-      message: "Council member added successfully",
+      message: "Council member created successfully",
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: "Failed to add council member" },
+      { success: false, error: "Failed to create council member" },
       { status: 500 }
     );
   }
 }
 
+// PUT - Update council member
 export async function PUT(request) {
   try {
     const formData = await request.formData();
@@ -144,7 +128,6 @@ export async function PUT(request) {
     const description = formData.get("description");
     const image = formData.get("image");
 
-    // Validate required fields
     if (!id || !name || !position || !congregation) {
       return NextResponse.json(
         {
@@ -155,18 +138,23 @@ export async function PUT(request) {
       );
     }
 
-    const councilMemberIndex = councilMembers.findIndex(
-      (member) => member.id === id
+    // Check if council member exists
+    const checkResult = await pool.query(
+      "SELECT * FROM council_members WHERE id = $1",
+      [id]
     );
-    if (councilMemberIndex === -1) {
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Council member not found" },
         { status: 404 }
       );
     }
 
+    const existingMember = checkResult.rows[0];
+
     // Handle image upload if a new image is provided
-    let imagePath = councilMembers[councilMemberIndex].image;
+    let imagePath = existingMember.image;
     if (image && image.size > 0) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -179,37 +167,44 @@ export async function PUT(request) {
 
       // Save the new image file to local storage
       try {
-        await writeFile(join(process.cwd(), "public", imagePath), buffer);
-        console.log(`New council image saved: ${imagePath}`);
+        const uploadDir = join(process.cwd(), "public", "uploads", "council");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving new council image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save new image" },
           { status: 500 }
         );
       }
-
-      // Keep old images - admin will manually delete when needed
-      console.log(`New council member image saved: ${imagePath}`);
-      console.log(
-        `Old council member image kept: ${councilMembers[councilMemberIndex].image}`
-      );
     }
 
-    const updatedCouncilMember = {
-      ...councilMembers[councilMemberIndex],
+    const updateQuery = `
+      UPDATE council_members SET
+        name = $1,
+        position = $2,
+        congregation = $3,
+        phone = $4,
+        email = $5,
+        description = $6,
+        image = $7,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $8
+      RETURNING *
+    `;
+
+    const updateParams = [
       name,
       position,
       congregation,
-      phone: phone || "",
-      email: email || "",
-      description: description || "",
-      image: imagePath,
-    };
+      phone || "",
+      email || "",
+      description || "",
+      imagePath,
+      id,
+    ];
 
-    councilMembers[councilMemberIndex] = updatedCouncilMember;
-
-    await saveCouncilMembers();
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedCouncilMember = result.rows[0];
 
     return NextResponse.json({
       success: true,
@@ -224,53 +219,53 @@ export async function PUT(request) {
   }
 }
 
+// DELETE - Delete council member
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id"));
     const deleteType = searchParams.get("type") || "both";
 
-    const councilMemberIndex = councilMembers.findIndex(
-      (member) => member.id === id
-    );
-    if (councilMemberIndex === -1) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "Council member not found" },
-        { status: 404 }
+        { success: false, error: "Council member ID is required" },
+        { status: 400 }
       );
     }
 
     if (deleteType === "both") {
-      // Delete the image file if it exists
-      if (
-        councilMembers[councilMemberIndex].image &&
-        councilMembers[councilMemberIndex].image.startsWith("/uploads/council/")
-      ) {
-        try {
-          await unlink(
-            join(
-              process.cwd(),
-              "public",
-              councilMembers[councilMemberIndex].image
-            )
-          );
-          console.log(
-            `Council member image deleted: ${councilMembers[councilMemberIndex].image}`
-          );
-        } catch (error) {
-          console.error("Error deleting council member image:", error);
-        }
+      // Permanently delete the council member
+      const result = await pool.query(
+        "DELETE FROM council_members WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Council member not found" },
+          { status: 404 }
+        );
       }
-      councilMembers.splice(councilMemberIndex, 1);
-      await saveCouncilMembers();
+
       return NextResponse.json({
         success: true,
         message:
           "Council member permanently deleted from both dashboard and main website",
       });
     } else {
-      councilMembers[councilMemberIndex].dashboard_deleted = true;
-      await saveCouncilMembers();
+      // Soft delete - mark as deleted
+      const result = await pool.query(
+        "UPDATE council_members SET dashboard_deleted = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Council member not found" },
+          { status: 404 }
+        );
+      }
+
       return NextResponse.json({
         success: true,
         message:
@@ -284,6 +279,3 @@ export async function DELETE(request) {
     );
   }
 }
-
-// Load council members on startup
-loadCouncilMembers();

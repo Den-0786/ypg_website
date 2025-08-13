@@ -1,92 +1,34 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, unlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
+import pool from "@/lib/database.js";
 
-// Database - in production, this would be a real database
-let teamMembers = [];
-
-// Helper function to sort team members by hierarchy
-function sortTeamMembersByHierarchy(members) {
-  const hierarchyOrder = [
-    "President",
-    "President's Representative",
-    "President's Rep",
-    "Secretary",
-    "Assistant Secretary",
-    "Treasurer",
-    "Financial Secretary",
-    "Organizing Secretary",
-    "Public Relations Officer",
-    "Welfare Officer",
-    "Member",
-  ];
-
-  return members.sort((a, b) => {
-    const aIndex = hierarchyOrder.findIndex((role) =>
-      a.role.toLowerCase().includes(role.toLowerCase())
-    );
-    const bIndex = hierarchyOrder.findIndex((role) =>
-      b.role.toLowerCase().includes(role.toLowerCase())
-    );
-
-    // If both roles are found in hierarchy, sort by hierarchy order
-    if (aIndex !== -1 && bIndex !== -1) {
-      return aIndex - bIndex;
-    }
-
-    // If only one role is found, prioritize it
-    if (aIndex !== -1) return -1;
-    if (bIndex !== -1) return 1;
-
-    // If neither role is in hierarchy, sort alphabetically
-    return a.role.localeCompare(b.role);
-  });
-}
-
-// Helper function to save team members to a file
-async function saveTeamMembers() {
-  try {
-    const filePath = join(process.cwd(), "team-members.json");
-    await writeFile(filePath, JSON.stringify(teamMembers, null, 2));
-  } catch (error) {
-    console.error("Error saving team members:", error);
-  }
-}
-
-// Helper function to load team members from a file
-async function loadTeamMembers() {
-  try {
-    const filePath = join(process.cwd(), "team-members.json");
-    const data = await readFile(filePath, "utf8");
-    teamMembers = JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading team members:", error);
-  }
-}
-
+// GET - Fetch team members
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const deleted = searchParams.get("deleted") === "true";
+    const position = searchParams.get("position");
+    const limit = parseInt(searchParams.get("limit")) || 10;
 
-    // Filter based on deleted status
-    let filteredMembers = teamMembers;
-    if (deleted) {
-      filteredMembers = teamMembers.filter(
-        (member) => member.dashboard_deleted
-      );
-    } else {
-      filteredMembers = teamMembers.filter(
-        (member) => !member.dashboard_deleted
-      );
+    let query = "SELECT * FROM team_members WHERE dashboard_deleted = false";
+    let params = [];
+    let paramIndex = 1;
+
+    if (position) {
+      query += ` AND position = $${paramIndex}`;
+      params.push(position);
+      paramIndex++;
     }
 
-    // Sort team members by hierarchy order
-    const sortedMembers = sortTeamMembersByHierarchy(filteredMembers);
+    query += ` ORDER BY created_at DESC LIMIT $${paramIndex}`;
+    params.push(limit);
+
+    const result = await pool.query(query, params);
 
     return NextResponse.json({
       success: true,
-      teamMembers: sortedMembers,
+      team: result.rows,
+      total: result.rows.length,
     });
   } catch (error) {
     return NextResponse.json(
@@ -96,42 +38,53 @@ export async function GET(request) {
   }
 }
 
+// POST - Create new team member
 export async function POST(request) {
   try {
-    const formData = await request.formData();
-    const name = formData.get("name");
-    const role = formData.get("role");
-    const phone = formData.get("phone");
-    const quote = formData.get("quote");
-    const twitter = formData.get("twitter");
-    const facebook = formData.get("facebook");
-    const image = formData.get("image");
+    const contentType = request.headers.get("content-type");
+    let memberData;
 
-    // Validate required fields
-    if (!name || !role) {
-      return NextResponse.json(
-        { success: false, error: "Name and role are required" },
-        { status: 400 }
-      );
+    if (contentType && contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      memberData = {
+        name: formData.get("name"),
+        position: formData.get("position"),
+        department: formData.get("department"),
+        bio: formData.get("bio"),
+        image: formData.get("image"),
+      };
+    } else {
+      memberData = await request.json();
     }
 
-    // Handle image upload
-    let imagePath = null;
-    if (image && image.size > 0) {
-      const bytes = await image.arrayBuffer();
+    // Validation
+    const errors = {};
+    if (!memberData.name?.trim()) errors.name = "Name is required";
+    if (!memberData.position?.trim()) errors.position = "Position is required";
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ success: false, errors }, { status: 400 });
+    }
+
+    // Handle image upload if provided
+    let imagePath = "/placeholder-team.jpg";
+    if (memberData.image && memberData.image.size > 0) {
+      const bytes = await memberData.image.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // Generate unique filename
       const timestamp = Date.now();
-      const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const sanitizedName = memberData.image.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
+      );
       const fileName = `${timestamp}-${sanitizedName}`;
       imagePath = `/uploads/team/${fileName}`;
 
-      // Save the image file to local storage
       try {
-        await writeFile(join(process.cwd(), "public", imagePath), buffer);
+        const uploadDir = join(process.cwd(), "public", "uploads", "team");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save image" },
           { status: 500 }
@@ -139,115 +92,133 @@ export async function POST(request) {
       }
     }
 
-    const newTeamMember = {
-      id:
-        teamMembers.length > 0
-          ? Math.max(...teamMembers.map((m) => m.id)) + 1
-          : 1,
-      name,
-      role,
-      phone: phone || "",
-      quote: quote || "",
-      image: imagePath,
-      social: {
-        twitter: twitter || "#",
-        facebook: facebook || "#",
-      },
-    };
+    const insertQuery = `
+      INSERT INTO team_members (
+        name, position, department, bio, image
+      ) VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `;
 
-    teamMembers.push(newTeamMember);
+    const insertParams = [
+      memberData.name,
+      memberData.position,
+      memberData.department || "",
+      memberData.bio || "",
+      imagePath,
+    ];
 
-    // In a real application, you would save to a database
-    // await saveTeamMembers();
+    const result = await pool.query(insertQuery, insertParams);
+    const newMember = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      teamMember: newTeamMember,
-      message: "Team member added successfully",
+      member: newMember,
+      message: "Team member created successfully",
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: "Failed to add team member" },
+      { success: false, error: "Failed to create team member" },
       { status: 500 }
     );
   }
 }
 
+// PUT - Update team member
 export async function PUT(request) {
   try {
-    const formData = await request.formData();
-    const id = parseInt(formData.get("id"));
-    const name = formData.get("name");
-    const role = formData.get("role");
-    const phone = formData.get("phone");
-    const quote = formData.get("quote");
-    const twitter = formData.get("twitter");
-    const facebook = formData.get("facebook");
-    const image = formData.get("image");
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
 
-    // Validate required fields
-    if (!id || !name || !role) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "ID, name, and role are required" },
+        { success: false, error: "Member ID is required" },
         { status: 400 }
       );
     }
 
-    const teamMemberIndex = teamMembers.findIndex((member) => member.id === id);
-    if (teamMemberIndex === -1) {
+    const contentType = request.headers.get("content-type");
+    let updateData;
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      updateData = {
+        name: formData.get("name"),
+        position: formData.get("position"),
+        department: formData.get("department"),
+        bio: formData.get("bio"),
+        image: formData.get("image"),
+      };
+    } else {
+      updateData = await request.json();
+    }
+
+    const checkResult = await pool.query(
+      "SELECT * FROM team_members WHERE id = $1",
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Team member not found" },
         { status: 404 }
       );
     }
 
+    const existingMember = checkResult.rows[0];
+
     // Handle image upload if a new image is provided
-    let imagePath = teamMembers[teamMemberIndex].image;
-    if (image && image.size > 0) {
-      const bytes = await image.arrayBuffer();
+    let imagePath = existingMember.image;
+    if (updateData.image && updateData.image.size > 0) {
+      const bytes = await updateData.image.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // Generate unique filename
       const timestamp = Date.now();
-      const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const sanitizedName = updateData.image.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
+      );
       const fileName = `${timestamp}-${sanitizedName}`;
       imagePath = `/uploads/team/${fileName}`;
 
-      // Save the new image file to local storage
       try {
-        await writeFile(join(process.cwd(), "public", imagePath), buffer);
+        const uploadDir = join(process.cwd(), "public", "uploads", "team");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
       } catch (error) {
-        console.error("Error saving new image:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save new image" },
           { status: 500 }
         );
       }
-
-      // Keep old images - admin will manually delete when needed
     }
 
-    const updatedTeamMember = {
-      ...teamMembers[teamMemberIndex],
-      name,
-      role,
-      phone: phone || "",
-      quote: quote || "",
-      image: imagePath,
-      social: {
-        twitter: twitter || "#",
-        facebook: facebook || "#",
-      },
-    };
+    const updateQuery = `
+      UPDATE team_members SET
+        name = $1,
+        position = $2,
+        department = $3,
+        bio = $4,
+        image = $5,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $6
+      RETURNING *
+    `;
 
-    teamMembers[teamMemberIndex] = updatedTeamMember;
+    const updateParams = [
+      updateData.name,
+      updateData.position,
+      updateData.department || "",
+      updateData.bio || "",
+      imagePath,
+      id,
+    ];
 
-    // In a real application, you would save to a database
-    // await saveTeamMembers();
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedMember = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      teamMember: updatedTeamMember,
+      member: updatedMember,
       message: "Team member updated successfully",
     });
   } catch (error) {
@@ -258,37 +229,50 @@ export async function PUT(request) {
   }
 }
 
+// DELETE - Delete team member
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id"));
-    const deleteType = searchParams.get("type") || "both";
+    const deleteType = searchParams.get("type") || "soft";
 
-    const teamMemberIndex = teamMembers.findIndex((member) => member.id === id);
-    if (teamMemberIndex === -1) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "Team member not found" },
-        { status: 404 }
+        { success: false, error: "Member ID is required" },
+        { status: 400 }
       );
     }
 
-    if (deleteType === "both") {
-      teamMembers.splice(teamMemberIndex, 1);
-      return NextResponse.json({
-        success: true,
-        message:
-          "Team member permanently deleted from both dashboard and main website",
-      });
+    if (deleteType === "hard") {
+      const result = await pool.query(
+        "DELETE FROM team_members WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Team member not found" },
+          { status: 404 }
+        );
+      }
     } else {
-      teamMembers[teamMemberIndex].dashboard_deleted = true;
-      return NextResponse.json({
-        success: true,
-        message: "Team member deleted from dashboard only (hidden from admin)",
-      });
+      const result = await pool.query(
+        "UPDATE team_members SET dashboard_deleted = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Team member not found" },
+          { status: 404 }
+        );
+      }
     }
 
-    // In a real application, you would save to a database
-    // await saveTeamMembers();
+    return NextResponse.json({
+      success: true,
+      message: `Team member ${deleteType === "hard" ? "permanently deleted" : "marked as deleted"}`,
+    });
   } catch (error) {
     return NextResponse.json(
       { success: false, error: "Failed to delete team member" },

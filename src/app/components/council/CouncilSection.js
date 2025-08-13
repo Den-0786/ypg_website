@@ -129,10 +129,12 @@ export default function CouncilSection() {
             <p className="text-gray-600">
               No council members available at the moment.
             </p>
-            <p className="text-xs text-gray-400 mt-2">
-              Debug: Loading: {loading.toString()}, Members:{" "}
-              {councilMembers.length}, Error: {error || "none"}
-            </p>
+            <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Coming Soon:</strong> The council members profiles will
+                  be available here. Stay tuned!
+                </p>
+              </div>
           </div>
         </div>
       </section>

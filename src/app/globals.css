@@ -6,7 +6,6 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-
 @layer base {
   :root {
     --color-background: #ffffff;
@@ -22,6 +21,11 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+  }
+
+  html {
+    overflow-x: hidden;
   }
 }
 
@@ -92,5 +96,25 @@
 
   .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
+  }
+
+  /* Prevent animation overflow */
+  .motion-safe\:transform {
+    will-change: transform;
+  }
+
+  /* Ensure containers don't overflow during animations */
+  .container {
+    overflow: hidden;
+  }
+
+  /* Ensure navigation stays at top */
+  nav {
+    z-index: 50 !important;
+  }
+
+  /* Prevent horizontal scroll from animations */
+  * {
+    box-sizing: border-box;
   }
 }

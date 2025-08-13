@@ -1,52 +1,36 @@
 import { NextResponse } from "next/server";
-import { writeFile, readFile, unlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { join } from "path";
+import pool from "@/lib/database.js";
 
-// Database - in production, this would be a real database
-let blogPosts = [];
-
-// Helper function to handle image uploads
-async function handleImageUpload(image, category) {
-  if (!image || image.size === 0) return null;
-
-  const bytes = await image.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  // Generate unique filename
-  const timestamp = Date.now();
-  const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-  const fileName = `${timestamp}-${sanitizedName}`;
-  const imagePath = `/uploads/${category}/${fileName}`;
-
-  // Save the image file to local storage
-  try {
-    await writeFile(join(process.cwd(), "public", imagePath), buffer);
-
-    return imagePath;
-  } catch (error) {
-    console.error("Error saving blog image:", error);
-    throw new Error("Failed to save image");
-  }
-}
-
+// GET - Fetch blog posts
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const forWebsite = searchParams.get("forWebsite");
+    const category = searchParams.get("category");
+    const limit = parseInt(searchParams.get("limit")) || 10;
 
-    let filteredPosts = blogPosts;
+    let query = "SELECT * FROM blog_posts WHERE dashboard_deleted = false";
+    let params = [];
+    let paramIndex = 1;
 
-    // If requesting for website, filter out soft-deleted posts
-    if (forWebsite === "true") {
-      filteredPosts = blogPosts.filter((post) => !post.dashboard_deleted);
+    if (category) {
+      query += ` AND category = $${paramIndex}`;
+      params.push(category);
+      paramIndex++;
     }
+
+    query += ` ORDER BY date DESC, created_at DESC LIMIT $${paramIndex}`;
+    params.push(limit);
+
+    const result = await pool.query(query, params);
 
     return NextResponse.json({
       success: true,
-      blog: filteredPosts,
+      posts: result.rows,
+      total: result.rows.length,
     });
   } catch (error) {
-    console.error("Error in blog GET:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch blog posts" },
       { status: 500 }
@@ -54,15 +38,13 @@ export async function GET(request) {
   }
 }
 
+// POST - Create new blog post
 export async function POST(request) {
   try {
+    const contentType = request.headers.get("content-type");
     let postData;
 
-    // Check if the request is FormData or JSON
-    const contentType = request.headers.get("content-type");
-
     if (contentType && contentType.includes("multipart/form-data")) {
-      // Handle FormData
       const formData = await request.formData();
       postData = {
         title: formData.get("title"),
@@ -71,39 +53,64 @@ export async function POST(request) {
         author: formData.get("author"),
         category: formData.get("category"),
         date: formData.get("date"),
-        image: formData.get("image")
-          ? await handleImageUpload(formData.get("image"), "blog")
-          : null,
+        image: formData.get("image"),
       };
     } else {
-      // Handle JSON
       postData = await request.json();
     }
 
-    // Validate required fields
-    if (
-      !postData.title ||
-      !postData.excerpt ||
-      !postData.category ||
-      !postData.date
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Missing required fields: title, excerpt, category, and date are required",
-        },
-        { status: 400 }
-      );
+    // Validation
+    const errors = {};
+    if (!postData.title?.trim()) errors.title = "Title is required";
+    if (!postData.content?.trim()) errors.content = "Content is required";
+    if (!postData.author?.trim()) errors.author = "Author is required";
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
-    const newPost = {
-      id: blogPosts.length + 1,
-      ...postData,
-      created_at: new Date().toISOString(),
-    };
+    // Handle image upload if provided
+    let imagePath = "/placeholder-blog.jpg";
+    if (postData.image && postData.image.size > 0) {
+      const bytes = await postData.image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
 
-    blogPosts.push(newPost);
+      const timestamp = Date.now();
+      const sanitizedName = postData.image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/blog/${fileName}`;
+
+      try {
+        const uploadDir = join(process.cwd(), "public", "uploads", "blog");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: "Failed to save image" },
+          { status: 500 }
+        );
+      }
+    }
+
+    const insertQuery = `
+      INSERT INTO blog_posts (
+        title, excerpt, content, author, category, date, image
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+    `;
+
+    const insertParams = [
+      postData.title,
+      postData.excerpt || "",
+      postData.content,
+      postData.author,
+      postData.category || "General",
+      postData.date || new Date().toISOString().split("T")[0],
+      imagePath,
+    ];
+
+    const result = await pool.query(insertQuery, insertParams);
+    const newPost = result.rows[0];
 
     return NextResponse.json({
       success: true,
@@ -111,7 +118,6 @@ export async function POST(request) {
       message: "Blog post created successfully",
     });
   } catch (error) {
-    console.error("Error in blog POST:", error);
     return NextResponse.json(
       { success: false, error: "Failed to create blog post" },
       { status: 500 }
@@ -119,73 +125,111 @@ export async function POST(request) {
   }
 }
 
+// PUT - Update blog post
 export async function PUT(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id"));
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Post ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const contentType = request.headers.get("content-type");
     let updateData;
 
-    // Check if the request is FormData or JSON
-    const contentType = request.headers.get("content-type");
-
     if (contentType && contentType.includes("multipart/form-data")) {
-      // Handle FormData
       const formData = await request.formData();
       updateData = {
-        id: parseInt(formData.get("id")),
         title: formData.get("title"),
         excerpt: formData.get("excerpt"),
         content: formData.get("content"),
         author: formData.get("author"),
         category: formData.get("category"),
         date: formData.get("date"),
-        image: formData.get("image")
-          ? await handleImageUpload(formData.get("image"), "blog")
-          : null,
+        image: formData.get("image"),
       };
     } else {
-      // Handle JSON
       updateData = await request.json();
     }
 
-    const { id, ...postData } = updateData;
+    const checkResult = await pool.query(
+      "SELECT * FROM blog_posts WHERE id = $1",
+      [id]
+    );
 
-    const postIndex = blogPosts.findIndex((post) => post.id === id);
-    if (postIndex === -1) {
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Blog post not found" },
         { status: 404 }
       );
     }
 
-    // Validate required fields
-    if (
-      !postData.title ||
-      !postData.excerpt ||
-      !postData.category ||
-      !postData.date
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Missing required fields: title, excerpt, category, and date are required",
-        },
-        { status: 400 }
+    const existingPost = checkResult.rows[0];
+
+    // Handle image upload if a new image is provided
+    let imagePath = existingPost.image;
+    if (updateData.image && updateData.image.size > 0) {
+      const bytes = await updateData.image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const timestamp = Date.now();
+      const sanitizedName = updateData.image.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
       );
+      const fileName = `${timestamp}-${sanitizedName}`;
+      imagePath = `/uploads/blog/${fileName}`;
+
+      try {
+        const uploadDir = join(process.cwd(), "public", "uploads", "blog");
+        const filePath = join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: "Failed to save new image" },
+          { status: 500 }
+        );
+      }
     }
 
-    blogPosts[postIndex] = {
-      ...blogPosts[postIndex],
-      ...postData,
-      updated_at: new Date().toISOString(),
-    };
+    const updateQuery = `
+      UPDATE blog_posts SET
+        title = $1,
+        excerpt = $2,
+        content = $3,
+        author = $4,
+        category = $5,
+        date = $6,
+        image = $7,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $8
+      RETURNING *
+    `;
+
+    const updateParams = [
+      updateData.title,
+      updateData.excerpt || "",
+      updateData.content,
+      updateData.author,
+      updateData.category || "General",
+      updateData.date || new Date().toISOString().split("T")[0],
+      imagePath,
+      id,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedPost = result.rows[0];
 
     return NextResponse.json({
       success: true,
-      post: blogPosts[postIndex],
+      post: updatedPost,
       message: "Blog post updated successfully",
     });
   } catch (error) {
-    console.error("Error in blog PUT:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update blog post" },
       { status: 500 }
@@ -193,44 +237,51 @@ export async function PUT(request) {
   }
 }
 
+// DELETE - Delete blog post
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id"));
-    const deleteType = searchParams.get("type") || "both"; // Default to 'both' if not specified
+    const deleteType = searchParams.get("type") || "soft";
 
-    const postIndex = blogPosts.findIndex((post) => post.id === id);
-    if (postIndex === -1) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "Blog post not found" },
-        { status: 404 }
+        { success: false, error: "Post ID is required" },
+        { status: 400 }
       );
     }
 
-    if (deleteType === "dashboard") {
-      // Soft delete - mark as deleted from dashboard only
-      blogPosts[postIndex] = {
-        ...blogPosts[postIndex],
-        dashboard_deleted: true,
-        deleted_at: new Date().toISOString(),
-      };
+    if (deleteType === "hard") {
+      const result = await pool.query(
+        "DELETE FROM blog_posts WHERE id = $1 RETURNING id",
+        [id]
+      );
 
-      return NextResponse.json({
-        success: true,
-        message: "Blog post hidden from dashboard successfully",
-      });
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Blog post not found" },
+          { status: 404 }
+        );
+      }
     } else {
-      // Hard delete - remove completely from both dashboard and website
-      blogPosts.splice(postIndex, 1);
+      const result = await pool.query(
+        "UPDATE blog_posts SET dashboard_deleted = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id",
+        [id]
+      );
 
-      return NextResponse.json({
-        success: true,
-        message:
-          "Blog post deleted from both dashboard and website successfully",
-      });
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Blog post not found" },
+          { status: 404 }
+        );
+      }
     }
+
+    return NextResponse.json({
+      success: true,
+      message: `Blog post ${deleteType === "hard" ? "permanently deleted" : "marked as deleted"}`,
+    });
   } catch (error) {
-    console.error("Error in blog DELETE:", error);
     return NextResponse.json(
       { success: false, error: "Failed to delete blog post" },
       { status: 500 }

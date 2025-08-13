@@ -1,30 +1,30 @@
 import { NextResponse } from "next/server";
+import pool from "@/lib/database.js";
 
-// Branch presidents data (empty initially)
-let branchPresidents = [];
-
-// GET - Fetch all branch presidents (for admin)
+// GET - Fetch branch presidents
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const isActive = searchParams.get("active");
+    const isActive = searchParams.get("isActive");
 
-    let filteredPresidents = branchPresidents;
+    let query = "SELECT * FROM branch_presidents";
+    let params = [];
 
-    if (isActive === "true") {
-      filteredPresidents = branchPresidents.filter(
-        (president) => president.is_active
-      );
+    if (isActive !== null) {
+      query += " WHERE is_active = $1";
+      params.push(isActive === "true");
     }
 
-    // Sort by newest first
-    filteredPresidents.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
+    query += " ORDER BY congregation ASC";
 
-    return NextResponse.json(filteredPresidents);
+    const result = await pool.query(query, params);
+
+    return NextResponse.json({
+      success: true,
+      presidents: result.rows,
+      total: result.rows.length,
+    });
   } catch (error) {
-    console.error("Error fetching branch presidents:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch branch presidents" },
       { status: 500 }
@@ -35,48 +35,46 @@ export async function GET(request) {
 // POST - Create new branch president
 export async function POST(request) {
   try {
-    const presidentData = await request.json();
-    const {
-      president_name,
-      congregation,
-      location,
-      phone_number,
-      email,
-      is_active,
-    } = presidentData;
+    const data = await request.json();
 
     // Validation
     const errors = {};
-    if (!president_name?.trim()) errors.president_name = "Name is required";
-    if (!congregation?.trim()) errors.congregation = "Congregation is required";
-    if (!phone_number?.trim()) errors.phone_number = "Phone is required";
-    if (!email?.trim()) errors.email = "Email is required";
+    if (!data.president_name?.trim())
+      errors.president_name = "President name is required";
+    if (!data.congregation?.trim())
+      errors.congregation = "Congregation is required";
+    if (!data.phone_number?.trim())
+      errors.phone_number = "Phone number is required";
 
     if (Object.keys(errors).length > 0) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
-    const newPresident = {
-      id: Math.max(...branchPresidents.map((p) => p.id), 0) + 1,
-      president_name: president_name.trim(),
-      congregation: congregation.trim(),
-      location: location?.trim() || "",
-      phone_number: phone_number.trim(),
-      email: email.trim().toLowerCase(),
-      is_active: is_active !== undefined ? is_active : true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const insertQuery = `
+      INSERT INTO branch_presidents (
+        president_name, congregation, location, phone_number, email, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
 
-    branchPresidents.push(newPresident);
+    const insertParams = [
+      data.president_name,
+      data.congregation,
+      data.location || "",
+      data.phone_number,
+      data.email || "",
+      data.is_active !== false, // Default to true
+    ];
+
+    const result = await pool.query(insertQuery, insertParams);
+    const newPresident = result.rows[0];
 
     return NextResponse.json({
       success: true,
+      president: newPresident,
       message: "Branch president created successfully",
-      id: newPresident.id,
     });
   } catch (error) {
-    console.error("Error creating branch president:", error);
     return NextResponse.json(
       { success: false, error: "Failed to create branch president" },
       { status: 500 }
@@ -97,53 +95,53 @@ export async function PUT(request) {
       );
     }
 
-    const presidentData = await request.json();
-    const {
-      president_name,
-      congregation,
-      location,
-      phone_number,
-      email,
-      is_active,
-    } = presidentData;
+    const data = await request.json();
 
-    // Validation
-    const errors = {};
-    if (!president_name?.trim()) errors.president_name = "Name is required";
-    if (!congregation?.trim()) errors.congregation = "Congregation is required";
-    if (!phone_number?.trim()) errors.phone_number = "Phone is required";
-    if (!email?.trim()) errors.email = "Email is required";
+    // Check if president exists
+    const checkResult = await pool.query(
+      "SELECT * FROM branch_presidents WHERE id = $1",
+      [id]
+    );
 
-    if (Object.keys(errors).length > 0) {
-      return NextResponse.json({ success: false, errors }, { status: 400 });
-    }
-
-    const presidentIndex = branchPresidents.findIndex((p) => p.id === id);
-    if (presidentIndex === -1) {
+    if (checkResult.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Branch president not found" },
         { status: 404 }
       );
     }
 
-    // Update the president
-    branchPresidents[presidentIndex] = {
-      ...branchPresidents[presidentIndex],
-      president_name: president_name.trim(),
-      congregation: congregation.trim(),
-      location: location?.trim() || "",
-      phone_number: phone_number.trim(),
-      email: email.trim().toLowerCase(),
-      is_active: is_active !== undefined ? is_active : true,
-      updated_at: new Date().toISOString(),
-    };
+    const updateQuery = `
+      UPDATE branch_presidents SET
+        president_name = $1,
+        congregation = $2,
+        location = $3,
+        phone_number = $4,
+        email = $5,
+        is_active = $6,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $7
+      RETURNING *
+    `;
+
+    const updateParams = [
+      data.president_name,
+      data.congregation,
+      data.location || "",
+      data.phone_number,
+      data.email || "",
+      data.is_active !== false,
+      id,
+    ];
+
+    const result = await pool.query(updateQuery, updateParams);
+    const updatedPresident = result.rows[0];
 
     return NextResponse.json({
       success: true,
+      president: updatedPresident,
       message: "Branch president updated successfully",
     });
   } catch (error) {
-    console.error("Error updating branch president:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update branch president" },
       { status: 500 }
@@ -164,23 +162,23 @@ export async function DELETE(request) {
       );
     }
 
-    const presidentIndex = branchPresidents.findIndex((p) => p.id === id);
-    if (presidentIndex === -1) {
+    const result = await pool.query(
+      "DELETE FROM branch_presidents WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Branch president not found" },
         { status: 404 }
       );
     }
 
-    // Remove the president
-    branchPresidents.splice(presidentIndex, 1);
-
     return NextResponse.json({
       success: true,
       message: "Branch president deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting branch president:", error);
     return NextResponse.json(
       { success: false, error: "Failed to delete branch president" },
       { status: 500 }

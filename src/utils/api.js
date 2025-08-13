@@ -192,7 +192,8 @@ export const branchPresidentAPI = {
   getPresidents: async () => {
     try {
       const response = await fetch(`/api/branch-presidents?active=true`);
-      return await response.json();
+      const data = await response.json();
+      return data.success ? data.presidents : [];
     } catch (error) {
       console.error("Error fetching branch presidents:", error);
       throw error;
@@ -202,7 +203,8 @@ export const branchPresidentAPI = {
   getAdminPresidents: async () => {
     try {
       const response = await fetch(`/api/branch-presidents`);
-      return await response.json();
+      const data = await response.json();
+      return data.success ? data.presidents : [];
     } catch (error) {
       console.error("Error fetching admin branch presidents:", error);
       throw error;
