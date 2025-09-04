@@ -197,3 +197,8 @@ scripts/create-welfare-committee-table.js        # Setup script
 - Email notifications
 - Profile picture cropping/editing
 - Committee member roles and permissions
+
+
+
+
+

@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # Authentication API endpoints
     path('api/auth/login/', views.api_supervisor_login, name='api_supervisor_login'),
+    path('api/auth/login', views.api_supervisor_login, name='api_supervisor_login_no_slash'),
     path('api/auth/logout/', views.api_supervisor_logout, name='api_supervisor_logout'),
     path('api/auth/status/', views.api_supervisor_status, name='api_supervisor_status'),
     path('api/auth/credentials/', views.api_supervisor_change_credentials, name='api_supervisor_change_credentials'),

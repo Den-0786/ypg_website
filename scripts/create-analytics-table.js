@@ -39,3 +39,8 @@ async function createAnalyticsTable() {
 }
 
 createAnalyticsTable();
+
+
+
+
+

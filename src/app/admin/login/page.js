@@ -15,7 +15,6 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  
   useEffect(() => {
     const checkAuthentication = () => {
       const authenticated = localStorage.getItem("ypg_admin_authenticated");
@@ -23,7 +22,6 @@ export default function AdminLogin() {
       const loginTime = localStorage.getItem("ypg_admin_login_time");
 
       if (authenticated === "true" && user && loginTime) {
-        
         const loginDate = new Date(loginTime);
         const now = new Date();
         const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
@@ -47,7 +45,7 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +56,6 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (data.success) {
-        
         localStorage.setItem("ypg_admin_authenticated", "true");
         localStorage.setItem("ypg_admin_user", data.user.username);
         localStorage.setItem("ypg_admin_login_time", data.user.loginTime);

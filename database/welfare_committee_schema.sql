@@ -30,3 +30,8 @@ COMMENT ON COLUMN welfare_committee.picture IS 'Profile picture file path or URL
 COMMENT ON COLUMN welfare_committee.created_at IS 'Timestamp when record was created';
 COMMENT ON COLUMN welfare_committee.updated_at IS 'Timestamp when record was last updated';
 COMMENT ON COLUMN welfare_committee.deleted_at IS 'Soft delete timestamp (NULL if not deleted)';
+
+
+
+
+
