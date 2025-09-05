@@ -24,6 +24,7 @@ import CongregationalExecutives from "./components/congregations/Congregations";
 import CouncilSection from "./components/council/CouncilSection";
 import PastExecutives from "./components/past-executives/PastExecutives";
 import WelfareSection from "./components/welfare/WelfareSection";
+import AdvertisementSection from "./components/advertisements/AdvertisementSection";
 
 export default function Home() {
   return (
@@ -46,6 +47,7 @@ export default function Home() {
         <MinistriesSection />
         <CouncilSection />
         <WelfareSection />
+        <AdvertisementSection />
         <JoinUsSection />
         <GallerySection />
         <BlogSection />

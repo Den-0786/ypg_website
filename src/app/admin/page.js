@@ -27,6 +27,7 @@ import BranchPresidentsManagement from "./components/BranchPresidentsManagement"
 import WelfareCommittee from "./components/WelfareCommittee";
 import CouncilManagement from "./components/CouncilManagement";
 import PastExecutivesManagement from "./components/PastExecutivesManagement";
+import AdvertisementManagement from "./components/AdvertisementManagement";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -415,6 +416,9 @@ export default function AdminDashboard() {
               )}
               {activeTab === "welfare-committee" && (
                 <WelfareCommittee theme={theme} />
+              )}
+              {activeTab === "advertisements" && (
+                <AdvertisementManagement theme={theme} />
               )}
 
               {activeTab === "Settings" && (

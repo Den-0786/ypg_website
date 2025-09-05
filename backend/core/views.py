@@ -13,14 +13,14 @@ from .models import Supervisor
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident
+    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement
 )
 from .serializers import (
     QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer, 
     QuizResultsSerializer, EventSerializer, TeamMemberSerializer,
     DonationSerializer, ContactMessageSerializer, MinistryRegistrationSerializer,
     BlogPostSerializer, TestimonialSerializer, GalleryItemSerializer,
-    CongregationSerializer, AnalyticsSerializer
+    CongregationSerializer, AnalyticsSerializer, AdvertisementSerializer
 )
 import json
 
@@ -554,6 +554,24 @@ def api_team_members(request):
         return Response({
             'success': True,
             'team': serializer.data
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_council_members(request):
+    """Get all council members (same as team members)"""
+    try:
+        team_members = TeamMember.objects.filter(is_active=True).order_by('order', 'name')
+        serializer = TeamMemberSerializer(team_members, many=True)
+        return Response({
+            'success': True,
+            'councilMembers': serializer.data
         })
     except Exception as e:
         return Response({

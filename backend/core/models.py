@@ -171,3 +171,49 @@ class BranchPresident(models.Model):
     class Meta:
         verbose_name = "Branch President"
         verbose_name_plural = "Branch Presidents"
+
+class Advertisement(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ('food', 'Food & Catering'),
+        ('fashion', 'Fashion & Beauty'),
+        ('technology', 'Technology'),
+        ('education', 'Education & Training'),
+        ('health', 'Health & Wellness'),
+        ('automotive', 'Automotive'),
+        ('real_estate', 'Real Estate'),
+        ('services', 'Services'),
+        ('other', 'Other'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    advertiser_name = models.CharField(max_length=100)
+    advertiser_contact = models.CharField(max_length=20)
+    advertiser_email = models.EmailField()
+    location = models.CharField(max_length=200)
+    is_member = models.BooleanField(default=False)
+    member_congregation = models.CharField(max_length=100, blank=True, null=True)
+    price_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_fixed = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_type = models.CharField(max_length=20, choices=[('fixed', 'Fixed Price'), ('range', 'Price Range')], default='fixed')
+    images = models.JSONField(default=list)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField()
+    
+    def __str__(self):
+        return f"{self.title} - {self.advertiser_name}"
+    
+    class Meta:
+        verbose_name = "Advertisement"
+        verbose_name_plural = "Advertisements"

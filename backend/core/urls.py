@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from advertisement_views import api_advertisements, api_create_advertisement, api_update_advertisement, api_delete_advertisement
+from settings_views import api_settings_profile, api_settings_website
 
 urlpatterns = [
     # Authentication API endpoints
@@ -31,6 +33,9 @@ urlpatterns = [
     path('api/team/create/', views.api_create_team_member, name='api_create_team_member'),
     path('api/team/<int:member_id>/update/', views.api_update_team_member, name='api_update_team_member'),
     path('api/team/<int:member_id>/delete/', views.api_delete_team_member, name='api_delete_team_member'),
+    
+    # Council API endpoints
+    path('api/council/', views.api_council_members, name='api_council_members'),
     
     # Donations API endpoints
     path('api/donations/', views.api_donations, name='api_donations'),
@@ -85,6 +90,16 @@ urlpatterns = [
     path('branch-presidents/create/', views.api_branch_president_create, name='api_branch_president_create'),
     path('branch-presidents/<int:president_id>/update/', views.api_branch_president_update, name='api_branch_president_update'),
     path('branch-presidents/<int:president_id>/delete/', views.api_branch_president_delete, name='api_branch_president_delete'),
+    
+    # Advertisement API endpoints
+    path('api/advertisements/', api_advertisements, name='api_advertisements'),
+    path('api/advertisements/create/', api_create_advertisement, name='api_create_advertisement'),
+    path('api/advertisements/<int:ad_id>/update/', api_update_advertisement, name='api_update_advertisement'),
+    path('api/advertisements/<int:ad_id>/delete/', api_delete_advertisement, name='api_delete_advertisement'),
+    
+    # Settings API endpoints
+    path('api/settings/profile/', api_settings_profile, name='api_settings_profile'),
+    path('api/settings/website/', api_settings_website, name='api_settings_website'),
 ]
 
 

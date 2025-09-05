@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics
+    Testimonial, GalleryItem, Congregation, Analytics, Advertisement
 )
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -73,4 +73,9 @@ class CongregationSerializer(serializers.ModelSerializer):
 class AnalyticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Analytics
+        fields = '__all__'
+
+class AdvertisementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advertisement
         fields = '__all__'

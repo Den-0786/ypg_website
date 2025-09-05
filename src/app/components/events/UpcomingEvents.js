@@ -39,7 +39,7 @@ export default function EventSection() {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "/api/events?type=upcoming&excludeDeleted=true"
+          "http://localhost:8002/api/events?type=upcoming&excludeDeleted=true"
         );
         const data = await response.json();
 
@@ -58,7 +58,7 @@ export default function EventSection() {
 
   if (loading) {
     return (
-      <section id="events" className="px-4 py-16 bg-white">
+      <section id="events" className="px-4 py-16 bg-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
@@ -71,7 +71,7 @@ export default function EventSection() {
 
   if (events.length === 0) {
     return (
-      <section id="events" className="px-4 py-16 bg-white">
+      <section id="events" className="px-4 py-16 bg-blue-50">
         <div className="max-w-7xl mx-auto">
           <motion.h2
             className="text-4xl font-bold text-center mb-4 text-blue-800"
@@ -96,7 +96,7 @@ export default function EventSection() {
   }
 
   return (
-    <section id="events" className="px-4 py-16 bg-white">
+    <section id="events" className="px-4 py-16 bg-blue-50">
       <div className="max-w-7xl mx-auto">
         <motion.h2
           className="text-4xl font-bold text-center mb-4 text-blue-800"

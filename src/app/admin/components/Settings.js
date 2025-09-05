@@ -109,7 +109,9 @@ export default function SettingsComponent({ onClose }) {
     const loadProfile = async () => {
       setIsProfileLoading(true);
       try {
-        const response = await fetch("/api/settings/profile");
+        const response = await fetch(
+          "http://localhost:8002/api/settings/profile"
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -135,7 +137,9 @@ export default function SettingsComponent({ onClose }) {
   useEffect(() => {
     const loadWebsiteSettings = async () => {
       try {
-        const response = await fetch("/api/settings/website");
+        const response = await fetch(
+          "http://localhost:8002/api/settings/website"
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -377,7 +381,7 @@ export default function SettingsComponent({ onClose }) {
       let response;
       switch (section) {
         case "profile":
-          response = await fetch("/api/settings/profile", {
+          response = await fetch("http://localhost:8002/api/settings/profile", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -401,7 +405,7 @@ export default function SettingsComponent({ onClose }) {
           break;
 
         case "website":
-          response = await fetch("/api/settings/website", {
+          response = await fetch("http://localhost:8002/api/settings/website", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -419,7 +423,7 @@ export default function SettingsComponent({ onClose }) {
           break;
 
         case "appearance":
-          response = await fetch("/api/settings/website", {
+          response = await fetch("http://localhost:8002/api/settings/website", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -687,7 +691,7 @@ export default function SettingsComponent({ onClose }) {
         // Save restored settings to database
         try {
           // Save profile settings
-          await fetch("/api/settings/profile", {
+          await fetch("http://localhost:8002/api/settings/profile", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -696,7 +700,7 @@ export default function SettingsComponent({ onClose }) {
           });
 
           // Save website settings
-          await fetch("/api/settings/website", {
+          await fetch("http://localhost:8002/api/settings/website", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -775,19 +779,22 @@ export default function SettingsComponent({ onClose }) {
         const avatarData = e.target.result;
 
         // Save the avatar to the database
-        const response = await fetch("/api/settings/profile", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fullName: profile.fullName,
-            email: profile.email,
-            phone: profile.phone,
-            role: profile.role,
-            avatar: avatarData,
-          }),
-        });
+        const response = await fetch(
+          "http://localhost:8002/api/settings/profile",
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              fullName: profile.fullName,
+              email: profile.email,
+              phone: profile.phone,
+              role: profile.role,
+              avatar: avatarData,
+            }),
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();

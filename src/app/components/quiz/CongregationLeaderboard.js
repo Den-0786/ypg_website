@@ -109,8 +109,8 @@ export default function CongregationLeaderboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center justify-center mb-2">
             <Trophy className="w-8 h-8 text-yellow-500 mr-3" />
             Congregation Quiz Leaderboard
           </h2>
@@ -195,7 +195,7 @@ export default function CongregationLeaderboard() {
 
         {/* Full Leaderboard */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center justify-center">
             <BarChart3 className="w-5 h-5 text-blue-500 mr-2" />
             Complete Leaderboard
           </h3>

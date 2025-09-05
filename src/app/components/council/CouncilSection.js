@@ -22,11 +22,16 @@ export default function CouncilSection() {
   useEffect(() => {
     const fetchCouncilMembers = async () => {
       try {
-        const response = await fetch("/api/council");
+        const response = await fetch("http://localhost:8002/api/council/");
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.success) {
-          setCouncilMembers(data.councilMembers);
+          setCouncilMembers(data.councilMembers || []);
         } else {
           setError(data.error || "Failed to fetch council members");
         }
@@ -130,11 +135,11 @@ export default function CouncilSection() {
               No council members available at the moment.
             </p>
             <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>Coming Soon:</strong> The council members profiles will
-                  be available here. Stay tuned!
-                </p>
-              </div>
+              <p className="text-sm text-blue-800">
+                <strong>Coming Soon:</strong> The council members profiles will
+                be available here. Stay tuned!
+              </p>
+            </div>
           </div>
         </div>
       </section>

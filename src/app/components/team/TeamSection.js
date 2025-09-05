@@ -14,7 +14,7 @@ export default function TeamSection() {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("/api/team");
+        const response = await fetch("http://localhost:8002/api/team/");
         const data = await response.json();
 
         if (data.success) {
@@ -126,8 +126,10 @@ export default function TeamSection() {
               </p>
               <div className="bg-blue-50 p-4 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>Coming Soon:</strong> Our executive team profiles will
-                  be available here. Stay tuned!
+                  <strong>
+                    No district executives available at the moment.
+                  </strong>
+                  Our executive team profiles will be added soon.
                 </p>
               </div>
             </div>
@@ -207,8 +209,6 @@ export default function TeamSection() {
                                         &quot;{member.bio}&quot;
                                       </p>
                                     )}
-
-
                                   </div>
                                 </div>
                               </div>

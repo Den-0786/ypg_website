@@ -1,6 +1,6 @@
 // API Configuration and utility functions
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8002";
 
 // Generic API request function with error handling
 export const apiRequest = async (endpoint, options = {}) => {
@@ -31,41 +31,95 @@ export const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-// Quiz API functions - These connect to your external database management system
+// Quiz API functions - These connect to the YPG Database backend (port 8001)
+const QUIZ_API_BASE_URL = "http://localhost:8001";
+
 export const quizAPI = {
-  // Get all quizzes from external system
-  getQuizzes: () => apiRequest("/api/quizzes/"),
+  // Get all quizzes from YPG Database system
+  getQuizzes: () => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/`;
+    return fetch(url, {
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 
-  // Get active quiz from external system
-  getActiveQuiz: () => apiRequest("/api/quizzes/active/"),
+  // Get active quiz from YPG Database system
+  getActiveQuiz: () => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/active/`;
+    return fetch(url, {
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 
-  // Get quiz results from external system
-  getQuizResults: () => apiRequest("/api/quizzes/results/"),
+  // Get quiz results from YPG Database system
+  getQuizResults: () => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/results/`;
+    return fetch(url, {
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 
-  // Submit quiz answer to external system
-  submitQuiz: (quizData) =>
-    apiRequest("/api/quizzes/submit/", {
+  // Submit quiz answer to YPG Database system
+  submitQuiz: (quizData) => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/submit/`;
+    return fetch(url, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(quizData),
-    }),
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 
-  // Get specific quiz questions from external system
-  getQuizQuestions: (quizId) => apiRequest(`/api/quizzes/${quizId}/questions/`),
+  // Get specific quiz questions from YPG Database system
+  getQuizQuestions: (quizId) => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/${quizId}/questions/`;
+    return fetch(url, {
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 
-  // Get congregation quiz statistics and leaderboard from external system
-  getCongregationStats: () => apiRequest("/api/quizzes/congregation-stats/"),
+  // Get congregation quiz statistics and leaderboard from YPG Database system
+  getCongregationStats: () => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/congregation-stats/`;
+    return fetch(url, {
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 
-  // Cleanup expired quizzes on external system
-  cleanupExpiredQuizzes: () =>
-    apiRequest("/api/quizzes/cleanup/", {
+  // Cleanup expired quizzes on YPG Database system
+  cleanupExpiredQuizzes: () => {
+    const url = `${QUIZ_API_BASE_URL}/api/quizzes/cleanup/`;
+    return fetch(url, {
       method: "POST",
-    }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => ({ success: true, data }))
+      .catch((error) => ({ success: false, error: error.message }));
+  },
 };
 
 // Contact API functions
 export const contactAPI = {
   submitContact: (contactData) =>
-    fetch("/api/contact", {
+    fetch("http://localhost:8002/api/contact", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,12 +130,14 @@ export const contactAPI = {
       .catch((error) => ({ success: false, error: error.message })),
 
   getMessages: (status = null) =>
-    fetch(`/api/contact${status ? `?status=${status}` : ""}`)
+    fetch(
+      `http://localhost:8002/api/contact${status ? `?status=${status}` : ""}`
+    )
       .then((res) => res.json())
       .catch((error) => ({ success: false, error: error.message })),
 
   updateMessage: (id, updateData) =>
-    fetch("/api/contact", {
+    fetch("http://localhost:8002/api/contact", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +148,7 @@ export const contactAPI = {
       .catch((error) => ({ success: false, error: error.message })),
 
   deleteMessage: (id) =>
-    fetch(`/api/contact?id=${id}`, {
+    fetch(`http://localhost:8002/api/contact?id=${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -102,7 +158,7 @@ export const contactAPI = {
 // Donation API functions
 export const donationAPI = {
   submitDonation: (donationData) =>
-    fetch("/api/donations", {
+    fetch("http://localhost:8002/api/donations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -116,7 +172,7 @@ export const donationAPI = {
 // Ministry API functions
 export const ministryAPI = {
   submitMinistryRegistration: (ministryData) =>
-    fetch("/api/ministry", {
+    fetch("http://localhost:8002/api/ministry", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,21 +187,21 @@ export const ministryAPI = {
 export const ystoreAPI = {
   // Get all active items for main website
   getItems: () =>
-    fetch("/api/ystore?forWebsite=true")
+    fetch("http://localhost:8002/api/ystore?forWebsite=true")
       .then((res) => res.json())
       .then((data) => ({ success: data.success, data }))
       .catch((error) => ({ success: false, error: error.message })),
 
   // Get all items for admin dashboard
   getAdminItems: () =>
-    fetch("/api/ystore")
+    fetch("http://localhost:8002/api/ystore")
       .then((res) => res.json())
       .then((data) => ({ success: data.success, data }))
       .catch((error) => ({ success: false, error: error.message })),
 
   // Create new item
   createItem: (itemData) =>
-    fetch("/api/ystore", {
+    fetch("http://localhost:8002/api/ystore", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -157,7 +213,7 @@ export const ystoreAPI = {
 
   // Update item
   updateItem: (itemId, itemData) =>
-    fetch("/api/ystore", {
+    fetch("http://localhost:8002/api/ystore", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -191,7 +247,9 @@ export const ystoreAPI = {
 export const branchPresidentAPI = {
   getPresidents: async () => {
     try {
-      const response = await fetch(`/api/branch-presidents?active=true`);
+      const response = await fetch(
+        `http://localhost:8002/api/branch-presidents?active=true`
+      );
       const data = await response.json();
       return data.success ? data.presidents : [];
     } catch (error) {
@@ -202,7 +260,9 @@ export const branchPresidentAPI = {
 
   getAdminPresidents: async () => {
     try {
-      const response = await fetch(`/api/branch-presidents`);
+      const response = await fetch(
+        `http://localhost:8002/api/branch-presidents`
+      );
       const data = await response.json();
       return data.success ? data.presidents : [];
     } catch (error) {
