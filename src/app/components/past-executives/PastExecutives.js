@@ -13,7 +13,7 @@ export default function PastExecutives() {
 
   const fetchPastExecutives = async () => {
     try {
-      const response = await fetch("/api/past-executives");
+      const response = await fetch("http://localhost:8002/api/past-executives");
       const data = await response.json();
       if (data.success) {
         setPastExecutives(data.pastExecutives);

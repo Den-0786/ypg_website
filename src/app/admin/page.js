@@ -121,7 +121,7 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     try {
       // Call logout API (Next.js route)
-      await fetch("/api/auth/logout", {
+      await fetch("http://localhost:8002/api/auth/logout", {
         method: "POST",
       });
     } catch (error) {
@@ -197,15 +197,15 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData("/api/team", setTeamMembers);
-      fetchData("/api/events", setEvents);
-      fetchData("/api/donations", setDonations);
-      fetchData("/api/ministry", setMinistryRegistrations);
-      fetchData("/api/blog", setBlogPosts);
-      fetchData("/api/testimonials", setTestimonials);
-      fetchData("/api/media", setMedia);
-      fetchData("/api/contact", setContactMessages);
-      fetchData("/api/analytics", setAnalytics);
+      fetchData("http://localhost:8002/api/team", setTeamMembers);
+      fetchData("http://localhost:8002/api/events", setEvents);
+      fetchData("http://localhost:8002/api/donations", setDonations);
+      fetchData("http://localhost:8002/api/ministry", setMinistryRegistrations);
+      fetchData("http://localhost:8002/api/blog", setBlogPosts);
+      fetchData("http://localhost:8002/api/testimonials", setTestimonials);
+      fetchData("http://localhost:8002/api/media", setMedia);
+      fetchData("http://localhost:8002/api/contact", setContactMessages);
+      fetchData("http://localhost:8002/api/analytics", setAnalytics);
       updateStats();
     }
   }, [isAuthenticated]);

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics, Advertisement
+    Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem
 )
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -78,4 +78,9 @@ class AnalyticsSerializer(serializers.ModelSerializer):
 class AdvertisementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advertisement
+        fields = '__all__'
+
+class YStoreItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = YStoreItem
         fields = '__all__'

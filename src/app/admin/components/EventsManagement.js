@@ -49,7 +49,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
     }
 
     try {
-      const response = await fetch("/api/events", {
+      const response = await fetch("http://localhost:8002/api/events", {
         method: "POST",
         body: formData,
       });

@@ -158,6 +158,7 @@ class BranchPresident(models.Model):
     """
     name = models.CharField(max_length=100)
     congregation = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, blank=True)
     phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True)
     position = models.CharField(max_length=100, default="Branch President")
@@ -217,3 +218,28 @@ class Advertisement(models.Model):
     class Meta:
         verbose_name = "Advertisement"
         verbose_name_plural = "Advertisements"
+
+class YStoreItem(models.Model):
+    CATEGORY_CHOICES = [
+        ('clothing', 'Clothing'),
+        ('accessories', 'Accessories'),
+        ('books', 'Books'),
+        ('merchandise', 'Merchandise'),
+        ('other', 'Other'),
+    ]
+    
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='merchandise')
+    image = models.ImageField(upload_to='ystore/', null=True, blank=True)
+    is_available = models.BooleanField(default=True)
+    stock_quantity = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        db_table = 'core_ystore_item'

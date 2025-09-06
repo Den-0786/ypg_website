@@ -43,13 +43,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         formData.append("tiktokUrl", newMedia.tiktokUrl);
         formData.append("image", newMedia.file);
 
-        response = await fetch("/api/media", {
+        response = await fetch("http://localhost:8002/api/media", {
           method: "POST",
           body: formData,
         });
       } else {
         // If no file, use JSON
-        response = await fetch("/api/media", {
+        response = await fetch("http://localhost:8002/api/media", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

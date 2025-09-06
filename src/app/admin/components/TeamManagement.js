@@ -41,7 +41,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
         formData.append("image", newMember.image);
       }
 
-      const response = await fetch("/api/team", {
+      const response = await fetch("http://localhost:8002/api/team", {
         method: "POST",
         body: formData,
       });

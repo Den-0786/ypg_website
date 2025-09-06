@@ -33,13 +33,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         formData.append("date", newPost.date);
         formData.append("image", newPost.image);
 
-        response = await fetch("/api/blog", {
+        response = await fetch("http://localhost:8002/api/blog", {
           method: "POST",
           body: formData,
         });
       } else {
         // If no image, use JSON
-        response = await fetch("/api/blog", {
+        response = await fetch("http://localhost:8002/api/blog", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -91,13 +91,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         formData.append("date", editingPost.date);
         formData.append("image", editingPost.image);
 
-        response = await fetch(`/api/blog?id=${editingPost.id}`, {
+        response = await fetch(`http://localhost:8002/api/blog?id=${editingPost.id}`, {
           method: "PUT",
           body: formData,
         });
       } else {
         // If no image, use JSON
-        response = await fetch(`/api/blog?id=${editingPost.id}`, {
+        response = await fetch(`http://localhost:8002/api/blog?id=${editingPost.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

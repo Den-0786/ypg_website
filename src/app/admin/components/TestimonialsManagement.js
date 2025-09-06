@@ -30,7 +30,7 @@ const TestimonialsManagement = ({
 
   const handleAddTestimonial = async () => {
     try {
-      const response = await fetch("/api/testimonials", {
+      const response = await fetch("http://localhost:8002/api/testimonials", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

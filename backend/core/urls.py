@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from advertisement_views import api_advertisements, api_create_advertisement, api_update_advertisement, api_delete_advertisement
 from settings_views import api_settings_profile, api_settings_website
+from ystore_views import api_ystore_items, api_ystore_item_detail
 
 urlpatterns = [
     # Authentication API endpoints
@@ -100,6 +101,10 @@ urlpatterns = [
     # Settings API endpoints
     path('api/settings/profile/', api_settings_profile, name='api_settings_profile'),
     path('api/settings/website/', api_settings_website, name='api_settings_website'),
+    
+    # Y-Store API endpoints
+    path('api/ystore/', api_ystore_items, name='api_ystore_items'),
+    path('api/ystore/item/', api_ystore_item_detail, name='api_ystore_item_detail'),
 ]
 
 

@@ -99,7 +99,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     }
 
     try {
-      const response = await fetch("/api/donations", {
+      const response = await fetch("http://localhost:8002/api/donations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

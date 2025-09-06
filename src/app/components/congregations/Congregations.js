@@ -62,19 +62,19 @@ export default function CongregationalExecutives() {
           <table className="w-full min-w-[900px] border-collapse">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="py-3 px-4 text-left min-w-[180px] whitespace-nowrap">
+                <th className="py-3 px-4 text-center min-w-[180px] whitespace-nowrap">
                   Name
                 </th>
-                <th className="py-3 px-4 text-left min-w-[180px] whitespace-nowrap">
+                <th className="py-3 px-4 text-center min-w-[180px] whitespace-nowrap">
                   Congregation
                 </th>
-                <th className="py-3 px-4 text-left min-w-[140px] whitespace-nowrap">
+                <th className="py-3 px-4 text-center min-w-[140px] whitespace-nowrap">
                   Location
                 </th>
-                <th className="py-3 px-4 text-left min-w-[160px] whitespace-nowrap">
+                <th className="py-3 px-4 text-center min-w-[160px] whitespace-nowrap">
                   Contact
                 </th>
-                <th className="py-3 px-4 text-left min-w-[220px] whitespace-nowrap">
+                <th className="py-3 px-4 text-center min-w-[220px] whitespace-nowrap">
                   Email
                 </th>
               </tr>
@@ -86,20 +86,20 @@ export default function CongregationalExecutives() {
                   className={`hover:bg-blue-50 transition-colors ${index % 2 === 1 ? "bg-gray-50" : ""}`}
                 >
                   <td className="py-4 px-4 font-medium text-gray-700 min-w-[180px] whitespace-nowrap">
-                    {president.president_name}
+                    {president.name}
                   </td>
                   <td className="py-4 px-4 text-gray-700 min-w-[180px] whitespace-nowrap">
                     {president.congregation}
                   </td>
-                  <td className="py-4 px-4 text-gray-700 min-w-[140px] whitespace-nowrap">
-                    {president.location}
+                  <td className="py-4 px-4 text-gray-700 min-w-[140px] whitespace-nowrap text-center">
+                    {president.location || "Not specified"}
                   </td>
-                  <td className="py-4 px-4 min-w-[160px] whitespace-nowrap">
+                  <td className="py-4 px-4 min-w-[160px] whitespace-nowrap text-center">
                     <a
-                      href={`tel:${president.phone_number}`}
+                      href={`tel:${president.phone}`}
                       className="text-blue-600 hover:underline"
                     >
-                      {president.phone_number}
+                      {president.phone}
                     </a>
                   </td>
                   <td className="py-4 px-4 min-w-[220px] whitespace-nowrap">
@@ -114,18 +114,6 @@ export default function CongregationalExecutives() {
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className="mt-8 text-center">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-            Download Contact List
-          </button>
-          <p className="text-gray-500 text-sm mt-3">
-            For updates or corrections, please contact the district office at{" "}
-            <a href="mailto:district@example.com" className="text-blue-600">
-              district@example.com
-            </a>
-          </p>
         </div>
       </div>
     </section>

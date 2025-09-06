@@ -61,7 +61,7 @@ const MinistryManagement = ({
 
   const handleAddRegistration = async () => {
     try {
-      const response = await fetch("/api/ministry", {
+      const response = await fetch("http://localhost:8002/api/ministry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -177,7 +177,7 @@ const MinistryManagement = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/ministries", {
+      const response = await fetch("http://localhost:8002/api/ministries", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1409,13 +1409,17 @@ def api_branch_presidents(request):
                 'id': president.id,
                 'name': president.name,
                 'congregation': president.congregation,
+                'location': president.location,
                 'phone': president.phone,
                 'email': president.email,
                 'position': president.position,
                 'is_active': president.is_active,
                 'created_at': president.created_at.isoformat(),
             })
-        return Response(data)
+        return Response({
+            'success': True,
+            'presidents': data
+        })
     except Exception as e:
         return Response({
             'success': False,
@@ -1435,6 +1439,7 @@ def api_branch_presidents_admin(request):
                 'id': president.id,
                 'name': president.name,
                 'congregation': president.congregation,
+                'location': president.location,
                 'phone': president.phone,
                 'email': president.email,
                 'position': president.position,
@@ -1442,7 +1447,10 @@ def api_branch_presidents_admin(request):
                 'created_at': president.created_at.isoformat(),
                 'updated_at': president.updated_at.isoformat(),
             })
-        return Response(data)
+        return Response({
+            'success': True,
+            'presidents': data
+        })
     except Exception as e:
         return Response({
             'success': False,
@@ -1459,6 +1467,7 @@ def api_branch_president_create(request):
         president = BranchPresident.objects.create(
             name=data.get('name'),
             congregation=data.get('congregation'),
+            location=data.get('location', ''),
             phone=data.get('phone'),
             email=data.get('email', ''),
             position=data.get('position', 'Branch President'),
@@ -1485,6 +1494,7 @@ def api_branch_president_update(request, president_id):
         president = BranchPresident.objects.get(id=president_id)
         president.name = data.get('name', president.name)
         president.congregation = data.get('congregation', president.congregation)
+        president.location = data.get('location', president.location)
         president.phone = data.get('phone', president.phone)
         president.email = data.get('email', president.email)
         president.position = data.get('position', president.position)

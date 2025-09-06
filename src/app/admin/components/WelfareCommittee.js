@@ -93,7 +93,7 @@ export default function WelfareCommittee() {
   const loadCommitteeMembers = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/welfare-committee");
+      const response = await fetch("http://localhost:8002/api/welfare-committee");
       if (!response.ok) throw new Error("Failed to load committee members");
       const data = await response.json();
       setCommittee(data.members || []);

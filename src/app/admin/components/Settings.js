@@ -71,7 +71,9 @@ export default function SettingsComponent({ onClose }) {
   useEffect(() => {
     const loadCredentials = async () => {
       try {
-        const response = await fetch("/api/auth/credentials");
+        const response = await fetch(
+          "http://localhost:8002/api/auth/credentials"
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -391,7 +393,7 @@ export default function SettingsComponent({ onClose }) {
           break;
 
         case "security":
-          response = await fetch("/api/auth/credentials", {
+          response = await fetch("http://localhost:8002/api/auth/credentials", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

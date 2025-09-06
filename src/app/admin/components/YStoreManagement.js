@@ -53,7 +53,7 @@ export default function YStoreManagement({ theme }) {
 
   const fetchStoreItems = async () => {
     try {
-      const response = await fetch("/api/ystore");
+      const response = await fetch("http://localhost:8002/api/ystore");
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -179,13 +179,13 @@ export default function YStoreManagement({ theme }) {
           formDataToSend.append("tags", JSON.stringify(apiData.tags));
           formDataToSend.append("image", formData.image);
 
-          response = await fetch(`/api/ystore?id=${editingItem.id}`, {
+          response = await fetch(`http://localhost:8002/api/ystore?id=${editingItem.id}`, {
             method: "PUT",
             body: formDataToSend,
           });
         } else {
           // If no image, use JSON
-          response = await fetch(`/api/ystore?id=${editingItem.id}`, {
+          response = await fetch(`http://localhost:8002/api/ystore?id=${editingItem.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -218,13 +218,13 @@ export default function YStoreManagement({ theme }) {
           formDataToSend.append("tags", JSON.stringify(apiData.tags));
           formDataToSend.append("image", formData.image);
 
-          response = await fetch("/api/ystore", {
+          response = await fetch("http://localhost:8002/api/ystore", {
             method: "POST",
             body: formDataToSend,
           });
         } else {
           // If no image, use JSON
-          response = await fetch("/api/ystore", {
+          response = await fetch("http://localhost:8002/api/ystore", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -291,7 +291,7 @@ export default function YStoreManagement({ theme }) {
 
       const newStock = item.isOutOfStock ? 10 : 0; // Set to 10 if out of stock, 0 if in stock
 
-      const response = await fetch(`/api/ystore?id=${id}`, {
+      const response = await fetch(`http://localhost:8002/api/ystore?id=${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -319,7 +319,7 @@ export default function YStoreManagement({ theme }) {
       const item = storeItems.find((item) => item.id === id);
       if (!item) return;
 
-      const response = await fetch(`/api/ystore?id=${id}`, {
+      const response = await fetch(`http://localhost:8002/api/ystore?id=${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

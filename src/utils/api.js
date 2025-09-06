@@ -248,7 +248,7 @@ export const branchPresidentAPI = {
   getPresidents: async () => {
     try {
       const response = await fetch(
-        `http://localhost:8002/api/branch-presidents?active=true`
+        `http://localhost:8002/branch-presidents/?active=true`
       );
       const data = await response.json();
       return data.success ? data.presidents : [];
@@ -261,7 +261,7 @@ export const branchPresidentAPI = {
   getAdminPresidents: async () => {
     try {
       const response = await fetch(
-        `http://localhost:8002/api/branch-presidents`
+        `http://localhost:8002/branch-presidents/admin/`
       );
       const data = await response.json();
       return data.success ? data.presidents : [];
@@ -273,13 +273,16 @@ export const branchPresidentAPI = {
 
   createPresident: async (data) => {
     try {
-      const response = await fetch(`/api/branch-presidents`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `http://localhost:8002/branch-presidents/create/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
       return await response.json();
     } catch (error) {
       console.error("Error creating branch president:", error);
@@ -289,13 +292,16 @@ export const branchPresidentAPI = {
 
   updatePresident: async (presidentId, data) => {
     try {
-      const response = await fetch(`/api/branch-presidents?id=${presidentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `http://localhost:8002/branch-presidents/${presidentId}/update/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
       return await response.json();
     } catch (error) {
       console.error("Error updating branch president:", error);
@@ -305,12 +311,15 @@ export const branchPresidentAPI = {
 
   deletePresident: async (presidentId) => {
     try {
-      const response = await fetch(`/api/branch-presidents?id=${presidentId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8002/branch-presidents/${presidentId}/delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       return await response.json();
     } catch (error) {
       console.error("Error deleting branch president:", error);

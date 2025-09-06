@@ -46,7 +46,7 @@ export default function CouncilManagement({ theme }) {
   useEffect(() => {
     const fetchCouncilMembers = async () => {
       try {
-        const response = await fetch("/api/council");
+        const response = await fetch("http://localhost:8002/api/council");
         const data = await response.json();
         if (data.success) {
           setCouncilMembers(data.councilMembers);
@@ -172,12 +172,12 @@ export default function CouncilManagement({ theme }) {
       let response;
       if (editingMember) {
         formDataToSend.append("id", editingMember.id);
-        response = await fetch("/api/council", {
+        response = await fetch("http://localhost:8002/api/council", {
           method: "PUT",
           body: formDataToSend,
         });
       } else {
-        response = await fetch("/api/council", {
+        response = await fetch("http://localhost:8002/api/council", {
           method: "POST",
           body: formDataToSend,
         });

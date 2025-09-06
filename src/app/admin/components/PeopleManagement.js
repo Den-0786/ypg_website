@@ -81,7 +81,7 @@ export default function PeopleManagement({
         formData.append("image", newTeamMember.image);
       }
 
-      const response = await fetch("/api/team", {
+      const response = await fetch("http://localhost:8002/api/team", {
         method: "POST",
         body: formData,
       });
@@ -121,7 +121,7 @@ export default function PeopleManagement({
         formData.append("image", newTeamMember.image);
       }
 
-      const response = await fetch("/api/team", {
+      const response = await fetch("http://localhost:8002/api/team", {
         method: "PUT",
         body: formData,
       });

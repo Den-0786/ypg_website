@@ -21,7 +21,7 @@ export default function BlogSection() {
   useEffect(() => {
     const fetchBlogPosts = async () => {
       try {
-        const response = await fetch("/api/blog?forWebsite=true");
+        const response = await fetch("http://localhost:8002/api/blog?forWebsite=true");
         const data = await response.json();
         if (data.success) {
           setBlogPosts(data.posts);
