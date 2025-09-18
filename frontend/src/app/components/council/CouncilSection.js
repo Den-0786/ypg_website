@@ -44,6 +44,23 @@ export default function CouncilSection() {
     };
 
     fetchCouncilMembers();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchCouncilMembers, 30000);
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchCouncilMembers();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   useEffect(() => {

@@ -2,20 +2,77 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PastExecutives() {
   const [pastExecutives, setPastExecutives] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSet, setCurrentSet] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     fetchPastExecutives();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchPastExecutives, 30000);
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchPastExecutives();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
+
+  // Handle responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Create sets based on screen size
+  const cardsPerSet = isMobile ? 1 : 4;
+  const totalSets = Math.ceil(pastExecutives.length / cardsPerSet);
+  const sets = [];
+
+  for (let i = 0; i < pastExecutives.length; i += cardsPerSet) {
+    sets.push(pastExecutives.slice(i, i + cardsPerSet));
+  }
+
+  // If we have fewer cards than the set size, show all cards in one set
+  const shouldShowAllCards = pastExecutives.length <= cardsPerSet;
+
+  // Auto-advance carousel
+  useEffect(() => {
+    if (totalSets > 1) {
+      const interval = setInterval(() => {
+        setCurrentSet((prev) => (prev + 1) % totalSets);
+      }, 5000); // Change slide every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [totalSets]);
 
   const fetchPastExecutives = async () => {
     try {
-      const response = await fetch("http://localhost:8002/api/past-executives");
+      const response = await fetch(
+        "http://localhost:8002/api/past-executives/"
+      );
       const data = await response.json();
       if (data.success) {
+        // Backend already returns executives in correct hierarchy order
         setPastExecutives(data.pastExecutives);
       }
     } catch (error) {
@@ -156,74 +213,109 @@ export default function PastExecutives() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {pastExecutives.map((executive) => (
-            <div
-              key={executive.id}
-              className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20"
-            >
-              <div className="relative h-64 bg-gradient-to-br from-purple-100 to-blue-100">
-                {executive.image ? (
-                  <Image
-                    src={executive.image}
-                    alt={executive.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="w-20 h-20 bg-gradient-to-r from-purple-200 to-blue-200 rounded-full flex items-center justify-center">
-                      <svg
-                        className="h-10 w-10 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors duration-300">
-                  {executive.name}
-                </h3>
-                <p className="text-gray-600 mb-3">{executive.position}</p>
-                <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium border border-purple-200">
-                  {executive.reignPeriod}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {pastExecutives.length > 0 && (
+          <div className="relative h-[400px] sm:h-[500px] lg:h-[500px]">
+            <AnimatePresence mode="wait">
+              {sets.map(
+                (set, setIndex) =>
+                  currentSet === setIndex && (
+                    <motion.div
+                      key={`set-${setIndex}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className={`flex justify-center items-center gap-4 sm:gap-8 absolute inset-0 ${
+                        shouldShowAllCards ? "flex-wrap" : ""
+                      }`}
+                    >
+                      {set.map((executive, index) => {
+                        const direction = index % 2 === 0 ? "left" : "right";
+                        return (
+                          <motion.div
+                            key={executive.id}
+                            initial={{
+                              opacity: 0,
+                              x: direction === "left" ? -50 : 50,
+                              y: 20,
+                            }}
+                            animate={{
+                              opacity: 1,
+                              x: 0,
+                              y: 0,
+                            }}
+                            transition={{
+                              duration: 0.6,
+                              delay: index * 0.1,
+                            }}
+                            className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 w-full max-w-80 flex-shrink-0"
+                          >
+                            <div className="relative h-64 bg-gradient-to-br from-purple-100 to-blue-100">
+                              {executive.image ? (
+                                <Image
+                                  src={`http://localhost:8002${executive.image}`}
+                                  alt={executive.name}
+                                  fill
+                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <div className="w-20 h-20 bg-gradient-to-r from-purple-200 to-blue-200 rounded-full flex items-center justify-center">
+                                    <svg
+                                      className="h-10 w-10 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                            <div className="p-6">
+                              <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors duration-300">
+                                {executive.name}
+                              </h3>
+                              <p className="text-gray-600 mb-3">
+                                {executive.position_display}
+                              </p>
+                              <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium border border-purple-200">
+                                {executive.reign_period}
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </motion.div>
+                  )
+              )}
+            </AnimatePresence>
 
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-3 text-gray-600 bg-white/70 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 shadow-lg">
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="text-sm font-medium">
-              Sorted by most recent reign period
-            </span>
+            {/* Navigation dots */}
+            {!shouldShowAllCards && totalSets > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                {sets.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSet(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      currentSet === index
+                        ? "bg-purple-600 scale-125"
+                        : "bg-white/50 hover:bg-white/70"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

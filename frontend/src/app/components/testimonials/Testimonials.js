@@ -215,11 +215,11 @@ export default function TestimonialsSection() {
                             href="mailto:youth@presbyterian.org"
                             className="text-blue-600 hover:underline"
                           >
-                            youth@presbyterian.org
+                            ahinsandistrictypg@gmail.org
                           </a>
                         </p>
                         <p className="text-gray-700">
-                          Phone: +1 (555) 123-4567
+                          Phone: +233531427671
                         </p>
                       </div>
                       <p className="text-gray-600">

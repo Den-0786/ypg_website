@@ -105,6 +105,12 @@ urlpatterns = [
     # Y-Store API endpoints
     path('api/ystore/', api_ystore_items, name='api_ystore_items'),
     path('api/ystore/item/', api_ystore_item_detail, name='api_ystore_item_detail'),
+    
+    # Past Executives API endpoints
+    path('api/past-executives/', views.api_past_executives, name='api_past_executives'),
+    path('api/past-executives/create/', views.api_past_executive_create, name='api_past_executive_create'),
+    path('api/past-executives/<int:executive_id>/update/', views.api_past_executive_update, name='api_past_executive_update'),
+    path('api/past-executives/<int:executive_id>/delete/', views.api_past_executive_delete, name='api_past_executive_delete'),
 ]
 
 

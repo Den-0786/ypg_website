@@ -5,20 +5,43 @@ import { branchPresidentAPI } from "../../../utils/api";
 export default function CongregationalExecutives() {
   const [presidents, setPresidents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     fetchPresidents();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchPresidents, 30000);
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchPresidents();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   const fetchPresidents = async () => {
     try {
-      setLoading(true);
+      if (isInitialLoad) {
+        setLoading(true);
+      }
       const data = await branchPresidentAPI.getPresidents();
       setPresidents(data);
     } catch (error) {
       console.error("Error fetching presidents:", error);
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+      setIsInitialLoad(false);
     }
   };
 

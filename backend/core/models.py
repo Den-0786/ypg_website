@@ -178,6 +178,38 @@ class BranchPresident(models.Model):
         verbose_name = "Branch President"
         verbose_name_plural = "Branch Presidents"
 
+class PastExecutive(models.Model):
+    """
+    Past Executive model for managing former district executives
+    """
+    POSITION_CHOICES = [
+        ('president', 'President'),
+        ('president_rep', "President's Representative"),
+        ('secretary', 'Secretary'),
+        ('assistant_secretary', 'Assistant Secretary'),
+        ('financial_secretary', 'Financial Secretary'),
+        ('treasurer', 'Treasurer'),
+        ('organizing_secretary', 'Organizing Secretary'),
+        ('evangelism_secretary', 'Evangelism Secretary'),
+        ('welfare_secretary', 'Welfare Secretary'),
+        ('other', 'Other'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='other')
+    reign_period = models.CharField(max_length=50, help_text="e.g., 2020-2022")
+    image = models.ImageField(upload_to='past_executives/', null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.name} - {self.get_position_display()}"
+    
+    class Meta:
+        verbose_name = "Past Executive"
+        verbose_name_plural = "Past Executives"
+
 class Advertisement(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),

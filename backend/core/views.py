@@ -13,7 +13,7 @@ from .models import Supervisor
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement
+    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive
 )
 from .serializers import (
     QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer, 
@@ -656,7 +656,10 @@ def api_team_members(request):
             'secretary',
             'assistant secretary',
             'financial secretary',
-            'treasurer'
+            'treasurer',
+            'organizing secretary',
+            'evangelism secretary',
+            'welfare secretary'
         ]
         
         team_members = TeamMember.objects.filter(is_active=True)
@@ -1556,7 +1559,7 @@ def api_track_analytics(request):
 def api_branch_presidents(request):
     """Get all branch presidents for main website"""
     try:
-        presidents = BranchPresident.objects.filter(is_active=True).order_by('congregation')
+        presidents = BranchPresident.objects.filter(is_active=True).order_by('created_at')
         data = []
         for president in presidents:
             data.append({
@@ -1586,7 +1589,7 @@ def api_branch_presidents(request):
 def api_branch_presidents_admin(request):
     """Get all branch presidents for admin dashboard"""
     try:
-        presidents = BranchPresident.objects.all().order_by('congregation')
+        presidents = BranchPresident.objects.all().order_by('created_at')
         data = []
         for president in presidents:
             data.append({
@@ -1685,6 +1688,191 @@ def api_branch_president_delete(request, president_id):
         return Response({
             'success': False,
             'error': 'Branch president not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Past Executives API Views
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_past_executives(request):
+    """Get all past executives"""
+    try:
+        show_deleted = request.GET.get('deleted', 'false').lower() == 'true'
+        
+        if show_deleted:
+            executives = PastExecutive.objects.all()
+        else:
+            executives = PastExecutive.objects.filter(is_deleted=False)
+        
+        # Define position hierarchy order
+        position_order = {
+            'president': 1,
+            'president_rep': 2,
+            'secretary': 3,
+            'assistant_secretary': 4,
+            'financial_secretary': 5,
+            'treasurer': 6,
+            'organizing_secretary': 7,
+            'evangelism_secretary': 8,
+            'welfare_secretary': 9,
+            'other': 10
+        }
+        
+        # Sort executives by position hierarchy
+        executives_list = list(executives)
+        executives_list.sort(key=lambda x: position_order.get(x.position, 10))
+        
+        data = []
+        for executive in executives_list:
+            data.append({
+                'id': executive.id,
+                'name': executive.name,
+                'position': executive.position,
+                'position_display': executive.get_position_display(),
+                'reign_period': executive.reign_period,
+                'image': executive.image.url if executive.image else None,
+                'is_deleted': executive.is_deleted,
+                'created_at': executive.created_at.isoformat(),
+                'updated_at': executive.updated_at.isoformat(),
+            })
+        
+        return Response({
+            'success': True,
+            'pastExecutives': data
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_past_executive_create(request):
+    """Create new past executive"""
+    try:
+        # Handle both JSON and FormData requests
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'name': request.POST.get('name'),
+                'position': request.POST.get('position', 'other'),
+                'reign_period': request.POST.get('reign_period', ''),
+            }
+            # Handle image upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+        
+        executive = PastExecutive.objects.create(
+            name=data.get('name'),
+            position=data.get('position', 'other'),
+            reign_period=data.get('reign_period', ''),
+            image=data.get('image')
+        )
+        
+        return Response({
+            'success': True,
+            'message': 'Past executive created successfully',
+            'executive': {
+                'id': executive.id,
+                'name': executive.name,
+                'position': executive.position,
+                'position_display': executive.get_position_display(),
+                'reign_period': executive.reign_period,
+                'image': executive.image.url if executive.image else None,
+                'is_deleted': executive.is_deleted,
+                'created_at': executive.created_at.isoformat(),
+                'updated_at': executive.updated_at.isoformat(),
+            }
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_past_executive_update(request, executive_id):
+    """Update past executive"""
+    try:
+        # Handle both JSON and FormData requests
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'name': request.POST.get('name'),
+                'position': request.POST.get('position'),
+                'reign_period': request.POST.get('reign_period'),
+            }
+            # Handle image upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+        
+        executive = PastExecutive.objects.get(id=executive_id)
+        
+        executive.name = data.get('name', executive.name)
+        executive.position = data.get('position', executive.position)
+        executive.reign_period = data.get('reign_period', executive.reign_period)
+        if 'image' in data and data['image'] is not None:
+            executive.image = data['image']
+        executive.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Past executive updated successfully',
+            'executive': {
+                'id': executive.id,
+                'name': executive.name,
+                'position': executive.position,
+                'position_display': executive.get_position_display(),
+                'reign_period': executive.reign_period,
+                'image': executive.image.url if executive.image else None,
+                'is_deleted': executive.is_deleted,
+                'created_at': executive.created_at.isoformat(),
+                'updated_at': executive.updated_at.isoformat(),
+            }
+        })
+    except PastExecutive.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Past executive not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_past_executive_delete(request, executive_id):
+    """Delete past executive (soft delete)"""
+    try:
+        executive = PastExecutive.objects.get(id=executive_id)
+        executive.is_deleted = True
+        executive.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Past executive deleted successfully'
+        })
+    except PastExecutive.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Past executive not found'
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({

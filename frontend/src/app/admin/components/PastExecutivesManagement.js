@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Eye, EyeOff, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function PastExecutivesManagement({ theme }) {
   const [pastExecutives, setPastExecutives] = useState([]);
@@ -10,8 +11,8 @@ export default function PastExecutivesManagement({ theme }) {
   const [currentExecutive, setCurrentExecutive] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    position: "",
-    reignPeriod: "",
+    position: "other",
+    reign_period: "",
     image: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
@@ -25,14 +26,17 @@ export default function PastExecutivesManagement({ theme }) {
   const fetchPastExecutives = async () => {
     try {
       const response = await fetch(
-        `/api/past-executives?deleted=${showDeleted}`
+        `http://localhost:8002/api/past-executives/?deleted=${showDeleted}`
       );
       const data = await response.json();
       if (data.success) {
         setPastExecutives(data.pastExecutives);
+      } else {
+        toast.error(data.error || "Failed to fetch past executives");
       }
     } catch (error) {
       console.error("Error fetching past executives:", error);
+      toast.error("Failed to fetch past executives");
     }
   };
 
@@ -51,23 +55,49 @@ export default function PastExecutivesManagement({ theme }) {
     setLoading(true);
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("position", formData.position);
-      formDataToSend.append("reignPeriod", formData.reignPeriod);
-      if (formData.image) {
-        formDataToSend.append("image", formData.image);
-      }
-
       const url = isEditMode
-        ? `/api/past-executives?id=${currentExecutive.id}`
-        : "/api/past-executives";
+        ? `http://localhost:8002/api/past-executives/${currentExecutive.id}/update/`
+        : "http://localhost:8002/api/past-executives/create/";
       const method = isEditMode ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        body: formDataToSend,
-      });
+      let response;
+
+      if (formData.image && formData.image instanceof File) {
+        // Use FormData for image uploads
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("position", formData.position);
+        formDataToSend.append("reign_period", formData.reign_period);
+        formDataToSend.append("image", formData.image);
+
+        response = await fetch(url, {
+          method,
+          body: formDataToSend,
+        });
+      } else {
+        // Use JSON for non-image requests
+        const apiData = {
+          name: formData.name,
+          position: formData.position,
+          reign_period: formData.reign_period,
+        };
+
+        // Only include image if it's a File object (new upload)
+        if (formData.image && formData.image instanceof File) {
+          // This shouldn't happen as we check above, but just in case
+          console.warn(
+            "Image file detected in JSON path, this should use FormData"
+          );
+        }
+
+        response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(apiData),
+        });
+      }
 
       const data = await response.json();
 
@@ -75,13 +105,13 @@ export default function PastExecutivesManagement({ theme }) {
         setIsModalOpen(false);
         resetForm();
         fetchPastExecutives();
-        alert(data.message);
+        toast.success(data.message);
       } else {
-        alert(data.error || "Failed to save past executive");
+        toast.error(data.error || "Failed to save past executive");
       }
     } catch (error) {
       console.error("Error saving past executive:", error);
-      alert("Failed to save past executive");
+      toast.error("Failed to save past executive");
     } finally {
       setLoading(false);
     }
@@ -92,43 +122,43 @@ export default function PastExecutivesManagement({ theme }) {
     setFormData({
       name: executive.name,
       position: executive.position,
-      reignPeriod: executive.reignPeriod,
-      image: null,
+      reign_period: executive.reign_period,
+      image: executive.image || null,
     });
     setImagePreview(executive.image);
     setIsEditMode(true);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id, deleteType = "both") => {
+  const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this past executive?")) {
       return;
     }
 
     try {
       const response = await fetch(
-        `/api/past-executives?id=${id}&type=${deleteType}`,
+        `http://localhost:8002/api/past-executives/${id}/delete/`,
         { method: "DELETE" }
       );
       const data = await response.json();
 
       if (data.success) {
         fetchPastExecutives();
-        alert(data.message);
+        toast.success(data.message);
       } else {
-        alert(data.error || "Failed to delete past executive");
+        toast.error(data.error || "Failed to delete past executive");
       }
     } catch (error) {
       console.error("Error deleting past executive:", error);
-      alert("Failed to delete past executive");
+      toast.error("Failed to delete past executive");
     }
   };
 
   const resetForm = () => {
     setFormData({
       name: "",
-      position: "",
-      reignPeriod: "",
+      position: "other",
+      reign_period: "",
       image: null,
     });
     setImagePreview(null);
@@ -249,7 +279,7 @@ export default function PastExecutivesManagement({ theme }) {
               >
                 {executive.image ? (
                   <img
-                    src={executive.image}
+                    src={`http://localhost:8002${executive.image}`}
                     alt={executive.name}
                     className="w-full h-48 object-cover"
                   />
@@ -293,7 +323,7 @@ export default function PastExecutivesManagement({ theme }) {
                   {executive.position}
                 </p>
                 <p className="text-sm font-medium text-blue-600 mb-3">
-                  {executive.reignPeriod}
+                  {executive.reign_period}
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -410,9 +440,9 @@ export default function PastExecutivesManagement({ theme }) {
                 </label>
                 <input
                   type="text"
-                  value={formData.reignPeriod}
+                  value={formData.reign_period}
                   onChange={(e) =>
-                    setFormData({ ...formData, reignPeriod: e.target.value })
+                    setFormData({ ...formData, reign_period: e.target.value })
                   }
                   placeholder="2019 - 2022"
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${

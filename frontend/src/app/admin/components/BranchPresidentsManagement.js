@@ -587,15 +587,14 @@ export default function BranchPresidentsManagement({ theme }) {
                   <label
                     className={`block text-sm font-medium ${theme === "dark" ? "text-gray-200" : "text-gray-700"} mb-1`}
                   >
-                    Email Address
+                    Email Address (Optional)
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
-                    placeholder="Enter email address"
-                    required
+                    placeholder="Enter email address (optional)"
                   />
                 </motion.div>
 
