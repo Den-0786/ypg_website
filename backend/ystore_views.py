@@ -20,12 +20,9 @@ def api_ystore_items(request):
             # Check if this is for website display
             for_website = request.GET.get('forWebsite', 'false').lower() == 'true'
             
-            if for_website:
-                # Only return available items for website
-                items = YStoreItem.objects.filter(is_available=True).order_by('-created_at')
-            else:
-                # Return all items for admin
-                items = YStoreItem.objects.all().order_by('-created_at')
+            # Return all items for both website and admin
+            # The frontend will handle displaying out-of-stock items appropriately
+            items = YStoreItem.objects.all().order_by('-created_at')
             
             serializer = YStoreItemSerializer(items, many=True)
             return Response({

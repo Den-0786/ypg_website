@@ -64,14 +64,19 @@ class Event(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     location = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='events/', blank=True, null=True)
+    participants = models.PositiveIntegerField(default=0, help_text="Number of participants/attendees")
     is_featured = models.BooleanField(default=False)
     registration_required = models.BooleanField(default=False)
+    dashboard_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class TeamMember(models.Model):
     name = models.CharField(max_length=100)
     position = models.CharField(max_length=100)
-    bio = models.TextField(blank=True)
+    congregation = models.CharField(max_length=200, blank=True)
+    quote = models.TextField(blank=True, help_text="Favorite quote or motto")
+    image = models.ImageField(upload_to='team/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -235,6 +240,7 @@ class YStoreItem(models.Model):
     image = models.ImageField(upload_to='ystore/', null=True, blank=True)
     is_available = models.BooleanField(default=True)
     stock_quantity = models.PositiveIntegerField(default=0)
+    contact = models.CharField(max_length=20, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

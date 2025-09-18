@@ -437,9 +437,25 @@ def api_delete_quiz(request, quiz_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_events(request):
-    """Get all events"""
+    """Get all events with optional filtering"""
     try:
-        events = Event.objects.all().order_by('-start_date')
+        from django.utils import timezone
+        
+        events = Event.objects.all()
+        
+        # Filter by type (upcoming/past)
+        event_type = request.GET.get('type')
+        if event_type == 'upcoming':
+            events = events.filter(start_date__gte=timezone.now())
+        elif event_type == 'past':
+            events = events.filter(start_date__lt=timezone.now())
+        
+        # Exclude deleted events
+        exclude_deleted = request.GET.get('excludeDeleted')
+        if exclude_deleted == 'true':
+            events = events.filter(dashboard_deleted=False)
+        
+        events = events.order_by('-start_date')
         serializer = EventSerializer(events, many=True)
         return Response({
             'success': True,
@@ -475,7 +491,43 @@ def api_event_detail(request, event_id):
 def api_create_event(request):
     """Create a new event"""
     try:
-        data = json.loads(request.body)
+        from datetime import datetime
+        
+        # Handle both JSON and FormData
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'title': request.POST.get('title'),
+                'description': request.POST.get('description'),
+                'location': request.POST.get('location'),
+                'participants': int(request.POST.get('participants', 0)),
+                'event_type': 'general',  # Default event type
+                'is_featured': False,
+                'registration_required': False,
+            }
+            
+            # Handle image upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+            
+            # Combine date and time fields
+            start_date = request.POST.get('start_date')
+            start_time = request.POST.get('start_time')
+            end_date = request.POST.get('end_date')
+            end_time = request.POST.get('end_time')
+            
+            if start_date and start_time:
+                data['start_date'] = f"{start_date} {start_time}"
+            elif start_date:
+                data['start_date'] = f"{start_date} 00:00:00"
+                
+            if end_date and end_time:
+                data['end_date'] = f"{end_date} {end_time}"
+            elif end_date:
+                data['end_date'] = f"{end_date} 23:59:59"
+        
         serializer = EventSerializer(data=data)
         
         if serializer.is_valid():
@@ -483,7 +535,7 @@ def api_create_event(request):
             return Response({
                 'success': True,
                 'message': 'Event created successfully',
-                'event_id': event.id
+                'event': serializer.data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
@@ -503,14 +555,50 @@ def api_update_event(request, event_id):
     """Update an event"""
     try:
         event = get_object_or_404(Event, id=event_id)
-        data = json.loads(request.body)
+        
+        # Handle both JSON and FormData
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'title': request.POST.get('title'),
+                'description': request.POST.get('description'),
+                'location': request.POST.get('location'),
+                'participants': int(request.POST.get('participants', 0)),
+                'event_type': 'general',  # Default event type
+                'is_featured': False,
+                'registration_required': False,
+            }
+            
+            # Handle image upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+            
+            # Combine date and time fields
+            start_date = request.POST.get('start_date')
+            start_time = request.POST.get('start_time')
+            end_date = request.POST.get('end_date')
+            end_time = request.POST.get('end_time')
+            
+            if start_date and start_time:
+                data['start_date'] = f"{start_date} {start_time}"
+            elif start_date:
+                data['start_date'] = f"{start_date} 00:00:00"
+                
+            if end_date and end_time:
+                data['end_date'] = f"{end_date} {end_time}"
+            elif end_date:
+                data['end_date'] = f"{end_date} 23:59:59"
+        
         serializer = EventSerializer(event, data=data, partial=True)
         
         if serializer.is_valid():
-            serializer.save()
+            updated_event = serializer.save()
             return Response({
                 'success': True,
-                'message': 'Event updated successfully'
+                'message': 'Event updated successfully',
+                'event': serializer.data
             })
         else:
             return Response({
@@ -530,11 +618,23 @@ def api_delete_event(request, event_id):
     """Delete an event"""
     try:
         event = get_object_or_404(Event, id=event_id)
-        event.delete()
+        
+        # Get delete type from query parameters
+        delete_type = request.GET.get('type', 'both')
+        
+        if delete_type == 'dashboard':
+            # Soft delete - mark as deleted from dashboard only
+            event.dashboard_deleted = True
+            event.save()
+            message = 'Event removed from dashboard successfully'
+        else:
+            # Hard delete - remove completely
+            event.delete()
+            message = 'Event deleted permanently'
         
         return Response({
             'success': True,
-            'message': 'Event deleted successfully'
+            'message': message
         })
     except Exception as e:
         return Response({
@@ -549,8 +649,30 @@ def api_delete_event(request, event_id):
 def api_team_members(request):
     """Get all team members"""
     try:
-        team_members = TeamMember.objects.filter(is_active=True).order_by('order', 'name')
-        serializer = TeamMemberSerializer(team_members, many=True)
+        # Define the hierarchy order
+        hierarchy_order = [
+            'president',
+            "president's rep",
+            'secretary',
+            'assistant secretary',
+            'financial secretary',
+            'treasurer'
+        ]
+        
+        team_members = TeamMember.objects.filter(is_active=True)
+        
+        # Sort by hierarchy first, then by name for same position
+        def get_position_order(member):
+            position_lower = member.position.lower()
+            try:
+                return hierarchy_order.index(position_lower)
+            except ValueError:
+                # If position not in hierarchy, put it after treasurer
+                return len(hierarchy_order)
+        
+        sorted_members = sorted(team_members, key=lambda x: (get_position_order(x), x.name))
+        
+        serializer = TeamMemberSerializer(sorted_members, many=True)
         return Response({
             'success': True,
             'team': serializer.data
@@ -603,15 +725,31 @@ def api_team_member_detail(request, member_id):
 def api_create_team_member(request):
     """Create a new team member"""
     try:
-        data = json.loads(request.body)
+        # Handle both JSON and FormData requests
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'name': request.POST.get('name'),
+                'position': request.POST.get('position'),
+                'congregation': request.POST.get('congregation', ''),
+                'quote': request.POST.get('quote', ''),
+                'is_active': True,
+                'order': 0
+            }
+            # Handle image upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+        
         serializer = TeamMemberSerializer(data=data)
         
         if serializer.is_valid():
             member = serializer.save()
             return Response({
                 'success': True,
-                'message': 'Team member created successfully',
-                'member_id': member.id
+                'message': 'District executive created successfully',
+                'member': serializer.data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
@@ -631,14 +769,30 @@ def api_update_team_member(request, member_id):
     """Update a team member"""
     try:
         member = get_object_or_404(TeamMember, id=member_id)
-        data = json.loads(request.body)
+        
+        # Handle both JSON and FormData requests
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'name': request.POST.get('name'),
+                'position': request.POST.get('position'),
+                'congregation': request.POST.get('congregation', ''),
+                'quote': request.POST.get('quote', ''),
+            }
+            # Handle image upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+        
         serializer = TeamMemberSerializer(member, data=data, partial=True)
         
         if serializer.is_valid():
             serializer.save()
             return Response({
                 'success': True,
-                'message': 'Team member updated successfully'
+                'message': 'District executive updated successfully',
+                'member': serializer.data
             })
         else:
             return Response({
