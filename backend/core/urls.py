@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from advertisement_views import api_advertisements, api_create_advertisement, api_update_advertisement, api_delete_advertisement
+from advertisement_views import api_advertisements, api_advertisements_admin, api_create_advertisement, api_update_advertisement, api_delete_advertisement
 from settings_views import api_settings_profile, api_settings_website
 from ystore_views import api_ystore_items, api_ystore_item_detail
 
@@ -37,6 +37,9 @@ urlpatterns = [
     
     # Council API endpoints
     path('api/council/', views.api_council_members, name='api_council_members'),
+    path('api/council/create/', views.api_create_council_member, name='api_create_council_member'),
+    path('api/council/<int:member_id>/update/', views.api_update_council_member, name='api_update_council_member'),
+    path('api/council/<int:member_id>/delete/', views.api_delete_council_member, name='api_delete_council_member'),
     
     # Donations API endpoints
     path('api/donations/', views.api_donations, name='api_donations'),
@@ -55,6 +58,11 @@ urlpatterns = [
     path('api/ministry/register/', views.api_submit_ministry_registration, name='api_submit_ministry_registration'),
     path('api/ministry/<int:registration_id>/approve/', views.api_approve_ministry_registration, name='api_approve_ministry_registration'),
     path('api/ministry/<int:registration_id>/delete/', views.api_delete_ministry_registration, name='api_delete_ministry_registration'),
+    # Ministries CRUD
+    path('api/ministries/', views.api_ministries, name='api_ministries'),
+    path('api/ministries/create/', views.api_create_ministry, name='api_create_ministry'),
+    path('api/ministries/<int:ministry_id>/update/', views.api_update_ministry, name='api_update_ministry'),
+    path('api/ministries/<int:ministry_id>/delete/', views.api_delete_ministry, name='api_delete_ministry'),
     
     # Blog API endpoints
     path('api/blog/', views.api_blog_posts, name='api_blog_posts'),
@@ -94,6 +102,7 @@ urlpatterns = [
     
     # Advertisement API endpoints
     path('api/advertisements/', api_advertisements, name='api_advertisements'),
+    path('api/advertisements/admin/', api_advertisements_admin, name='api_advertisements_admin'),
     path('api/advertisements/create/', api_create_advertisement, name='api_create_advertisement'),
     path('api/advertisements/<int:ad_id>/update/', api_update_advertisement, name='api_update_advertisement'),
     path('api/advertisements/<int:ad_id>/delete/', api_delete_advertisement, name='api_delete_advertisement'),

@@ -24,7 +24,6 @@ import TrashManagement from "./components/TrashManagement";
 import CommunicationManagement from "./components/CommunicationManagement";
 import YStoreManagement from "./components/YStoreManagement";
 import BranchPresidentsManagement from "./components/BranchPresidentsManagement";
-import WelfareCommittee from "./components/WelfareCommittee";
 import CouncilManagement from "./components/CouncilManagement";
 import PastExecutivesManagement from "./components/PastExecutivesManagement";
 import AdvertisementManagement from "./components/AdvertisementManagement";
@@ -208,6 +207,39 @@ export default function AdminDashboard() {
       fetchData("http://localhost:8002/api/analytics", setAnalytics);
       updateStats();
     }
+  }, [isAuthenticated]);
+
+  // Light polling to auto-refresh ministry registrations
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const id = setInterval(() => {
+      fetchData("http://localhost:8002/api/ministry", setMinistryRegistrations);
+    }, 10000);
+    return () => clearInterval(id);
+  }, [isAuthenticated]);
+
+  // BroadcastChannel listener for instant refresh on new website registrations
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let channel;
+    try {
+      channel = new BroadcastChannel("ypg_ministry");
+      channel.onmessage = (event) => {
+        if (event?.data?.type === "registration_created") {
+          fetchData(
+            "http://localhost:8002/api/ministry",
+            setMinistryRegistrations
+          );
+        }
+      };
+    } catch (e) {
+      // ignore if unsupported
+    }
+    return () => {
+      try {
+        channel && channel.close();
+      } catch (e) {}
+    };
   }, [isAuthenticated]);
 
   useEffect(() => {
@@ -414,9 +446,6 @@ export default function AdminDashboard() {
               )}
               {activeTab === "branch-presidents" && (
                 <BranchPresidentsManagement theme={theme} />
-              )}
-              {activeTab === "welfare-committee" && (
-                <WelfareCommittee theme={theme} />
               )}
               {activeTab === "advertisements" && (
                 <AdvertisementManagement theme={theme} />

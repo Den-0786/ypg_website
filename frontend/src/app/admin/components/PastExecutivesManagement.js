@@ -18,6 +18,8 @@ export default function PastExecutivesManagement({ theme }) {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showDeleted, setShowDeleted] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [executiveToDelete, setExecutiveToDelete] = useState(null);
 
   useEffect(() => {
     fetchPastExecutives();
@@ -130,21 +132,26 @@ export default function PastExecutivesManagement({ theme }) {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this past executive?")) {
-      return;
-    }
+  const handleDeleteClick = (executive) => {
+    setExecutiveToDelete(executive);
+    setShowDeleteModal(true);
+  };
 
+  const confirmDelete = async () => {
+    if (!executiveToDelete) return;
     try {
       const response = await fetch(
-        `http://localhost:8002/api/past-executives/${id}/delete/`,
+        `http://localhost:8002/api/past-executives/${executiveToDelete.id}/delete/`,
         { method: "DELETE" }
       );
       const data = await response.json();
 
       if (data.success) {
+        // refresh list
         fetchPastExecutives();
-        toast.success(data.message);
+        toast.success(data.message || "Past executive deleted successfully");
+        setShowDeleteModal(false);
+        setExecutiveToDelete(null);
       } else {
         toast.error(data.error || "Failed to delete past executive");
       }
@@ -262,7 +269,7 @@ export default function PastExecutivesManagement({ theme }) {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {pastExecutives.map((executive) => (
             <div
               key={executive.id}
@@ -281,16 +288,16 @@ export default function PastExecutivesManagement({ theme }) {
                   <img
                     src={`http://localhost:8002${executive.image}`}
                     alt={executive.name}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-40 object-cover"
                   />
                 ) : (
                   <div
-                    className={`w-full h-48 flex items-center justify-center ${
+                    className={`w-full h-40 flex items-center justify-center ${
                       theme === "dark" ? "bg-gray-600" : "bg-gray-200"
                     }`}
                   >
                     <svg
-                      className={`h-12 w-12 ${
+                      className={`h-10 w-10 ${
                         theme === "dark" ? "text-gray-500" : "text-gray-400"
                       }`}
                       fill="none"
@@ -338,7 +345,7 @@ export default function PastExecutivesManagement({ theme }) {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(executive.id)}
+                    onClick={() => handleDeleteClick(executive)}
                     className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                       theme === "dark"
                         ? "text-red-400 bg-red-900/20 hover:bg-red-900/30"
@@ -502,6 +509,66 @@ export default function PastExecutivesManagement({ theme }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && executiveToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className={`rounded-lg p-6 w-full max-w-md mx-4 ${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className={`text-lg font-semibold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Confirm Deletion
+              </h3>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setExecutiveToDelete(null);
+                }}
+                className={`p-1 rounded-lg transition-colors ${
+                  theme === "dark"
+                    ? "hover:bg-gray-700 text-white"
+                    : "hover:bg-gray-100 text-gray-800"
+                }`}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div
+              className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-6`}
+            >
+              Are you sure you want to delete "{executiveToDelete.name}"?
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setExecutiveToDelete(null);
+                }}
+                className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${
+                  theme === "dark"
+                    ? "border-gray-600 text-gray-300 hover:bg-gray-700"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BookOpen,
   Plus,
@@ -29,7 +29,6 @@ const MinistryManagement = ({
     phone: "",
     congregation: "",
     ministry: "",
-    age: "",
     message: "",
   });
 
@@ -59,19 +58,56 @@ const MinistryManagement = ({
   // Ministries data - in production this would come from API
   const [ministries, setMinistries] = useState([]);
 
+  // Load ministries on mount so they persist after refresh
+  useEffect(() => {
+    const fetchMinistries = async () => {
+      try {
+        const res = await fetch("http://localhost:8002/api/ministries/");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.ministries)) {
+          setMinistries(data.ministries);
+        } else {
+          setMinistries([]);
+        }
+      } catch (e) {
+        setMinistries([]);
+      }
+    };
+    fetchMinistries();
+  }, []);
+
   const handleAddRegistration = async () => {
     try {
-      const response = await fetch("http://localhost:8002/api/ministry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newRegistration),
-      });
+      const response = await fetch(
+        "http://localhost:8002/api/ministry/register/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: newRegistration.name,
+            email: newRegistration.email || "",
+            phone: newRegistration.phone,
+            congregation: newRegistration.congregation,
+            ministry: newRegistration.ministry,
+            message: newRegistration.message,
+          }),
+        }
+      );
 
       if (response.ok) {
-        const addedRegistration = await response.json();
-        setMinistryRegistrations([...ministryRegistrations, addedRegistration]);
+        const data = await response.json();
+        const added = {
+          id: data.registration_id || data.id || Date.now(),
+          name: newRegistration.name,
+          email: newRegistration.email || "",
+          phone: newRegistration.phone,
+          congregation: newRegistration.congregation,
+          ministry: newRegistration.ministry,
+          message: newRegistration.message,
+        };
+        setMinistryRegistrations([...ministryRegistrations, added]);
         setShowAddModal(false);
         setNewRegistration({
           name: "",
@@ -79,7 +115,6 @@ const MinistryManagement = ({
           phone: "",
           congregation: "",
           ministry: "",
-          age: "",
           message: "",
         });
         toast.success("Ministry registration added successfully!");
@@ -177,38 +212,65 @@ const MinistryManagement = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:8002/api/ministries", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newMinistry),
-      });
+      const response = await fetch(
+        "http://localhost:8002/api/ministries/create/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: newMinistry.name,
+            description: newMinistry.description,
+            leader_name: newMinistry.leaderName,
+            leader_phone: newMinistry.leaderPhone,
+            color: newMinistry.color,
+          }),
+        }
+      );
 
       if (response.ok) {
-        const addedMinistry = await response.json();
-        setMinistries([...ministries, addedMinistry]);
-        setShowAddMinistryModal(false);
-        setNewMinistry({
-          name: "",
-          description: "",
-          leaderName: "",
-          leaderPhone: "",
-          color: "from-blue-500 to-teal-500",
-        });
-        setValidationErrors({});
-        toast.success("Ministry added successfully!");
+        const data = await response.json();
+        if (data.success && data.ministry) {
+          setMinistries([...ministries, data.ministry]);
+          setShowAddMinistryModal(false);
+          setNewMinistry({
+            name: "",
+            description: "",
+            leaderName: "",
+            leaderPhone: "",
+            color: "from-blue-500 to-teal-500",
+          });
+          setValidationErrors({});
+          toast.success("Ministry added successfully!");
+        } else {
+          const message = data.error || "Failed to add ministry";
+          setValidationErrors({ submit: message });
+          toast.error(message);
+          setTimeout(
+            () => setValidationErrors((e) => ({ ...e, submit: "" })),
+            5000
+          );
+        }
       } else {
         const errorData = await response.json();
         setValidationErrors({
           submit: errorData.message || "Failed to add ministry",
         });
         toast.error(errorData.message || "Failed to add ministry");
+        setTimeout(
+          () => setValidationErrors((e) => ({ ...e, submit: "" })),
+          5000
+        );
       }
     } catch (error) {
       console.error("Error adding ministry:", error);
       setValidationErrors({ submit: "Network error. Please try again." });
       toast.error("Network error. Please try again.");
+      setTimeout(
+        () => setValidationErrors((e) => ({ ...e, submit: "" })),
+        5000
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -229,35 +291,62 @@ const MinistryManagement = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/ministries/${editingMinistry.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingMinistry),
-      });
+      const response = await fetch(
+        `http://localhost:8002/api/ministries/${editingMinistry.id}/update/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: editingMinistry.name,
+            description: editingMinistry.description,
+            leader_name: editingMinistry.leaderName,
+            leader_phone: editingMinistry.leaderPhone,
+            color: editingMinistry.color,
+          }),
+        }
+      );
 
       if (response.ok) {
-        const updatedMinistry = await response.json();
-        setMinistries(
-          ministries.map((ministry) =>
-            ministry.id === editingMinistry.id ? updatedMinistry : ministry
-          )
-        );
-        setEditingMinistry(null);
-        setValidationErrors({});
-        toast.success("Ministry updated successfully!");
+        const data = await response.json();
+        if (data.success && data.ministry) {
+          setMinistries(
+            ministries.map((ministry) =>
+              ministry.id === editingMinistry.id ? data.ministry : ministry
+            )
+          );
+          setEditingMinistry(null);
+          setValidationErrors({});
+          toast.success("Ministry updated successfully!");
+        } else {
+          const message = data.error || "Failed to update ministry";
+          setValidationErrors({ submit: message });
+          toast.error(message);
+          setTimeout(
+            () => setValidationErrors((e) => ({ ...e, submit: "" })),
+            5000
+          );
+        }
       } else {
         const errorData = await response.json();
         setValidationErrors({
           submit: errorData.message || "Failed to update ministry",
         });
         toast.error(errorData.message || "Failed to update ministry");
+        setTimeout(
+          () => setValidationErrors((e) => ({ ...e, submit: "" })),
+          5000
+        );
       }
     } catch (error) {
       console.error("Error updating ministry:", error);
       setValidationErrors({ submit: "Network error. Please try again." });
       toast.error("Network error. Please try again.");
+      setTimeout(
+        () => setValidationErrors((e) => ({ ...e, submit: "" })),
+        5000
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -273,10 +362,8 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `/api/ministries?id=${ministryToDelete.id}&type=${deleteType}`,
-        {
-          method: "DELETE",
-        }
+        `http://localhost:8002/api/ministries/${ministryToDelete.id}/delete/?type=${deleteType}`,
+        { method: "DELETE" }
       );
 
       if (response.ok) {
@@ -459,7 +546,18 @@ const MinistryManagement = ({
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setEditingMinistry(ministry)}
+                    onClick={() =>
+                      setEditingMinistry({
+                        ...ministry,
+                        leaderName:
+                          ministry.leaderName ?? ministry.leader_name ?? "",
+                        leaderPhone:
+                          ministry.leaderPhone ?? ministry.leader_phone ?? "",
+                        name: ministry.name ?? "",
+                        description: ministry.description ?? "",
+                        color: ministry.color ?? "from-blue-500 to-teal-500",
+                      })
+                    }
                     className="flex-1 flex items-center justify-center space-x-1 bg-gray-100 text-gray-600 px-3 py-2 rounded text-sm hover:bg-gray-200 transition-colors"
                   >
                     <Edit className="w-3 h-3" />
@@ -504,48 +602,44 @@ const MinistryManagement = ({
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead
-                className={theme === "dark" ? "bg-gray-700" : "bg-gray-50"}
+                className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} text-center`}
               >
                 <tr>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                    className={`px-6 py-3 text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider text-center`}
                   >
                     Name
                   </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                    className={`px-6 py-3 text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider text-center`}
                   >
                     Email
                   </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                    className={`px-6 py-3 text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider text-center`}
                   >
                     Phone
                   </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                    className={`px-6 py-3 text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider text-center`}
                   >
                     Congregation
                   </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                    className={`px-6 py-3 text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider text-center`}
                   >
                     Ministry
                   </th>
+
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
-                  >
-                    Age
-                  </th>
-                  <th
-                    className={`px-6 py-3 text-left text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider`}
+                    className={`px-6 py-3 text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-500"} uppercase tracking-wider text-center`}
                   >
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody
-                className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} divide-y ${theme === "dark" ? "divide-gray-700" : "divide-gray-200"}`}
+                className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} divide-y ${theme === "dark" ? "divide-gray-700" : "divide-gray-200"} text-center`}
               >
                 {ministryRegistrations.map((registration) => (
                   <motion.tr
@@ -594,11 +688,7 @@ const MinistryManagement = ({
                     >
                       {registration.ministry}
                     </td>
-                    <td
-                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
-                    >
-                      {registration.age}
-                    </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
@@ -681,10 +771,7 @@ const MinistryManagement = ({
                         <span className="font-medium">Congregation:</span>{" "}
                         {registration.congregation}
                       </p>
-                      <p>
-                        <span className="font-medium">Age:</span>{" "}
-                        {registration.age}
-                      </p>
+
                       {registration.message && (
                         <p>
                           <span className="font-medium">Message:</span>{" "}
@@ -855,27 +942,7 @@ const MinistryManagement = ({
                     </option>
                   </select>
                 </div>
-                <div>
-                  <label
-                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
-                  >
-                    Age
-                  </label>
-                  <input
-                    type="number"
-                    value={newRegistration.age}
-                    onChange={(e) =>
-                      setNewRegistration({
-                        ...newRegistration,
-                        age: e.target.value,
-                      })
-                    }
-                    placeholder="Enter age"
-                    min="13"
-                    max="35"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                  />
-                </div>
+
                 <div>
                   <label
                     className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
@@ -1053,27 +1120,7 @@ const MinistryManagement = ({
                     </option>
                   </select>
                 </div>
-                <div>
-                  <label
-                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
-                  >
-                    Age
-                  </label>
-                  <input
-                    type="number"
-                    value={editingRegistration.age}
-                    onChange={(e) =>
-                      setEditingRegistration({
-                        ...editingRegistration,
-                        age: e.target.value,
-                      })
-                    }
-                    placeholder="Enter age"
-                    min="13"
-                    max="35"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                  />
-                </div>
+
                 <div>
                   <label
                     className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
@@ -1372,7 +1419,7 @@ const MinistryManagement = ({
                   </label>
                   <input
                     type="text"
-                    value={editingMinistry.name}
+                    value={editingMinistry.name ?? ""}
                     onChange={(e) =>
                       setEditingMinistry({
                         ...editingMinistry,
@@ -1388,7 +1435,7 @@ const MinistryManagement = ({
                     Description
                   </label>
                   <textarea
-                    value={editingMinistry.description}
+                    value={editingMinistry.description ?? ""}
                     onChange={(e) =>
                       setEditingMinistry({
                         ...editingMinistry,
@@ -1406,7 +1453,7 @@ const MinistryManagement = ({
                   </label>
                   <input
                     type="text"
-                    value={editingMinistry.leaderName}
+                    value={editingMinistry.leaderName ?? ""}
                     onChange={(e) =>
                       setEditingMinistry({
                         ...editingMinistry,
@@ -1423,7 +1470,7 @@ const MinistryManagement = ({
                   </label>
                   <input
                     type="tel"
-                    value={editingMinistry.leaderPhone}
+                    value={editingMinistry.leaderPhone ?? ""}
                     onChange={(e) => {
                       setEditingMinistry({
                         ...editingMinistry,
@@ -1445,7 +1492,7 @@ const MinistryManagement = ({
                     Color Theme
                   </label>
                   <select
-                    value={editingMinistry.color}
+                    value={editingMinistry.color ?? "from-blue-500 to-teal-500"}
                     onChange={(e) =>
                       setEditingMinistry({
                         ...editingMinistry,

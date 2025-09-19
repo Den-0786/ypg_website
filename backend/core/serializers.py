@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem
+    Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem,
+    Ministry
 )
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -48,6 +49,11 @@ class ContactMessageSerializer(serializers.ModelSerializer):
 class MinistryRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = MinistryRegistration
+        fields = '__all__'
+
+class MinistrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ministry
         fields = '__all__'
 
 class BlogPostSerializer(serializers.ModelSerializer):

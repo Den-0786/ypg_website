@@ -55,7 +55,7 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(MinistryRegistration)
 class MinistryRegistrationAdmin(admin.ModelAdmin):
-    list_display = ['name', 'ministry', 'congregation', 'age', 'is_approved', 'created_at']
+    list_display = ['name', 'ministry', 'congregation', 'is_approved', 'created_at']
     list_filter = ['ministry', 'is_approved', 'created_at']
     search_fields = ['name', 'email', 'congregation']
     readonly_fields = ['created_at']

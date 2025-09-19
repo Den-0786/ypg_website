@@ -4,66 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import toast from "react-hot-toast";
 
-const ministries = [
-  {
-    name: "Y-Singers",
-    description:
-      "Youth choir focused on gospel music and worship leading. Our choir ministry provides opportunities for young people to develop their musical talents while leading the congregation in worship. We practice weekly and perform at various church events, youth programs, and special services throughout the year.",
-    color: "from-purple-500 to-pink-500",
-  },
-  {
-    name: "Y-Jama Troop",
-    description:
-      "Cultural dance and traditional praise group showcasing Ghanaian heritage. This ministry celebrates our rich cultural traditions through dance, drumming, and traditional music. Members learn authentic Ghanaian dance moves, drumming techniques, and cultural expressions that honor our heritage while glorifying God.",
-    color: "from-amber-500 to-orange-500",
-  },
-  {
-    name: "Choreography Group",
-    description:
-      "Creative expression of worship through dance and movement. Our choreography team creates beautiful dance routines that enhance worship services and special events. We blend contemporary and traditional dance styles to create meaningful performances that touch hearts and glorify God.",
-    color: "from-blue-500 to-teal-500",
-  },
-  {
-    name: "Evangelism & Prayer Team",
-    description:
-      "Leads outreach, prayer meetings, and spiritual growth programs. This ministry is dedicated to spreading the gospel and building spiritual maturity. We organize street evangelism, prayer walks, Bible study sessions, and discipleship programs to help young people grow in their faith.",
-    color: "from-green-500 to-emerald-500",
-  },
-  {
-    name: "Y-Media",
-    description:
-      "Manages visual content, social media, and church media coverage. Our media team handles photography, videography, live streaming, and social media management. We document church events, create promotional content, and maintain our online presence to reach more people with our message.",
-    color: "from-red-500 to-rose-500",
-  },
-  {
-    name: "Dancing Group",
-    description:
-      "Contemporary dance ministry expressing joy and praise through movement. We use modern dance styles to express worship and praise in creative ways. Our performances combine energy, creativity, and spiritual meaning to engage audiences and glorify God through movement.",
-    color: "from-indigo-500 to-purple-600",
-  },
-  {
-    name: "Ushering Wing",
-    description:
-      "Welcomes and guides worshippers, maintains order during services. Our ushering team ensures smooth and organized church services by welcoming members, managing seating arrangements, collecting offerings, and maintaining order. We create a welcoming atmosphere for all worshippers.",
-    color: "from-emerald-500 to-green-600",
-  },
-  {
-    name: "Youth Bible Study",
-    description:
-      "Deep dive into scripture, theological discussions, and spiritual growth. Our Bible study ministry provides in-depth study of God's Word through interactive sessions, group discussions, and practical applications. We explore various topics, books of the Bible, and contemporary issues from a biblical perspective.",
-    color: "from-orange-500 to-red-500",
-  },
-];
+const ministriesDefault = [];
 
 export default function MinistriesSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
-  const [expandedMinistries, setExpandedMinistries] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [expandedName, setExpandedName] = useState("");
+  const [ministries, setMinistries] = useState(ministriesDefault);
   const [registrationForm, setRegistrationForm] = useState({
     name: "",
+    email: "",
     phone: "",
     congregation: "",
     ministry: "",
@@ -72,6 +27,24 @@ export default function MinistriesSection() {
 
   const cardsPerView = isMobile ? 1 : 4;
   const totalSlides = Math.ceil(ministries.length / cardsPerView);
+  useEffect(() => {
+    const fetchMinistries = async () => {
+      try {
+        const res = await fetch("http://localhost:8002/api/ministries/");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.ministries)) {
+          setMinistries(data.ministries);
+        } else {
+          setMinistries([]);
+        }
+      } catch (e) {
+        setMinistries([]);
+      }
+    };
+    fetchMinistries();
+    const id = setInterval(fetchMinistries, 30000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -149,29 +122,61 @@ export default function MinistriesSection() {
       return;
     }
 
-    try {
-      // In a real implementation, this would send data to your API
-      // For now, we'll just simulate a successful submission
-      console.log("Submitting registration:", registrationForm);
+    // Show confirmation modal instead of direct submission
+    setShowConfirmModal(true);
+  };
 
-      // Show success message by closing modal and showing a success message
+  const confirmRegistration = async () => {
+    try {
+      const res = await fetch("http://localhost:8002/api/ministry/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: registrationForm.name,
+          email: registrationForm.email,
+          phone: registrationForm.phone,
+          ministry: registrationForm.ministry,
+          congregation: registrationForm.congregation,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data.error
+            ? JSON.stringify(data.error)
+            : data.message || "Failed to submit"
+        );
+      }
+
+      // Close both modals
       setShowRegistrationModal(false);
+      setShowConfirmModal(false);
 
       // Reset form
       setRegistrationForm({
         name: "",
+        email: "",
         phone: "",
         congregation: "",
         ministry: "",
       });
 
-      // Show success message (you could implement a better notification system)
-      alert(
+      // Show success toast
+      toast.success(
         "Registration submitted successfully! Our team will contact you soon."
       );
+
+      // Notify dashboard to refresh (cross-tab/window)
+      try {
+        const channel = new BroadcastChannel("ypg_ministry");
+        channel.postMessage({ type: "registration_created" });
+        channel.close();
+      } catch (e) {
+        // no-op: BroadcastChannel may not be supported
+      }
     } catch (error) {
       console.error("Error submitting registration:", error);
-      alert("Error submitting registration. Please try again.");
+      toast.error("Error submitting registration. Please try again.");
     }
   };
 
@@ -193,10 +198,7 @@ export default function MinistriesSection() {
   };
 
   const toggleMinistryExpansion = (ministryName) => {
-    setExpandedMinistries((prev) => ({
-      ...prev,
-      [ministryName]: !prev[ministryName],
-    }));
+    setExpandedName((prev) => (prev === ministryName ? "" : ministryName));
   };
 
   const getTruncatedDescription = (description, isExpanded) => {
@@ -279,12 +281,12 @@ export default function MinistriesSection() {
                 className="w-full"
               >
                 <div
-                  className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-4"} gap-8 px-6`}
+                  className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-4"} gap-8 px-6 items-start`}
                 >
                   {getVisibleItems().map((ministry, idx) => (
                     <motion.div
                       key={`${currentIndex}-${ministry.name}-${idx}`}
-                      className="relative group overflow-hidden rounded-2xl shadow-lg bg-white"
+                      className="relative group overflow-hidden rounded-2xl shadow-lg bg-white self-start"
                       whileHover={{ y: -5 }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -301,9 +303,25 @@ export default function MinistriesSection() {
                         <p className="text-gray-600 mb-4">
                           {getTruncatedDescription(
                             ministry.description,
-                            expandedMinistries[ministry.name]
+                            expandedName === ministry.name
                           )}
                         </p>
+                        {(ministry.leader_name || ministry.leader_phone) && (
+                          <div className="text-sm text-gray-500 space-y-1 mb-8">
+                            {ministry.leader_name && (
+                              <p>
+                                <span className="font-medium">Leader:</span>{" "}
+                                {ministry.leader_name}
+                              </p>
+                            )}
+                            {ministry.leader_phone && (
+                              <p>
+                                <span className="font-medium">Phone:</span>{" "}
+                                {ministry.leader_phone}
+                              </p>
+                            )}
+                          </div>
+                        )}
 
                         <div className="absolute bottom-4 left-6">
                           <button
@@ -312,12 +330,16 @@ export default function MinistriesSection() {
                             }
                             className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center"
                           >
-                            {expandedMinistries[ministry.name]
+                            {expandedName === ministry.name
                               ? "Read Less"
                               : "Read More"}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 ml-1"
+                              className={`h-4 w-4 ml-1 transition-transform duration-200 ${
+                                expandedName === ministry.name
+                                  ? "rotate-180"
+                                  : ""
+                              }`}
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -326,7 +348,7 @@ export default function MinistriesSection() {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M9 5l7 7-7 7"
+                                d="M19 9l-7 7-7-7"
                               />
                             </svg>
                           </button>
@@ -557,6 +579,23 @@ export default function MinistriesSection() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        value={registrationForm.email}
+                        onChange={(e) =>
+                          setRegistrationForm({
+                            ...registrationForm,
+                            email: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Phone Number
                       </label>
                       <input
@@ -624,6 +663,7 @@ export default function MinistriesSection() {
                         ))}
                       </select>
                     </div>
+
                     <div className="flex justify-end gap-2 mt-6">
                       <button
                         type="button"
@@ -640,6 +680,88 @@ export default function MinistriesSection() {
                       </button>
                     </div>
                   </form>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      {/* Confirmation Modal */}
+      <Transition.Root show={showConfirmModal} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setShowConfirmModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <div className="flex items-center mb-4">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                      <svg
+                        className="h-6 w-6 text-blue-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-bold leading-6 text-gray-900 text-center mb-2"
+                  >
+                    Confirm Registration
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500 text-center">
+                      Are you sure you want to submit your ministry
+                      registration? Our team will contact you soon.
+                    </p>
+                  </div>
+                  <div className="mt-6 flex justify-center gap-3">
+                    <button
+                      type="button"
+                      className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                      onClick={() => setShowConfirmModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+                      onClick={confirmRegistration}
+                    >
+                      Confirm Registration
+                    </button>
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

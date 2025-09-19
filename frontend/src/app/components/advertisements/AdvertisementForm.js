@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -21,6 +22,8 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [contactWarning, setContactWarning] = useState("");
 
   const categories = [
     { value: "food", label: "Food & Catering" },
@@ -34,26 +37,160 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
     { value: "other", label: "Other" },
   ];
 
+  const validateContact = (contactValue) => {
+    if (!contactValue.trim()) {
+      return "Contact number is required";
+    }
+
+    // Split by "/" to handle multiple numbers
+    const numbers = contactValue
+      .split("/")
+      .map((num) => num.trim())
+      .filter((num) => num.length > 0);
+
+    if (numbers.length === 0) {
+      return "Please enter at least one contact number";
+    }
+
+    for (let i = 0; i < numbers.length; i++) {
+      const number = numbers[i];
+
+      // Remove spaces for validation but keep original for display
+      const numberWithoutSpaces = number.replace(/\s/g, "");
+
+      // Check if number starts with +233 or 0
+      if (
+        !numberWithoutSpaces.startsWith("+233") &&
+        !numberWithoutSpaces.startsWith("0")
+      ) {
+        return `Number ${i + 1}: Must start with +233 or 0`;
+      }
+
+      // Check length for each number (without spaces)
+      if (
+        numberWithoutSpaces.startsWith("0") &&
+        numberWithoutSpaces.length !== 10
+      ) {
+        return `Number ${i + 1}: Must be exactly 10 digits (e.g., 0241234567)`;
+      }
+
+      if (
+        numberWithoutSpaces.startsWith("+233") &&
+        numberWithoutSpaces.length !== 13
+      ) {
+        return `Number ${i + 1}: Must be exactly 13 digits (e.g., +233241234567)`;
+      }
+
+      // Check if it's only digits after +233 or 0 (excluding spaces)
+      const digitsOnly = numberWithoutSpaces.startsWith("+233")
+        ? numberWithoutSpaces.substring(4)
+        : numberWithoutSpaces.substring(1);
+      if (!/^\d+$/.test(digitsOnly)) {
+        return `Number ${i + 1}: Must contain only digits after the prefix`;
+      }
+    }
+
+    // Check if there's a "/" but no second number
+    if (contactValue.includes("/")) {
+      const parts = contactValue.split("/");
+      if (parts.length > 1 && parts[parts.length - 1].trim() === "") {
+        return "Please complete the second contact number after '/'";
+      }
+    }
+
+    return null; // No error
+  };
+
+  const validateEmail = (email) => {
+    if (!email.trim()) {
+      return null; // Email is optional
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return "Please enter a valid email address";
+    }
+
+    return null;
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Validate contact
+    const contactError = validateContact(formData.advertiser_contact);
+    if (contactError) {
+      errors.advertiser_contact = contactError;
+    }
+
+    // Check character limit
+    if (formData.advertiser_contact.length > 30) {
+      errors.advertiser_contact = "Contact field cannot exceed 30 characters";
+    }
+
+    // Validate email
+    const emailError = validateEmail(formData.advertiser_email);
+    if (emailError) {
+      errors.advertiser_email = emailError;
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error("Please fix the validation errors before submitting");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // Create FormData for file uploads
+      const formDataToSend = new FormData();
+
+      // Add all form fields
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("advertiser_name", formData.advertiser_name);
+      formDataToSend.append("advertiser_contact", formData.advertiser_contact);
+      formDataToSend.append(
+        "advertiser_email",
+        formData.advertiser_email || ""
+      );
+      formDataToSend.append("location", formData.location);
+      formDataToSend.append("is_member", formData.is_member);
+      formDataToSend.append(
+        "member_congregation",
+        formData.member_congregation || ""
+      );
+      formDataToSend.append("price_type", formData.price_type);
+      formDataToSend.append("price_fixed", formData.price_fixed || "");
+      formDataToSend.append("price_min", formData.price_min || "");
+      formDataToSend.append("price_max", formData.price_max || "");
+
+      // Add images
+      formData.images.forEach((file, index) => {
+        formDataToSend.append(`image_${index}`, file);
+      });
+
       const response = await fetch(
         "http://localhost:8002/api/advertisements/create/",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          body: formDataToSend,
         }
       );
 
       const data = await response.json();
 
       if (data.success) {
-        alert(
+        toast.success(
           "Advertisement submitted successfully! Admin will review and approve."
         );
         setFormData({
@@ -75,10 +212,43 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
         onClose();
         if (onSubmit) onSubmit();
       } else {
-        alert("Error: " + data.error);
+        // Handle different error formats with more specific messages
+        let errorMessage = "Failed to submit advertisement. Please try again.";
+
+        if (typeof data.error === "string") {
+          errorMessage = data.error;
+        } else if (data.error && typeof data.error === "object") {
+          // Handle validation errors - show the first error found
+          const errorKeys = Object.keys(data.error);
+          if (errorKeys.length > 0) {
+            const firstError = data.error[errorKeys[0]];
+            if (Array.isArray(firstError) && firstError.length > 0) {
+              errorMessage = `Validation Error: ${firstError[0]}`;
+            } else if (typeof firstError === "string") {
+              errorMessage = `Validation Error: ${firstError}`;
+            }
+          }
+        }
+
+        // Show specific error messages for common issues
+        if (errorMessage.includes("advertiser_contact")) {
+          errorMessage =
+            "Please check your contact number format. Use +233XXXXXXXXX or 0XXXXXXXXX format.";
+        } else if (errorMessage.includes("advertiser_email")) {
+          errorMessage = "Please enter a valid email address.";
+        } else if (errorMessage.includes("title")) {
+          errorMessage = "Please enter a valid advertisement title.";
+        } else if (errorMessage.includes("description")) {
+          errorMessage = "Please provide a description for your advertisement.";
+        } else if (errorMessage.includes("category")) {
+          errorMessage = "Please select a category for your advertisement.";
+        }
+
+        toast.error(errorMessage);
       }
     } catch (error) {
-      alert("Error submitting advertisement: " + error.message);
+      console.error("Error submitting advertisement:", error);
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -90,6 +260,38 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    // Real-time validation for specific fields
+    if (name === "advertiser_contact") {
+      const error = validateContact(value);
+      setValidationErrors((prev) => ({
+        ...prev,
+        advertiser_contact: error,
+      }));
+
+      // Check character count and show warning
+      if (value.length >= 30) {
+        setContactWarning(
+          `Error: Maximum 30 characters allowed. You have ${value.length} characters.`
+        );
+      } else {
+        setContactWarning("");
+      }
+    } else if (name === "advertiser_email") {
+      const error = validateEmail(value);
+      setValidationErrors((prev) => ({
+        ...prev,
+        advertiser_email: error,
+      }));
+    } else {
+      // Clear validation error for other fields when user starts typing
+      if (validationErrors[name]) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          [name]: null,
+        }));
+      }
+    }
   };
 
   return (
@@ -202,27 +404,56 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     name="advertiser_contact"
                     value={formData.advertiser_contact}
                     onChange={handleChange}
+                    maxLength="30"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="+233 XX XXX XXXX"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      validationErrors.advertiser_contact
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    placeholder="+233 XX XXX XXXX or 0XX XXX XXXX / +233 XX XXX XXXX"
                   />
+                  {validationErrors.advertiser_contact && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {validationErrors.advertiser_contact}
+                    </p>
+                  )}
+                  {contactWarning && (
+                    <p
+                      className={`text-xs mt-1 ${
+                        contactWarning.includes("Error")
+                          ? "text-red-500"
+                          : "text-orange-500"
+                      }`}
+                    >
+                      {contactWarning}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address *
+                    Email Address (Optional)
                   </label>
                   <input
                     type="email"
                     name="advertiser_email"
                     value={formData.advertiser_email}
                     onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      validationErrors.advertiser_email
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
                     placeholder="your@email.com"
                   />
+                  {validationErrors.advertiser_email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {validationErrors.advertiser_email}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -366,25 +597,22 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Product/Service Images (Max 4) *
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
-                  <span className="text-5xl text-gray-400 mx-auto mb-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center hover:border-blue-400 transition">
+                  <span className="text-2xl text-gray-400 mx-auto mb-2">
                     📤
                   </span>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Upload high-quality images of your product/service
-                  </p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    These images will be used for the main advertisement display
+                  <p className="text-xs text-gray-600 mb-2">
+                    Upload images of your product/service
                   </p>
                   <input
                     type="file"
                     multiple
                     accept="image/*"
                     onChange={(e) => {
-                      const files = Array.from(e.target.files).slice(0, 4);
+                      const newFiles = Array.from(e.target.files);
                       setFormData((prev) => ({
                         ...prev,
-                        images: files,
+                        images: [...prev.images, ...newFiles].slice(0, 4),
                       }));
                     }}
                     className="hidden"
@@ -392,23 +620,39 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                   />
                   <label
                     htmlFor="image-upload"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                    className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer text-sm"
                   >
                     Choose Images
                   </label>
                   {formData.images.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-600 mb-2">
-                        Selected: {formData.images.length} image(s)
+                    <div className="mt-2">
+                      <p className="text-xs text-gray-600 mb-1">
+                        Selected: {formData.images.length}/4 image(s)
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1">
                         {formData.images.map((file, index) => (
-                          <span
+                          <div
                             key={index}
-                            className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
+                            className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs"
                           >
-                            {file.name}
-                          </span>
+                            <span className="truncate max-w-20">
+                              {file.name}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  images: prev.images.filter(
+                                    (_, i) => i !== index
+                                  ),
+                                }));
+                              }}
+                              className="ml-1 text-red-600 hover:text-red-800 text-xs"
+                            >
+                              ×
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </div>

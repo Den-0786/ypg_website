@@ -11,7 +11,6 @@ import TeamSection from "./components/team/TeamSection";
 import YStoreSection from "./components/store/YStore";
 import TestimonialsSection from "./components/testimonials/Testimonials";
 import MinistriesSection from "./components/ministries/Ministries";
-import JoinUsSection from "./components/joinus/JoinUs";
 import GallerySection from "./components/ygallery/YGallery";
 import BlogSection from "./components/blog/BlogSection";
 import ContactSection from "./components/contact/ContactSection";
@@ -48,7 +47,6 @@ export default function Home() {
         <CouncilSection />
         <WelfareSection />
         <AdvertisementSection />
-        <JoinUsSection />
         <GallerySection />
         <BlogSection />
         <DonateSection />

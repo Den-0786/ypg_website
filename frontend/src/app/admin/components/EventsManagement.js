@@ -34,13 +34,13 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
   const now = new Date();
   const upcomingEvents = events.filter((event) => {
-    const eventDate = new Date(event.start_date);
-    return eventDate >= now && !event.dashboard_deleted;
+    const eventEndDate = new Date(event.end_date || event.start_date);
+    return eventEndDate >= now && !event.dashboard_deleted;
   });
 
   const pastEvents = events.filter((event) => {
-    const eventDate = new Date(event.start_date);
-    return eventDate < now && !event.dashboard_deleted;
+    const eventEndDate = new Date(event.end_date || event.start_date);
+    return eventEndDate < now && !event.dashboard_deleted;
   });
 
   const deletedEvents = events.filter((event) => event.dashboard_deleted);

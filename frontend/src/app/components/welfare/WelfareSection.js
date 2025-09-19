@@ -2,12 +2,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import {
-  Heart,
   Users,
   Shield,
   FileText,
-  Phone,
-  Mail,
   ChevronDown,
   ChevronUp,
   X,
@@ -16,30 +13,6 @@ import {
 export default function WelfareSection() {
   const [openFaq, setOpenFaq] = useState(null);
   const [showFaqModal, setShowFaqModal] = useState(false);
-
-  const welfareCommittee = [
-    {
-      name: "Sarah Addo",
-      position: "Welfare Coordinator",
-      phone: "+233 24 123 4567",
-      email: "welfare@ahinsanypg.com",
-      image: "/placeholder-team.jpg",
-    },
-    {
-      name: "Kwame Mensah",
-      position: "Assistant Coordinator",
-      phone: "+233 20 987 6543",
-      email: "assistant@ahinsanypg.com",
-      image: "/placeholder-team.jpg",
-    },
-    {
-      name: "Grace Osei",
-      position: "Treasurer",
-      phone: "+233 26 456 7890",
-      email: "treasurer@ahinsanypg.com",
-      image: "/placeholder-team.jpg",
-    },
-  ];
 
   const faqs = [
     {
@@ -86,25 +59,21 @@ export default function WelfareSection() {
 
   const benefits = [
     {
-      icon: Heart,
       title: "Community Support",
       description:
         "Be part of a caring community that supports each other in times of need",
     },
     {
-      icon: Shield,
       title: "Financial Security",
       description:
         "Access to emergency funds when you or your family face difficult situations",
     },
     {
-      icon: Users,
       title: "Network of Care",
       description:
         "Connect with fellow guilders who understand and support your journey",
     },
     {
-      icon: FileText,
       title: "Transparent Process",
       description:
         "Clear guidelines and proper documentation for all welfare activities",
@@ -114,7 +83,7 @@ export default function WelfareSection() {
   return (
     <section
       id="welfare"
-      className="py-20 bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden"
+      className="py-12 bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden"
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-100/20 via-transparent to-purple-100/20"></div>
@@ -127,11 +96,8 @@ export default function WelfareSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6 shadow-lg">
-            <Heart className="w-10 h-10 text-white" />
-          </div>
           <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
             YPG Welfare Program
           </h2>
@@ -147,7 +113,7 @@ export default function WelfareSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12"
         >
           {benefits.map((benefit, index) => (
             <motion.div
@@ -157,9 +123,6 @@ export default function WelfareSection() {
               transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
               className="bg-white rounded-2xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-6">
-                <benefit.icon className="w-8 h-8 text-white" />
-              </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-4">
                 {benefit.title}
               </h3>
@@ -175,21 +138,22 @@ export default function WelfareSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 md:p-12 mb-20 text-white"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl px-4 py-6 md:px-6 md:py-8 mb-8 text-white"
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-bold mb-6">
+            <h3 className="text-3xl md:text-4xl font-bold mb-4">
               Ready to Join?
             </h3>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-blue-100 mb-6">
               Become part of our welfare community and experience the power of
               collective support.
             </p>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h4 className="text-xl font-semibold mb-4">How to Register</h4>
-              <p className="text-blue-100 mb-4">
-                For registration, contact your congregation guild representative
-                or YPG president in your congregation for full details.
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <h4 className="text-xl font-semibold mb-3">How to Register</h4>
+              <p className="text-blue-100 mb-3">
+                For registration and more info or enquiries, contact your
+                congregation guild representative or YPG president in your
+                congregation for full details.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <div className="flex items-center gap-2 text-blue-100">
@@ -206,121 +170,14 @@ export default function WelfareSection() {
                 </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-
-        {/* Welfare Committee */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mb-20"
-        >
-          <div className="text-center mb-12">
-            <h3 className="text-4xl font-bold text-gray-800 mb-4">
-              Welfare Committee
-            </h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Meet our dedicated team of leaders who manage the welfare program
-              with care and transparency.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {welfareCommittee.map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+            <div className="mt-6">
+              <button
+                onClick={() => setShowFaqModal(true)}
+                className="inline-flex items-center gap-3 px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 border border-white/30"
               >
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-6 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">
-                      {member.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </span>
-                  </div>
-                  <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                    {member.name}
-                  </h4>
-                  <p className="text-blue-600 font-medium mb-4">
-                    {member.position}
-                  </p>
-                  <div className="space-y-2">
-                    <a
-                      href={`tel:${member.phone}`}
-                      className="flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600 transition"
-                    >
-                      <Phone className="w-4 h-4" />
-                      <span className="text-sm">{member.phone}</span>
-                    </a>
-                    <a
-                      href={`mailto:${member.email}`}
-                      className="flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600 transition"
-                    >
-                      <Mail className="w-4 h-4" />
-                      <span className="text-sm">{member.email}</span>
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* FAQ Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="max-w-4xl mx-auto"
-        >
-          <div className="text-center mb-12">
-            <h3 className="text-4xl font-bold text-gray-800 mb-4">
-              Frequently Asked Questions
-            </h3>
-            <p className="text-xl text-gray-600 mb-8">
-              Find answers to common questions about the YPG Welfare Program.
-            </p>
-            <button
-              onClick={() => setShowFaqModal(true)}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            >
-              <ChevronDown className="w-5 h-5" />
-              View All Questions
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Call to Action */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-center mt-16"
-        >
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-            <h3 className="text-2xl font-bold mb-4">Need More Information?</h3>
-            <p className="text-blue-100 mb-6">
-              Contact any member of our welfare committee or your branch
-              representative for detailed information.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#contact"
-                className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-full hover:bg-gray-100 transition"
-              >
-                Contact Us
-              </a>
-              <a
-                href="#gallery"
-                className="px-8 py-3 border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-blue-600 transition"
-              >
-                View Gallery
-              </a>
+                <ChevronDown className="w-5 h-5" />
+                View All Questions
+              </button>
             </div>
           </div>
         </motion.div>

@@ -86,13 +86,14 @@ DATABASES = {
     }
 }
 
-# Production Database (PostgreSQL)
+# Production Database (PostgreSQL) - Only use if DATABASE_URL is explicitly set
 try:
-    if config('DATABASE_URL', default=''):
+    database_url = config('DATABASE_URL', default='')
+    if database_url and not database_url.startswith('sqlite'):
         import dj_database_url
-        DATABASES['default'] = dj_database_url.parse(config('DATABASE_URL'))
+        DATABASES['default'] = dj_database_url.parse(database_url)
 except:
-    # Use SQLite if DATABASE_URL is not available
+    # Use SQLite if DATABASE_URL is not available or is SQLite
     pass
 
 

@@ -228,13 +228,14 @@ export default function TeamSection() {
                                   src={
                                     member.image
                                       ? `http://localhost:8002${member.image}`
-                                      : "/placeholder-team.jpg"
+                                      : "/placeholder-item.jpg"
                                   }
                                   alt={member.name}
                                   fill
                                   className="object-cover"
                                   style={{ objectPosition: "center 10%" }}
                                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
+                                  unoptimized
                                 />
                                 {/* Color overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />

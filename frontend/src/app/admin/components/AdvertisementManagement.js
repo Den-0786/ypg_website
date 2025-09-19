@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import {
   Tag,
   Search,
@@ -19,6 +20,8 @@ import {
   Image as ImageIcon,
   Plus,
   AlertCircle,
+  RefreshCw,
+  Calendar,
 } from "lucide-react";
 
 export default function AdvertisementManagement({ theme }) {
@@ -29,14 +32,25 @@ export default function AdvertisementManagement({ theme }) {
   const [selectedAd, setSelectedAd] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState("view");
+  const [currentImageIndex, setCurrentImageIndex] = useState({});
+  const [autoPlay, setAutoPlay] = useState({});
+  const [editFormData, setEditFormData] = useState({});
+  const [expandedCards, setExpandedCards] = useState({});
 
   useEffect(() => {
     fetchAdvertisements();
+
+    // Refresh advertisements every 10 seconds
+    const interval = setInterval(fetchAdvertisements, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchAdvertisements = async () => {
     try {
-      const response = await fetch("http://localhost:8002/api/advertisements/");
+      const response = await fetch(
+        "http://localhost:8002/api/advertisements/admin/"
+      );
       const data = await response.json();
       if (data.success) {
         setAdvertisements(data.advertisements);
@@ -99,6 +113,113 @@ export default function AdvertisementManagement({ theme }) {
     return matchesSearch && matchesStatus;
   });
 
+  // Auto-play carousel effect
+  useEffect(() => {
+    const autoPlayIntervals = {};
+
+    filteredAds.forEach((ad) => {
+      if (ad.images && ad.images.length > 1) {
+        autoPlayIntervals[ad.id] = setInterval(() => {
+          // Only auto-play if not hovering
+          if (autoPlay[ad.id] !== false) {
+            setCurrentImageIndex((prev) => ({
+              ...prev,
+              [ad.id]: ((prev[ad.id] || 0) + 1) % ad.images.length,
+            }));
+          }
+        }, 3000); // Change image every 3 seconds
+      }
+    });
+
+    return () => {
+      Object.values(autoPlayIntervals).forEach(clearInterval);
+    };
+  }, [filteredAds, autoPlay]);
+
+  const nextImage = (adId, totalImages) => {
+    setCurrentImageIndex((prev) => ({
+      ...prev,
+      [adId]: ((prev[adId] || 0) + 1) % totalImages,
+    }));
+  };
+
+  const prevImage = (adId, totalImages) => {
+    setCurrentImageIndex((prev) => ({
+      ...prev,
+      [adId]: ((prev[adId] || 0) - 1 + totalImages) % totalImages,
+    }));
+  };
+
+  const handleEditFormChange = (field, value) => {
+    setEditFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const openModal = (ad, actionType) => {
+    setSelectedAd(ad);
+    setAction(actionType);
+    setShowModal(true);
+    if (actionType === "edit") {
+      setEditFormData({
+        title: ad.title,
+        description: ad.description,
+        advertiser_name: ad.advertiser_name,
+        advertiser_contact: ad.advertiser_contact,
+        advertiser_email: ad.advertiser_email || "",
+        location: ad.location,
+        category: ad.category,
+        price_type: ad.price_type,
+        price_fixed: ad.price_fixed || "",
+        price_min: ad.price_min || "",
+        price_max: ad.price_max || "",
+        admin_notes: ad.admin_notes || "",
+      });
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8002/api/advertisements/${selectedAd.id}/update/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editFormData),
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        // Update the local state with the new data
+        setAdvertisements((prev) =>
+          prev.map((ad) =>
+            ad.id === selectedAd.id ? { ...ad, ...editFormData } : ad
+          )
+        );
+        setShowModal(false);
+        toast.success("Advertisement updated successfully!");
+      } else {
+        toast.error("Failed to update advertisement: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error updating advertisement:", error);
+      toast.error("Error updating advertisement. Please try again.");
+    }
+  };
+
+  const toggleExpanded = (cardKey) => {
+    setExpandedCards((prev) => {
+      const currentValue = prev[cardKey] || false;
+      return {
+        ...prev,
+        [cardKey]: !currentValue,
+      };
+    });
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case "approved":
@@ -149,6 +270,17 @@ export default function AdvertisementManagement({ theme }) {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <button
+            onClick={fetchAdvertisements}
+            className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+              theme === "dark"
+                ? "bg-gray-700 hover:bg-gray-600 text-white"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+            }`}
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
           <div className="relative">
             <Search
               className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${theme === "dark" ? "text-gray-400" : "text-gray-400"}`}
@@ -182,141 +314,269 @@ export default function AdvertisementManagement({ theme }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredAds.map((ad) => (
-          <motion.div
-            key={ad.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`rounded-lg shadow-md border overflow-hidden ${
-              theme === "dark"
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
-            }`}
-          >
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3
-                    className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                  >
-                    {ad.title}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                        ad.category
-                      )}`}
-                    >
-                      {ad.category.replace("_", " ").toUpperCase()}
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        ad.status
-                      )}`}
-                    >
-                      {ad.status.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-              </div>
+      <div className="flex justify-center items-start gap-4 sm:gap-8 overflow-x-auto pb-4">
+        {filteredAds.map((ad, index) => {
+          const currentIndex = currentImageIndex[ad.id] || 0;
+          const hasImages = ad.images && ad.images.length > 0;
+          const cardKey = `dashboard-card-${ad.id}-${index}`;
+          const isExpanded = expandedCards[cardKey] || false;
 
-              <p
-                className={`text-sm mb-4 line-clamp-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-              >
-                {ad.description}
-              </p>
-
-              <div className="space-y-2 mb-4">
-                <div
-                  className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  {ad.advertiser_name}
-                </div>
-                <div
-                  className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                >
-                  <Phone className="w-4 h-4 mr-2" />
-                  {ad.advertiser_contact}
-                </div>
-                <div
-                  className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  {ad.location}
-                </div>
-                <div
-                  className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  {ad.price_type === "fixed"
-                    ? `GHS ${ad.price_fixed}`
-                    : `GHS ${ad.price_min} - ${ad.price_max}`}
-                </div>
-                {ad.is_member && (
-                  <div className="flex items-center text-sm text-green-600">
-                    <Check className="w-4 h-4 mr-2" />
-                    YPG Member - {ad.member_congregation}
-                  </div>
-                )}
-              </div>
-
+          return (
+            <motion.div
+              key={ad.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`rounded-lg shadow-md border overflow-hidden w-full max-w-64 flex-shrink-0 self-start ${
+                theme === "dark"
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200"
+              }`}
+            >
+              {/* Image Carousel */}
               <div
-                className={`flex items-center justify-between pt-4 border-t ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`}
+                className="relative h-64 bg-gray-100"
+                onMouseEnter={() =>
+                  setAutoPlay((prev) => ({ ...prev, [ad.id]: false }))
+                }
+                onMouseLeave={() =>
+                  setAutoPlay((prev) => ({ ...prev, [ad.id]: true }))
+                }
               >
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedAd(ad);
-                      setAction("view");
-                      setShowModal(true);
-                    }}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedAd(ad);
-                      setAction("edit");
-                      setShowModal(true);
-                    }}
-                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(ad.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex gap-1">
-                  {ad.status === "pending" && (
+                <div className="relative w-full h-full overflow-hidden">
+                  <img
+                    src={
+                      hasImages && ad.images[currentIndex]
+                        ? `http://localhost:8002${ad.images[currentIndex].url}`
+                        : "/placeholder-item.jpg"
+                    }
+                    alt={`${ad.title} - Image ${currentIndex + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+
+                  {/* Navigation Arrows */}
+                  {ad.images.length > 1 && (
                     <>
                       <button
-                        onClick={() => handleStatusChange(ad.id, "approved")}
-                        className="p-1 text-green-600 hover:bg-green-50 rounded transition"
-                        title="Approve"
+                        onClick={() => prevImage(ad.id, ad.images.length)}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                       >
-                        <Check className="w-4 h-4" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
                       </button>
                       <button
-                        onClick={() => handleStatusChange(ad.id, "rejected")}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded transition"
-                        title="Reject"
+                        onClick={() => nextImage(ad.id, ad.images.length)}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                       >
-                        <X className="w-4 h-4" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
                       </button>
                     </>
                   )}
+
+                  {/* Image Indicators */}
+                  {ad.images.length > 1 && (
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                      {ad.images.map((_, imgIndex) => (
+                        <button
+                          key={imgIndex}
+                          onClick={() =>
+                            setCurrentImageIndex((prev) => ({
+                              ...prev,
+                              [ad.id]: imgIndex,
+                            }))
+                          }
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            imgIndex === currentIndex
+                              ? "bg-white"
+                              : "bg-white/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h3
+                      className={`text-base font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                    >
+                      {ad.title}
+                    </h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
+                          ad.category
+                        )}`}
+                      >
+                        {ad.category.replace("_", " ").toUpperCase()}
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                          ad.status
+                        )}`}
+                      >
+                        {ad.status.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {isExpanded && (
+                  <>
+                    <p
+                      className={`text-sm mb-4 line-clamp-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                    >
+                      {ad.description}
+                    </p>
+
+                    <div className="space-y-2 mb-4">
+                      <div
+                        className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        {ad.advertiser_name}
+                      </div>
+                      <div
+                        className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                      >
+                        <Phone className="w-4 h-4 mr-2" />
+                        {ad.advertiser_contact}
+                      </div>
+                      {ad.advertiser_email && (
+                        <div
+                          className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                        >
+                          <Mail className="w-4 h-4 mr-2" />
+                          {ad.advertiser_email}
+                        </div>
+                      )}
+                      <div
+                        className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Expires: {new Date(ad.expires_at).toLocaleDateString()}
+                      </div>
+                      <div
+                        className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                      >
+                        <MapPin className="w-4 h-4 mr-2" />
+                        {ad.location}
+                      </div>
+                      <div
+                        className={`flex items-center text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                      >
+                        <DollarSign className="w-4 h-4 mr-2" />
+                        {ad.price_type === "fixed"
+                          ? `GHS ${ad.price_fixed}`
+                          : `GHS ${ad.price_min} - ${ad.price_max}`}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div
+                  className={`flex items-center justify-between pt-4 border-t ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`}
+                >
+                  <div className="flex gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleExpanded(cardKey);
+                      }}
+                      className={`p-2 transition-colors rounded-lg hover:bg-blue-50 ${
+                        theme === "dark"
+                          ? "text-blue-400 hover:text-blue-300"
+                          : "text-blue-600 hover:text-blue-700"
+                      }`}
+                      title={isExpanded ? "Show Less" : "Show More"}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-4 w-4 transition-transform duration-200 ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => openModal(ad, "view")}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openModal(ad, "edit")}
+                      className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(ad.id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-1">
+                    {ad.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => handleStatusChange(ad.id, "approved")}
+                          className="p-1 text-green-600 hover:bg-green-50 rounded transition"
+                          title="Approve"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleStatusChange(ad.id, "rejected")}
+                          className="p-1 text-red-600 hover:bg-red-50 rounded transition"
+                          title="Reject"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {filteredAds.length === 0 && (
@@ -375,7 +635,16 @@ export default function AdvertisementManagement({ theme }) {
                     </label>
                     <input
                       type="text"
-                      value={selectedAd.title}
+                      value={
+                        action === "edit"
+                          ? editFormData.title
+                          : selectedAd.title
+                      }
+                      onChange={
+                        action === "edit"
+                          ? (e) => handleEditFormChange("title", e.target.value)
+                          : undefined
+                      }
                       readOnly={action === "view"}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -400,7 +669,17 @@ export default function AdvertisementManagement({ theme }) {
                     Description
                   </label>
                   <textarea
-                    value={selectedAd.description}
+                    value={
+                      action === "edit"
+                        ? editFormData.description
+                        : selectedAd.description
+                    }
+                    onChange={
+                      action === "edit"
+                        ? (e) =>
+                            handleEditFormChange("description", e.target.value)
+                        : undefined
+                    }
                     readOnly={action === "view"}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -414,7 +693,20 @@ export default function AdvertisementManagement({ theme }) {
                     </label>
                     <input
                       type="text"
-                      value={selectedAd.advertiser_name}
+                      value={
+                        action === "edit"
+                          ? editFormData.advertiser_name
+                          : selectedAd.advertiser_name
+                      }
+                      onChange={
+                        action === "edit"
+                          ? (e) =>
+                              handleEditFormChange(
+                                "advertiser_name",
+                                e.target.value
+                              )
+                          : undefined
+                      }
                       readOnly={action === "view"}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -425,7 +717,20 @@ export default function AdvertisementManagement({ theme }) {
                     </label>
                     <input
                       type="text"
-                      value={selectedAd.advertiser_contact}
+                      value={
+                        action === "edit"
+                          ? editFormData.advertiser_contact
+                          : selectedAd.advertiser_contact
+                      }
+                      onChange={
+                        action === "edit"
+                          ? (e) =>
+                              handleEditFormChange(
+                                "advertiser_contact",
+                                e.target.value
+                              )
+                          : undefined
+                      }
                       readOnly={action === "view"}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -439,7 +744,20 @@ export default function AdvertisementManagement({ theme }) {
                     </label>
                     <input
                       type="email"
-                      value={selectedAd.advertiser_email}
+                      value={
+                        action === "edit"
+                          ? editFormData.advertiser_email
+                          : selectedAd.advertiser_email
+                      }
+                      onChange={
+                        action === "edit"
+                          ? (e) =>
+                              handleEditFormChange(
+                                "advertiser_email",
+                                e.target.value
+                              )
+                          : undefined
+                      }
                       readOnly={action === "view"}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -450,7 +768,17 @@ export default function AdvertisementManagement({ theme }) {
                     </label>
                     <input
                       type="text"
-                      value={selectedAd.location}
+                      value={
+                        action === "edit"
+                          ? editFormData.location
+                          : selectedAd.location
+                      }
+                      onChange={
+                        action === "edit"
+                          ? (e) =>
+                              handleEditFormChange("location", e.target.value)
+                          : undefined
+                      }
                       readOnly={action === "view"}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -492,18 +820,6 @@ export default function AdvertisementManagement({ theme }) {
                   </div>
                 </div>
 
-                {selectedAd.is_member && (
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="flex items-center text-green-800">
-                      <Check className="w-5 h-5 mr-2" />
-                      <span className="font-medium">YPG Member</span>
-                    </div>
-                    <p className="text-green-700 text-sm mt-1">
-                      Congregation: {selectedAd.member_congregation}
-                    </p>
-                  </div>
-                )}
-
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => setShowModal(false)}
@@ -513,10 +829,7 @@ export default function AdvertisementManagement({ theme }) {
                   </button>
                   {action === "edit" && (
                     <button
-                      onClick={() => {
-                        handleStatusChange(selectedAd.id, selectedAd.status);
-                        setShowModal(false);
-                      }}
+                      onClick={handleSaveChanges}
                       className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                     >
                       Save Changes

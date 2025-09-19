@@ -82,6 +82,19 @@ export default function CouncilSection() {
     sets.push(councilMembers.slice(i, i + cardsPerSet));
   }
 
+  // Ensure currentSet is valid after layout/size changes
+  useEffect(() => {
+    if (totalSets > 0 && currentSet >= totalSets) {
+      setCurrentSet(0);
+    }
+  }, [totalSets, currentSet]);
+
+  const getImageUrl = (url) => {
+    if (!url) return "/placeholder-item.jpg";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8002${url.startsWith("/") ? url : "/" + url}`;
+  };
+
   useEffect(() => {
     if (totalSets > 1) {
       const interval = setInterval(() => {
@@ -164,7 +177,7 @@ export default function CouncilSection() {
   }
 
   return (
-    <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+    <section className="py-12 bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5">
         <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-blue-600 mix-blend-multiply filter blur-xl"></div>
@@ -178,11 +191,8 @@ export default function CouncilSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-6"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6">
-            <Users className="w-8 h-8 text-white" />
-          </div>
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
             Council Members
           </h2>
@@ -240,7 +250,7 @@ export default function CouncilSection() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -50 }}
                     transition={{ duration: 0.5 }}
-                    className="grid gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"
+                    className={`grid gap-5 px-2 ${set.length === 1 ? "grid-cols-1 place-items-center" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 justify-items-center"}`}
                   >
                     {set.map((member, index) => {
                       const direction = index % 2 === 0 ? "left" : "right";
@@ -267,41 +277,37 @@ export default function CouncilSection() {
                             y: -8,
                             transition: { duration: 0.2 },
                           }}
-                          className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 w-[260px]"
                         >
-                          <div className="relative h-[18rem] sm:h-72 lg:h-[20rem] w-full">
-                            <Image
-                              src={member.image}
+                          <div className="relative h-[22rem] sm:h-[22rem] lg:h-[24rem] w-[260px]">
+                            <img
+                              src={getImageUrl(member.image)}
                               alt={member.name}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                              className="absolute inset-0 w-full h-full object-cover"
+                              loading="lazy"
                             />
                             {/* Color overlay */}
                             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />
 
                             {/* Text overlay with background */}
-                            <div className="absolute bottom-0 top-[8rem] left-0 right-0 p-3 sm:p-4">
-                              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
-                                <h3 className="text-sm sm:text-lg font-bold text-gray-800 mb-1 line-clamp-1">
+                            <div className="absolute bottom-0 top-[13rem] left-0 right-0 p-3 sm:p-4">
+                              <div className="bg-white/60 backdrop-blur-md rounded-xl p-2 sm:p-3 shadow-lg border border-white/70">
+                                <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-1 line-clamp-1">
                                   {member.name}
                                 </h3>
-                                <p className="text-blue-600 font-medium mb-1 sm:mb-2 text-xs sm:text-sm flex items-center">
-                                  <Users className="w-3 h-3 mr-1" />
+                                <p className="text-blue-600 font-semibold mb-1 sm:mb-2 text-[11px] sm:text-sm">
                                   {member.position}
                                 </p>
-                                <p className="text-gray-600 font-light text-xs mb-2 flex items-center">
-                                  <MapPin className="w-3 h-3 mr-1" />
+                                <p className="text-gray-700 font-medium text-[11px] mb-2">
                                   {member.congregation}
                                 </p>
                                 {member.phone && (
-                                  <p className="text-amber-600 font-light text-xs mb-2 flex items-center">
-                                    <Phone className="w-3 h-3 mr-1" />
+                                  <p className="text-amber-700 font-medium text-[11px] mb-2">
                                     {member.phone}
                                   </p>
                                 )}
                                 {member.description && (
-                                  <p className="text-gray-700 mb-2 italic text-xs sm:text-sm line-clamp-2">
+                                  <p className="text-gray-700 mb-2 italic text-[11px] sm:text-sm line-clamp-2">
                                     &quot;{member.description}&quot;
                                   </p>
                                 )}
@@ -317,22 +323,7 @@ export default function CouncilSection() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mt-12"
-        >
-          <p className="text-gray-600 mb-4">
-            Interested in learning more about our council structure?
-          </p>
-          <button className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-            Contact Us
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </button>
-        </motion.div>
+        {/* Bottom CTA removed per request */}
       </div>
     </section>
   );

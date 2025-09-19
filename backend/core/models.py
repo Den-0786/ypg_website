@@ -78,6 +78,8 @@ class TeamMember(models.Model):
     quote = models.TextField(blank=True, help_text="Favorite quote or motto")
     image = models.ImageField(upload_to='team/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_council = models.BooleanField(default=False)
+    position_order = models.IntegerField(default=999)
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -101,12 +103,22 @@ class ContactMessage(models.Model):
 
 class MinistryRegistration(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
     ministry = models.CharField(max_length=100)
     congregation = models.CharField(max_length=100)
-    age = models.IntegerField()
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Ministry(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    leader_name = models.CharField(max_length=100, blank=True)
+    leader_phone = models.CharField(max_length=20, blank=True)
+    color = models.CharField(max_length=50, default='from-blue-500 to-teal-500')
+    dashboard_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class BlogPost(models.Model):
     title = models.CharField(max_length=200)
@@ -200,6 +212,7 @@ class PastExecutive(models.Model):
     reign_period = models.CharField(max_length=50, help_text="e.g., 2020-2022")
     image = models.ImageField(upload_to='past_executives/', null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
+    position_order = models.IntegerField(default=999)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -233,8 +246,8 @@ class Advertisement(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     advertiser_name = models.CharField(max_length=100)
-    advertiser_contact = models.CharField(max_length=20)
-    advertiser_email = models.EmailField()
+    advertiser_contact = models.CharField(max_length=30)
+    advertiser_email = models.EmailField(blank=True, null=True)
     location = models.CharField(max_length=200)
     is_member = models.BooleanField(default=False)
     member_congregation = models.CharField(max_length=100, blank=True, null=True)

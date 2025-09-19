@@ -172,12 +172,15 @@ export default function CouncilManagement({ theme }) {
       let response;
       if (editingMember) {
         formDataToSend.append("id", editingMember.id);
-        response = await fetch("http://localhost:8002/api/council", {
-          method: "PUT",
-          body: formDataToSend,
-        });
+        response = await fetch(
+          `http://localhost:8002/api/council/${editingMember.id}/update/`,
+          {
+            method: "PUT",
+            body: formDataToSend,
+          }
+        );
       } else {
-        response = await fetch("http://localhost:8002/api/council", {
+        response = await fetch("http://localhost:8002/api/council/create/", {
           method: "POST",
           body: formDataToSend,
         });
@@ -185,15 +188,16 @@ export default function CouncilManagement({ theme }) {
 
       const data = await response.json();
       if (data.success) {
+        const saved = data.member || data.councilMember || data;
         if (editingMember) {
           setCouncilMembers(
             councilMembers.map((member) =>
-              member.id === editingMember.id ? data.councilMember : member
+              member && member.id === editingMember.id ? saved : member
             )
           );
           toast.success("Council member updated successfully!");
         } else {
-          setCouncilMembers([...councilMembers, data.councilMember]);
+          setCouncilMembers([...councilMembers, saved]);
           toast.success("Council member added successfully!");
         }
         closeModal();
@@ -218,10 +222,8 @@ export default function CouncilManagement({ theme }) {
 
     try {
       const response = await fetch(
-        `/api/council?id=${memberToDelete.id}&type=${deleteType}`,
-        {
-          method: "DELETE",
-        }
+        `http://localhost:8002/api/council/${memberToDelete.id}/delete/`,
+        { method: "DELETE" }
       );
 
       if (response.ok) {
@@ -263,6 +265,12 @@ export default function CouncilManagement({ theme }) {
     "Odagya No2",
     "Kokobriko",
   ];
+
+  const getImageUrl = (url) => {
+    if (!url) return "/placeholder-item.jpg";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8002${url.startsWith("/") ? url : "/" + url}`;
+  };
 
   const getPositionIcon = (position) => {
     if (position.includes("President")) return <Crown className="w-5 h-5" />;
@@ -338,7 +346,7 @@ export default function CouncilManagement({ theme }) {
             <span className="text-2xl font-bold">
               {
                 councilMembers.filter((member) =>
-                  member.position.includes("President")
+                  (member?.position || "").includes("President")
                 ).length
               }
             </span>
@@ -365,7 +373,7 @@ export default function CouncilManagement({ theme }) {
             <span className="text-2xl font-bold">
               {
                 councilMembers.filter((member) =>
-                  member.position.includes("Secretary")
+                  (member?.position || "").includes("Secretary")
                 ).length
               }
             </span>
@@ -386,15 +394,15 @@ export default function CouncilManagement({ theme }) {
             }`}
           >
             {/* Member Image */}
-            <div className="relative h-96 bg-gray-200">
+            <div className="relative h-72 bg-gray-200">
               <img
-                src={member.image}
+                src={getImageUrl(member.image)}
                 alt={member.name}
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center text-xs font-medium">
-                {getPositionIcon(member.position)}
-                <span className="ml-1">{member.position}</span>
+                {getPositionIcon(member.position || "")}
+                <span className="ml-1">{member.position || ""}</span>
               </div>
             </div>
 
@@ -484,34 +492,22 @@ export default function CouncilManagement({ theme }) {
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-t-2xl -mx-6 -mt-6 pt-6 px-6"></div>
 
                   <div className="relative flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="relative">
-                        <div
-                          className={`w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg`}
-                        >
-                          <Crown className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
-                          <span className="text-xs">✨</span>
-                        </div>
-                      </div>
-                      <div>
-                        <h2
-                          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
-                        >
-                          {editingMember
-                            ? "✏️ Edit Council Member"
-                            : "🎉 Add New Council Member"}
-                        </h2>
-                        <p
-                          className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} flex items-center mt-1`}
-                        >
-                          <Users className="w-4 h-4 mr-1" />
-                          {editingMember
-                            ? "Update member information with care"
-                            : "Welcome a new leader to our council"}
-                        </p>
-                      </div>
+                    <div>
+                      <h2
+                        className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                      >
+                        {editingMember
+                          ? "Edit Council Member"
+                          : "Add New Council Member"}
+                      </h2>
+                      <p
+                        className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} flex items-center mt-1"`}
+                      >
+                        <Users className="w-4 h-4 mr-1" />
+                        {editingMember
+                          ? "Update member information with care"
+                          : "Welcome a new leader to our council"}
+                      </p>
                     </div>
                     <button
                       onClick={closeModal}

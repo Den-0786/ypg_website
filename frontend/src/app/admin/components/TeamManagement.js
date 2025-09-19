@@ -25,6 +25,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,29 +132,33 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (
-      window.confirm("Are you sure you want to delete this district executive?")
-    ) {
-      try {
-        const response = await fetch(
-          `http://localhost:8002/api/team/${id}/delete/`,
-          {
-            method: "DELETE",
-          }
-        );
+  const handleDeleteClick = (member) => {
+    setMemberToDelete(member);
+    setShowDeleteModal(true);
+  };
 
-        const data = await response.json();
-
-        if (data.success) {
-          setTeamMembers(teamMembers.filter((member) => member.id !== id));
-          toast.success("District executive deleted successfully!");
-        } else {
-          toast.error(data.error || "Failed to delete district executive");
+  const confirmDelete = async () => {
+    if (!memberToDelete) return;
+    try {
+      const response = await fetch(
+        `http://localhost:8002/api/team/${memberToDelete.id}/delete/`,
+        {
+          method: "DELETE",
         }
-      } catch (error) {
-        toast.error("An error occurred while deleting district executive");
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTeamMembers(teamMembers.filter((m) => m.id !== memberToDelete.id));
+        toast.success("District executive deleted successfully!");
+        setShowDeleteModal(false);
+        setMemberToDelete(null);
+      } else {
+        toast.error(data.error || "Failed to delete district executive");
       }
+    } catch (error) {
+      toast.error("An error occurred while deleting district executive");
     }
   };
 
@@ -247,7 +253,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(member.id)}
+                onClick={() => handleDeleteClick(member)}
                 className={`px-3 py-1 text-sm rounded transition-colors ${
                   theme === "dark"
                     ? "bg-red-600 hover:bg-red-700 text-white"
@@ -556,6 +562,66 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && memberToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className={`rounded-lg p-6 w-full max-w-md mx-4 ${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className={`text-lg font-semibold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Confirm Deletion
+              </h3>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setMemberToDelete(null);
+                }}
+                className={`p-1 rounded-lg transition-colors ${
+                  theme === "dark"
+                    ? "hover:bg-gray-700 text-white"
+                    : "hover:bg-gray-100 text-gray-800"
+                }`}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div
+              className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-6`}
+            >
+              Are you sure you want to delete "{memberToDelete.name}"?
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setMemberToDelete(null);
+                }}
+                className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${
+                  theme === "dark"
+                    ? "border-gray-600 text-gray-300 hover:bg-gray-700"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

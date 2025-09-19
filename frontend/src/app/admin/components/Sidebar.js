@@ -19,7 +19,6 @@ import {
   UserCheck,
   Crown,
   History,
-  Heart,
   Tag,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -43,7 +42,6 @@ const Sidebar = ({
     { id: "ministry", name: "Ministry", icon: BookOpen },
     { id: "council", name: "Council Members", icon: Crown },
     { id: "past-executives", name: "Past Executives", icon: History },
-    { id: "welfare-committee", name: "Welfare Committee", icon: Heart },
     { id: "advertisements", name: "Advertisements", icon: Tag },
     { id: "ystore", name: "Y-Store", icon: ShoppingCart },
     { id: "blog", name: "Blog", icon: FileText },

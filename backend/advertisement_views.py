@@ -27,12 +27,78 @@ def api_advertisements(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_advertisements_admin(request):
+    """Get all advertisements for admin dashboard"""
+    try:
+        ads = Advertisement.objects.all().order_by('-created_at')
+        serializer = AdvertisementSerializer(ads, many=True)
+        return Response({
+            'success': True,
+            'advertisements': serializer.data
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_advertisement(request):
     """Create new advertisement"""
     try:
-        data = json.loads(request.body)
+        # Handle both JSON and FormData
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'title': request.POST.get('title', ''),
+                'description': request.POST.get('description', ''),
+                'category': request.POST.get('category', ''),
+                'advertiser_name': request.POST.get('advertiser_name', ''),
+                'advertiser_contact': request.POST.get('advertiser_contact', ''),
+                'advertiser_email': request.POST.get('advertiser_email') or None,
+                'location': request.POST.get('location', ''),
+                'is_member': request.POST.get('is_member') == 'true',
+                'member_congregation': request.POST.get('member_congregation') or None,
+                'price_type': request.POST.get('price_type', 'fixed'),
+                'price_fixed': request.POST.get('price_fixed') or None,
+                'price_min': request.POST.get('price_min') or None,
+                'price_max': request.POST.get('price_max') or None,
+                'images': [],  # Will be handled separately
+            }
+            
+            # Handle uploaded images
+            image_files = []
+            for key, file in request.FILES.items():
+                if key.startswith('image_'):
+                    # Save the file to media/advertisements directory
+                    import os
+                    from django.core.files.storage import default_storage
+                    
+                    # Create unique filename
+                    import uuid
+                    file_extension = os.path.splitext(file.name)[1]
+                    unique_filename = f"{uuid.uuid4()}{file_extension}"
+                    file_path = f"advertisements/{unique_filename}"
+                    
+                    # Save the file
+                    saved_path = default_storage.save(file_path, file)
+                    
+                    # Add to images list
+                    image_files.append({
+                        'name': file.name,
+                        'path': saved_path,
+                        'url': f"/media/{saved_path}",
+                        'size': file.size,
+                        'content_type': file.content_type
+                    })
+            data['images'] = image_files
+        
         data['expires_at'] = timezone.now() + timezone.timedelta(days=30)
         serializer = AdvertisementSerializer(data=data)
         if serializer.is_valid():

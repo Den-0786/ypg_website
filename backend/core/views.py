@@ -13,14 +13,16 @@ from .models import Supervisor
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
-    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive
+    Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive,
+    Ministry
 )
 from .serializers import (
     QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer, 
     QuizResultsSerializer, EventSerializer, TeamMemberSerializer,
     DonationSerializer, ContactMessageSerializer, MinistryRegistrationSerializer,
     BlogPostSerializer, TestimonialSerializer, GalleryItemSerializer,
-    CongregationSerializer, AnalyticsSerializer, AdvertisementSerializer
+    CongregationSerializer, AnalyticsSerializer, AdvertisementSerializer,
+    MinistrySerializer
 )
 import json
 
@@ -445,16 +447,19 @@ def api_events(request):
         
         # Filter by type (upcoming/past)
         event_type = request.GET.get('type')
+        # Use end_date to determine if an event is past; events remain upcoming until they end
+        now = timezone.now()
         if event_type == 'upcoming':
-            events = events.filter(start_date__gte=timezone.now())
+            events = events.filter(end_date__gte=now)
         elif event_type == 'past':
-            events = events.filter(start_date__lt=timezone.now())
+            events = events.filter(end_date__lt=now)
         
         # Exclude deleted events
         exclude_deleted = request.GET.get('excludeDeleted')
         if exclude_deleted == 'true':
             events = events.filter(dashboard_deleted=False)
         
+        # Order by start date descending (most recent first)
         events = events.order_by('-start_date')
         serializer = EventSerializer(events, many=True)
         return Response({
@@ -649,7 +654,7 @@ def api_delete_event(request, event_id):
 def api_team_members(request):
     """Get all team members"""
     try:
-        # Define the hierarchy order
+        # Fixed hierarchy order
         hierarchy_order = [
             'president',
             "president's rep",
@@ -657,23 +662,59 @@ def api_team_members(request):
             'assistant secretary',
             'financial secretary',
             'treasurer',
-            'organizing secretary',
-            'evangelism secretary',
-            'welfare secretary'
+            'evangelism coordinator',
+            'organizer',
+            'others',
         ]
-        
-        team_members = TeamMember.objects.filter(is_active=True)
-        
+
+        # Synonyms mapping to normalize positions into the hierarchy labels
+        synonyms_map = {
+            "president's representative": "president's rep",
+            'president rep': "president's rep",
+            'assistant sec': 'assistant secretary',
+            'fin sec': 'financial secretary',
+            'financial sec': 'financial secretary',
+            'evangelism sec': 'evangelism secretary',
+            'evangelism coordinator': 'evangelism coordinator',
+            'protocol': 'protocol officer',
+            'protocol sec': 'protocol officer',
+            'protocol secretary': 'protocol officer',
+        }
+
+        team_members = TeamMember.objects.filter(is_active=True, is_council=False)
+
+        def normalize_position(raw_position: str) -> str:
+            if not raw_position:
+                return ''
+            pos = raw_position.strip().lower()
+            # normalize unicode quotes/backticks to ASCII apostrophe
+            pos = pos.replace('\u2019', "'").replace('\u2018', "'").replace('`', "'")
+            # collapse multiple spaces
+            pos = ' '.join(pos.split())
+            # reduce longer words to mapped short forms when applicable
+            if 'representative' in pos and "president" in pos:
+                pos = "president's rep"
+            # normalize common synonyms
+            pos = synonyms_map.get(pos, pos)
+            return pos
+
         # Sort by hierarchy first, then by name for same position
         def get_position_order(member):
-            position_lower = member.position.lower()
+            position_key = normalize_position(member.position)
             try:
-                return hierarchy_order.index(position_lower)
+                return hierarchy_order.index(position_key)
             except ValueError:
-                # If position not in hierarchy, put it after treasurer
+                # If position not in hierarchy, put it after listed roles
                 return len(hierarchy_order)
-        
-        sorted_members = sorted(team_members, key=lambda x: (get_position_order(x), x.name))
+
+        # If position_order present, prefer it; else compute from mapping
+        sorted_members = sorted(
+            team_members,
+            key=lambda x: (
+                getattr(x, 'position_order', 999) if getattr(x, 'position_order', 999) != 999 else get_position_order(x),
+                x.name
+            )
+        )
         
         serializer = TeamMemberSerializer(sorted_members, many=True)
         return Response({
@@ -692,7 +733,7 @@ def api_team_members(request):
 def api_council_members(request):
     """Get all council members (same as team members)"""
     try:
-        team_members = TeamMember.objects.filter(is_active=True).order_by('order', 'name')
+        team_members = TeamMember.objects.filter(is_active=True, is_council=True).order_by('order', 'name')
         serializer = TeamMemberSerializer(team_members, many=True)
         return Response({
             'success': True,
@@ -748,7 +789,7 @@ def api_create_team_member(request):
         serializer = TeamMemberSerializer(data=data)
         
         if serializer.is_valid():
-            member = serializer.save()
+            member = serializer.save(is_council=False)
             return Response({
                 'success': True,
                 'message': 'District executive created successfully',
@@ -791,7 +832,7 @@ def api_update_team_member(request, member_id):
         serializer = TeamMemberSerializer(member, data=data, partial=True)
         
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(is_council=False)
             return Response({
                 'success': True,
                 'message': 'District executive updated successfully',
@@ -816,6 +857,96 @@ def api_delete_team_member(request, member_id):
     try:
         member = get_object_or_404(TeamMember, id=member_id)
         member.delete()
+        return Response({
+            'success': True,
+            'message': 'Team member deleted successfully'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# Council API endpoints (separate from team)
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_create_council_member(request):
+    try:
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = {
+                'name': request.POST.get('name'),
+                'position': request.POST.get('position'),
+                'congregation': request.POST.get('congregation', ''),
+                'quote': request.POST.get('quote', ''),
+                'is_active': True,
+                'order': int(request.POST.get('order', 0) or 0)
+            }
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+
+        serializer = TeamMemberSerializer(data=data)
+
+        if serializer.is_valid():
+            member = serializer.save(is_council=True)
+            return Response({
+                'success': True,
+                'message': 'Council member created successfully',
+                'member': TeamMemberSerializer(member).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'success': False,
+                'error': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_update_council_member(request, member_id):
+    try:
+        member = get_object_or_404(TeamMember, id=member_id, is_council=True)
+
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = {
+                'name': request.POST.get('name'),
+                'position': request.POST.get('position'),
+                'congregation': request.POST.get('congregation', ''),
+                'quote': request.POST.get('quote', ''),
+            }
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+
+        serializer = TeamMemberSerializer(member, data=data, partial=True)
+        if serializer.is_valid():
+            updated = serializer.save(is_council=True)
+            return Response({
+                'success': True,
+                'message': 'Council member updated successfully',
+                'member': TeamMemberSerializer(updated).data
+            })
+        else:
+            return Response({'success': False, 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_delete_council_member(request, member_id):
+    try:
+        member = get_object_or_404(TeamMember, id=member_id, is_council=True)
+        member.delete()
+        return Response({'success': True, 'message': 'Council member deleted successfully'})
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         return Response({
             'success': True,
@@ -1078,6 +1209,65 @@ def api_delete_ministry_registration(request, registration_id):
             'success': True,
             'message': 'Ministry registration deleted successfully'
         })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Ministries CRUD
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_ministries(request):
+    try:
+        items = Ministry.objects.filter(dashboard_deleted=False).order_by('-created_at')
+        return Response({'success': True, 'ministries': MinistrySerializer(items, many=True).data})
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_create_ministry(request):
+    try:
+        data = json.loads(request.body)
+        serializer = MinistrySerializer(data=data)
+        if serializer.is_valid():
+            item = serializer.save()
+            return Response({'success': True, 'ministry': MinistrySerializer(item).data}, status=status.HTTP_201_CREATED)
+        return Response({'success': False, 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_update_ministry(request, ministry_id):
+    try:
+        item = get_object_or_404(Ministry, id=ministry_id)
+        data = json.loads(request.body)
+        serializer = MinistrySerializer(item, data=data, partial=True)
+        if serializer.is_valid():
+            updated = serializer.save()
+            return Response({'success': True, 'ministry': MinistrySerializer(updated).data})
+        return Response({'success': False, 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_delete_ministry(request, ministry_id):
+    try:
+        delete_type = request.GET.get('type', 'both')
+        item = get_object_or_404(Ministry, id=ministry_id)
+        if delete_type == 'dashboard':
+            item.dashboard_deleted = True
+            item.save()
+            return Response({'success': True, 'message': 'Ministry removed from dashboard'})
+        item.delete()
+        return Response({'success': True, 'message': 'Ministry deleted successfully'})
     except Exception as e:
         return Response({
             'success': False,
@@ -1710,23 +1900,20 @@ def api_past_executives(request):
         else:
             executives = PastExecutive.objects.filter(is_deleted=False)
         
-        # Define position hierarchy order
-        position_order = {
+        # Fixed order using position_order when available, else fallback mapping
+        fallback_order = {
             'president': 1,
-            'president_rep': 2,
+            "president's rep": 2,
             'secretary': 3,
-            'assistant_secretary': 4,
-            'financial_secretary': 5,
+            'assistant secretary': 4,
+            'financial secretary': 5,
             'treasurer': 6,
-            'organizing_secretary': 7,
-            'evangelism_secretary': 8,
-            'welfare_secretary': 9,
-            'other': 10
+            'evangelism coordinator': 7,
+            'organizer': 8,
+            'others': 99,
         }
-        
-        # Sort executives by position hierarchy
         executives_list = list(executives)
-        executives_list.sort(key=lambda x: position_order.get(x.position, 10))
+        executives_list.sort(key=lambda x: (getattr(x, 'position_order', 999) if getattr(x, 'position_order', 999) != 999 else fallback_order.get(getattr(x, 'position', '').lower(), 999), x.name))
         
         data = []
         for executive in executives_list:
