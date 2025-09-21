@@ -68,7 +68,8 @@ class Event(models.Model):
     participants = models.PositiveIntegerField(default=0, help_text="Number of participants/attendees")
     is_featured = models.BooleanField(default=False)
     registration_required = models.BooleanField(default=False)
-    dashboard_deleted = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class TeamMember(models.Model):
@@ -81,17 +82,64 @@ class TeamMember(models.Model):
     is_council = models.BooleanField(default=False)
     position_order = models.IntegerField(default=999)
     order = models.IntegerField(default=0)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Donation(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    PAYMENT_METHOD_CHOICES = [
+        ('momo', 'Mobile Money'),
+        ('cash', 'Cash'),
+        ('bank', 'Bank Transfer'),
+        ('card', 'Credit/Debit Card'),
+    ]
+    
+    PURPOSE_CHOICES = [
+        ('general', 'General Fund'),
+        ('events', 'Events & Activities'),
+        ('welfare', 'Welfare Committee'),
+        ('ministry', 'Ministry Support'),
+        ('building', 'Building Fund'),
+        ('education', 'Education Fund'),
+        ('other', 'Other'),
+    ]
+    
     donor_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=50)
-    payment_status = models.CharField(max_length=20, default='pending')
+    currency = models.CharField(max_length=10, default='GHS')
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+    purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES, default='general')
+    message = models.TextField(blank=True, null=True)
+    transaction_id = models.CharField(max_length=255, blank=True, null=True)
     receipt_code = models.CharField(max_length=50, unique=True)
+    verified_at = models.DateTimeField(blank=True, null=True)
+    verified_by = models.CharField(max_length=100, blank=True, null=True)
+    is_recurring = models.BooleanField(default=False)
+    recurring_frequency = models.CharField(max_length=20, blank=True, null=True)  # monthly, yearly
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.receipt_code:
+            self.receipt_code = self.generate_receipt_code()
+        super().save(*args, **kwargs)
+    
+    def generate_receipt_code(self):
+        import uuid
+        return f"YPG-{uuid.uuid4().hex[:8].upper()}"
+    
+    def __str__(self):
+        return f"{self.donor_name} - {self.amount} {self.currency}"
 
 class ContactMessage(models.Model):
     name = models.CharField(max_length=100)
@@ -99,6 +147,8 @@ class ContactMessage(models.Model):
     subject = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class MinistryRegistration(models.Model):
@@ -122,29 +172,66 @@ class Ministry(models.Model):
 
 class BlogPost(models.Model):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
     content = models.TextField()
     excerpt = models.TextField(blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.CharField(max_length=100, default="YPG Leadership")
+    category = models.CharField(max_length=50, default="General")
+    date = models.DateField(blank=True, null=True)
+    image = models.ImageField(upload_to='blog/', blank=True, null=True)
     is_published = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.title)
+            # Ensure uniqueness
+            original_slug = self.slug
+            counter = 1
+            while BlogPost.objects.filter(slug=self.slug).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
 
 class Testimonial(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('denied', 'Denied'),
+    ]
+    
     name = models.CharField(max_length=100)
-    position = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20, blank=True)
+    congregation = models.CharField(max_length=100, blank=True)
+    position = models.CharField(max_length=100, blank=True)  # Made optional
     content = models.TextField()
+    image = models.ImageField(upload_to='testimonials/', blank=True, null=True)
     rating = models.IntegerField(default=5)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    admin_notes = models.TextField(blank=True)  # For admin to add notes when denying
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
 class GalleryItem(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='gallery/', blank=True, null=True)
+    video = models.FileField(upload_to='gallery/videos/', blank=True, null=True)
+    congregation = models.CharField(max_length=200, blank=True)
+    date = models.DateField(blank=True, null=True)
+    youtube_url = models.URLField(blank=True)
+    tiktok_url = models.URLField(blank=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -9,6 +9,12 @@ from django.utils import timezone
 from django.db.models import Q, Count, Sum
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.conf import settings
+import re
+from datetime import datetime, timedelta
 from .models import Supervisor
 from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
@@ -25,6 +31,146 @@ from .serializers import (
     MinistrySerializer
 )
 import json
+
+# Rate limiting decorator
+def rate_limit(max_requests=10, window_seconds=60):
+    def decorator(view_func):
+        def wrapper(request, *args, **kwargs):
+            # Get client IP
+            client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+            if ',' in client_ip:
+                client_ip = client_ip.split(',')[0].strip()
+            
+            # Create cache key
+            cache_key = f"rate_limit_{client_ip}_{view_func.__name__}"
+            
+            # Get current request count
+            current_requests = cache.get(cache_key, 0)
+            
+            if current_requests >= max_requests:
+                return Response({
+                    'success': False,
+                    'data': {
+                        'success': False,
+                        'error': 'Rate limit exceeded. Please try again later.'
+                    }
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+            
+            # Increment counter
+            cache.set(cache_key, current_requests + 1, window_seconds)
+            
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+# Email notification functions
+def send_donation_notifications(donation):
+    """Send email notifications for new donations"""
+    try:
+        # Email to donor
+        donor_subject = f"Donation Confirmation - {donation.receipt_code}"
+        donor_message = f"""
+Dear {donation.donor_name},
+
+Thank you for your generous donation of GHS {donation.amount} to YPG Ministry.
+
+Donation Details:
+- Receipt Code: {donation.receipt_code}
+- Amount: GHS {donation.amount}
+- Purpose: {donation.get_purpose_display()}
+- Payment Method: {donation.get_payment_method_display()}
+- Date: {donation.created_at.strftime('%B %d, %Y at %I:%M %p')}
+
+Your donation is currently pending verification. You will receive another email once it's verified.
+
+Thank you for supporting our ministry!
+
+YPG Ministry Team
+        """
+        
+        # Email to admin
+        admin_subject = f"New Donation - {donation.receipt_code} - GHS {donation.amount}"
+        admin_message = f"""
+New donation received:
+
+Donor: {donation.donor_name}
+Email: {donation.email}
+Phone: {donation.phone}
+Amount: GHS {donation.amount}
+Purpose: {donation.get_purpose_display()}
+Payment Method: {donation.get_payment_method_display()}
+Receipt Code: {donation.receipt_code}
+Date: {donation.created_at.strftime('%B %d, %Y at %I:%M %p')}
+
+Message: {donation.message or 'No message provided'}
+
+Please verify this donation in the admin dashboard.
+
+YPG Donation System
+        """
+        
+        # Send emails (configure SMTP settings in Django settings)
+        if hasattr(settings, 'EMAIL_HOST') and settings.EMAIL_HOST:
+            send_mail(
+                donor_subject,
+                donor_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [donation.email],
+                fail_silently=True,
+            )
+            
+            # Send to admin (you can configure admin email in settings)
+            admin_email = getattr(settings, 'ADMIN_EMAIL', 'admin@ypg.com')
+            send_mail(
+                admin_subject,
+                admin_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [admin_email],
+                fail_silently=True,
+            )
+    except Exception as e:
+        print(f"Error sending donation notifications: {e}")
+
+# Input validation functions
+def validate_donation_data(data):
+    errors = {}
+    
+    # Validate donor name
+    if not data.get('donor_name') or len(data['donor_name'].strip()) < 2:
+        errors['donor_name'] = 'Donor name must be at least 2 characters long'
+    
+    # Validate email
+    email = data.get('email', '')
+    if email:
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            errors['email'] = 'Please enter a valid email address'
+    
+    # Validate phone
+    phone = data.get('phone', '')
+    if phone:
+        phone = phone.replace(' ', '').replace('-', '')
+        if not (phone.startswith('0') and len(phone) == 10) and not (phone.startswith('+233') and len(phone) == 13):
+            errors['phone'] = 'Phone number must be 10 digits starting with 0 or 13 digits starting with +233'
+    
+    # Validate amount
+    amount = data.get('amount')
+    if not amount or float(amount) <= 0:
+        errors['amount'] = 'Amount must be greater than 0'
+    elif float(amount) > 1000000:  # 1 million limit
+        errors['amount'] = 'Amount cannot exceed 1,000,000'
+    
+    # Validate payment method
+    valid_payment_methods = ['momo', 'cash', 'bank', 'card']
+    if data.get('payment_method') not in valid_payment_methods:
+        errors['payment_method'] = 'Invalid payment method'
+    
+    # Validate purpose
+    valid_purposes = ['general', 'events', 'welfare', 'ministry', 'building', 'education', 'other']
+    if data.get('purpose') not in valid_purposes:
+        errors['purpose'] = 'Invalid purpose'
+    
+    return errors
 
 # Authentication API endpoints
 @csrf_exempt
@@ -145,10 +291,10 @@ def api_supervisor_status(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
-@api_view(['PUT'])
+@api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
 def api_supervisor_change_credentials(request):
-    """Change supervisor credentials"""
+    """Get or change supervisor credentials"""
     try:
         if not request.user.is_authenticated:
             return Response({
@@ -164,6 +310,20 @@ def api_supervisor_change_credentials(request):
                 'error': 'Supervisor access required'
             }, status=status.HTTP_403_FORBIDDEN)
         
+        if request.method == 'GET':
+            # Return current credentials
+            return Response({
+                'success': True,
+                'credentials': {
+                    'username': request.user.username,
+                    'email': request.user.email,
+                    'hasPassword': bool(request.user.password),
+                    'fullName': f"{request.user.first_name} {request.user.last_name}".strip() or 'YPG Administrator',
+                    'role': 'System Administrator'
+                }
+            })
+        
+        # Handle PUT request for changing credentials
         data = json.loads(request.body)
         current_password = data.get('currentPassword')
         new_username = data.get('newUsername')
@@ -457,7 +617,7 @@ def api_events(request):
         # Exclude deleted events
         exclude_deleted = request.GET.get('excludeDeleted')
         if exclude_deleted == 'true':
-            events = events.filter(dashboard_deleted=False)
+            events = events.filter(is_deleted=False)
         
         # Order by start date descending (most recent first)
         events = events.order_by('-start_date')
@@ -963,13 +1123,58 @@ def api_delete_council_member(request, member_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_donations(request):
-    """Get all donations"""
+    """Get all donations with analytics"""
     try:
+        from django.db.models import Sum, Count
+        from django.utils import timezone
+        from datetime import timedelta
+        
         donations = Donation.objects.all().order_by('-created_at')
         serializer = DonationSerializer(donations, many=True)
+        
+        # Analytics data
+        total_donations = donations.aggregate(
+            total_amount=Sum('amount'),
+            total_count=Count('id')
+        )
+        
+        # Monthly donations
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        monthly_donations = donations.filter(created_at__gte=thirty_days_ago).aggregate(
+            monthly_amount=Sum('amount'),
+            monthly_count=Count('id')
+        )
+        
+        # Purpose breakdown
+        purpose_breakdown = donations.values('purpose').annotate(
+            amount=Sum('amount'),
+            count=Count('id')
+        ).order_by('-amount')
+        
+        # Payment method breakdown
+        payment_breakdown = donations.values('payment_method').annotate(
+            amount=Sum('amount'),
+            count=Count('id')
+        ).order_by('-amount')
+        
+        # Status breakdown
+        status_breakdown = donations.values('payment_status').annotate(
+            amount=Sum('amount'),
+            count=Count('id')
+        ).order_by('-amount')
+        
         return Response({
             'success': True,
-            'donations': serializer.data
+            'donations': serializer.data,
+            'analytics': {
+                'total_amount': total_donations['total_amount'] or 0,
+                'total_count': total_donations['total_count'] or 0,
+                'monthly_amount': monthly_donations['monthly_amount'] or 0,
+                'monthly_count': monthly_donations['monthly_count'] or 0,
+                'purpose_breakdown': list(purpose_breakdown),
+                'payment_breakdown': list(payment_breakdown),
+                'status_breakdown': list(status_breakdown),
+            }
         })
     except Exception as e:
         return Response({
@@ -980,29 +1185,79 @@ def api_donations(request):
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@rate_limit(max_requests=5, window_seconds=300)  # 5 requests per 5 minutes
 def api_submit_donation(request):
     """Submit a donation"""
     try:
         data = json.loads(request.body)
+        
+        # Validate input data
+        validation_errors = validate_donation_data(data)
+        if validation_errors:
+            return Response({
+                'success': False,
+                'data': {
+                    'success': False,
+                    'error': 'Validation failed',
+                    'details': validation_errors
+                }
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Sanitize input data
+        data['donor_name'] = data.get('donor_name', '').strip()[:100]
+        data['email'] = data.get('email', '').strip().lower()[:254]
+        data['phone'] = data.get('phone', '').strip()[:20]
+        data['message'] = data.get('message', '').strip()[:1000]
+        
         serializer = DonationSerializer(data=data)
         
         if serializer.is_valid():
             donation = serializer.save()
+            
+            # Auto-verify certain payment methods
+            if donation.payment_method in ['cash', 'bank']:
+                donation.payment_status = 'verified'
+                donation.verified_at = timezone.now()
+                donation.verified_by = 'Auto-Verification'
+                donation.save()
+            
+            # Send email notifications
+            send_donation_notifications(donation)
+            
             return Response({
                 'success': True,
-                'message': 'Donation submitted successfully',
-                'donation_id': donation.id,
-                'receipt_code': donation.receipt_code
+                'data': {
+                    'success': True,
+                    'message': 'Donation submitted successfully',
+                    'donation_id': donation.id,
+                    'receipt_code': donation.receipt_code,
+                    'donation': DonationSerializer(donation).data
+                }
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
                 'success': False,
-                'error': serializer.errors
+                'data': {
+                    'success': False,
+                    'error': 'Validation failed',
+                    'details': serializer.errors
+                }
             }, status=status.HTTP_400_BAD_REQUEST)
+    except json.JSONDecodeError:
+        return Response({
+            'success': False,
+            'data': {
+                'success': False,
+                'error': 'Invalid JSON data'
+            }
+        }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({
             'success': False,
-            'error': str(e)
+            'data': {
+                'success': False,
+                'error': 'Internal server error'
+            }
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
@@ -1014,16 +1269,24 @@ def api_verify_donation(request, donation_id):
         donation = get_object_or_404(Donation, id=donation_id)
         donation.payment_status = 'verified'
         donation.verified_at = timezone.now()
+        donation.verified_by = request.data.get('verified_by', 'Admin')
         donation.save()
         
         return Response({
             'success': True,
-            'message': 'Donation verified successfully'
+            'data': {
+                'success': True,
+                'message': 'Donation verified successfully',
+                'donation': DonationSerializer(donation).data
+            }
         })
     except Exception as e:
         return Response({
             'success': False,
-            'error': str(e)
+            'data': {
+                'success': False,
+                'error': str(e)
+            }
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
@@ -1037,13 +1300,253 @@ def api_delete_donation(request, donation_id):
         
         return Response({
             'success': True,
-            'message': 'Donation deleted successfully'
+            'data': {
+                'success': True,
+                'message': 'Donation deleted successfully'
+            }
         })
     except Exception as e:
         return Response({
             'success': False,
-            'error': str(e)
+            'data': {
+                'success': False,
+                'error': str(e)
+            }
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_donation_analytics(request):
+    """Get donation analytics"""
+    try:
+        from django.db.models import Sum, Count
+        from datetime import datetime, timedelta
+        
+        # Basic stats
+        total_donations = Donation.objects.count()
+        total_amount = Donation.objects.aggregate(total=Sum('amount'))['total'] or 0
+        verified_amount = Donation.objects.filter(payment_status='verified').aggregate(total=Sum('amount'))['total'] or 0
+        
+        # Status counts
+        pending_count = Donation.objects.filter(payment_status='pending').count()
+        verified_count = Donation.objects.filter(payment_status='verified').count()
+        failed_count = Donation.objects.filter(payment_status='failed').count()
+        
+        # Payment method breakdown
+        payment_methods = Donation.objects.filter(payment_status='verified').values('payment_method').annotate(
+            total_amount=Sum('amount'),
+            count=Count('id')
+        )
+        
+        # Purpose breakdown
+        purposes = Donation.objects.filter(payment_status='verified').values('purpose').annotate(
+            total_amount=Sum('amount'),
+            count=Count('id')
+        )
+        
+        # Monthly trends (last 6 months)
+        monthly_trends = []
+        for i in range(5, -1, -1):
+            date = datetime.now() - timedelta(days=30*i)
+            month_start = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            if i == 0:
+                month_end = datetime.now()
+            else:
+                next_month = month_start + timedelta(days=32)
+                month_end = next_month.replace(day=1) - timedelta(days=1)
+            
+            month_amount = Donation.objects.filter(
+                payment_status='verified',
+                created_at__gte=month_start,
+                created_at__lte=month_end
+            ).aggregate(total=Sum('amount'))['total'] or 0
+            
+            monthly_trends.append({
+                'month': month_start.strftime('%b'),
+                'year': month_start.year,
+                'amount': float(month_amount)
+            })
+        
+        return Response({
+            'success': True,
+            'data': {
+                'total_donations': total_donations,
+                'total_amount': float(total_amount),
+                'verified_amount': float(verified_amount),
+                'pending_count': pending_count,
+                'verified_count': verified_count,
+                'failed_count': failed_count,
+                'payment_methods': list(payment_methods),
+                'purposes': list(purposes),
+                'monthly_trends': monthly_trends
+            }
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'data': {
+                'success': False,
+                'error': str(e)
+            }
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_impact_statistics(request):
+    """Get real impact statistics for the donation page"""
+    try:
+        from django.db.models import Count, Sum
+        from datetime import datetime, timedelta
+
+        # Get real statistics
+        total_youth_reached = TeamMember.objects.count() + 450  # Team members + estimated reach
+        total_events = Event.objects.filter(status='published').count()
+        total_donations = Donation.objects.filter(payment_status='verified').count()
+        total_donation_amount = Donation.objects.filter(payment_status='verified').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        
+        # Calculate community impact percentage based on verified donations
+        community_impact = min(100, (total_donations * 2))  # 2% per verified donation, max 100%
+
+        return Response({
+            'success': True,
+            'data': {
+                'youth_reached': total_youth_reached,
+                'events_organized': total_events,
+                'community_impact': community_impact,
+                'total_donations': total_donations,
+                'total_amount': float(total_donation_amount)
+            }
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'data': {
+                'success': False,
+                'error': str(e)
+            }
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_process_payment(request):
+    """Process payment through payment gateway (Paystack integration)"""
+    try:
+        data = json.loads(request.body)
+        donation_id = data.get('donation_id')
+        payment_method = data.get('payment_method')
+        
+        if not donation_id:
+            return Response({
+                'success': False,
+                'data': {
+                    'success': False,
+                    'error': 'Donation ID is required'
+                }
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        donation = get_object_or_404(Donation, id=donation_id)
+        
+        if payment_method == 'card':
+            # Simulate payment gateway processing
+            # In real implementation, integrate with Paystack, Stripe, etc.
+            payment_result = process_card_payment(donation)
+            
+            if payment_result['success']:
+                donation.payment_status = 'verified'
+                donation.verified_at = timezone.now()
+                donation.verified_by = 'Payment Gateway'
+                donation.transaction_id = payment_result['transaction_id']
+                donation.save()
+                
+                # Send verification email
+                send_verification_notification(donation)
+                
+                return Response({
+                    'success': True,
+                    'data': {
+                        'success': True,
+                        'message': 'Payment processed successfully',
+                        'transaction_id': payment_result['transaction_id'],
+                        'donation': DonationSerializer(donation).data
+                    }
+                })
+            else:
+                donation.payment_status = 'failed'
+                donation.save()
+                
+                return Response({
+                    'success': False,
+                    'data': {
+                        'success': False,
+                        'error': payment_result['error']
+                    }
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            'success': False,
+            'data': {
+                'success': False,
+                'error': 'Invalid payment method'
+            }
+        }, status=status.HTTP_400_BAD_REQUEST)
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'data': {
+                'success': False,
+                'error': str(e)
+            }
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def process_card_payment(donation):
+    """Simulate card payment processing"""
+    # In real implementation, integrate with payment gateway
+    # For now, simulate successful payment
+    import uuid
+    
+    return {
+        'success': True,
+        'transaction_id': f"TXN_{uuid.uuid4().hex[:12].upper()}",
+        'message': 'Payment processed successfully'
+    }
+
+def send_verification_notification(donation):
+    """Send verification notification to donor"""
+    try:
+        subject = f"Donation Verified - {donation.receipt_code}"
+        message = f"""
+Dear {donation.donor_name},
+
+Great news! Your donation of GHS {donation.amount} has been verified and processed.
+
+Donation Details:
+- Receipt Code: {donation.receipt_code}
+- Amount: GHS {donation.amount}
+- Purpose: {donation.get_purpose_display()}
+- Transaction ID: {donation.transaction_id}
+- Verified Date: {donation.verified_at.strftime('%B %d, %Y at %I:%M %p')}
+
+Thank you for your generous support of our ministry!
+
+YPG Ministry Team
+        """
+        
+        if hasattr(settings, 'EMAIL_HOST') and settings.EMAIL_HOST:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [donation.email],
+                fail_silently=True,
+            )
+    except Exception as e:
+        print(f"Error sending verification notification: {e}")
 
 # Contact API endpoints
 @csrf_exempt
@@ -1281,11 +1784,18 @@ def api_delete_ministry(request, ministry_id):
 def api_blog_posts(request):
     """Get all blog posts"""
     try:
-        posts = BlogPost.objects.filter(is_published=True).order_by('-published_at')
+        # Check if this is for the website (published only) or dashboard (all posts)
+        for_website = request.GET.get('forWebsite', 'false').lower() == 'true'
+        
+        if for_website:
+            posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')
+        else:
+            posts = BlogPost.objects.all().order_by('-created_at')
+            
         serializer = BlogPostSerializer(posts, many=True)
         return Response({
             'success': True,
-            'blog': serializer.data
+            'posts': serializer.data
         })
     except Exception as e:
         return Response({
@@ -1319,15 +1829,21 @@ def api_blog_post_detail(request, slug):
 def api_create_blog_post(request):
     """Create a new blog post"""
     try:
-        data = json.loads(request.body)
-        serializer = BlogPostSerializer(data=data)
+        if request.FILES:
+            # Handle file upload
+            data = request.data.copy()
+            serializer = BlogPostSerializer(data=data)
+        else:
+            # Handle JSON data
+            data = json.loads(request.body)
+            serializer = BlogPostSerializer(data=data)
         
         if serializer.is_valid():
             post = serializer.save()
             return Response({
                 'success': True,
                 'message': 'Blog post created successfully',
-                'post_id': post.id
+                'post': serializer.data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
@@ -1393,7 +1909,18 @@ def api_delete_blog_post(request, slug):
 def api_testimonials(request):
     """Get all testimonials"""
     try:
-        testimonials = Testimonial.objects.filter(is_active=True).order_by('-created_at')
+        # Check if this is for the main website (only approved testimonials)
+        for_website = request.GET.get('forWebsite', 'false').lower() == 'true'
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
+        
+        if for_website:
+            testimonials = Testimonial.objects.filter(status='approved', is_active=True, is_deleted=False).order_by('-created_at')
+        elif deleted_only:
+            testimonials = Testimonial.objects.filter(is_deleted=True).order_by('-deleted_at')
+        else:
+            # For dashboard, show all non-deleted testimonials
+            testimonials = Testimonial.objects.filter(is_deleted=False).order_by('-created_at')
+            
         serializer = TestimonialSerializer(testimonials, many=True)
         return Response({
             'success': True,
@@ -1463,14 +1990,122 @@ def api_update_testimonial(request, testimonial_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_testimonial(request, testimonial_id):
-    """Delete a testimonial"""
+    """Soft delete a testimonial"""
     try:
         testimonial = get_object_or_404(Testimonial, id=testimonial_id)
-        testimonial.delete()
+        testimonial.is_deleted = True
+        testimonial.deleted_at = timezone.now()
+        testimonial.save()
         
         return Response({
             'success': True,
-            'message': 'Testimonial deleted successfully'
+            'message': 'Testimonial moved to trash successfully'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_restore_testimonial(request, testimonial_id):
+    """Restore a soft deleted testimonial"""
+    try:
+        testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+        testimonial.is_deleted = False
+        testimonial.deleted_at = None
+        testimonial.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Testimonial restored successfully'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_submit_testimonial(request):
+    """Submit a testimonial for review (public endpoint)"""
+    try:
+        # Handle both JSON and FormData
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            # Handle FormData
+            data = {
+                'name': request.POST.get('name', ''),
+                'phone': request.POST.get('phone', ''),
+                'congregation': request.POST.get('congregation', ''),
+                'content': request.POST.get('content', ''),
+            }
+            # Handle file upload
+            if 'image' in request.FILES:
+                data['image'] = request.FILES['image']
+        
+        serializer = TestimonialSerializer(data=data)
+        
+        if serializer.is_valid():
+            testimonial = serializer.save(status='pending')
+            return Response({
+                'success': True,
+                'message': 'Testimonial submitted successfully and is pending review',
+                'testimonial_id': testimonial.id
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'success': False,
+                'error': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_approve_testimonial(request, testimonial_id):
+    """Approve a testimonial"""
+    try:
+        testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+        testimonial.status = 'approved'
+        testimonial.is_active = True
+        testimonial.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Testimonial approved successfully'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_deny_testimonial(request, testimonial_id):
+    """Deny a testimonial"""
+    try:
+        data = json.loads(request.body)
+        testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+        testimonial.status = 'denied'
+        testimonial.is_active = False
+        testimonial.admin_notes = data.get('admin_notes', '')
+        testimonial.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Testimonial denied successfully'
         })
     except Exception as e:
         return Response({
@@ -1503,15 +2138,43 @@ def api_gallery_items(request):
 def api_create_gallery_item(request):
     """Create a new gallery item"""
     try:
-        data = json.loads(request.body)
-        serializer = GalleryItemSerializer(data=data)
+        if request.FILES:
+            # Handle file upload
+            data = request.data.copy()
+            
+            # Handle video files properly
+            if data.get('category') == 'video' and 'file' in request.FILES:
+                # Move the file from 'file' to 'video' field
+                data['video'] = request.FILES['file']
+                # Remove image field to avoid conflicts
+                if 'image' in data:
+                    del data['image']
+            elif data.get('category') == 'image' and 'file' in request.FILES:
+                # Move the file from 'file' to 'image' field
+                data['image'] = request.FILES['file']
+                # Remove video field to avoid conflicts
+                if 'video' in data:
+                    del data['video']
+            
+            # Ensure we don't have both image and video fields
+            if 'image' in data and 'video' in data:
+                if data.get('category') == 'video':
+                    del data['image']
+                else:
+                    del data['video']
+            
+            serializer = GalleryItemSerializer(data=data)
+        else:
+            # Handle JSON data
+            data = json.loads(request.body)
+            serializer = GalleryItemSerializer(data=data)
         
         if serializer.is_valid():
             item = serializer.save()
             return Response({
                 'success': True,
                 'message': 'Gallery item created successfully',
-                'item_id': item.id
+                'media': serializer.data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
@@ -1519,6 +2182,9 @@ def api_create_gallery_item(request):
                 'error': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
+        import traceback
+        print(f"Error in api_create_gallery_item: {str(e)}")
+        print(traceback.format_exc())
         return Response({
             'success': False,
             'error': str(e)

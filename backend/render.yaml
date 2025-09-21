@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ypg-website-backend
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn ypg_backend.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ypg-website-backend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://ypg-website-frontend.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ypg-website-db
+          property: connectionString
+    healthCheckPath: /admin/
+
+databases:
+  - name: ypg-website-db
+    plan: starter
+    databaseName: ypg_website_db
+    user: ypg_website_user

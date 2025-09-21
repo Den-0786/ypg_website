@@ -46,6 +46,9 @@ urlpatterns = [
     path('api/donations/submit/', views.api_submit_donation, name='api_submit_donation'),
     path('api/donations/<int:donation_id>/verify/', views.api_verify_donation, name='api_verify_donation'),
     path('api/donations/<int:donation_id>/delete/', views.api_delete_donation, name='api_delete_donation'),
+    path('api/donations/analytics/', views.api_donation_analytics, name='api_donation_analytics'),
+    path('api/donations/process-payment/', views.api_process_payment, name='api_process_payment'),
+    path('api/impact-statistics/', views.api_impact_statistics, name='api_impact_statistics'),
     
     # Contact API endpoints
     path('api/contact/', views.api_contact_messages, name='api_contact_messages'),
@@ -65,17 +68,21 @@ urlpatterns = [
     path('api/ministries/<int:ministry_id>/delete/', views.api_delete_ministry, name='api_delete_ministry'),
     
     # Blog API endpoints
-    path('api/blog/', views.api_blog_posts, name='api_blog_posts'),
-    path('api/blog/<slug:slug>/', views.api_blog_post_detail, name='api_blog_post_detail'),
     path('api/blog/create/', views.api_create_blog_post, name='api_create_blog_post'),
     path('api/blog/<slug:slug>/update/', views.api_update_blog_post, name='api_update_blog_post'),
     path('api/blog/<slug:slug>/delete/', views.api_delete_blog_post, name='api_delete_blog_post'),
+    path('api/blog/<slug:slug>/', views.api_blog_post_detail, name='api_blog_post_detail'),
+    path('api/blog/', views.api_blog_posts, name='api_blog_posts'),
     
     # Testimonials API endpoints
     path('api/testimonials/', views.api_testimonials, name='api_testimonials'),
     path('api/testimonials/create/', views.api_create_testimonial, name='api_create_testimonial'),
     path('api/testimonials/<int:testimonial_id>/update/', views.api_update_testimonial, name='api_update_testimonial'),
     path('api/testimonials/<int:testimonial_id>/delete/', views.api_delete_testimonial, name='api_delete_testimonial'),
+    path('api/testimonials/<int:testimonial_id>/restore/', views.api_restore_testimonial, name='api_restore_testimonial'),
+    path('api/testimonials/<int:testimonial_id>/approve/', views.api_approve_testimonial, name='api_approve_testimonial'),
+    path('api/testimonials/<int:testimonial_id>/deny/', views.api_deny_testimonial, name='api_deny_testimonial'),
+    path('api/testimonials/submit/', views.api_submit_testimonial, name='api_submit_testimonial'),
     
     # Gallery API endpoints
     path('api/gallery/', views.api_gallery_items, name='api_gallery_items'),

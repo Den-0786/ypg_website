@@ -37,9 +37,14 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DonationSerializer(serializers.ModelSerializer):
+    payment_status_display = serializers.CharField(source='get_payment_status_display', read_only=True)
+    payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
+    purpose_display = serializers.CharField(source='get_purpose_display', read_only=True)
+    
     class Meta:
         model = Donation
         fields = '__all__'
+        read_only_fields = ('receipt_code', 'created_at', 'updated_at', 'verified_at')
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
