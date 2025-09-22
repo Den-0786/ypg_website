@@ -259,7 +259,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      import("../utils/config.js").then(({ buildApiUrl }) => {
+      import("../../utils/config.js").then(({ buildApiUrl }) => {
         fetchData(buildApiUrl("api/team"), setTeamMembers);
         fetchData(buildApiUrl("api/events"), setEvents);
         fetchData(buildApiUrl("api/donations"), setDonations);
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
   }, [isAuthenticated]);
   useEffect(() => {
     if (!isAuthenticated) return;
-    import("../utils/config.js").then(({ buildApiUrl }) => {
+    import("../../utils/config.js").then(({ buildApiUrl }) => {
       const id = setInterval(() => {
         fetchData(buildApiUrl("api/ministry"), setMinistryRegistrations);
         fetchData(buildApiUrl("api/contact"), (data) => {
