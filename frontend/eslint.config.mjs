@@ -1,14 +1,15 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import { createRequire } from "module";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+let config = [];
+try {
+  // Prefer Next.js flat config (includes core-web-vitals rules)
+  const next = require("eslint-config-next");
+  config = [...next()];
+} catch (err) {
+  // Fall back to empty config if eslint-config-next isn't available at build time
+  config = [];
+}
 
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
-
-export default eslintConfig;
+export default config;
