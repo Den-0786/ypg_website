@@ -78,27 +78,33 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         formData.append("tiktok_url", newMedia.tiktokUrl);
         formData.append("file", newMedia.file); // Send as 'file' - backend will handle routing
 
-        response = await fetch("http://localhost:8002/api/gallery/create/", {
-          method: "POST",
-          body: formData,
-        });
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/create/`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
       } else {
         // If no file, use JSON
-        response = await fetch("http://localhost:8002/api/gallery/create/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: newMedia.title,
-            description: newMedia.description,
-            category: newMedia.type,
-            congregation: newMedia.congregation,
-            date: newMedia.date,
-            youtube_url: newMedia.youtubeUrl,
-            tiktok_url: newMedia.tiktokUrl,
-          }),
-        });
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/create/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: newMedia.title,
+              description: newMedia.description,
+              category: newMedia.type,
+              congregation: newMedia.congregation,
+              date: newMedia.date,
+              youtube_url: newMedia.youtubeUrl,
+              tiktok_url: newMedia.tiktokUrl,
+            }),
+          }
+        );
       }
 
       if (response.ok) {
@@ -147,7 +153,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         formData.append("image", editingMedia.file);
 
         response = await fetch(
-          `http://localhost:8002/api/gallery/${editingMedia.id}/update/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
           {
             method: "PUT",
             body: formData,
@@ -156,7 +162,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
       } else {
         // If no file, use JSON
         response = await fetch(
-          `http://localhost:8002/api/gallery/${editingMedia.id}/update/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
           {
             method: "PUT",
             headers: {
@@ -199,7 +205,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/gallery/${itemToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${itemToDelete.id}/delete/`,
         {
           method: "DELETE",
         }
@@ -244,13 +250,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             <div className="h-64 relative overflow-hidden">
               {item.image ? (
                 <img
-                  src={`http://localhost:8002${item.image}`}
+                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`}
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />
               ) : item.video ? (
                 <video
-                  src={`http://localhost:8002${item.video}`}
+                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.video}`}
                   className="w-full h-full object-cover"
                   controls
                   preload="metadata"

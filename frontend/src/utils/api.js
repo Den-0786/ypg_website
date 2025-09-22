@@ -157,7 +157,7 @@ export const contactAPI = {
 // Donation API functions
 export const donationAPI = {
   submitDonation: (donationData) =>
-    fetch("http://localhost:8002/api/donations", {
+    fetch(`${API_BASE_URL}/api/donations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -171,7 +171,7 @@ export const donationAPI = {
 // Ministry API functions
 export const ministryAPI = {
   submitMinistryRegistration: (ministryData) =>
-    fetch("http://localhost:8002/api/ministry", {
+    fetch(`${API_BASE_URL}/api/ministry`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -247,7 +247,7 @@ export const branchPresidentAPI = {
   getPresidents: async () => {
     try {
       const response = await fetch(
-        `http://localhost:8002/branch-presidents/?active=true`
+        `${API_BASE_URL}/branch-presidents/?active=true`
       );
       const data = await response.json();
       return data.success ? data.presidents : [];
@@ -259,9 +259,7 @@ export const branchPresidentAPI = {
 
   getAdminPresidents: async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8002/branch-presidents/admin/`
-      );
+      const response = await fetch(`${API_BASE_URL}/branch-presidents/admin/`);
       const data = await response.json();
       return data.success ? data.presidents : [];
     } catch (error) {
@@ -273,7 +271,7 @@ export const branchPresidentAPI = {
   createPresident: async (data) => {
     try {
       const response = await fetch(
-        `http://localhost:8002/branch-presidents/create/`,
+        `${API_BASE_URL}/branch-presidents/create/`,
         {
           method: "POST",
           headers: {
@@ -292,7 +290,7 @@ export const branchPresidentAPI = {
   updatePresident: async (presidentId, data) => {
     try {
       const response = await fetch(
-        `http://localhost:8002/branch-presidents/${presidentId}/update/`,
+        `${API_BASE_URL}/branch-presidents/${presidentId}/update/`,
         {
           method: "PUT",
           headers: {
@@ -311,7 +309,7 @@ export const branchPresidentAPI = {
   deletePresident: async (presidentId) => {
     try {
       const response = await fetch(
-        `http://localhost:8002/branch-presidents/${presidentId}/delete/`,
+        `${API_BASE_URL}/branch-presidents/${presidentId}/delete/`,
         {
           method: "DELETE",
           headers: {

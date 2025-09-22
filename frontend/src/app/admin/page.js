@@ -179,9 +179,12 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:8002/api/auth/logout", {
-        method: "POST",
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/logout`,
+        {
+          method: "POST",
+        }
+      );
     } catch (error) {
     } finally {
       localStorage.removeItem("ypg_admin_authenticated");
@@ -306,15 +309,18 @@ export default function AdminDashboard() {
 
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        fetchData("http://localhost:8002/api/contact", (data) => {
-          // Transform the data to match dashboard expectations
-          const transformedData = data.map((message) => ({
-            ...message,
-            date: message.created_at,
-            status: message.is_read ? "read" : "unread",
-          }));
-          setContactMessages(transformedData);
-        });
+        fetchData(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact`,
+          (data) => {
+            // Transform the data to match dashboard expectations
+            const transformedData = data.map((message) => ({
+              ...message,
+              date: message.created_at,
+              status: message.is_read ? "read" : "unread",
+            }));
+            setContactMessages(transformedData);
+          }
+        );
       }
     };
 
@@ -333,7 +339,7 @@ export default function AdminDashboard() {
       channel.onmessage = (event) => {
         if (event?.data?.type === "registration_created") {
           fetchData(
-            "http://localhost:8002/api/ministry",
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry`,
             setMinistryRegistrations
           );
         }

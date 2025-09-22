@@ -43,10 +43,13 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
         formData.append("image", newMember.image);
       }
 
-      const response = await fetch("http://localhost:8002/api/team/create/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/create/`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
 
@@ -92,7 +95,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       }
 
       const response = await fetch(
-        `http://localhost:8002/api/team/${editingMember.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${editingMember.id}/update/`,
         {
           method: "PUT",
           body: formData,
@@ -141,7 +144,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
     if (!memberToDelete) return;
     try {
       const response = await fetch(
-        `http://localhost:8002/api/team/${memberToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${memberToDelete.id}/delete/`,
         {
           method: "DELETE",
         }
@@ -210,7 +213,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
               <img
                 src={
                   member.image
-                    ? `http://localhost:8002${member.image}`
+                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${member.image}`
                     : "/placeholder-team.jpg"
                 }
                 alt={member.name}

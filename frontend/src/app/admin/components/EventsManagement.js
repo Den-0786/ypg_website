@@ -65,10 +65,13 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:8002/api/events/create/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/create/`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -117,7 +120,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/events/${editingEvent.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${editingEvent.id}/update/`,
         {
           method: "PUT",
           body: formData,
@@ -128,7 +131,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
         const result = await response.json();
         if (result.success && result.event) {
           const eventsResponse = await fetch(
-            "http://localhost:8002/api/events/"
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/`
           );
           if (eventsResponse.ok) {
             const eventsData = await eventsResponse.json();
@@ -161,7 +164,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/events/${eventToDelete.id}/delete/?type=${deleteType}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${eventToDelete.id}/delete/?type=${deleteType}`,
         {
           method: "DELETE",
         }
@@ -289,7 +292,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             >
               {event.image ? (
                 <img
-                  src={`http://localhost:8002${event.image}`}
+                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${event.image}`}
                   alt={event.title}
                   className="w-full h-full object-cover object-center"
                   style={{ objectPosition: "center 25%" }}

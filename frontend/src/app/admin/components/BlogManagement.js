@@ -35,27 +35,33 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         formData.append("is_published", newPost.is_published);
         formData.append("image", newPost.image);
 
-        response = await fetch("http://localhost:8002/api/blog/create/", {
-          method: "POST",
-          body: formData,
-        });
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/create/`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
       } else {
         // If no image, use JSON
-        response = await fetch("http://localhost:8002/api/blog/create/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: newPost.title,
-            content: newPost.content,
-            excerpt: newPost.excerpt,
-            author: newPost.author,
-            category: newPost.category,
-            date: newPost.date,
-            is_published: newPost.is_published,
-          }),
-        });
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/create/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: newPost.title,
+              content: newPost.content,
+              excerpt: newPost.excerpt,
+              author: newPost.author,
+              category: newPost.category,
+              date: newPost.date,
+              is_published: newPost.is_published,
+            }),
+          }
+        );
       }
 
       if (response.ok) {
@@ -88,7 +94,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
     try {
       // Backend expects slug path and JSON body; image updates are not supported here
       const response = await fetch(
-        `http://localhost:8002/api/blog/${editingPost.slug}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${editingPost.slug}/update/`,
         {
           method: "PUT",
           headers: {
@@ -132,7 +138,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/blog/${postToDelete.slug}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${postToDelete.slug}/delete/`,
         {
           method: "DELETE",
         }
@@ -217,7 +223,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                 <div className="h-64 relative overflow-hidden">
                   {post.image ? (
                     <img
-                      src={`http://localhost:8002${post.image}`}
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${post.image}`}
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />

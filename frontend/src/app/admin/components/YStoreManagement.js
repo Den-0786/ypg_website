@@ -46,7 +46,9 @@ export default function YStoreManagement({ theme }) {
 
   const fetchStoreItems = async () => {
     try {
-      const response = await fetch("http://localhost:8002/api/ystore/");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`
+      );
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -241,7 +243,7 @@ export default function YStoreManagement({ theme }) {
           formDataToSend.append("image", formData.image);
 
           response = await fetch(
-            `http://localhost:8002/api/ystore/item/?id=${editingItem.id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${editingItem.id}`,
             {
               method: "PUT",
               body: formDataToSend,
@@ -250,7 +252,7 @@ export default function YStoreManagement({ theme }) {
         } else {
           // If no new image file, use JSON
           response = await fetch(
-            `http://localhost:8002/api/ystore/item/?id=${editingItem.id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${editingItem.id}`,
             {
               method: "PUT",
               headers: {
@@ -287,19 +289,25 @@ export default function YStoreManagement({ theme }) {
           formDataToSend.append("contact", apiData.contact);
           formDataToSend.append("image", formData.image);
 
-          response = await fetch("http://localhost:8002/api/ystore/", {
-            method: "POST",
-            body: formDataToSend,
-          });
+          response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`,
+            {
+              method: "POST",
+              body: formDataToSend,
+            }
+          );
         } else {
           // If no image file, use JSON
-          response = await fetch("http://localhost:8002/api/ystore/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(apiData),
-          });
+          response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(apiData),
+            }
+          );
         }
 
         if (response.ok) {
@@ -361,7 +369,7 @@ export default function YStoreManagement({ theme }) {
       const newStock = item.isOutOfStock ? 10 : 0; // Set to 10 if out of stock, 0 if in stock
 
       const response = await fetch(
-        `http://localhost:8002/api/ystore/item/?id=${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${id}`,
         {
           method: "PUT",
           headers: {
@@ -392,7 +400,7 @@ export default function YStoreManagement({ theme }) {
       if (!item) return;
 
       const response = await fetch(
-        `http://localhost:8002/api/ystore/item/?id=${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${id}`,
         {
           method: "PUT",
           headers: {
@@ -559,7 +567,7 @@ export default function YStoreManagement({ theme }) {
               <img
                 src={
                   item.image
-                    ? `http://localhost:8002${item.image}`
+                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`
                     : "/placeholder-item.jpg"
                 }
                 alt={item.name}

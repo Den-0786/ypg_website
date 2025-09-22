@@ -3,9 +3,12 @@ import Link from "next/link";
 
 async function fetchBlogPosts() {
   try {
-    const res = await fetch("http://localhost:8002/api/blog/?forWebsite=true", {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/?forWebsite=true`,
+      {
+        cache: "no-store",
+      }
+    );
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data?.posts) ? data.posts : [];
@@ -44,7 +47,7 @@ export default async function BlogListPage() {
                     <Image
                       src={
                         post.image
-                          ? `http://localhost:8002${post.image}`
+                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${post.image}`
                           : "/placeholder-item.jpg"
                       }
                       alt={post.title}
@@ -75,4 +78,3 @@ export default async function BlogListPage() {
     </section>
   );
 }
-
