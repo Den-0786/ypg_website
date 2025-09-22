@@ -49,7 +49,7 @@ export default function AdvertisementManagement({ theme }) {
   const fetchAdvertisements = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8002/api/advertisements/admin/"
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/admin/`
       );
       const data = await response.json();
       if (data.success) {
@@ -65,7 +65,7 @@ export default function AdvertisementManagement({ theme }) {
   const handleStatusChange = async (adId, newStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:8002/api/advertisements/${adId}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/update/`,
         {
           method: "PUT",
           headers: {
@@ -89,7 +89,7 @@ export default function AdvertisementManagement({ theme }) {
     if (window.confirm("Are you sure you want to delete this advertisement?")) {
       try {
         const response = await fetch(
-          `http://localhost:8002/api/advertisements/${adId}/delete/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/delete/`,
           {
             method: "DELETE",
           }
@@ -182,7 +182,7 @@ export default function AdvertisementManagement({ theme }) {
   const handleSaveChanges = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8002/api/advertisements/${selectedAd.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${selectedAd.id}/update/`,
         {
           method: "PUT",
           headers: {
@@ -346,7 +346,7 @@ export default function AdvertisementManagement({ theme }) {
                   <img
                     src={
                       hasImages && ad.images[currentIndex]
-                        ? `http://localhost:8002${ad.images[currentIndex].url}`
+                        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${ad.images[currentIndex].url}`
                         : "/placeholder-item.jpg"
                     }
                     alt={`${ad.title} - Image ${currentIndex + 1}`}

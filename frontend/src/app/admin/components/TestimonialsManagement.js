@@ -49,7 +49,7 @@ const TestimonialsManagement = ({
     setIsProcessing(true);
     try {
       const response = await fetch(
-        `http://localhost:8002/api/testimonials/${testimonialId}/approve/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/approve/`,
         {
           method: "POST",
           headers: {
@@ -92,7 +92,7 @@ const TestimonialsManagement = ({
     setIsProcessing(true);
     try {
       const response = await fetch(
-        `http://localhost:8002/api/testimonials/${testimonialId}/deny/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/deny/`,
         {
           method: "POST",
           headers: {
@@ -143,7 +143,7 @@ const TestimonialsManagement = ({
     setIsProcessing(true);
     try {
       const response = await fetch(
-        `http://localhost:8002/api/testimonials/${testimonialId}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/delete/`,
         {
           method: "DELETE",
         }
@@ -224,7 +224,7 @@ const TestimonialsManagement = ({
           <img
             src={
               testimonial.image
-                ? `http://localhost:8002${testimonial.image}`
+                ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${testimonial.image}`
                 : "/placeholder-item.jpg"
             }
             alt={testimonial.name}
@@ -492,7 +492,7 @@ const TestimonialsManagement = ({
                           <img
                             src={
                               selectedTestimonial.image
-                                ? `http://localhost:8002${selectedTestimonial.image}`
+                                ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${selectedTestimonial.image}`
                                 : "/placeholder-item.jpg"
                             }
                             alt={selectedTestimonial.name}

@@ -28,7 +28,7 @@ export default function PastExecutivesManagement({ theme }) {
   const fetchPastExecutives = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8002/api/past-executives/?deleted=${showDeleted}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/?deleted=${showDeleted}`
       );
       const data = await response.json();
       if (data.success) {
@@ -58,8 +58,8 @@ export default function PastExecutivesManagement({ theme }) {
 
     try {
       const url = isEditMode
-        ? `http://localhost:8002/api/past-executives/${currentExecutive.id}/update/`
-        : "http://localhost:8002/api/past-executives/create/";
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${currentExecutive.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/create/`;
       const method = isEditMode ? "PUT" : "POST";
 
       let response;
@@ -141,7 +141,7 @@ export default function PastExecutivesManagement({ theme }) {
     if (!executiveToDelete) return;
     try {
       const response = await fetch(
-        `http://localhost:8002/api/past-executives/${executiveToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${executiveToDelete.id}/delete/`,
         { method: "DELETE" }
       );
       const data = await response.json();
@@ -286,7 +286,7 @@ export default function PastExecutivesManagement({ theme }) {
               >
                 {executive.image ? (
                   <img
-                    src={`http://localhost:8002${executive.image}`}
+                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${executive.image}`}
                     alt={executive.name}
                     className="w-full h-40 object-cover"
                   />
