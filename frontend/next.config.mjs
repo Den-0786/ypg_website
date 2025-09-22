@@ -5,14 +5,14 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "ypg-website-backend.onrender.com",
+        hostname: "ypg-website.onrender.com",
         port: "",
         pathname: "/media/**",
       },
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "8002",
+        protocol: "https",
+        hostname: "ypg-website-backend.onrender.com",
+        port: "",
         pathname: "/media/**",
       },
     ],
@@ -21,7 +21,7 @@ const nextConfig = {
     const backend =
       process.env.NEXT_PUBLIC_API_BASE_URL ||
       (process.env.NODE_ENV === "production"
-        ? "https://ypg-website-backend.onrender.com"
+        ? "https://ypg-website.onrender.com"
         : "http://localhost:8000");
     return [
       {
