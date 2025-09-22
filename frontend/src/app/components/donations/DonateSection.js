@@ -18,6 +18,7 @@ import {
   CheckCircle,
   ArrowRight,
   Star,
+  XCircle,
 } from "lucide-react";
 
 export default function DonateSection() {

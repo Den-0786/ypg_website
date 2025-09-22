@@ -166,7 +166,7 @@ export default function FAQ() {
               <div className="bg-gray-50 p-6 border-t border-gray-200">
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
-                    Still have questions? We'd love to help!
+                    Still have questions? We&apos;d love to help!
                   </p>
                   <div className="flex gap-4 justify-center">
                     <a

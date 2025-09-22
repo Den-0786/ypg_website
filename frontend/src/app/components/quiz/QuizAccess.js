@@ -83,7 +83,7 @@ export default function QuizAccess() {
       if (result.success) {
         const data = result.data;
 
-      if (data.success) {
+        if (data.success) {
         toast.success("Quiz submitted successfully! Results will be available after the quiz ends.");
         setShowQuiz(false); // Close the quiz interface
       } else {
