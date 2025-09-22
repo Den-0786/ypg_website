@@ -577,23 +577,65 @@ export default function ContentManagement({
           {media.map((item) => (
             <div
               key={item.id}
-              className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
+              className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
             >
-              <div className={`aspect-video ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} flex items-center justify-center`}>
-                {item.type === "video" ? (
-                  <Video className={`w-12 h-12 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+              <div className="aspect-video relative overflow-hidden">
+                {item.image ? (
+                  <img
+                    src={`http://localhost:8002${item.image}`}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <Image className={`w-12 h-12 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <div
+                    className={`h-full ${theme === "dark" ? "bg-gray-700" : "bg-gray-200"} flex items-center justify-center`}
+                  >
+                    {item.category === "video" ? (
+                      <Video
+                        className={`w-12 h-12 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
+                      />
+                    ) : (
+                      <Image
+                        className={`w-12 h-12 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
               <div className="p-4">
-                <h3 className={`font-medium mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</h3>
-                <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{item.type}</p>
+                <h3
+                  className={`font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                >
+                  {item.title}
+                </h3>
+                <p
+                  className={`text-sm mb-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                >
+                  {item.category}
+                </p>
+                {item.congregation && (
+                  <p
+                    className={`text-xs mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                  >
+                    📍 {item.congregation}
+                  </p>
+                )}
+                {item.date && (
+                  <p
+                    className={`text-xs mb-3 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                  >
+                    📅 {new Date(item.date).toLocaleDateString()}
+                  </p>
+                )}
                 <div className="flex space-x-2">
-                  <button className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}>
+                  <button
+                    className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-900"}`}
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className={`${theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}>
+                  <button
+                    className={`${theme === "dark" ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-900"}`}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -980,7 +1022,10 @@ export default function ContentManagement({
               <div className="mb-6">
                 <p className="text-gray-700 mb-2">
                   Are you sure you want to delete{" "}
-                  <strong>&quot;{itemToDelete.title || itemToDelete.name}&quot;</strong>?
+                  <strong>
+                    &quot;{itemToDelete.title || itemToDelete.name}&quot;
+                  </strong>
+                  ?
                 </p>
                 <p className="text-sm text-gray-500">
                   Choose your deletion option:

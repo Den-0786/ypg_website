@@ -16,6 +16,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
     category: "",
     date: new Date().toISOString().split("T")[0],
     image: null,
+    is_published: true,
   });
 
   const handleAddPost = async () => {
@@ -31,15 +32,16 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         formData.append("author", newPost.author);
         formData.append("category", newPost.category);
         formData.append("date", newPost.date);
+        formData.append("is_published", newPost.is_published);
         formData.append("image", newPost.image);
 
-        response = await fetch("http://localhost:8002/api/blog", {
+        response = await fetch("http://localhost:8002/api/blog/create/", {
           method: "POST",
           body: formData,
         });
       } else {
         // If no image, use JSON
-        response = await fetch("http://localhost:8002/api/blog", {
+        response = await fetch("http://localhost:8002/api/blog/create/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -51,13 +53,18 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
             author: newPost.author,
             category: newPost.category,
             date: newPost.date,
+            is_published: newPost.is_published,
           }),
         });
       }
 
       if (response.ok) {
         const addedPost = await response.json();
-        setBlogPosts([...blogPosts, addedPost.blogPost]);
+        // Backend returns { success, message, post }
+        const created = addedPost.post || addedPost.blogPost || null;
+        if (created) {
+          setBlogPosts([...(blogPosts || []), created]);
+        }
         setShowAddModal(false);
         setNewPost({
           title: "",
@@ -67,6 +74,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
           category: "",
           date: new Date().toISOString().split("T")[0],
           image: null,
+          is_published: true,
         });
         toast.success("Blog post added successfully!");
       }
@@ -78,26 +86,10 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
 
   const handleUpdatePost = async () => {
     try {
-      let response;
-
-      if (editingPost.image) {
-        // If there's an image, use FormData
-        const formData = new FormData();
-        formData.append("title", editingPost.title);
-        formData.append("content", editingPost.content);
-        formData.append("excerpt", editingPost.excerpt);
-        formData.append("author", editingPost.author);
-        formData.append("category", editingPost.category);
-        formData.append("date", editingPost.date);
-        formData.append("image", editingPost.image);
-
-        response = await fetch(`http://localhost:8002/api/blog?id=${editingPost.id}`, {
-          method: "PUT",
-          body: formData,
-        });
-      } else {
-        // If no image, use JSON
-        response = await fetch(`http://localhost:8002/api/blog?id=${editingPost.id}`, {
+      // Backend expects slug path and JSON body; image updates are not supported here
+      const response = await fetch(
+        `http://localhost:8002/api/blog/${editingPost.slug}/update/`,
+        {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -109,15 +101,16 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
             author: editingPost.author,
             category: editingPost.category,
             date: editingPost.date,
+            is_published: !!editingPost.is_published,
           }),
-        });
-      }
+        }
+      );
 
       if (response.ok) {
-        const updatedPost = await response.json();
+        // Backend returns only { success, message }. Update local state optimistically
         setBlogPosts(
-          blogPosts.map((post) =>
-            post.id === editingPost.id ? updatedPost.blogPost : post
+          (blogPosts || []).map((post) =>
+            post.id === editingPost.id ? { ...post, ...editingPost } : post
           )
         );
         setEditingPost(null);
@@ -139,7 +132,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
 
     try {
       const response = await fetch(
-        `/api/blog?id=${postToDelete.id}&type=${deleteType}`,
+        `http://localhost:8002/api/blog/${postToDelete.slug}/delete/`,
         {
           method: "DELETE",
         }
@@ -153,11 +146,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         } else {
           // Hide from dashboard only (soft delete)
           setBlogPosts(
-            blogPosts.map((post) =>
-              post.id === postToDelete.id
-                ? { ...post, dashboard_deleted: true }
-                : post
-            )
+            (blogPosts || [])
+              .filter((post) => post && post.title)
+              .map((post) =>
+                post.id === postToDelete.id
+                  ? { ...post, dashboard_deleted: true }
+                  : post
+              )
           );
           toast.success("Blog post removed from dashboard!");
         }
@@ -188,57 +183,102 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
       </div>
 
       {/* Blog Posts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogPosts.map((post) => (
-          <motion.div
-            key={post.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
+      {!blogPosts || blogPosts.length === 0 ? (
+        <div className="text-center py-12">
+          <div
+            className={`${theme === "dark" ? "bg-gray-800" : "bg-gray-50"} rounded-lg p-8`}
           >
-            <div
-              className={`h-64 ${theme === "dark" ? "bg-gradient-to-r from-blue-600 to-purple-700" : "bg-gradient-to-r from-blue-500 to-purple-600"} flex items-center justify-center`}
+            <FileText
+              className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-gray-600" : "text-gray-400"}`}
+            />
+            <h3
+              className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-900"}`}
             >
-              <FileText className="w-12 h-12 text-white" />
-            </div>
-            <div className="p-6">
-              <h3
-                className={`font-semibold mb-2 line-clamp-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+              No Blog Posts Yet
+            </h3>
+            <p
+              className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+            >
+              Create your first blog post to get started.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {(blogPosts || [])
+            .filter((post) => post && post.title)
+            .map((post) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
               >
-                {post.title}
-              </h3>
-              <p
-                className={`text-sm mb-3 line-clamp-3 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-              >
-                {post.content}
-              </p>
-              <div
-                className={`space-y-1 text-xs mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-              >
-                <p>✍️ {post.author}</p>
-                <p>📂 {post.category}</p>
-                <p>📅 {post.date}</p>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setEditingPost(post)}
-                  className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                >
-                  <Edit className="w-3 h-3" />
-                  <span>Edit</span>
-                </button>
-                <button
-                  onClick={() => handleDeleteClick(post)}
-                  className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-red-900/30 text-red-300 hover:bg-red-800/40" : "bg-red-100 text-red-600 hover:bg-red-200"}`}
-                >
-                  <Trash2 className="w-3 h-3" />
-                  <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+                <div className="h-64 relative overflow-hidden">
+                  {post.image ? (
+                    <img
+                      src={`http://localhost:8002${post.image}`}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className={`h-full ${theme === "dark" ? "bg-gradient-to-r from-blue-600 to-purple-700" : "bg-gradient-to-r from-blue-500 to-purple-600"} flex items-center justify-center`}
+                    >
+                      <FileText className="w-12 h-12 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-6">
+                  <h3
+                    className={`font-semibold mb-2 line-clamp-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  >
+                    {post.title}
+                  </h3>
+                  <p
+                    className={`text-sm mb-3 line-clamp-3 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                  >
+                    {post.content}
+                  </p>
+                  <div
+                    className={`space-y-1 text-xs mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                  >
+                    <p>✍️ {post.author}</p>
+                    <p>📂 {post.category}</p>
+                    <p>📅 {post.date}</p>
+                  </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        post.is_published
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {post.is_published ? "Published" : "Draft"}
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setEditingPost(post)}
+                      className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                    >
+                      <Edit className="w-3 h-3" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(post)}
+                      className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-red-900/30 text-red-300 hover:bg-red-800/40" : "bg-red-100 text-red-600 hover:bg-red-200"}`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+        </div>
+      )}
 
       {/* Add Post Modal */}
       <AnimatePresence>
@@ -347,6 +387,22 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
                     />
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="is_published_add"
+                    type="checkbox"
+                    checked={!!newPost.is_published}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, is_published: e.target.checked })
+                    }
+                  />
+                  <label
+                    htmlFor="is_published_add"
+                    className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-sm`}
+                  >
+                    Published
+                  </label>
                 </div>
                 <div>
                   <label
@@ -578,6 +634,25 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
                     />
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="is_published_edit"
+                    type="checkbox"
+                    checked={!!editingPost.is_published}
+                    onChange={(e) =>
+                      setEditingPost({
+                        ...editingPost,
+                        is_published: e.target.checked,
+                      })
+                    }
+                  />
+                  <label
+                    htmlFor="is_published_edit"
+                    className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-sm`}
+                  >
+                    Published
+                  </label>
                 </div>
                 <div>
                   <label

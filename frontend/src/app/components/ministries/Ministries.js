@@ -30,7 +30,9 @@ export default function MinistriesSection() {
   useEffect(() => {
     const fetchMinistries = async () => {
       try {
-        const res = await fetch("http://localhost:8002/api/ministries/");
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/`
+        );
         const data = await res.json();
         if (data.success && Array.isArray(data.ministries)) {
           setMinistries(data.ministries);
@@ -128,17 +130,20 @@ export default function MinistriesSection() {
 
   const confirmRegistration = async () => {
     try {
-      const res = await fetch("http://localhost:8002/api/ministry/register/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: registrationForm.name,
-          email: registrationForm.email,
-          phone: registrationForm.phone,
-          ministry: registrationForm.ministry,
-          congregation: registrationForm.congregation,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/register/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: registrationForm.name,
+            email: registrationForm.email,
+            phone: registrationForm.phone,
+            ministry: registrationForm.ministry,
+            congregation: registrationForm.congregation,
+          }),
+        }
+      );
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(

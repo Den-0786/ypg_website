@@ -68,7 +68,7 @@ export default function PastExecutives() {
   const fetchPastExecutives = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8002/api/past-executives/"
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/`
       );
       const data = await response.json();
       if (data.success) {
@@ -223,7 +223,7 @@ export default function PastExecutives() {
                             <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
                               {executive.image ? (
                                 <Image
-                                  src={`http://localhost:8002${executive.image}`}
+                                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${executive.image}`}
                                   alt={executive.name}
                                   fill
                                   className="object-cover group-hover:scale-105 transition-transform duration-300"

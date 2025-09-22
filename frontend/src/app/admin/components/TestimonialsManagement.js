@@ -1,13 +1,21 @@
 import { useState } from "react";
 import {
   MessageCircle,
-  Plus,
-  Edit,
+  CheckCircle,
+  XCircle,
+  Eye,
   Trash2,
-  X,
+  Clock,
+  User,
+  Phone,
+  Building,
+  FileText,
+  Camera,
   AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 import toast from "react-hot-toast";
 
 const TestimonialsManagement = ({
@@ -15,704 +23,784 @@ const TestimonialsManagement = ({
   setTestimonials,
   theme,
 }) => {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingTestimonial, setEditingTestimonial] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedTestimonial, setSelectedTestimonial] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [testimonialToDelete, setTestimonialToDelete] = useState(null);
-  const [newTestimonial, setNewTestimonial] = useState({
-    name: "",
-    role: "",
-    quote: "",
-    highlight: "",
-    rating: 5,
-    image: null,
-  });
+  const [showDenyModal, setShowDenyModal] = useState(false);
+  const [denyNotes, setDenyNotes] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleAddTestimonial = async () => {
-    try {
-      const response = await fetch("http://localhost:8002/api/testimonials", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newTestimonial),
-      });
+  // Filter testimonials by status
+  const pendingTestimonials = testimonials.filter(
+    (t) => t.status === "pending"
+  );
+  const approvedTestimonials = testimonials.filter(
+    (t) => t.status === "approved"
+  );
+  const deniedTestimonials = testimonials.filter((t) => t.status === "denied");
 
-      if (response.ok) {
-        const addedTestimonial = await response.json();
-        setTestimonials([...testimonials, addedTestimonial]);
-        setShowAddModal(false);
-        setNewTestimonial({
-          name: "",
-          role: "",
-          quote: "",
-          highlight: "",
-          rating: 5,
-          image: null,
-        });
-        toast.success("Testimonial added successfully!");
-      }
-    } catch (error) {
-      console.error("Error adding testimonial:", error);
-      toast.error("Failed to add testimonial. Please try again.");
-    }
+  const handleViewTestimonial = (testimonial) => {
+    setSelectedTestimonial(testimonial);
+    setShowViewModal(true);
   };
 
-  const handleUpdateTestimonial = async () => {
+  const handleApproveTestimonial = async (testimonialId) => {
+    setIsProcessing(true);
     try {
       const response = await fetch(
-        `/api/testimonials/${editingTestimonial.id}`,
+        `http://localhost:8002/api/testimonials/${testimonialId}/approve/`,
         {
-          method: "PUT",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(editingTestimonial),
         }
       );
 
-      if (response.ok) {
-        const updatedTestimonial = await response.json();
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state
         setTestimonials(
-          testimonials.map((testimonial) =>
-            testimonial.id === editingTestimonial.id
-              ? updatedTestimonial
-              : testimonial
+          testimonials.map((t) =>
+            t.id === testimonialId
+              ? { ...t, status: "approved", is_active: true }
+              : t
           )
         );
-        setEditingTestimonial(null);
-        toast.success("Testimonial updated successfully!");
+
+        // Trigger refresh on main website
+        if (window.refreshTestimonials) {
+          window.refreshTestimonials();
+        }
+
+        toast.success("Testimonial approved successfully!");
+        setShowViewModal(false);
+      } else {
+        toast.error("Failed to approve testimonial");
       }
     } catch (error) {
-      console.error("Error updating testimonial:", error);
-      toast.error("Failed to update testimonial. Please try again.");
+      console.error("Error approving testimonial:", error);
+      toast.error("Failed to approve testimonial");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const handleDeleteClick = (testimonial) => {
-    setTestimonialToDelete(testimonial);
-    setShowDeleteModal(true);
-  };
-
-  const handleDeleteTestimonial = async (deleteType) => {
-    if (!testimonialToDelete) return;
-
+  const handleDenyTestimonial = async (testimonialId) => {
+    setIsProcessing(true);
     try {
       const response = await fetch(
-        `/api/testimonials?id=${testimonialToDelete.id}&type=${deleteType}`,
+        `http://localhost:8002/api/testimonials/${testimonialId}/deny/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ admin_notes: denyNotes }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state
+        setTestimonials(
+          testimonials.map((t) =>
+            t.id === testimonialId
+              ? {
+                  ...t,
+                  status: "denied",
+                  is_active: false,
+                  admin_notes: denyNotes,
+                }
+              : t
+          )
+        );
+
+        // Trigger refresh on main website
+        if (window.refreshTestimonials) {
+          window.refreshTestimonials();
+        }
+
+        toast.success("Testimonial denied");
+        setShowDenyModal(false);
+        setShowViewModal(false);
+        setDenyNotes("");
+      } else {
+        toast.error("Failed to deny testimonial");
+      }
+    } catch (error) {
+      console.error("Error denying testimonial:", error);
+      toast.error("Failed to deny testimonial");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDeleteTestimonial = async (testimonialId) => {
+    setIsProcessing(true);
+    try {
+      const response = await fetch(
+        `http://localhost:8002/api/testimonials/${testimonialId}/delete/`,
         {
           method: "DELETE",
         }
       );
 
-      if (response.ok) {
-        if (deleteType === "both") {
-          // Remove from both dashboard and main website
-          setTestimonials(
-            testimonials.filter(
-              (testimonial) => testimonial.id !== testimonialToDelete.id
-            )
-          );
-          toast.success("Testimonial permanently deleted!");
-        } else {
-          // Hide from dashboard only (soft delete)
-          setTestimonials(
-            testimonials.map((testimonial) =>
-              testimonial.id === testimonialToDelete.id
-                ? { ...testimonial, dashboard_deleted: true }
-                : testimonial
-            )
-          );
-          toast.success("Testimonial removed from dashboard!");
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove from local state
+        setTestimonials(testimonials.filter((t) => t.id !== testimonialId));
+
+        // Trigger refresh on main website
+        if (window.refreshTestimonials) {
+          window.refreshTestimonials();
         }
+
+        toast.success("Testimonial deleted successfully!");
         setShowDeleteModal(false);
-        setTestimonialToDelete(null);
+        setShowViewModal(false);
+      } else {
+        toast.error("Failed to delete testimonial");
       }
     } catch (error) {
       console.error("Error deleting testimonial:", error);
-      toast.error("Failed to delete testimonial. Please try again.");
+      toast.error("Failed to delete testimonial");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  return (
-    <div className="space-y-6">
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      pending: {
+        icon: Clock,
+        text: "Pending",
+        className: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        iconClassName: "text-yellow-600",
+      },
+      approved: {
+        icon: CheckCircle,
+        text: "Approved",
+        className: "bg-green-100 text-green-800 border-green-200",
+        iconClassName: "text-green-600",
+      },
+      denied: {
+        icon: XCircle,
+        text: "Denied",
+        className: "bg-red-100 text-red-800 border-red-200",
+        iconClassName: "text-red-600",
+      },
+    };
+
+    const config = statusConfig[status] || statusConfig.pending;
+    const Icon = config.icon;
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${config.className}`}
+      >
+        <Icon className={`w-3 h-3 ${config.iconClassName}`} />
+        {config.text}
+      </span>
+    );
+  };
+
+  const TestimonialCard = ({ testimonial }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`rounded-lg border p-4 ${
+        theme === "dark"
+          ? "bg-gray-800 border-gray-700"
+          : "bg-white border-gray-200"
+      }`}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <img
+            src={
+              testimonial.image
+                ? `http://localhost:8002${testimonial.image}`
+                : "/placeholder-item.jpg"
+            }
+            alt={testimonial.name}
+            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+          />
+          <div>
+            <h3
+              className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            >
+              {testimonial.name}
+            </h3>
+            <p
+              className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+            >
+              {testimonial.congregation}
+            </p>
+          </div>
+        </div>
+        {getStatusBadge(testimonial.status)}
+      </div>
+
+      <p
+        className={`text-sm mb-3 line-clamp-3 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+      >
+        {testimonial.content}
+      </p>
+
       <div className="flex items-center justify-between">
-        <h2
-          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
-        >
-          Testimonials Management
-        </h2>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <Phone className="w-3 h-3" />
+          {testimonial.phone}
+        </div>
         <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={() => handleViewTestimonial(testimonial)}
+          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+            theme === "dark"
+              ? "bg-blue-600 hover:bg-blue-700 text-white"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+          }`}
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Testimonial</span>
+          <Eye className="w-3 h-3 inline mr-1" />
+          View
         </button>
       </div>
+    </motion.div>
+  );
 
-      {/* Testimonials Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {testimonials.map((testimonial) => (
-          <motion.div
-            key={testimonial.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
           >
-            <div
-              className={`h-48 ${theme === "dark" ? "bg-gradient-to-r from-green-600 to-emerald-700" : "bg-gradient-to-r from-green-500 to-emerald-600"} flex items-center justify-center`}
-            >
-              <MessageCircle className="w-12 h-12 text-white" />
-            </div>
-            <div className="p-6">
-              <h3
-                className={`font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}
-              >
-                {testimonial.name}
-              </h3>
-              <p
-                className={`text-sm mb-3 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-              >
-                {testimonial.role}
-              </p>
-              <p
-                className={`text-sm mb-4 line-clamp-3 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-              >
-                {testimonial.content}
-              </p>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <span
-                      key={i}
-                      className={
-                        i < testimonial.rating
-                          ? "text-yellow-400"
-                          : theme === "dark"
-                            ? "text-gray-600"
-                            : "text-gray-300"
-                      }
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-                <span
-                  className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-                >
-                  {testimonial.rating}/5
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setEditingTestimonial(testimonial)}
-                  className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                >
-                  <Edit className="w-3 h-3" />
-                  <span>Edit</span>
-                </button>
-                <button
-                  onClick={() => handleDeleteClick(testimonial)}
-                  className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-red-900/30 text-red-300 hover:bg-red-800/40" : "bg-red-100 text-red-600 hover:bg-red-200"}`}
-                >
-                  <Trash2 className="w-3 h-3" />
-                  <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            Testimonials Management
+          </h2>
+          <p
+            className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+          >
+            Review and manage member testimonials
+          </p>
+        </div>
       </div>
 
-      {/* Add Testimonial Modal */}
-      <AnimatePresence>
-        {showAddModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div
+          className={`rounded-lg border p-4 ${
+            theme === "dark"
+              ? "bg-gray-800 border-gray-700"
+              : "bg-white border-gray-200"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-yellow-100">
+              <Clock className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div>
+              <p
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+              >
+                {pendingTestimonials.length}
+              </p>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              >
+                Pending Review
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`rounded-lg border p-4 ${
+            theme === "dark"
+              ? "bg-gray-800 border-gray-700"
+              : "bg-white border-gray-200"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-green-100">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+              >
+                {approvedTestimonials.length}
+              </p>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              >
+                Approved
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`rounded-lg border p-4 ${
+            theme === "dark"
+              ? "bg-gray-800 border-gray-700"
+              : "bg-white border-gray-200"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-red-100">
+              <XCircle className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <p
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+              >
+                {deniedTestimonials.length}
+              </p>
+              <p
+                className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              >
+                Denied
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Testimonials */}
+      {pendingTestimonials.length > 0 && (
+        <div>
+          <h3
+            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
           >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto border`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3
-                    className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
-                  >
-                    Add Testimonial
-                  </h3>
-                  <p
-                    className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-                  >
-                    Share a beautiful testimony
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+            Pending Review ({pendingTestimonials.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pendingTestimonials.map((testimonial) => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+            ))}
+          </div>
+        </div>
+      )}
 
-              <div className="space-y-3">
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={newTestimonial.name}
-                    onChange={(e) =>
-                      setNewTestimonial({
-                        ...newTestimonial,
-                        name: e.target.value,
-                      })
-                    }
-                    placeholder="Enter full name"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Role/Congregation *
-                  </label>
-                  <input
-                    type="text"
-                    value={newTestimonial.role}
-                    onChange={(e) =>
-                      setNewTestimonial({
-                        ...newTestimonial,
-                        role: e.target.value,
-                      })
-                    }
-                    placeholder="e.g., Youth Leader, Emmanuel Congregation"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Testimonial Quote *
-                  </label>
-                  <textarea
-                    value={newTestimonial.quote}
-                    onChange={(e) =>
-                      setNewTestimonial({
-                        ...newTestimonial,
-                        quote: e.target.value,
-                      })
-                    }
-                    rows={3}
-                    placeholder="Share your inspiring testimony..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Highlighted Phrase *
-                  </label>
-                  <input
-                    type="text"
-                    value={newTestimonial.highlight}
-                    onChange={(e) =>
-                      setNewTestimonial({
-                        ...newTestimonial,
-                        highlight: e.target.value,
-                      })
-                    }
-                    placeholder="A key phrase to highlight"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Rating
-                  </label>
-                  <select
-                    value={newTestimonial.rating}
-                    onChange={(e) =>
-                      setNewTestimonial({
-                        ...newTestimonial,
-                        rating: parseInt(e.target.value),
-                      })
-                    }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-800"}`}
-                  >
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <option key={rating} value={rating}>
-                        {rating} Star{rating > 1 ? "s" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Profile Image (Optional)
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`flex items-center text-xs min-w-[100px] max-w-[120px] truncate gap-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-                    >
-                      <MessageCircle
-                        className={`w-3 h-3 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
-                      />
-                      {newTestimonial.image ? (
-                        <span>
-                          {typeof newTestimonial.image === "string"
-                            ? newTestimonial.image
-                            : newTestimonial.image.name}
-                        </span>
-                      ) : (
-                        <span>No file chosen</span>
-                      )}
-                    </div>
-                    <label
-                      className={`px-3 py-1.5 rounded-lg font-semibold cursor-pointer text-xs border transition-colors ${theme === "dark" ? "bg-blue-900/30 text-blue-400 hover:bg-blue-800/40 border-blue-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"}`}
-                    >
-                      Upload
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) =>
-                          setNewTestimonial({
-                            ...newTestimonial,
-                            image: e.target.files[0],
-                          })
-                        }
-                      />
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex space-x-3 mt-4">
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors font-medium text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddTestimonial}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-semibold shadow-md hover:shadow-lg text-sm"
-                >
-                  Add Testimonial
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Edit Testimonial Modal */}
-      <AnimatePresence>
-        {editingTestimonial && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      {/* Approved Testimonials */}
+      {approvedTestimonials.length > 0 && (
+        <div>
+          <h3
+            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
           >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto border`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3
-                    className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
-                  >
-                    Edit Testimonial
-                  </h3>
-                  <p
-                    className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-                  >
-                    Update the testimony
-                  </p>
-                </div>
-                <button
-                  onClick={() => setEditingTestimonial(null)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
+            Approved ({approvedTestimonials.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {approvedTestimonials.map((testimonial) => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Denied Testimonials */}
+      {deniedTestimonials.length > 0 && (
+        <div>
+          <h3
+            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          >
+            Denied ({deniedTestimonials.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {deniedTestimonials.map((testimonial) => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {testimonials.length === 0 && (
+        <div className="text-center py-12">
+          <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3
+            className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          >
+            No Testimonials Yet
+          </h3>
+          <p
+            className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+          >
+            Testimonials submitted by members will appear here for review.
+          </p>
+        </div>
+      )}
+
+      {/* View Testimonial Modal */}
+      <Transition.Root show={showViewModal} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setShowViewModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className={`w-full max-w-2xl transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${
+                    theme === "dark"
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-100"
+                  } border`}
                 >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+                  {selectedTestimonial && (
+                    <>
+                      <div className="flex items-center justify-between mb-6">
+                        <Dialog.Title
+                          as="h3"
+                          className={`text-xl font-semibold ${
+                            theme === "dark" ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          Testimonial Review
+                        </Dialog.Title>
+                        {getStatusBadge(selectedTestimonial.status)}
+                      </div>
 
-              <div className="space-y-3">
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingTestimonial.name}
-                    onChange={(e) =>
-                      setEditingTestimonial({
-                        ...editingTestimonial,
-                        name: e.target.value,
-                      })
-                    }
-                    placeholder="Enter full name"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
+                      <div className="space-y-6">
+                        {/* Testimonial Details */}
+                        <div className="flex items-start gap-4">
+                          <img
+                            src={
+                              selectedTestimonial.image
+                                ? `http://localhost:8002${selectedTestimonial.image}`
+                                : "/placeholder-item.jpg"
+                            }
+                            alt={selectedTestimonial.name}
+                            className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                          />
+                          <div className="flex-1">
+                            <h4
+                              className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                            >
+                              {selectedTestimonial.name}
+                            </h4>
+                            <div className="space-y-1 text-sm text-gray-600">
+                              <p>
+                                <Building className="w-4 h-4 inline mr-2" />
+                                {selectedTestimonial.congregation}
+                              </p>
+                              <p>
+                                <Phone className="w-4 h-4 inline mr-2" />
+                                {selectedTestimonial.phone}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Role/Congregation *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingTestimonial.role}
-                    onChange={(e) =>
-                      setEditingTestimonial({
-                        ...editingTestimonial,
-                        role: e.target.value,
-                      })
-                    }
-                    placeholder="e.g., Youth Leader, Emmanuel Congregation"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
+                        {/* Testimonial Content */}
+                        <div>
+                          <h5
+                            className={`font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                          >
+                            Testimonial
+                          </h5>
+                          <p
+                            className={`text-sm leading-relaxed ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                          >
+                            {selectedTestimonial.content}
+                          </p>
+                        </div>
 
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Testimonial Quote *
-                  </label>
-                  <textarea
-                    value={editingTestimonial.quote}
-                    onChange={(e) =>
-                      setEditingTestimonial({
-                        ...editingTestimonial,
-                        quote: e.target.value,
-                      })
-                    }
-                    rows={3}
-                    placeholder="Share your inspiring testimony..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
+                        {/* Admin Notes (if denied) */}
+                        {selectedTestimonial.status === "denied" &&
+                          selectedTestimonial.admin_notes && (
+                            <div
+                              className={`p-3 rounded-lg ${theme === "dark" ? "bg-red-900/20 border-red-800" : "bg-red-50 border-red-200"} border`}
+                            >
+                              <h5
+                                className={`font-medium mb-1 ${theme === "dark" ? "text-red-400" : "text-red-800"}`}
+                              >
+                                Admin Notes
+                              </h5>
+                              <p
+                                className={`text-sm ${theme === "dark" ? "text-red-300" : "text-red-700"}`}
+                              >
+                                {selectedTestimonial.admin_notes}
+                              </p>
+                            </div>
+                          )}
 
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Highlighted Phrase *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingTestimonial.highlight}
-                    onChange={(e) =>
-                      setEditingTestimonial({
-                        ...editingTestimonial,
-                        highlight: e.target.value,
-                      })
-                    }
-                    placeholder="A key phrase to highlight"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"}`}
-                  />
-                </div>
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 justify-end">
+                          <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4 inline mr-2" />
+                            Delete
+                          </button>
 
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Rating
-                  </label>
-                  <select
-                    value={editingTestimonial.rating}
-                    onChange={(e) =>
-                      setEditingTestimonial({
-                        ...editingTestimonial,
-                        rating: parseInt(e.target.value),
-                      })
-                    }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-800"}`}
-                  >
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <option key={rating} value={rating}>
-                        {rating} Star{rating > 1 ? "s" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                          {selectedTestimonial.status === "pending" && (
+                            <>
+                              <button
+                                onClick={() => setShowDenyModal(true)}
+                                className="px-4 py-2 rounded-lg bg-gray-600 text-white font-medium hover:bg-gray-700 transition-colors"
+                              >
+                                <XCircle className="w-4 h-4 inline mr-2" />
+                                Deny
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleApproveTestimonial(
+                                    selectedTestimonial.id
+                                  )
+                                }
+                                disabled={isProcessing}
+                                className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
+                              >
+                                <CheckCircle className="w-4 h-4 inline mr-2" />
+                                {isProcessing ? "Processing..." : "Approve"}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
 
-                <div>
-                  <label
-                    className={`block text-sm font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Profile Image (Optional)
-                  </label>
-                  <div className="flex items-center gap-2">
+      {/* Deny Modal */}
+      <Transition.Root show={showDenyModal} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setShowDenyModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${
+                    theme === "dark"
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-100"
+                  } border`}
+                >
+                  <div className="flex items-center gap-3 mb-4">
                     <div
-                      className={`flex items-center text-xs min-w-[100px] max-w-[120px] truncate gap-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                      className={`p-2 rounded-full ${theme === "dark" ? "bg-red-900/30" : "bg-red-100"}`}
                     >
-                      <MessageCircle
-                        className={`w-3 h-3 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                      <XCircle
+                        className={`w-5 h-5 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
                       />
-                      {editingTestimonial.image ? (
-                        <span>
-                          {typeof editingTestimonial.image === "string"
-                            ? editingTestimonial.image
-                            : editingTestimonial.image.name}
-                        </span>
-                      ) : (
-                        <span>No file chosen</span>
-                      )}
                     </div>
-                    <label
-                      className={`px-3 py-1.5 rounded-lg font-semibold cursor-pointer text-xs border transition-colors ${theme === "dark" ? "bg-blue-900/30 text-blue-400 hover:bg-blue-800/40 border-blue-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"}`}
+                    <Dialog.Title
+                      as="h3"
+                      className={`text-lg font-semibold ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
                     >
-                      Upload
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) =>
-                          setEditingTestimonial({
-                            ...editingTestimonial,
-                            image: e.target.files[0],
-                          })
-                        }
-                      />
-                    </label>
+                      Deny Testimonial
+                    </Dialog.Title>
                   </div>
-                </div>
-              </div>
 
-              <div className="flex space-x-3 mt-4">
-                <button
-                  onClick={() => setEditingTestimonial(null)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors font-medium text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdateTestimonial}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-semibold shadow-md hover:shadow-lg text-sm"
-                >
-                  Update Testimonial
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  <p
+                    className={`text-sm mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Please provide a reason for denying this testimonial:
+                  </p>
+
+                  <textarea
+                    value={denyNotes}
+                    onChange={(e) => setDenyNotes(e.target.value)}
+                    rows={4}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition ${
+                      theme === "dark"
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                    placeholder="Enter reason for denial..."
+                  />
+
+                  <div className="flex gap-3 justify-end mt-6">
+                    <button
+                      onClick={() => setShowDenyModal(false)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        theme === "dark"
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleDenyTestimonial(selectedTestimonial?.id)
+                      }
+                      disabled={isProcessing || !denyNotes.trim()}
+                      className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isProcessing ? "Processing..." : "Deny Testimonial"}
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {showDeleteModal && testimonialToDelete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+      <Transition.Root show={showDeleteModal} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setShowDeleteModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 w-full max-w-md"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                  Confirm Deletion
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setTestimonialToDelete(null);
-                  }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${
+                    theme === "dark"
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-100"
+                  } border`}
                 >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="mb-6">
-                <p className="text-gray-700 mb-2">
-                  Are you sure you want to delete{" "}
-                  <strong>&ldquo;{testimonialToDelete.name}&rdquo;</strong>?
-                </p>
-                <p className="text-sm text-gray-500">
-                  Choose your deletion option:
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleDeleteTestimonial("dashboard")}
-                  className="w-full px-4 py-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors border border-yellow-300"
-                >
-                  <div className="font-semibold">
-                    Delete from Dashboard Only
+                  <div className="flex items-center gap-3 mb-4">
+                    <div
+                      className={`p-2 rounded-full ${theme === "dark" ? "bg-red-900/30" : "bg-red-100"}`}
+                    >
+                      <Trash2
+                        className={`w-5 h-5 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
+                      />
+                    </div>
+                    <Dialog.Title
+                      as="h3"
+                      className={`text-lg font-semibold ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      Delete Testimonial
+                    </Dialog.Title>
                   </div>
-                  <div className="text-sm">
-                    Testimonial will be hidden from admin but remain on main
-                    website
-                  </div>
-                </button>
 
-                <button
-                  onClick={() => handleDeleteTestimonial("both")}
-                  className="w-full px-4 py-3 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors border border-red-300"
-                >
-                  <div className="font-semibold">Delete from Both</div>
-                  <div className="text-sm">
-                    Testimonial will be permanently deleted from dashboard and
-                    main website
-                  </div>
-                </button>
-              </div>
+                  <p
+                    className={`text-sm mb-6 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Are you sure you want to delete this testimonial? This
+                    action cannot be undone.
+                  </p>
 
-              <div className="mt-6">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setTestimonialToDelete(null);
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  {selectedTestimonial && (
+                    <div
+                      className={`rounded-lg p-3 mb-6 ${
+                        theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                      >
+                        From: {selectedTestimonial.name}
+                      </p>
+                      <p
+                        className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+                      >
+                        Congregation: {selectedTestimonial.congregation}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => setShowDeleteModal(false)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        theme === "dark"
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleDeleteTestimonial(selectedTestimonial?.id)
+                      }
+                      disabled={isProcessing}
+                      className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isProcessing ? "Deleting..." : "Delete Testimonial"}
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </div>
   );
 };

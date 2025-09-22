@@ -1,6 +1,7 @@
 // API Configuration and utility functions
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8002";
+import { getApiBaseUrl } from "./config.js";
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Generic API request function with error handling
 export const apiRequest = async (endpoint, options = {}) => {
@@ -31,8 +32,8 @@ export const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-// Quiz API functions - These connect to the YPG Database backend (port 8002)
-const QUIZ_API_BASE_URL = "http://localhost:8002";
+// Quiz API functions - These connect to the YPG Database backend (hosted)
+const QUIZ_API_BASE_URL = "https://ypg-database-system.onrender.com";
 
 export const quizAPI = {
   // Get all quizzes from YPG Database system
@@ -119,7 +120,7 @@ export const quizAPI = {
 // Contact API functions
 export const contactAPI = {
   submitContact: (contactData) =>
-    fetch("http://localhost:8002/api/contact", {
+    fetch(`${API_BASE_URL}/api/contact/submit/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -130,14 +131,12 @@ export const contactAPI = {
       .catch((error) => ({ success: false, error: error.message })),
 
   getMessages: (status = null) =>
-    fetch(
-      `http://localhost:8002/api/contact${status ? `?status=${status}` : ""}`
-    )
+    fetch(`${API_BASE_URL}/api/contact${status ? `?status=${status}` : ""}`)
       .then((res) => res.json())
       .catch((error) => ({ success: false, error: error.message })),
 
   updateMessage: (id, updateData) =>
-    fetch("http://localhost:8002/api/contact", {
+    fetch(`${API_BASE_URL}/api/contact`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -148,7 +147,7 @@ export const contactAPI = {
       .catch((error) => ({ success: false, error: error.message })),
 
   deleteMessage: (id) =>
-    fetch(`http://localhost:8002/api/contact?id=${id}`, {
+    fetch(`${API_BASE_URL}/api/contact?id=${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -187,21 +186,21 @@ export const ministryAPI = {
 export const ystoreAPI = {
   // Get all active items for main website
   getItems: () =>
-    fetch("http://localhost:8002/api/ystore/?forWebsite=true")
+    fetch(`${API_BASE_URL}/api/ystore/?forWebsite=true`)
       .then((res) => res.json())
       .then((data) => ({ success: data.success, data }))
       .catch((error) => ({ success: false, error: error.message })),
 
   // Get all items for admin dashboard
   getAdminItems: () =>
-    fetch("http://localhost:8002/api/ystore/")
+    fetch(`${API_BASE_URL}/api/ystore/`)
       .then((res) => res.json())
       .then((data) => ({ success: data.success, data }))
       .catch((error) => ({ success: false, error: error.message })),
 
   // Create new item
   createItem: (itemData) =>
-    fetch("http://localhost:8002/api/ystore/", {
+    fetch(`${API_BASE_URL}/api/ystore/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -213,7 +212,7 @@ export const ystoreAPI = {
 
   // Update item
   updateItem: (itemId, itemData) =>
-    fetch("http://localhost:8002/api/ystore/", {
+    fetch(`${API_BASE_URL}/api/ystore/`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -227,7 +226,7 @@ export const ystoreAPI = {
   deleteItem: async (itemId, deleteType = "soft") => {
     try {
       const response = await fetch(
-        `/api/ystore?id=${itemId}&type=${deleteType}`,
+        `${API_BASE_URL}/api/ystore?id=${itemId}&type=${deleteType}`,
         {
           method: "DELETE",
           headers: {

@@ -3,12 +3,57 @@
 
 import { motion } from "framer-motion";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
-
-const testimonials = [];
+import { Fragment, useState, useEffect } from "react";
+import TestimonialSubmissionForm from "./TestimonialSubmissionForm";
 
 export default function TestimonialsSection() {
   const [showContactModal, setShowContactModal] = useState(false);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/?forWebsite=true`,
+        {
+          cache: "no-store",
+        }
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        setTestimonials(data.testimonials);
+      }
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTestimonials();
+
+    // Set up automatic refresh every 30 seconds
+    const interval = setInterval(fetchTestimonials, 30000);
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchTestimonials();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Expose refresh function globally for manual refresh
+    window.refreshTestimonials = fetchTestimonials;
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <section
@@ -37,7 +82,12 @@ export default function TestimonialsSection() {
           </p>
         </motion.div>
 
-        {testimonials.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading testimonials...</p>
+          </div>
+        ) : testimonials.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -45,41 +95,20 @@ export default function TestimonialsSection() {
             className="text-center py-16"
           >
             <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-12 h-12 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Share Your Story
+                No Testimonials Yet
               </h3>
               <p className="text-gray-600 mb-6">
-                We'd love to hear about your experience with YPG! Your testimony
+                Be the first to share your experience with YPG! Your testimony
                 can inspire others to join our community.
               </p>
-              <button
-                onClick={() => setShowContactModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
-              >
-                Share Your Testimony
-              </button>
             </div>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((t, index) => (
               <motion.div
-                key={index}
+                key={t.id || index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
@@ -89,13 +118,17 @@ export default function TestimonialsSection() {
                 <div className="p-6">
                   <div className="flex items-center mb-6">
                     <img
-                      src={t.image}
+                      src={
+                        t.image
+                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${t.image}`
+                          : "/placeholder-item.jpg"
+                      }
                       alt={t.name}
                       className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-md"
                     />
                     <div className="ml-4">
                       <h4 className="font-bold text-gray-900">{t.name}</h4>
-                      <p className="text-sm text-blue-600">{t.role}</p>
+                      <p className="text-sm text-blue-600">{t.congregation}</p>
                     </div>
                   </div>
 
@@ -104,22 +137,13 @@ export default function TestimonialsSection() {
                       &quot;
                     </span>
                     <p className="pl-6 text-gray-700 relative z-10">
-                      {t.quote.split(t.highlight).map((part, i) => (
-                        <span key={i}>
-                          {part}
-                          {i === 0 && (
-                            <span className="font-bold text-blue-600">
-                              {t.highlight}
-                            </span>
-                          )}
-                        </span>
-                      ))}
+                      {t.content}
                     </p>
                   </div>
 
                   <div className="mt-6 flex justify-between items-center">
                     <div className="flex space-x-1">
-                      {[...Array(5)].map((_, i) => (
+                      {[...Array(t.rating || 5)].map((_, i) => (
                         <svg
                           key={i}
                           className="w-5 h-5 text-yellow-400"
@@ -153,6 +177,7 @@ export default function TestimonialsSection() {
           </div>
         )}
 
+        {/* Share Your Story Button - Always visible */}
         <div className="mt-16 text-center">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -164,7 +189,7 @@ export default function TestimonialsSection() {
           </motion.button>
         </div>
 
-        {/* Contact Modal */}
+        {/* Testimonial Submission Modal */}
         <Transition.Root show={showContactModal} as={Fragment}>
           <Dialog
             as="div"
@@ -193,54 +218,16 @@ export default function TestimonialsSection() {
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-2xl font-bold leading-6 text-gray-900 mb-6"
                     >
                       Share Your Testimonial
                     </Dialog.Title>
-                    <div className="mt-2">
-                      <p className="text-gray-600 mb-4">
-                        We&apos;d love to hear your story! Please contact our
-                        admin team to share your testimony.
-                      </p>
-                      <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                        <h4 className="font-bold text-gray-900 mb-2">
-                          Contact Information:
-                        </h4>
-                        <p className="text-gray-700">
-                          Email:{" "}
-                          <a
-                            href="mailto:youth@presbyterian.org"
-                            className="text-blue-600 hover:underline"
-                          >
-                            ahinsandistrictypg@gmail.org
-                          </a>
-                        </p>
-                        <p className="text-gray-700">
-                          Phone: +233531427671
-                        </p>
-                      </div>
-                      <p className="text-gray-600">
-                        When contacting us, please include:
-                      </p>
-                      <ul className="list-disc list-inside text-gray-600 mt-2 ml-4">
-                        <li>Your full name</li>
-                        <li>Your congregation</li>
-                        <li>Your testimony</li>
-                        <li>A photo (optional)</li>
-                      </ul>
-                    </div>
-                    <div className="mt-6">
-                      <button
-                        type="button"
-                        className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        onClick={() => setShowContactModal(false)}
-                      >
-                        Close
-                      </button>
-                    </div>
+                    <TestimonialSubmissionForm
+                      onClose={() => setShowContactModal(false)}
+                    />
                   </Dialog.Panel>
                 </Transition.Child>
               </div>

@@ -36,7 +36,7 @@ export default function EventSection() {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8002/api/events?type=upcoming&excludeDeleted=true"
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events?type=upcoming&excludeDeleted=true`
         );
         const data = await response.json();
 
@@ -157,7 +157,7 @@ export default function EventSection() {
                   <Image
                     src={
                       event.image
-                        ? `http://localhost:8002${event.image}`
+                        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${event.image}`
                         : "/hero.jpg"
                     }
                     alt={event.title}

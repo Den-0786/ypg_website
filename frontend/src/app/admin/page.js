@@ -2,7 +2,7 @@
 
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import Sidebar from "./components/Sidebar";
@@ -30,6 +30,7 @@ import AdvertisementManagement from "./components/AdvertisementManagement";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,12 +39,76 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
 
-  // UI state
-  const [activeTab, setActiveTab] = useState("overview");
+  // Valid tab names for validation
+  const validTabs = [
+    "overview",
+    "team",
+    "events",
+    "donations",
+    "ministry",
+    "blog",
+    "testimonials",
+    "media",
+    "people",
+    "content",
+    "settings",
+    "analytics",
+    "financial",
+    "trash",
+    "communication",
+    "ystore",
+    "branch-presidents",
+    "council",
+    "past-executives",
+    "advertisements",
+  ];
+
+  // UI state - Initialize from URL parameter
+  const [activeTab, setActiveTab] = useState(() => {
+    const tabFromUrl = searchParams.get("tab");
+    // Validate that the tab from URL is valid
+    return validTabs.includes(tabFromUrl) ? tabFromUrl : "overview";
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [theme, setTheme] = useState("light");
+
+  // Function to handle tab changes with URL updates
+  const handleTabChange = (newTab) => {
+    // Validate the tab before setting
+    if (validTabs.includes(newTab)) {
+      setActiveTab(newTab);
+      // Update URL without page refresh
+      const url = new URL(window.location);
+      url.searchParams.set("tab", newTab);
+      window.history.replaceState({}, "", url);
+    }
+  };
+
+  // Listen for URL changes (back/forward navigation)
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const tabFromUrl = searchParams.get("tab");
+      if (
+        tabFromUrl &&
+        validTabs.includes(tabFromUrl) &&
+        tabFromUrl !== activeTab
+      ) {
+        setActiveTab(tabFromUrl);
+      } else if (!tabFromUrl && activeTab !== "overview") {
+        // If no tab in URL, go to overview
+        setActiveTab("overview");
+      }
+    };
+
+    // Listen for popstate events (back/forward button)
+    window.addEventListener("popstate", handleUrlChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+    };
+  }, [searchParams, activeTab, validTabs]);
 
   // Data state
   const [teamMembers, setTeamMembers] = useState([]);
@@ -62,7 +127,6 @@ export default function AdminDashboard() {
     totalMedia: 0,
   });
 
-  // Check authentication on component mount
   useEffect(() => {
     checkAuthentication();
   }, []);
@@ -73,7 +137,6 @@ export default function AdminDashboard() {
     const loginTime = localStorage.getItem("ypg_admin_login_time");
 
     if (authenticated === "true" && user && loginTime) {
-      // Check if session is still valid (24 hours)
       const loginDate = new Date(loginTime);
       const now = new Date();
       const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
@@ -87,7 +150,6 @@ export default function AdminDashboard() {
         const isFromLogin = sessionStorage.getItem("ypg_fresh_login");
         if (isFromLogin) {
           sessionStorage.removeItem("ypg_fresh_login");
-          // Show welcome message after a brief delay to ensure smooth transition
           setTimeout(() => {
             toast.success(
               `Welcome back, ${user}! Dashboard loaded successfully.`
@@ -95,7 +157,6 @@ export default function AdminDashboard() {
           }, 500);
         }
       } else {
-        // Session expired
         handleLogout();
         setSessionExpired(true);
         toast.error("Session expired. Please login again.");
@@ -105,7 +166,6 @@ export default function AdminDashboard() {
       setIsAuthenticated(false);
       setUser(null);
       setIsLoading(false);
-      // Redirect to login page
       router.push("/admin/login");
     }
   };
@@ -119,12 +179,10 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      // Call logout API (Next.js route)
       await fetch("http://localhost:8002/api/auth/logout", {
         method: "POST",
       });
     } catch (error) {
-      // Logout error handled silently
     } finally {
       localStorage.removeItem("ypg_admin_authenticated");
       localStorage.removeItem("ypg_admin_user");
@@ -133,12 +191,14 @@ export default function AdminDashboard() {
       setIsAuthenticated(false);
       setUser(null);
       setActiveTab("overview");
+      // Reset URL to remove tab parameter
+      const url = new URL(window.location);
+      url.searchParams.delete("tab");
+      window.history.replaceState({}, "", url);
 
       toast.success(
         "Logged out successfully! Thank you for using YPG Admin Dashboard."
       );
-
-      // Redirect to login page immediately
       router.push("/admin/login");
     }
   };
@@ -173,8 +233,8 @@ export default function AdminDashboard() {
           setter(data.team);
         } else if (data.success && Array.isArray(data.ministry)) {
           setter(data.ministry);
-        } else if (data.success && Array.isArray(data.blog)) {
-          setter(data.blog);
+        } else if (data.success && Array.isArray(data.posts)) {
+          setter(data.posts);
         } else if (data.success && Array.isArray(data.testimonials)) {
           setter(data.testimonials);
         } else if (data.success && Array.isArray(data.messages)) {
@@ -196,29 +256,75 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData("http://localhost:8002/api/team", setTeamMembers);
-      fetchData("http://localhost:8002/api/events", setEvents);
-      fetchData("http://localhost:8002/api/donations", setDonations);
-      fetchData("http://localhost:8002/api/ministry", setMinistryRegistrations);
-      fetchData("http://localhost:8002/api/blog", setBlogPosts);
-      fetchData("http://localhost:8002/api/testimonials", setTestimonials);
-      fetchData("http://localhost:8002/api/media", setMedia);
-      fetchData("http://localhost:8002/api/contact", setContactMessages);
-      fetchData("http://localhost:8002/api/analytics", setAnalytics);
-      updateStats();
+      import("../utils/config.js").then(({ buildApiUrl }) => {
+        fetchData(buildApiUrl("api/team"), setTeamMembers);
+        fetchData(buildApiUrl("api/events"), setEvents);
+        fetchData(buildApiUrl("api/donations"), setDonations);
+        fetchData(buildApiUrl("api/ministry"), setMinistryRegistrations);
+        fetchData(buildApiUrl("api/blog/"), (data) => {
+          console.log("Blog posts data:", data);
+          setBlogPosts(data);
+        });
+        fetchData(buildApiUrl("api/testimonials"), setTestimonials);
+        fetchData(buildApiUrl("api/gallery/"), setMedia);
+        fetchData(buildApiUrl("api/contact"), (data) => {
+          // Transform the data to match dashboard expectations
+          const transformedData = data.map((message) => ({
+            ...message,
+            date: message.created_at,
+            status: message.is_read ? "read" : "unread",
+          }));
+          setContactMessages(transformedData);
+        });
+        fetchData(buildApiUrl("api/analytics"), setAnalytics);
+        updateStats();
+      });
     }
   }, [isAuthenticated]);
-
-  // Light polling to auto-refresh ministry registrations
   useEffect(() => {
     if (!isAuthenticated) return;
-    const id = setInterval(() => {
-      fetchData("http://localhost:8002/api/ministry", setMinistryRegistrations);
-    }, 10000);
-    return () => clearInterval(id);
+    import("../utils/config.js").then(({ buildApiUrl }) => {
+      const id = setInterval(() => {
+        fetchData(buildApiUrl("api/ministry"), setMinistryRegistrations);
+        fetchData(buildApiUrl("api/contact"), (data) => {
+          // Transform the data to match dashboard expectations
+          const transformedData = data.map((message) => ({
+            ...message,
+            date: message.created_at,
+            status: message.is_read ? "read" : "unread",
+          }));
+          setContactMessages(transformedData);
+        });
+      }, 10000);
+      return () => clearInterval(id);
+    });
   }, [isAuthenticated]);
 
-  // BroadcastChannel listener for instant refresh on new website registrations
+  // Refresh contact messages when page becomes visible
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchData("http://localhost:8002/api/contact", (data) => {
+          // Transform the data to match dashboard expectations
+          const transformedData = data.map((message) => ({
+            ...message,
+            date: message.created_at,
+            status: message.is_read ? "read" : "unread",
+          }));
+          setContactMessages(transformedData);
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (!isAuthenticated) return;
     let channel;
@@ -232,9 +338,7 @@ export default function AdminDashboard() {
           );
         }
       };
-    } catch (e) {
-      // ignore if unsupported
-    }
+    } catch (e) {}
     return () => {
       try {
         channel && channel.close();
@@ -271,7 +375,6 @@ export default function AdminDashboard() {
     });
   };
 
-  // Show loading while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -283,12 +386,10 @@ export default function AdminDashboard() {
     );
   }
 
-  // If not authenticated, the useEffect will redirect to login
   if (!isAuthenticated) {
     return null;
   }
 
-  // Render main dashboard
   return (
     <div
       className={`min-h-screen transition-colors duration-200 ${
@@ -313,7 +414,7 @@ export default function AdminDashboard() {
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            setActiveTab={handleTabChange}
             theme={theme}
             toggleTheme={toggleTheme}
             setSettingsOpen={setSettingsOpen}
@@ -340,7 +441,7 @@ export default function AdminDashboard() {
                 <OverviewDashboard
                   stats={stats}
                   theme={theme}
-                  setActiveTab={setActiveTab}
+                  setActiveTab={handleTabChange}
                   teamMembers={teamMembers}
                   events={events}
                   donations={donations}

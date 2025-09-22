@@ -10,6 +10,7 @@ import {
   Timer,
   Calendar,
   Play,
+  Sparkles,
 } from "lucide-react";
 import { quizAPI } from "../../../utils/api";
 import toast from "react-hot-toast";

@@ -213,7 +213,7 @@ export default function YStoreSection() {
                       <Image
                         src={
                           item.image
-                            ? `http://localhost:8002${item.image}`
+                            ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`
                             : "/placeholder-item.jpg"
                         }
                         alt={item.name}

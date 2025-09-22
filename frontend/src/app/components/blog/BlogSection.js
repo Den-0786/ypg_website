@@ -17,24 +17,61 @@ export default function BlogSection() {
   // Use fallback data if API fails
   const displayPosts = blogPosts.length > 0 ? blogPosts : fallbackBlogPosts;
 
-  useEffect(() => {
-    const fetchBlogPosts = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8001/api/blog?forWebsite=true"
-        );
+  const fetchBlogPosts = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/?forWebsite=true`,
+        { cache: "no-store" }
+      );
+      if (response.ok) {
         const data = await response.json();
+        console.log("Blog API response:", data);
         if (data.success) {
-          setBlogPosts(data.posts);
+          console.log("Blog posts for website:", data.posts);
+          setBlogPosts(data.posts || []);
+        } else {
+          console.error("API returned error:", data.error);
+          setBlogPosts([]);
         }
-      } catch (error) {
-        console.error("Error fetching blog posts:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error("Failed to fetch blog posts:", response.status);
+        setBlogPosts([]);
+      }
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      setBlogPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Expose refresh function globally for manual refresh
+  useEffect(() => {
+    window.refreshBlogPosts = fetchBlogPosts;
+    return () => {
+      delete window.refreshBlogPosts;
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchBlogPosts();
+
+    // Refresh blog posts every 30 seconds to catch new posts
+    const interval = setInterval(fetchBlogPosts, 30000);
+
+    // Refresh when page becomes visible (user switches back to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchBlogPosts();
       }
     };
 
-    fetchBlogPosts();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   // Calculate slides based on screen size
@@ -45,7 +82,7 @@ export default function BlogSection() {
       } else if (window.innerWidth >= 768) {
         setSlidesPerView(3);
       } else {
-        setSlidesPerView(2);
+        setSlidesPerView(1);
       }
     };
 
@@ -154,9 +191,14 @@ export default function BlogSection() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -100 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="grid gap-6"
+                  className={`grid gap-6 ${
+                    displayPosts.length === 1 ? "place-items-center" : ""
+                  }`}
                   style={{
-                    gridTemplateColumns: `repeat(${slidesPerView}, 1fr)`,
+                    gridTemplateColumns:
+                      displayPosts.length === 1
+                        ? "1fr"
+                        : `repeat(${slidesPerView}, 1fr)`,
                   }}
                 >
                   {getCurrentPosts().map((post, index) => (
@@ -166,11 +208,21 @@ export default function BlogSection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                       whileHover={{ y: -5 }}
-                      className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl"
+                      className={`group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl ${
+                        displayPosts.length === 1 ? "max-w-xs w-full" : ""
+                      }`}
                     >
-                      <div className="relative h-64 overflow-hidden">
+                      <div
+                        className={`relative overflow-hidden ${
+                          displayPosts.length === 1 ? "h-80" : "h-64"
+                        }`}
+                      >
                         <Image
-                          src={post.image}
+                          src={
+                            post.image
+                              ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${post.image}`
+                              : "/placeholder-item.jpg"
+                          }
                           alt={post.title}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -188,7 +240,7 @@ export default function BlogSection() {
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-3 leading-snug">
                           <a
-                            href="#"
+                            href={`/blog/${post.slug}`}
                             className="hover:text-blue-600 transition-colors"
                           >
                             {post.title}
@@ -200,11 +252,11 @@ export default function BlogSection() {
                             expandedPosts[post.id]
                           )}
                         </p>
-                        <button
-                          onClick={() => togglePostExpansion(post.id)}
+                        <a
+                          href={`/blog/${post.slug}`}
                           className="inline-flex items-center text-blue-600 font-medium group-hover:text-blue-700 transition-colors"
                         >
-                          {expandedPosts[post.id] ? "Read Less" : "Read More"}
+                          Read More
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1"
@@ -217,7 +269,7 @@ export default function BlogSection() {
                               clipRule="evenodd"
                             />
                           </svg>
-                        </button>
+                        </a>
                       </div>
                     </motion.article>
                   ))}
@@ -261,21 +313,6 @@ export default function BlogSection() {
             {isAutoPlaying ? "Pause Auto-play" : "Start Auto-play"}
           </button>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <a
-            href="#"
-            className="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all hover:from-blue-700 hover:to-blue-600"
-          >
-            View All Articles
-          </a>
-        </motion.div>
       </div>
     </section>
   );

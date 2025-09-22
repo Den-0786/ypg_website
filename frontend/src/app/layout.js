@@ -1,8 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-// import { DefaultSeo } from 'next-seo';
-// import SEO from '../next-seo.config';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

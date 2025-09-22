@@ -1,8 +1,16 @@
 "use client";
-import { useState } from "react";
-import { Send, Phone, MessageSquare, Mail, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Send,
+  Phone,
+  MessageSquare,
+  Mail,
+  MapPin,
+  CheckCircle,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { contactAPI } from "../../../utils/api";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -14,6 +22,11 @@ export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [errors, setErrors] = useState({});
+
+  // Reset submission status on component mount
+  useEffect(() => {
+    setSubmissionStatus(null);
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -67,23 +80,99 @@ export default function ContactSection() {
       });
 
       if (result.success) {
-        const data = result.data;
-
-        if (data.success) {
-          setSubmissionStatus("success");
-          setFormData({
-            name: "",
-            email: "",
-            subject: "",
-            message: "",
-          });
-        } else {
-          setSubmissionStatus("error");
-        }
+        setSubmissionStatus("success");
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+        // Show success toast
+        toast.success(
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <div>
+              <p className="font-semibold text-gray-900">
+                Message Sent Successfully!
+              </p>
+              <p className="text-sm text-gray-600">
+                Thank you for contacting us. We'll get back to you soon!
+              </p>
+            </div>
+          </div>,
+          {
+            duration: 5000,
+            position: "top-center",
+            style: {
+              background: "#f0fdf4",
+              border: "1px solid #bbf7d0",
+              borderRadius: "12px",
+              padding: "16px",
+              boxShadow:
+                "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            },
+          }
+        );
+      } else {
+        setSubmissionStatus("error");
+        toast.error(
+          <div className="flex items-center gap-3">
+            <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+              <span className="text-red-600 text-xs font-bold">!</span>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">
+                Message Failed to Send
+              </p>
+              <p className="text-sm text-gray-600">
+                Please try again or contact us directly.
+              </p>
+            </div>
+          </div>,
+          {
+            duration: 5000,
+            position: "top-center",
+            style: {
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              borderRadius: "12px",
+              padding: "16px",
+              boxShadow:
+                "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            },
+          }
+        );
       }
     } catch (error) {
       console.error("Error submitting contact form:", error);
       setSubmissionStatus("error");
+      toast.error(
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+            <span className="text-red-600 text-xs font-bold">!</span>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900">
+              Message Failed to Send
+            </p>
+            <p className="text-sm text-gray-600">
+              Please try again or contact us directly.
+            </p>
+          </div>
+        </div>,
+        {
+          duration: 5000,
+          position: "top-center",
+          style: {
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            borderRadius: "12px",
+            padding: "16px",
+            boxShadow:
+              "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+          },
+        }
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -207,43 +296,6 @@ export default function ContactSection() {
                   {isSubmitting ? "Sending..." : "Send Message"}
                 </motion.button>
               </div>
-
-              {/* Success Message */}
-              {submissionStatus === "success" && (
-                <div className="md:col-span-2 bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-green-700 font-bold flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Message Sent Successfully!
-                  </h3>
-                  <p className="text-green-600 mt-1">
-                    Thank you for contacting us. We&apos;ll get back to you
-                    soon!
-                  </p>
-                </div>
-              )}
-
-              {/* Error Message */}
-              {submissionStatus === "error" && (
-                <div className="md:col-span-2 bg-red-50 p-4 rounded-lg">
-                  <h3 className="text-red-700 font-bold">
-                    Message Failed to Send
-                  </h3>
-                  <p className="text-red-600 mt-1">
-                    Please try again or contact us directly.
-                  </p>
-                </div>
-              )}
             </div>
           </motion.form>
 
@@ -368,6 +420,25 @@ export default function ContactSection() {
           </motion.div>
         </div>
       </div>
+
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            borderRadius: "12px",
+            boxShadow:
+              "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+          },
+        }}
+      />
     </section>
   );
 }

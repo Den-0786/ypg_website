@@ -31,12 +31,11 @@ import {
   Loader2,
 } from "lucide-react";
 
-export default function SettingsComponent({ onClose }) {
+export default function SettingsComponent({ onClose, theme, setTheme }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPin, setShowPin] = useState(false);
-  const [theme, setTheme] = useState("light");
   const [securityMethod, setSecurityMethod] = useState("password");
 
   // Loading and feedback states
@@ -71,27 +70,92 @@ export default function SettingsComponent({ onClose }) {
   useEffect(() => {
     const loadCredentials = async () => {
       try {
+        // Try to get credentials with a timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
         const response = await fetch(
-          "http://localhost:8002/api/auth/credentials"
+          "http://localhost:8002/api/auth/credentials/",
+          {
+            signal: controller,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.success) {
-          setCurrentCredentials(data.credentials);
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.credentials) {
+            setCurrentCredentials(data.credentials);
+            setSecurity((prev) => ({
+              ...prev,
+              newUsername: data.credentials.username,
+            }));
+            return;
+          }
+        } else if (response.status === 401) {
+          // User is not authenticated, use default credentials
+          console.log("User not authenticated, using default credentials");
+          setCurrentCredentials({
+            username: "admin",
+            hasPassword: true,
+            fullName: "YPG Administrator",
+            email: "admin@ahinsanypg.com",
+            role: "System Administrator",
+          });
           setSecurity((prev) => ({
             ...prev,
-            newUsername: data.credentials.username,
+            newUsername: "admin",
           }));
+          return;
         } else {
-          console.error(
-            "Failed to load credentials:",
-            data.message || "Unknown error"
+          // Handle other error responses
+          console.log(
+            `API returned status ${response.status}, using default credentials`
           );
+          setCurrentCredentials({
+            username: "admin",
+            hasPassword: true,
+            fullName: "YPG Administrator",
+            email: "admin@ahinsanypg.com",
+            role: "System Administrator",
+          });
+          setSecurity((prev) => ({
+            ...prev,
+            newUsername: "admin",
+          }));
+          return;
         }
+
+        // Fallback to default credentials
+        setCurrentCredentials({
+          username: "admin",
+          hasPassword: true,
+          fullName: "YPG Administrator",
+          email: "admin@ahinsanypg.com",
+          role: "System Administrator",
+        });
+        setSecurity((prev) => ({
+          ...prev,
+          newUsername: "admin",
+        }));
       } catch (error) {
-        console.error("Failed to load credentials:", error);
+        console.log("Using default credentials:", error.message);
+        // Set default credentials on error
+        setCurrentCredentials({
+          username: "admin",
+          hasPassword: true,
+          fullName: "YPG Administrator",
+          email: "admin@ahinsanypg.com",
+          role: "System Administrator",
+        });
+        setSecurity((prev) => ({
+          ...prev,
+          newUsername: "admin",
+        }));
       }
     };
     loadCredentials();
@@ -222,9 +286,7 @@ export default function SettingsComponent({ onClose }) {
   });
 
   const [appearance, setAppearance] = useState({
-    theme: "light",
     language: "English",
-    primaryColor: "#3B82F6",
     borderRadius: "medium",
   });
 
@@ -331,16 +393,8 @@ export default function SettingsComponent({ onClose }) {
   const validateAppearance = () => {
     const errors = {};
 
-    if (!appearance.theme) {
-      errors.theme = "Theme is required";
-    }
-
     if (!appearance.language) {
       errors.language = "Language is required";
-    }
-
-    if (!appearance.primaryColor) {
-      errors.primaryColor = "Primary color is required";
     }
 
     return errors;
@@ -519,7 +573,6 @@ export default function SettingsComponent({ onClose }) {
 
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
-    setAppearance({ ...appearance, theme: newTheme });
   };
 
   // Function to add history entry
@@ -673,9 +726,7 @@ export default function SettingsComponent({ onClose }) {
         };
 
         const restoredAppearance = {
-          theme: backup.appearance?.theme || "light",
           language: backup.appearance?.language || "English",
-          primaryColor: backup.appearance?.primaryColor || "#3B82F6",
           borderRadius: backup.appearance?.borderRadius || "medium",
         };
 
@@ -834,12 +885,28 @@ export default function SettingsComponent({ onClose }) {
   };
 
   const getInputClassName = (fieldName) => {
-    const baseClass =
-      "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base";
+    const baseClass = `w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-base ${
+      theme === "dark"
+        ? "bg-gray-700 text-white border-gray-600"
+        : "bg-white text-gray-900 border-gray-300"
+    }`;
     const errorClass = "border-red-500 focus:ring-red-500";
-    const normalClass = "border-gray-300 dark:border-gray-600";
+    const normalClass =
+      theme === "dark" ? "border-gray-600" : "border-gray-300";
 
     return `${baseClass} ${getFieldError(fieldName) ? errorClass : normalClass}`;
+  };
+
+  const getLabelClassName = () => {
+    return `block text-xs sm:text-sm font-medium mb-1 sm:mb-2 ${
+      theme === "dark" ? "text-gray-300" : "text-gray-700"
+    }`;
+  };
+
+  const getLabelWithIconClassName = () => {
+    return `text-xs sm:text-sm font-medium mb-1 sm:mb-2 flex items-center ${
+      theme === "dark" ? "text-gray-300" : "text-gray-700"
+    }`;
   };
 
   return (
@@ -855,11 +922,25 @@ export default function SettingsComponent({ onClose }) {
         className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg sm:max-w-2xl max-h-[95vh] overflow-hidden">
+        <div
+          className={`rounded-lg shadow-xl w-full max-w-lg sm:max-w-2xl max-h-[95vh] overflow-hidden ${
+            theme === "dark"
+              ? "bg-gray-800 text-white"
+              : "bg-white text-gray-900"
+          }`}
+        >
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <div
+            className={`flex items-center justify-between p-4 sm:p-6 border-b ${
+              theme === "dark" ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
             <div className="flex-1">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+              <h2
+                className={`text-lg sm:text-xl font-semibold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
                 Settings
               </h2>
               {saveStatus.type && (
@@ -881,7 +962,11 @@ export default function SettingsComponent({ onClose }) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className={`p-1 rounded-lg transition-colors ${
+                theme === "dark"
+                  ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              }`}
             >
               <X className="w-5 h-5" />
             </button>
@@ -890,7 +975,13 @@ export default function SettingsComponent({ onClose }) {
           {/* Modal Content */}
           <div className="flex h-96">
             {/* Settings Sidebar */}
-            <div className="w-48 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <div
+              className={`w-48 border-r ${
+                theme === "dark"
+                  ? "border-gray-700 bg-gray-900"
+                  : "border-gray-200 bg-gray-50"
+              }`}
+            >
               <nav className="p-4 space-y-2">
                 {settingsTabs.map((tab) => {
                   const Icon = tab.icon;
@@ -901,8 +992,12 @@ export default function SettingsComponent({ onClose }) {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         isActive
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          ? theme === "dark"
+                            ? "bg-blue-900 text-blue-300"
+                            : "bg-blue-100 text-blue-700"
+                          : theme === "dark"
+                            ? "text-gray-300 hover:bg-gray-700"
+                            : "text-gray-700 hover:bg-gray-100"
                       }`}
                     >
                       <Icon className="w-4 h-4 inline mr-2" />
@@ -918,14 +1013,22 @@ export default function SettingsComponent({ onClose }) {
               {/* Profile Settings */}
               {activeTab === "profile" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Profile Settings
                   </h3>
                   {isProfileLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="text-center">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p
+                          className={`text-sm ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
                           Loading profile data...
                         </p>
                       </div>
@@ -933,11 +1036,19 @@ export default function SettingsComponent({ onClose }) {
                   ) : (
                     <div className="space-y-3 sm:space-y-4">
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        <label
+                          className={`block text-xs sm:text-sm font-medium mb-1 sm:mb-2 ${
+                            theme === "dark" ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
                           Profile Picture
                         </label>
                         <div className="flex items-center space-x-4">
-                          <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center overflow-hidden ${
+                              theme === "dark" ? "bg-gray-700" : "bg-gray-200"
+                            }`}
+                          >
                             {profile.avatar ? (
                               <img
                                 src={profile.avatar}
@@ -959,14 +1070,20 @@ export default function SettingsComponent({ onClose }) {
                                 className="hidden"
                               />
                             </label>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <p
+                              className={`text-xs mt-1 ${
+                                theme === "dark"
+                                  ? "text-gray-400"
+                                  : "text-gray-500"
+                              }`}
+                            >
                               JPG, PNG or GIF. Max 5MB.
                             </p>
                           </div>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        <label className={getLabelClassName()}>
                           Full Name *
                         </label>
                         <input
@@ -985,9 +1102,7 @@ export default function SettingsComponent({ onClose }) {
                         )}
                       </div>
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Email *
-                        </label>
+                        <label className={getLabelClassName()}>Email *</label>
                         <input
                           type="email"
                           value={profile.email}
@@ -1004,9 +1119,7 @@ export default function SettingsComponent({ onClose }) {
                         )}
                       </div>
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Phone *
-                        </label>
+                        <label className={getLabelClassName()}>Phone *</label>
                         <input
                           type="tel"
                           value={profile.phone}
@@ -1023,15 +1136,13 @@ export default function SettingsComponent({ onClose }) {
                         )}
                       </div>
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                          Role
-                        </label>
+                        <label className={getLabelClassName()}>Role</label>
                         <select
                           value={profile.role}
                           onChange={(e) =>
                             setProfile({ ...profile, role: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base"
+                          className={getInputClassName("role")}
                         >
                           <option>System Administrator</option>
                           <option>Data Manager</option>
@@ -1075,18 +1186,34 @@ export default function SettingsComponent({ onClose }) {
               {/* Security Settings */}
               {activeTab === "security" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Security Settings
                   </h3>
 
                   {/* Authentication Info */}
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <div
+                    className={`rounded-lg p-4 ${
+                      theme === "dark" ? "bg-gray-700" : "bg-gray-50"
+                    }`}
+                  >
+                    <h4
+                      className={`text-xs sm:text-sm font-medium mb-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       Authentication Method
                     </h4>
                     <div className="flex items-center">
                       <Key className="w-4 h-4 mr-2 text-blue-600" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                      <span
+                        className={`text-sm ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
                         Username & Password Authentication
                       </span>
                     </div>
@@ -1106,7 +1233,7 @@ export default function SettingsComponent({ onClose }) {
                       </p>
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                      <label className={getLabelClassName()}>
                         New Username
                       </label>
                       <input
@@ -1128,7 +1255,7 @@ export default function SettingsComponent({ onClose }) {
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                      <label className={getLabelClassName()}>
                         Current Password
                       </label>
                       <div className="relative">
@@ -1162,7 +1289,7 @@ export default function SettingsComponent({ onClose }) {
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                      <label className={getLabelClassName()}>
                         New Password
                       </label>
                       <div className="relative">
@@ -1197,7 +1324,7 @@ export default function SettingsComponent({ onClose }) {
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                      <label className={getLabelClassName()}>
                         Confirm New Password
                       </label>
                       <div className="relative">
@@ -1269,11 +1396,19 @@ export default function SettingsComponent({ onClose }) {
               {/* Privacy Settings */}
               {activeTab === "privacy" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Privacy Policy
                   </h3>
                   <div className="space-y-4">
-                    <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                    <p
+                      className={`text-xs sm:text-sm ${
+                        theme === "dark" ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Your data is protected and used only for church
                       administration purposes. We do not share your information
                       with third parties. For more details, contact your
@@ -1301,28 +1436,28 @@ export default function SettingsComponent({ onClose }) {
               {/* Appearance Settings */}
               {activeTab === "appearance" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Appearance Settings
                   </h3>
                   <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Theme
-                      </label>
+                      <label className={getLabelClassName()}>Theme</label>
                       <select
-                        value={appearance.theme}
+                        value={theme}
                         onChange={(e) => handleThemeChange(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base"
+                        className={getInputClassName("theme")}
                       >
                         <option value="light">Light Mode</option>
                         <option value="dark">Dark Mode</option>
-                        <option value="auto">Auto (System)</option>
+                        <option value="system">Auto (System)</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Language
-                      </label>
+                      <label className={getLabelClassName()}>Language</label>
                       <select
                         value={appearance.language}
                         onChange={(e) =>
@@ -1331,28 +1466,12 @@ export default function SettingsComponent({ onClose }) {
                             language: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base"
+                        className={getInputClassName("language")}
                       >
                         <option>English</option>
                         <option>Twi</option>
                         <option>Ga</option>
                       </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                        Primary Color
-                      </label>
-                      <input
-                        type="color"
-                        value={appearance.primaryColor}
-                        onChange={(e) =>
-                          setAppearance({
-                            ...appearance,
-                            primaryColor: e.target.value,
-                          })
-                        }
-                        className="w-20 h-10 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer"
-                      />
                     </div>
                     <button
                       onClick={() => handleSave("appearance")}
@@ -1390,29 +1509,63 @@ export default function SettingsComponent({ onClose }) {
               {/* About */}
               {activeTab === "about" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     About
                   </h3>
                   <div className="space-y-4">
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <h4 className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+                    <div
+                      className={`border rounded-lg p-4 ${
+                        theme === "dark"
+                          ? "bg-blue-900/20 border-blue-800"
+                          : "bg-blue-50 border-blue-200"
+                      }`}
+                    >
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-2 ${
+                          theme === "dark" ? "text-blue-300" : "text-blue-900"
+                        }`}
+                      >
                         YPG Official Website
                       </h4>
-                      <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mb-2">
+                      <p
+                        className={`text-xs sm:text-sm mb-2 ${
+                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                        }`}
+                      >
                         Version: 1.1.0
                       </p>
-                      <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mb-2">
+                      <p
+                        className={`text-xs sm:text-sm mb-2 ${
+                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                        }`}
+                      >
                         Built for PCG Ahinsan District YPG
                       </p>
-                      <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200">
+                      <p
+                        className={`text-xs sm:text-sm ${
+                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                        }`}
+                      >
                         © 2025 PCG Ahinsan District YPG
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                      <h4
+                        className={`text-xs sm:text-sm font-medium ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         Features
                       </h4>
-                      <ul className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                      <ul
+                        className={`text-xs sm:text-sm space-y-1 ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
                         <li>• Members Management</li>
                         <li>• Event Planning</li>
                         <li>• Attendance Tracking</li>
@@ -1428,18 +1581,26 @@ export default function SettingsComponent({ onClose }) {
               {/* Website Content */}
               {activeTab === "website" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Website Content
                   </h3>
                   <div className="space-y-4 sm:space-y-6">
                     {/* General Settings */}
                     <div>
-                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white mb-3">
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-3 ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         General Settings
                       </h4>
                       <div className="grid grid-cols-1 gap-3 sm:gap-4">
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          <label className={getLabelClassName()}>
                             Website Title
                           </label>
                           <input
@@ -1460,7 +1621,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          <label className={getLabelClassName()}>
                             Contact Email
                           </label>
                           <input
@@ -1481,7 +1642,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                          <label className={getLabelClassName()}>
                             Phone Number
                           </label>
                           <input
@@ -1502,9 +1663,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-                            Address
-                          </label>
+                          <label className={getLabelClassName()}>Address</label>
                           <input
                             type="text"
                             value={generalSettings.address}
@@ -1524,7 +1683,7 @@ export default function SettingsComponent({ onClose }) {
                         </div>
                       </div>
                       <div className="mt-4">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                        <label className={getLabelClassName()}>
                           Description
                         </label>
                         <textarea
@@ -1536,19 +1695,23 @@ export default function SettingsComponent({ onClose }) {
                               description: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs sm:text-base"
+                          className={getInputClassName("description")}
                         />
                       </div>
                     </div>
 
                     {/* Social Media */}
                     <div>
-                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white mb-3">
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-3 ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         Social Media
                       </h4>
                       <div className="grid grid-cols-1 gap-3 sm:gap-4">
                         <div>
-                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className={getLabelWithIconClassName()}>
                             <Facebook className="w-4 h-4 mr-2 text-blue-600" />
                             Facebook URL
                           </label>
@@ -1570,7 +1733,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className={getLabelWithIconClassName()}>
                             <Instagram className="w-4 h-4 mr-2 text-pink-600" />
                             Instagram URL
                           </label>
@@ -1592,7 +1755,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className={getLabelWithIconClassName()}>
                             <Twitter className="w-4 h-4 mr-2 text-blue-400" />
                             Twitter URL
                           </label>
@@ -1614,7 +1777,7 @@ export default function SettingsComponent({ onClose }) {
                           )}
                         </div>
                         <div>
-                          <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 flex items-center">
+                          <label className={getLabelWithIconClassName()}>
                             <Youtube className="w-4 h-4 mr-2 text-red-600" />
                             YouTube URL
                           </label>
@@ -1674,15 +1837,33 @@ export default function SettingsComponent({ onClose }) {
               {/* Backup & Restore */}
               {activeTab === "backup" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Backup & Restore
                   </h3>
                   <div className="space-y-4">
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <h4 className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+                    <div
+                      className={`border rounded-lg p-4 ${
+                        theme === "dark"
+                          ? "bg-blue-900/20 border-blue-800"
+                          : "bg-blue-50 border-blue-200"
+                      }`}
+                    >
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-2 ${
+                          theme === "dark" ? "text-blue-300" : "text-blue-900"
+                        }`}
+                      >
                         Backup Settings
                       </h4>
-                      <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mb-4">
+                      <p
+                        className={`text-xs sm:text-sm mb-4 ${
+                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                        }`}
+                      >
                         Create a backup of all your current settings. This will
                         download a JSON file that you can use to restore your
                         settings later.
@@ -1696,11 +1877,25 @@ export default function SettingsComponent({ onClose }) {
                       </button>
                     </div>
 
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                      <h4 className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-300 mb-2">
+                    <div
+                      className={`border rounded-lg p-4 ${
+                        theme === "dark"
+                          ? "bg-green-900/20 border-green-800"
+                          : "bg-green-50 border-green-200"
+                      }`}
+                    >
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-2 ${
+                          theme === "dark" ? "text-green-300" : "text-green-900"
+                        }`}
+                      >
                         Restore Settings
                       </h4>
-                      <p className="text-xs sm:text-sm text-green-800 dark:text-green-200 mb-4">
+                      <p
+                        className={`text-xs sm:text-sm mb-4 ${
+                          theme === "dark" ? "text-green-200" : "text-green-800"
+                        }`}
+                      >
                         Restore your settings from a previously created backup
                         file.
                       </p>
@@ -1716,11 +1911,29 @@ export default function SettingsComponent({ onClose }) {
                       </label>
                     </div>
 
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                      <h4 className="text-xs sm:text-sm font-medium text-yellow-900 dark:text-yellow-300 mb-2">
+                    <div
+                      className={`border rounded-lg p-4 ${
+                        theme === "dark"
+                          ? "bg-yellow-900/20 border-yellow-800"
+                          : "bg-yellow-50 border-yellow-200"
+                      }`}
+                    >
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-2 ${
+                          theme === "dark"
+                            ? "text-yellow-300"
+                            : "text-yellow-900"
+                        }`}
+                      >
                         Important Notes
                       </h4>
-                      <ul className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-200 space-y-1">
+                      <ul
+                        className={`text-xs sm:text-sm space-y-1 ${
+                          theme === "dark"
+                            ? "text-yellow-200"
+                            : "text-yellow-800"
+                        }`}
+                      >
                         <li>
                           • Backup files contain sensitive information - keep
                           them secure
@@ -1737,17 +1950,35 @@ export default function SettingsComponent({ onClose }) {
               {/* Settings History */}
               {activeTab === "history" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-base sm:text-lg font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Settings History
                   </h3>
                   <div className="space-y-3">
                     {settingsHistory.length === 0 ? (
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 border border-gray-200 dark:border-gray-600 text-center">
+                      <div
+                        className={`rounded-lg p-8 border text-center ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600"
+                            : "bg-gray-50 border-gray-200"
+                        }`}
+                      >
                         <Info className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p
+                          className={`text-sm ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
                           No settings changes recorded yet.
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        <p
+                          className={`text-xs mt-1 ${
+                            theme === "dark" ? "text-gray-500" : "text-gray-500"
+                          }`}
+                        >
                           Changes will appear here after you save settings.
                         </p>
                       </div>
@@ -1756,23 +1987,49 @@ export default function SettingsComponent({ onClose }) {
                         {settingsHistory.map((item) => (
                           <div
                             key={item.id}
-                            className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                            className={`rounded-lg p-4 border ${
+                              theme === "dark"
+                                ? "bg-gray-700 border-gray-600"
+                                : "bg-gray-50 border-gray-200"
+                            }`}
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                                <h4
+                                  className={`text-xs sm:text-sm font-medium ${
+                                    theme === "dark"
+                                      ? "text-white"
+                                      : "text-gray-900"
+                                  }`}
+                                >
                                   {item.action}
                                 </h4>
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                <p
+                                  className={`text-xs mt-1 ${
+                                    theme === "dark"
+                                      ? "text-gray-400"
+                                      : "text-gray-600"
+                                  }`}
+                                >
                                   {item.details}
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                                <p
+                                  className={`text-xs mt-2 ${
+                                    theme === "dark"
+                                      ? "text-gray-500"
+                                      : "text-gray-500"
+                                  }`}
+                                >
                                   By: {item.user} • {item.timestamp}
                                 </p>
                               </div>
                               <button
                                 onClick={() => deleteHistoryEntry(item.id)}
-                                className="ml-2 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                className={`ml-2 p-1 text-gray-400 hover:text-red-600 rounded transition-colors ${
+                                  theme === "dark"
+                                    ? "hover:bg-red-900/20"
+                                    : "hover:bg-red-50"
+                                }`}
                                 title="Delete this entry"
                               >
                                 <X className="w-4 h-4" />

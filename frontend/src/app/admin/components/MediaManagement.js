@@ -16,6 +16,22 @@ import { motion, AnimatePresence } from "framer-motion";
 const MediaManagement = ({ media = [], setMedia, theme }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingMedia, setEditingMedia] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000
+    );
+  };
+
   const [newMedia, setNewMedia] = useState({
     title: "",
     description: "",
@@ -28,28 +44,47 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
   });
 
   const handleAddMedia = async () => {
+    // Basic validation
+    if (!newMedia.title.trim()) {
+      showToast("Please enter a title", "error");
+      return;
+    }
+
+    if (
+      newMedia.type === "video" &&
+      !newMedia.file &&
+      !newMedia.youtubeUrl &&
+      !newMedia.tiktokUrl
+    ) {
+      showToast(
+        "For videos, please either upload a video file or provide a YouTube/TikTok URL",
+        "error"
+      );
+      return;
+    }
+
     try {
       let response;
 
       if (newMedia.file) {
-        // If there's a file, use FormData
+        // If there's a file (image or video), use FormData
         const formData = new FormData();
         formData.append("title", newMedia.title);
         formData.append("description", newMedia.description);
-        formData.append("type", newMedia.type);
+        formData.append("category", newMedia.type);
         formData.append("congregation", newMedia.congregation);
         formData.append("date", newMedia.date);
-        formData.append("youtubeUrl", newMedia.youtubeUrl);
-        formData.append("tiktokUrl", newMedia.tiktokUrl);
-        formData.append("image", newMedia.file);
+        formData.append("youtube_url", newMedia.youtubeUrl);
+        formData.append("tiktok_url", newMedia.tiktokUrl);
+        formData.append("file", newMedia.file); // Send as 'file' - backend will handle routing
 
-        response = await fetch("http://localhost:8002/api/media", {
+        response = await fetch("http://localhost:8002/api/gallery/create/", {
           method: "POST",
           body: formData,
         });
       } else {
         // If no file, use JSON
-        response = await fetch("http://localhost:8002/api/media", {
+        response = await fetch("http://localhost:8002/api/gallery/create/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -57,11 +92,11 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
           body: JSON.stringify({
             title: newMedia.title,
             description: newMedia.description,
-            type: newMedia.type,
+            category: newMedia.type,
             congregation: newMedia.congregation,
             date: newMedia.date,
-            youtubeUrl: newMedia.youtubeUrl,
-            tiktokUrl: newMedia.tiktokUrl,
+            youtube_url: newMedia.youtubeUrl,
+            tiktok_url: newMedia.tiktokUrl,
           }),
         });
       }
@@ -80,9 +115,18 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
           youtubeUrl: "",
           tiktokUrl: "",
         });
+        showToast("Media added successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        showToast(
+          `Error: ${errorData.error || "Failed to add media"}`,
+          "error"
+        );
       }
     } catch (error) {
       console.error("Error adding media:", error);
+      showToast(`Error: ${error.message}`, "error");
     }
   };
 
@@ -95,34 +139,40 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         const formData = new FormData();
         formData.append("title", editingMedia.title);
         formData.append("description", editingMedia.description);
-        formData.append("type", editingMedia.type);
+        formData.append("category", editingMedia.type);
         formData.append("congregation", editingMedia.congregation);
         formData.append("date", editingMedia.date);
-        formData.append("youtubeUrl", editingMedia.youtubeUrl);
-        formData.append("tiktokUrl", editingMedia.tiktokUrl);
+        formData.append("youtube_url", editingMedia.youtubeUrl);
+        formData.append("tiktok_url", editingMedia.tiktokUrl);
         formData.append("image", editingMedia.file);
 
-        response = await fetch(`/api/media?id=${editingMedia.id}`, {
-          method: "PUT",
-          body: formData,
-        });
+        response = await fetch(
+          `http://localhost:8002/api/gallery/${editingMedia.id}/update/`,
+          {
+            method: "PUT",
+            body: formData,
+          }
+        );
       } else {
         // If no file, use JSON
-        response = await fetch(`/api/media?id=${editingMedia.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: editingMedia.title,
-            description: editingMedia.description,
-            type: editingMedia.type,
-            congregation: editingMedia.congregation,
-            date: editingMedia.date,
-            youtubeUrl: editingMedia.youtubeUrl,
-            tiktokUrl: editingMedia.tiktokUrl,
-          }),
-        });
+        response = await fetch(
+          `http://localhost:8002/api/gallery/${editingMedia.id}/update/`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: editingMedia.title,
+              description: editingMedia.description,
+              category: editingMedia.type,
+              congregation: editingMedia.congregation,
+              date: editingMedia.date,
+              youtube_url: editingMedia.youtubeUrl,
+              tiktok_url: editingMedia.tiktokUrl,
+            }),
+          }
+        );
       }
 
       if (response.ok) {
@@ -139,14 +189,26 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
     }
   };
 
-  const handleDeleteMedia = async (id) => {
+  const handleDeleteClick = (item) => {
+    setItemToDelete(item);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
+
     try {
-      const response = await fetch(`/api/media?id=${id}&type=${deleteType}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:8002/api/gallery/${itemToDelete.id}/delete/`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
-        setMedia(media.filter((item) => item.id !== id));
+        setMedia(media.filter((item) => item.id !== itemToDelete.id));
+        setShowDeleteModal(false);
+        setItemToDelete(null);
       }
     } catch (error) {
       console.error("Error deleting media:", error);
@@ -179,10 +241,27 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             animate={{ opacity: 1, y: 0 }}
             className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
           >
-            <div
-              className={`h-64 ${theme === "dark" ? "bg-gradient-to-r from-orange-600 to-red-600" : "bg-gradient-to-r from-orange-500 to-red-500"} flex items-center justify-center`}
-            >
-              <Image className="w-12 h-12 text-white" />
+            <div className="h-64 relative overflow-hidden">
+              {item.image ? (
+                <img
+                  src={`http://localhost:8002${item.image}`}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : item.video ? (
+                <video
+                  src={`http://localhost:8002${item.video}`}
+                  className="w-full h-full object-cover"
+                  controls
+                  preload="metadata"
+                />
+              ) : (
+                <div
+                  className={`h-full ${theme === "dark" ? "bg-gradient-to-r from-orange-600 to-red-600" : "bg-gradient-to-r from-orange-500 to-red-500"} flex items-center justify-center`}
+                >
+                  <Image className="w-12 h-12 text-white" />
+                </div>
+              )}
             </div>
             <div className="p-4">
               <h3
@@ -191,27 +270,42 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                 {item.title}
               </h3>
               <p
-                className={`text-sm mb-3 line-clamp-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                className={`text-sm mb-2 line-clamp-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
               >
                 {item.description}
               </p>
-              <div
-                className={`space-y-1 text-xs mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-              >
-                <p>📁 {item.type}</p>
-                <p>📅 {item.date}</p>
-                <p>📏 {item.size}</p>
-              </div>
+              {item.congregation && (
+                <p
+                  className={`text-xs mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                >
+                  📍 {item.congregation}
+                </p>
+              )}
+              {item.date && (
+                <p
+                  className={`text-xs mb-3 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                >
+                  📅 {new Date(item.date).toLocaleDateString()}
+                </p>
+              )}
               <div className="flex space-x-2">
                 <button
-                  onClick={() => setEditingMedia(item)}
+                  onClick={() =>
+                    setEditingMedia({
+                      ...item,
+                      type: item.category,
+                      youtubeUrl: item.youtube_url || "",
+                      tiktokUrl: item.tiktok_url || "",
+                      file: null,
+                    })
+                  }
                   className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
                 >
                   <Edit className="w-3 h-3" />
                   <span>Edit</span>
                 </button>
                 <button
-                  onClick={() => handleDeleteMedia(item.id)}
+                  onClick={() => handleDeleteClick(item)}
                   className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-red-900/30 text-red-300 hover:bg-red-800/40" : "bg-red-100 text-red-600 hover:bg-red-200"}`}
                 >
                   <Trash2 className="w-3 h-3" />
@@ -389,7 +483,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                   <label
                     className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
                   >
-                    Congregation/Location
+                    Congregation/Venue
                   </label>
                   <input
                     type="text"
@@ -653,7 +747,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                   <label
                     className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
                   >
-                    Congregation/Location
+                    Congregation/Venue
                   </label>
                   <input
                     type="text"
@@ -676,10 +770,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                   </label>
                   <input
                     type="date"
-                    value={
-                      editingMedia.date ||
-                      new Date().toISOString().split("T")[0]
-                    }
+                    value={editingMedia.date || ""}
                     onChange={(e) =>
                       setEditingMedia({ ...editingMedia, date: e.target.value })
                     }
@@ -745,6 +836,107 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                 </button>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        <AnimatePresence>
+          {showDeleteModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-xl max-w-md w-full p-6 border`}
+              >
+                <div className="flex items-center mb-4">
+                  <div className="flex-shrink-0 w-10 h-10 mx-auto bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-red-600" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h3
+                    className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  >
+                    Delete Media Item
+                  </h3>
+                  <p
+                    className={`text-sm mb-4 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                  >
+                    Are you sure you want to delete{" "}
+                    <strong>"{itemToDelete?.title}"</strong>? This action cannot
+                    be undone.
+                  </p>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => {
+                        setShowDeleteModal(false);
+                        setItemToDelete(null);
+                      }}
+                      className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteConfirm}
+                      className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </AnimatePresence>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.3 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+            className={`fixed bottom-4 right-4 z-50 max-w-sm w-full bg-white rounded-lg shadow-lg border-l-4 p-4 ${
+              toast.type === "error" ? "border-red-500" : "border-green-500"
+            }`}
+          >
+            <div className="flex">
+              <div className="flex-shrink-0">
+                {toast.type === "error" ? (
+                  <AlertTriangle className="h-5 w-5 text-red-400" />
+                ) : (
+                  <div className="h-5 w-5 text-green-400">✓</div>
+                )}
+              </div>
+              <div className="ml-3 w-0 flex-1">
+                <p
+                  className={`text-sm font-medium ${
+                    toast.type === "error" ? "text-red-800" : "text-green-800"
+                  }`}
+                >
+                  {toast.message}
+                </p>
+              </div>
+              <div className="ml-4 flex-shrink-0 flex">
+                <button
+                  className={`inline-flex ${
+                    toast.type === "error" ? "text-red-400" : "text-green-400"
+                  } hover:opacity-75`}
+                  onClick={() =>
+                    setToast({ show: false, message: "", type: "success" })
+                  }
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

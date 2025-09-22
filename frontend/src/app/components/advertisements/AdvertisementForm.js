@@ -71,7 +71,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
         numberWithoutSpaces.startsWith("0") &&
         numberWithoutSpaces.length !== 10
       ) {
-        return `Number ${i + 1}: Must be exactly 10 digits (e.g., 0241234567)`;
+        return `Number ${i + 1}: Must be exactly 10 digits (e.g., 0541107445)`;
       }
 
       if (
@@ -180,7 +180,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
       });
 
       const response = await fetch(
-        "http://localhost:8002/api/advertisements/create/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/create/`,
         {
           method: "POST",
           body: formDataToSend,

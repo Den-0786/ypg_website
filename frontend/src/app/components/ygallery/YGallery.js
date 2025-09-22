@@ -1,320 +1,276 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-"use client";
-
+/* eslint-disable jsx-a11y/alt-text */
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Play,
-  Youtube,
-  Music,
-  Download,
-} from "lucide-react";
-
-const galleryImages = [];
-
-const videos = [
-  {
-    src: "/videos/camp2023.mp4",
-    thumbnail: "/video-thumbnails/camp2023.jpg",
-    title: "Youth Camp 2023 Highlights",
-    links: [
-      { platform: "youtube", url: "https://youtube.com/watch?v=camp2023" },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456789" },
-    ],
-  },
-  {
-    src: "/videos/conference.mp4",
-    thumbnail: "/video-thumbnails/conference.jpg",
-    title: "Annual Youth Conference",
-    links: [
-      {
-        platform: "youtube",
-        url: "https://youtube.com/watch?v=conference2023",
-      },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456790" },
-    ],
-  },
-  {
-    src: "/videos/choir.mp4",
-    thumbnail: "/video-thumbnails/choir.jpg",
-    title: "Mass Choir Performance",
-    links: [
-      { platform: "youtube", url: "https://youtube.com/watch?v=masschoir" },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456791" },
-    ],
-  },
-  {
-    src: "/videos/outreach.mp4",
-    thumbnail: "/video-thumbnails/outreach.jpg",
-    title: "Community Outreach Program",
-    links: [
-      { platform: "youtube", url: "https://youtube.com/watch?v=outreach2023" },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456792" },
-    ],
-  },
-  {
-    src: "/videos/prayer.mp4",
-    thumbnail: "/video-thumbnails/prayer.jpg",
-    title: "Youth Prayer Meeting",
-    links: [
-      { platform: "youtube", url: "https://youtube.com/watch?v=prayer2023" },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456793" },
-    ],
-  },
-  {
-    src: "/videos/bible-study.mp4",
-    thumbnail: "/video-thumbnails/bible-study.jpg",
-    title: "Bible Study Session",
-    links: [
-      {
-        platform: "youtube",
-        url: "https://youtube.com/watch?v=biblestudy2023",
-      },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456794" },
-    ],
-  },
-  {
-    src: "/videos/evangelism.mp4",
-    thumbnail: "/video-thumbnails/evangelism.jpg",
-    title: "Street Evangelism",
-    links: [
-      {
-        platform: "youtube",
-        url: "https://youtube.com/watch?v=evangelism2023",
-      },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456795" },
-    ],
-  },
-  {
-    src: "/videos/fellowship.mp4",
-    thumbnail: "/video-thumbnails/fellowship.jpg",
-    title: "Youth Fellowship Night",
-    links: [
-      {
-        platform: "youtube",
-        url: "https://youtube.com/watch?v=fellowship2023",
-      },
-      { platform: "tiktok", url: "https://tiktok.com/@ypg/video/723456796" },
-    ],
-  },
-];
+import { motion } from "framer-motion";
+import { Play, Download, MapPin, Calendar, ImageIcon } from "lucide-react";
 
 export default function GallerySection() {
   const [contentType, setContentType] = useState("photos");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Check screen size on mount and resize
+  // Fetch gallery items from API
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
+    const fetchGalleryItems = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/`
+        );
+        console.log("Gallery API response status:", response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Gallery API data:", data);
+          // Handle the API response format: {success: true, media: [...]}
+          if (data.success && Array.isArray(data.media)) {
+            console.log("Setting gallery items:", data.media);
+            setGalleryItems(data.media);
+          } else {
+            console.error("API returned unexpected format:", data);
+            setGalleryItems([]);
+          }
+        } else {
+          console.error(
+            "Failed to fetch gallery items, status:",
+            response.status
+          );
+          setGalleryItems([]);
+        }
+      } catch (error) {
+        console.error("Error fetching gallery items:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
+    fetchGalleryItems();
+
+    // Refresh every 5 seconds to get latest updates
+    const interval = setInterval(fetchGalleryItems, 5000);
+
+    // Also refresh when page becomes visible (user switches back to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchGalleryItems();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
-  const visibleCount = isMobile ? 2 : 4;
-
-  const getCurrentContent = () => {
-    return contentType === "photos" ? galleryImages : videos;
-  };
-
-  const currentContent = getCurrentContent();
-
-  const next = () => {
-    setCurrentIndex((prev) =>
-      prev + visibleCount >= currentContent.length ? 0 : prev + visibleCount
-    );
-  };
-
-  const prev = () => {
-    setCurrentIndex((prev) =>
-      prev - visibleCount < 0
-        ? currentContent.length - visibleCount
-        : prev - visibleCount
-    );
-  };
-
-  const visibleItems = currentContent.slice(
-    currentIndex,
-    currentIndex + visibleCount
-  );
-
-  // Auto-play functionality
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-
-    const interval = setInterval(() => {
-      next();
-    }, 5000); // Change slides every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, currentIndex, currentContent.length, visibleCount]);
+  // Filter items based on content type
+  const filteredItems = (galleryItems || []).filter((item) => {
+    if (contentType === "photos") {
+      return item.category === "image";
+    } else {
+      return item.category === "video";
+    }
+  });
 
   const handleDownload = (item) => {
-    const link = document.createElement("a");
-    link.href = contentType === "photos" ? item.src : item.src;
-    link.download =
-      contentType === "photos"
-        ? `gallery-${item.caption?.replace(/[^a-zA-Z0-9]/g, "-")}.jpg`
-        : `${item.title?.replace(/[^a-zA-Z0-9]/g, "-")}.mp4`;
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (item.image) {
+      const link = document.createElement("a");
+      link.href = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`;
+      link.download = item.title || "gallery-item";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  if (loading) {
+    return (
+      <section id="gallery" className="py-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading gallery...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (galleryItems.length === 0) {
+    return (
+      <section id="gallery" className="py-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-red-600">No gallery items available</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="gallery" className="py-16 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-800">
-            Our Gallery
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Explore moments from our fellowship, congregations, and events
+    <section id="gallery" className="py-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-6"
+        >
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Gallery</h2>
+          <p className="text-base text-gray-600 max-w-2xl mx-auto mb-4">
+            Explore our collection of photos and videos from various events and
+            activities.
           </p>
-        </div>
 
-        <div className="flex justify-center mb-8 gap-4">
-          <button
-            onClick={() => {
-              setContentType("photos");
-              setCurrentIndex(0);
-            }}
-            className={`px-6 py-2 rounded-full ${contentType === "photos" ? "bg-blue-600 text-white" : "bg-white text-gray-700"} shadow-md transition`}
-          >
-            Pictures
-          </button>
-          <button
-            onClick={() => {
-              setContentType("videos");
-              setCurrentIndex(0);
-            }}
-            className={`px-6 py-2 rounded-full ${contentType === "videos" ? "bg-blue-600 text-white" : "bg-white text-gray-700"} shadow-md transition`}
-          >
-            Videos
-          </button>
-        </div>
-
-        <div className="relative">
-          <div className="flex justify-between items-center mb-4">
+          {/* Content Type Toggle - Made smaller */}
+          <div className="inline-flex space-x-1 bg-white p-1 rounded-lg shadow-sm border">
             <button
               onClick={() => {
-                prev();
-                setIsAutoPlaying(false);
+                setContentType("photos");
+                setCurrentIndex(0);
               }}
-              className="p-2 bg-white border rounded-full shadow hover:bg-blue-100 transition"
-              aria-label="Previous"
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                contentType === "photos"
+                  ? "bg-blue-500 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
             >
-              <ChevronLeft size={24} />
+              Photos
             </button>
+            <button
+              onClick={() => {
+                setContentType("videos");
+                setCurrentIndex(0);
+              }}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                contentType === "videos"
+                  ? "bg-blue-500 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Videos
+            </button>
+          </div>
+        </motion.div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                className={`px-3 py-1 text-xs rounded ${isAutoPlaying ? "bg-green-500 text-white" : "bg-gray-300 text-gray-700"}`}
-              >
-                {isAutoPlaying ? "Pause" : "Play"}
-              </button>
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="bg-white rounded-lg p-6 shadow-lg max-w-md mx-auto">
+              <Image
+                src="/placeholder-item.jpg"
+                alt="No items"
+                width={64}
+                height={64}
+                className="mx-auto mb-4 opacity-60"
+              />
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                No Media Available
+              </h3>
+              <p className="text-gray-600">
+                {contentType === "photos"
+                  ? "Photos will appear here once uploaded."
+                  : "Videos will appear here once uploaded."}
+              </p>
             </div>
-
-            <button
-              onClick={() => {
-                next();
-                setIsAutoPlaying(false);
-              }}
-              className="p-2 bg-white border rounded-full shadow hover:bg-blue-100 transition"
-              aria-label="Next"
-            >
-              <ChevronRight size={24} />
-            </button>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {visibleItems.map((item, index) => (
-              <motion.div
-                key={`${contentType}-${currentIndex}-${index}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="rounded-lg overflow-hidden shadow-md bg-white group"
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <div
+                className="flex gap-4 sm:gap-6 pb-4"
+                style={{ minWidth: "max-content" }}
               >
-                <div className="relative h-64">
-                  <Image
-                    src={contentType === "photos" ? item.src : item.thumbnail}
-                    alt={contentType === "photos" ? item.caption : item.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw"
-                    loading="lazy"
-                  />
-
-                  {contentType === "videos" && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition">
-                      <Play size={48} className="text-white" />
-                    </div>
-                  )}
-
-                  {/* Download button */}
-                  <button
-                    onClick={() => handleDownload(item)}
-                    className="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white"
-                    title="Download"
+                {filteredItems.map((item, index) => (
+                  <motion.div
+                    key={`${contentType}-${index}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-48 sm:w-56"
                   >
-                    <Download size={16} className="text-gray-700" />
-                  </button>
+                    <div className="relative w-full h-80 sm:h-96">
+                      {item.image ? (
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`}
+                          alt={item.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-110"
+                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw"
+                          loading="lazy"
+                        />
+                      ) : item.video ? (
+                        <video
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.video}`}
+                          className="w-full h-full object-cover"
+                          controls
+                          preload="metadata"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <Image
+                            src="/placeholder-item.jpg"
+                            alt="No media"
+                            width={64}
+                            height={64}
+                            className="opacity-50"
+                          />
+                        </div>
+                      )}
 
-                  {/* Gradient overlay for better text visibility */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      {contentType === "videos" &&
+                        !item.video &&
+                        (item.youtube_url || item.tiktok_url) && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition">
+                            <Play size={48} className="text-white" />
+                          </div>
+                        )}
 
-                  {/* Text overlay positioned at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg">
-                      <p className="text-gray-800 text-xs font-medium leading-tight">
-                        {contentType === "photos" ? item.caption : item.title}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {contentType === "videos" && item.links && (
-                  <div className="p-3">
-                    <div className="flex gap-2 mt-2">
-                      {item.links.map((link, i) => (
-                        <a
-                          key={i}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs px-2 py-1 bg-gray-100 rounded flex items-center gap-1 hover:bg-gray-200 transition"
+                      {/* Download button */}
+                      {item.image && (
+                        <button
+                          onClick={() => handleDownload(item)}
+                          className="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white"
+                          title="Download"
                         >
-                          {link.platform === "youtube" ? (
-                            <>
-                              <Youtube size={12} className="text-red-600" />
-                              <span>YouTube</span>
-                            </>
-                          ) : (
-                            <>
-                              <Music size={12} className="text-black" />
-                              <span>TikTok</span>
-                            </>
-                          )}
-                        </a>
-                      ))}
+                          <Download size={16} className="text-gray-700" />
+                        </button>
+                      )}
+
+                      {/* Gradient overlay for better text visibility - only for images */}
+                      {item.image && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      )}
+
+                      {/* Text overlay positioned at bottom */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="text-white font-semibold text-sm mb-1 line-clamp-1">
+                          {item.title}
+                        </h3>
+                        {item.congregation && (
+                          <div className="flex items-center text-white/80 text-xs mb-1">
+                            <MapPin size={12} className="mr-1" />
+                            <span className="line-clamp-1">
+                              {item.congregation}
+                            </span>
+                          </div>
+                        )}
+                        {item.date && (
+                          <div className="flex items-center text-white/80 text-xs">
+                            <Calendar size={12} className="mr-1" />
+                            <span>{formatDate(item.date)}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

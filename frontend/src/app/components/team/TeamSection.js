@@ -14,7 +14,9 @@ export default function TeamSection() {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("http://localhost:8002/api/team/");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/`
+        );
         const data = await response.json();
 
         if (data.success) {
@@ -55,7 +57,9 @@ export default function TeamSection() {
     const handleRefreshTeamMembers = () => {
       const fetchTeamMembers = async () => {
         try {
-          const response = await fetch("http://localhost:8002/api/team/");
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/`
+          );
           const data = await response.json();
 
           if (data.success) {
@@ -79,16 +83,26 @@ export default function TeamSection() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
+      if (typeof window === "undefined") return;
+      setIsMobile(window.innerWidth < 768); // Changed to 768px for mobile
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
   }, []);
 
   // Create sets based on screen size
-  const cardsPerSet = isMobile ? 2 : 4;
+  const getCardsPerSet = () => {
+    if (typeof window === "undefined") return 4; // Default for SSR
+    if (window.innerWidth < 768) return 1; // Mobile: 1 card per slide
+    if (window.innerWidth < 1024) return 2; // Tablet: 2 cards per slide
+    return 4; // Desktop: 4 cards per slide
+  };
+
+  const cardsPerSet = getCardsPerSet();
   const totalSets = Math.ceil(teamMembers.length / cardsPerSet);
   const sets = [];
 
@@ -182,7 +196,13 @@ export default function TeamSection() {
 
         {!loading && !error && teamMembers.length > 0 && (
           <>
-            <div className="relative h-[300px] sm:h-[400px] lg:h-[400px]">
+            <div
+              className={`relative ${
+                cardsPerSet === 1
+                  ? "h-[400px] sm:h-[500px]"
+                  : "h-[300px] sm:h-[400px] lg:h-[400px]"
+              }`}
+            >
               <AnimatePresence mode="wait">
                 {sets.map(
                   (set, setIndex) =>
@@ -193,7 +213,9 @@ export default function TeamSection() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.5 }}
-                        className={`flex justify-center items-center gap-4 sm:gap-8 absolute inset-0`}
+                        className={`flex justify-center items-center gap-4 sm:gap-8 absolute inset-0 ${
+                          cardsPerSet === 1 ? "flex-col" : "flex-row"
+                        }`}
                       >
                         {set.map((member, index) => {
                           const direction = index % 2 === 0 ? "left" : "right";
@@ -221,13 +243,23 @@ export default function TeamSection() {
                                 transition: { duration: 0.3 },
                               }}
                               whileHover={{ y: -10 }}
-                              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 w-full max-w-64 flex-shrink-0"
+                              className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 ${
+                                cardsPerSet === 1
+                                  ? "w-full max-w-80"
+                                  : "w-full max-w-64"
+                              }`}
                             >
-                              <div className="relative h-64 sm:h-72 lg:h-96 w-full">
+                              <div
+                                className={`relative w-full ${
+                                  cardsPerSet === 1
+                                    ? "h-80 sm:h-96"
+                                    : "h-64 sm:h-72 lg:h-96"
+                                }`}
+                              >
                                 <Image
                                   src={
                                     member.image
-                                      ? `http://localhost:8002${member.image}`
+                                      ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${member.image}`
                                       : "/placeholder-item.jpg"
                                   }
                                   alt={member.name}
@@ -241,7 +273,13 @@ export default function TeamSection() {
                                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />
 
                                 {/* Text overlay with background */}
-                                <div className="absolute bottom-0 top-[8rem] sm:top-[10rem] lg:top-[12rem] left-0 right-0 p-3 sm:p-4">
+                                <div
+                                  className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 ${
+                                    cardsPerSet === 1
+                                      ? "top-[10rem] sm:top-[12rem]"
+                                      : "top-[8rem] sm:top-[10rem] lg:top-[12rem]"
+                                  }`}
+                                >
                                   <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
                                     <h3 className="text-sm sm:text-lg font-bold text-gray-800 mb-1">
                                       {member.name}

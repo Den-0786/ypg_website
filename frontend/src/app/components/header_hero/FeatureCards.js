@@ -1,20 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function FeatureCards() {
+  const [isAnthemExpanded, setIsAnthemExpanded] = useState(false);
+
   const cards = [
-    {
-      title: "Main Website",
-      description:
-        "Discover the Presbyterian Young People's Guild community, events, and resources.",
-      link: "#main-website",
-    },
     {
       title: "Database Management",
       description:
         "Comprehensive member registration and congregation management system.",
       link: "https://ypgdatabasesystem.vercel.app/",
+    },
+    {
+      title: "YPG Anthem",
+      description:
+        "To know His will, and to do it, this is the purpose of YPG. God be our help, God bless our church under His banner may all youth unite. 2X",
+      fullDescription:
+        "To know His will, and to do it, this is the purpose of YPG. God be our help, God bless our church under His banner may all youth unite.2X\n\nRally round His banner its bids you one and all, with soul, with mind and body to serve the King of Kings, Join hands with YPG all youth within the church, to know His will and to do it. 2X",
+      link: "#main-website",
     },
     {
       title: "Attendance System",
@@ -55,7 +60,7 @@ export default function FeatureCards() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-start"
         >
           {cards.map((card, index) => (
             <motion.div
@@ -68,9 +73,39 @@ export default function FeatureCards() {
                 {card.title}
               </h3>
               <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                {card.description}
+                {card.title === "YPG Anthem" && isAnthemExpanded
+                  ? card.fullDescription.split("\n").map((line, index) => (
+                      <span key={index}>
+                        {line}
+                        {index <
+                          card.fullDescription.split("\n").length - 1 && <br />}
+                      </span>
+                    ))
+                  : card.description}
               </p>
-              {card.title !== "Main Website" && (
+              {card.title === "YPG Anthem" ? (
+                <button
+                  onClick={() => setIsAnthemExpanded(!isAnthemExpanded)}
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  {isAnthemExpanded ? "Read Less" : "Read More"}
+                  <svg
+                    className={`w-4 h-4 ml-1 transition-transform ${
+                      isAnthemExpanded ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              ) : card.title !== "Main Website" ? (
                 <motion.a
                   href={card.link}
                   target={card.link.startsWith("http") ? "_blank" : "_self"}
@@ -86,7 +121,7 @@ export default function FeatureCards() {
                       ? "Open System"
                       : "Learn More"}
                 </motion.a>
-              )}
+              ) : null}
             </motion.div>
           ))}
         </motion.div>

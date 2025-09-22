@@ -22,7 +22,9 @@ export default function CouncilSection() {
   useEffect(() => {
     const fetchCouncilMembers = async () => {
       try {
-        const response = await fetch("http://localhost:8002/api/council/");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/`
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -92,7 +94,7 @@ export default function CouncilSection() {
   const getImageUrl = (url) => {
     if (!url) return "/placeholder-item.jpg";
     if (url.startsWith("http")) return url;
-    return `http://localhost:8002${url.startsWith("/") ? url : "/" + url}`;
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${url.startsWith("/") ? url : "/" + url}`;
   };
 
   useEffect(() => {

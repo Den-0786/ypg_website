@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Trash2, MessageSquare, X, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function CommunicationManagement({
@@ -11,98 +11,113 @@ export default function CommunicationManagement({
   setContactMessages,
   theme,
 }) {
-  const [showAddContactMessage, setShowAddContactMessage] = useState(false);
-  const [newContactMessage, setNewContactMessage] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-    date: new Date().toISOString().split("T")[0],
-    status: "unread",
-  });
-  const [editingContactMessage, setEditingContactMessage] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Validation state
-  const [emailError, setEmailError] = useState("");
+  // Get unread messages
+  const unreadMessages = contactMessages.filter(
+    (msg) => msg.status === "unread"
+  );
+  const displayMessages = showUnreadOnly ? unreadMessages : contactMessages;
 
-  // Validation function
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError("");
-      return true;
+  // Handle viewing a message (automatically mark as read)
+  const handleViewMessage = async (message) => {
+    setSelectedMessage(message);
+    setShowMessageModal(true);
+
+    // If message is unread, mark it as read
+    if (message.status === "unread") {
+      try {
+        // Update local state immediately
+        setContactMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === message.id ? { ...msg, status: "read" } : msg
+          )
+        );
+
+        // Call API to update on server
+        const response = await fetch(
+          `http://localhost:8002/api/contact/${message.id}/read/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          // Revert local state if API call fails
+          setContactMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === message.id ? { ...msg, status: "unread" } : msg
+            )
+          );
+          toast.error("Failed to mark message as read");
+        }
+      } catch (error) {
+        console.error("Error marking message as read:", error);
+        // Revert local state if API call fails
+        setContactMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === message.id ? { ...msg, status: "unread" } : msg
+          )
+        );
+        toast.error("Failed to mark message as read");
+      }
     }
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      return false;
+  };
+
+  // Handle delete confirmation
+  const handleDeleteClick = (message) => {
+    setMessageToDelete(message);
+    setShowDeleteModal(true);
+  };
+
+  // Handle confirmed delete
+  const handleConfirmDelete = async () => {
+    if (!messageToDelete || isDeleting) return;
+
+    setIsDeleting(true);
+    console.log("Deleting message:", messageToDelete.id);
+
+    try {
+      // Call API to delete on server
+      const response = await fetch(
+        `http://localhost:8002/api/contact/${messageToDelete.id}/delete/`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      console.log("Delete response status:", response.status);
+
+      if (!response.ok) {
+        console.error("Delete failed with status:", response.status);
+        toast.error("Failed to delete message");
+        return;
+      }
+
+      // Update local state
+      setContactMessages((prev) =>
+        prev.filter((msg) => msg.id !== messageToDelete.id)
+      );
+      toast.success("Contact message deleted successfully!");
+
+      // Close modals
+      setShowDeleteModal(false);
+      setShowMessageModal(false);
+      setMessageToDelete(null);
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      toast.error("Failed to delete message");
+    } finally {
+      setIsDeleting(false);
     }
-    setEmailError("");
-    return true;
-  };
-
-  // Handle adding a new contact message
-  const handleAddContactMessage = (e) => {
-    e.preventDefault();
-
-    // Validate email before submitting
-    const isEmailValid = validateEmail(newContactMessage.email);
-    if (!isEmailValid) {
-      return; // Don't submit if validation fails
-    }
-
-    const newMessageWithId = {
-      ...newContactMessage,
-      id: Date.now(), // In a real app, this would come from the server
-    };
-    setContactMessages((prev) => [...prev, newMessageWithId]);
-    setShowAddContactMessage(false);
-    setNewContactMessage({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-      date: new Date().toISOString().split("T")[0],
-      status: "unread",
-    });
-    // Clear validation errors
-    setEmailError("");
-    toast.success("Contact message added successfully!");
-  };
-
-  // Handle updating a contact message
-  const handleUpdateContactMessage = (e) => {
-    e.preventDefault();
-    setContactMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === editingContactMessage.id
-          ? { ...newContactMessage, id: editingContactMessage.id }
-          : msg
-      )
-    );
-    setShowAddContactMessage(false);
-    setNewContactMessage({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-      date: new Date().toISOString().split("T")[0],
-      status: "unread",
-    });
-    setEditingContactMessage(null);
-    toast.success("Contact message updated successfully!");
-  };
-
-  // Handle deleting a contact message
-  const handleDeleteContactMessage = (id) => {
-    setContactMessages((prev) => prev.filter((msg) => msg.id !== id));
-    toast.success("Contact message deleted successfully!");
-  };
-
-  // Handle closing the modal
-  const handleCloseModal = () => {
-    setShowAddContactMessage(false);
-    // Clear validation errors when closing modal
-    setEmailError("");
   };
 
   return (
@@ -117,235 +132,118 @@ export default function CommunicationManagement({
         >
           Contact Messages
         </h2>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          onClick={() => {
-            setEditingContactMessage(null);
-            setNewContactMessage({
-              name: "",
-              email: "",
-              subject: "",
-              message: "",
-              date: new Date().toISOString().split("T")[0],
-              status: "unread",
-            });
-            // Clear validation errors when opening modal
-            setEmailError("");
-            setShowAddContactMessage(true);
-          }}
-        >
-          <Plus className="w-4 h-4 inline mr-2" />
-          Add Message
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-gray-500">
+            {contactMessages.length} message
+            {contactMessages.length !== 1 ? "s" : ""}
+          </div>
+          {unreadMessages.length > 0 && (
+            <button
+              onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                showUnreadOnly
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+              }`}
+            >
+              {showUnreadOnly
+                ? "Show All"
+                : `Show Unread (${unreadMessages.length})`}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Add Contact Message Modal */}
-      <Transition.Root show={showAddContactMessage} as={Fragment}>
-        <Dialog as="div" className="relative z-50" onClose={handleCloseModal}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity" />
-          </Transition.Child>
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
+      {/* Unread Messages Card */}
+      {unreadMessages.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-lg border border-dashed p-3 ${
+            theme === "dark"
+              ? "border-orange-400/40 bg-orange-900/20"
+              : "border-orange-300 bg-orange-50"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className={`p-1.5 rounded-full ${
+                  theme === "dark" ? "bg-orange-900/40" : "bg-orange-100"
+                }`}
               >
-                <Dialog.Panel
-                  className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} border`}
+                <MessageSquare
+                  className={`w-4 h-4 ${
+                    theme === "dark" ? "text-orange-400" : "text-orange-600"
+                  }`}
+                />
+              </div>
+              <div>
+                <span
+                  className={`text-sm font-medium ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
                 >
-                  <Dialog.Title
-                    as="h3"
-                    className={`text-lg font-semibold leading-6 mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                  >
-                    {editingContactMessage ? "Edit Message" : "Add Message"}
-                  </Dialog.Title>
-                  <p
-                    className={`text-sm mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-                  >
-                    {editingContactMessage
-                      ? "Update the contact message"
-                      : "Create a new contact message"}
-                  </p>
-                  <form
-                    onSubmit={
-                      editingContactMessage
-                        ? handleUpdateContactMessage
-                        : handleAddContactMessage
-                    }
-                    className="space-y-2.5"
-                  >
-                    <div>
-                      <label
-                        className={`block text-xs font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        className={`w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-700 placeholder-gray-500"}`}
-                        value={newContactMessage.name}
-                        onChange={(e) =>
-                          setNewContactMessage({
-                            ...newContactMessage,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-xs font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="Enter email address"
-                        className={`w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
-                          emailError
-                            ? "border-red-500 focus:ring-red-500"
-                            : theme === "dark"
-                              ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                              : "border-gray-300 bg-white text-gray-700 placeholder-gray-500"
-                        }`}
-                        value={newContactMessage.email}
-                        onChange={(e) => {
-                          setNewContactMessage({
-                            ...newContactMessage,
-                            email: e.target.value,
-                          });
-                          validateEmail(e.target.value);
-                        }}
-                        onBlur={(e) => validateEmail(e.target.value)}
-                      />
-                      {emailError && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center">
-                          <span className="mr-1">⚠️</span>
-                          {emailError}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-xs font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        Subject
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        className={`w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-700 placeholder-gray-500"}`}
-                        value={newContactMessage.subject}
-                        onChange={(e) =>
-                          setNewContactMessage({
-                            ...newContactMessage,
-                            subject: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-xs font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        Message
-                      </label>
-                      <textarea
-                        required
-                        className={`w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-700 placeholder-gray-500"}`}
-                        rows={3}
-                        value={newContactMessage.message}
-                        onChange={(e) =>
-                          setNewContactMessage({
-                            ...newContactMessage,
-                            message: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-xs font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        Date
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        className={`w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-700"}`}
-                        value={newContactMessage.date}
-                        onChange={(e) =>
-                          setNewContactMessage({
-                            ...newContactMessage,
-                            date: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-xs font-semibold mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        Status
-                      </label>
-                      <select
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-700"}`}
-                        value={newContactMessage.status}
-                        onChange={(e) =>
-                          setNewContactMessage({
-                            ...newContactMessage,
-                            status: e.target.value,
-                          })
-                        }
-                      >
-                        <option value="unread">Unread</option>
-                        <option value="read">Read</option>
-                        <option value="archived">Archived</option>
-                      </select>
-                    </div>
-                    <div className="flex justify-end gap-2 mt-4">
-                      <button
-                        type="button"
-                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                        onClick={() => setShowAddContactMessage(false)}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg text-sm"
-                      >
-                        {editingContactMessage ? "Update" : "Add"} Message
-                      </button>
-                    </div>
-                  </form>
-                </Dialog.Panel>
-              </Transition.Child>
+                  {unreadMessages.length} unread message
+                  {unreadMessages.length !== 1 ? "s" : ""}
+                </span>
+              </div>
             </div>
+            <button
+              onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                theme === "dark"
+                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                  : "bg-orange-600 hover:bg-orange-700 text-white"
+              }`}
+            >
+              {showUnreadOnly ? "Show All" : "View"}
+            </button>
           </div>
-        </Dialog>
-      </Transition.Root>
+        </motion.div>
+      )}
 
       {/* Contact Messages Table */}
       <div
         className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-sm border overflow-hidden`}
       >
+        {/* Table Header with Filter Status */}
+        {showUnreadOnly && (
+          <div
+            className={`px-4 py-3 border-b ${
+              theme === "dark"
+                ? "border-gray-700 bg-gray-700/50"
+                : "border-gray-200 bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    theme === "dark" ? "bg-orange-400" : "bg-orange-500"
+                  }`}
+                ></div>
+                <span
+                  className={`text-sm font-medium ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  Showing unread messages only
+                </span>
+              </div>
+              <button
+                onClick={() => setShowUnreadOnly(false)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  theme === "dark"
+                    ? "bg-gray-600 hover:bg-gray-500 text-gray-300"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                }`}
+              >
+                ← Back to All Messages
+              </button>
+            </div>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead
@@ -387,81 +285,413 @@ export default function CommunicationManagement({
             <tbody
               className={`${theme === "dark" ? "bg-gray-800 divide-gray-700" : "bg-white divide-gray-200"} divide-y`}
             >
-              {contactMessages.map((message) => (
-                <tr
-                  key={message.id}
-                  className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}
-                >
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                  >
-                    {message.name}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
-                  >
-                    {message.email}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
-                  >
-                    {message.subject}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
-                  >
-                    {new Date(message.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        message.status === "unread"
-                          ? theme === "dark"
-                            ? "bg-red-900/30 text-red-300"
-                            : "bg-red-100 text-red-800"
-                          : message.status === "read"
-                            ? theme === "dark"
-                              ? "bg-green-900/30 text-green-300"
-                              : "bg-green-100 text-green-800"
-                            : theme === "dark"
-                              ? "bg-gray-700 text-gray-300"
-                              : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {message.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      className={`mr-3 transition-colors ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-900"}`}
-                      onClick={() => {
-                        setEditingContactMessage(message);
-                        setNewContactMessage({
-                          name: message.name,
-                          email: message.email,
-                          subject: message.subject,
-                          message: message.message,
-                          date: message.date,
-                          status: message.status,
-                        });
-                        setShowAddContactMessage(true);
-                      }}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      className={`transition-colors ${theme === "dark" ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-900"}`}
-                      onClick={() => handleDeleteContactMessage(message.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+              {displayMessages.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div
+                        className={`p-3 rounded-full ${
+                          theme === "dark" ? "bg-gray-700" : "bg-gray-100"
+                        }`}
+                      >
+                        <MessageSquare
+                          className={`w-6 h-6 ${
+                            theme === "dark" ? "text-gray-500" : "text-gray-400"
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <h3
+                          className={`text-lg font-medium ${
+                            theme === "dark" ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          {showUnreadOnly
+                            ? "No unread messages"
+                            : "No messages"}
+                        </h3>
+                        <p
+                          className={`text-sm ${
+                            theme === "dark" ? "text-gray-500" : "text-gray-500"
+                          }`}
+                        >
+                          {showUnreadOnly
+                            ? "All messages have been read"
+                            : "No contact messages yet"}
+                        </p>
+                      </div>
+                      {showUnreadOnly && (
+                        <button
+                          onClick={() => setShowUnreadOnly(false)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            theme === "dark"
+                              ? "bg-blue-600 hover:bg-blue-700 text-white"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                          }`}
+                        >
+                          ← View All Messages
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                displayMessages.map((message) => (
+                  <tr
+                    key={message.id}
+                    className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}
+                  >
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                    >
+                      {message.name}
+                    </td>
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
+                      {message.email}
+                    </td>
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
+                      {message.subject}
+                    </td>
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-500"}`}
+                    >
+                      {new Date(message.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          message.status === "unread"
+                            ? theme === "dark"
+                              ? "bg-red-900/30 text-red-300"
+                              : "bg-red-100 text-red-800"
+                            : message.status === "read"
+                              ? theme === "dark"
+                                ? "bg-green-900/30 text-green-300"
+                                : "bg-green-100 text-green-800"
+                              : theme === "dark"
+                                ? "bg-gray-700 text-gray-300"
+                                : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {message.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        className={`mr-3 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                          message.status === "unread"
+                            ? theme === "dark"
+                              ? "bg-blue-600 hover:bg-blue-700 text-white"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                            : theme === "dark"
+                              ? "bg-gray-600 hover:bg-gray-700 text-gray-300"
+                              : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                        }`}
+                        onClick={() => handleViewMessage(message)}
+                        title="View full message"
+                      >
+                        {message.status === "unread" ? "Read" : "View"}
+                      </button>
+                      <button
+                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                          theme === "dark"
+                            ? "bg-red-600 hover:bg-red-700 text-white"
+                            : "bg-red-600 hover:bg-red-700 text-white"
+                        }`}
+                        onClick={() => handleDeleteClick(message)}
+                        title="Delete message"
+                      >
+                        <Trash2 className="w-3 h-3 inline mr-1" />
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Message Viewing Modal */}
+      <Transition.Root show={showMessageModal} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setShowMessageModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className={`w-full max-w-2xl transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${
+                    theme === "dark"
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-100"
+                  } border`}
+                >
+                  {selectedMessage && (
+                    <>
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`p-2 rounded-full ${
+                              theme === "dark"
+                                ? "bg-blue-900/30"
+                                : "bg-blue-100"
+                            }`}
+                          >
+                            <Mail
+                              className={`w-5 h-5 ${
+                                theme === "dark"
+                                  ? "text-blue-400"
+                                  : "text-blue-600"
+                              }`}
+                            />
+                          </div>
+                          <div>
+                            <Dialog.Title
+                              as="h3"
+                              className={`text-lg font-semibold ${
+                                theme === "dark"
+                                  ? "text-white"
+                                  : "text-gray-900"
+                              }`}
+                            >
+                              {selectedMessage.subject}
+                            </Dialog.Title>
+                            <p
+                              className={`text-sm ${
+                                theme === "dark"
+                                  ? "text-gray-400"
+                                  : "text-gray-600"
+                              }`}
+                            >
+                              From: {selectedMessage.name} (
+                              {selectedMessage.email})
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setShowMessageModal(false)}
+                          className={`p-2 rounded-full transition-colors ${
+                            theme === "dark"
+                              ? "hover:bg-gray-700"
+                              : "hover:bg-gray-100"
+                          }`}
+                        >
+                          <X
+                            className={`w-5 h-5 ${
+                              theme === "dark"
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      <div
+                        className={`rounded-lg p-4 ${
+                          theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                        }`}
+                      >
+                        <h4
+                          className={`font-medium mb-2 ${
+                            theme === "dark" ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          Message:
+                        </h4>
+                        <p
+                          className={`whitespace-pre-wrap ${
+                            theme === "dark" ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          {selectedMessage.message}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-6">
+                        <div
+                          className={`text-sm ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Received:{" "}
+                          {new Date(selectedMessage.date).toLocaleDateString()}{" "}
+                          at{" "}
+                          {new Date(selectedMessage.date).toLocaleTimeString()}
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => setShowMessageModal(false)}
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                              theme === "dark"
+                                ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            }`}
+                          >
+                            Close
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowMessageModal(false);
+                              setMessageToDelete(selectedMessage);
+                              setShowDeleteModal(true);
+                            }}
+                            className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors"
+                          >
+                            Delete Message
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      {/* Delete Confirmation Modal */}
+      <Transition.Root show={showDeleteModal} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setShowDeleteModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${
+                    theme === "dark"
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-100"
+                  } border`}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div
+                      className={`p-2 rounded-full ${
+                        theme === "dark" ? "bg-red-900/30" : "bg-red-100"
+                      }`}
+                    >
+                      <Trash2
+                        className={`w-5 h-5 ${
+                          theme === "dark" ? "text-red-400" : "text-red-600"
+                        }`}
+                      />
+                    </div>
+                    <Dialog.Title
+                      as="h3"
+                      className={`text-lg font-semibold ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      Delete Message
+                    </Dialog.Title>
+                  </div>
+
+                  <p
+                    className={`text-sm mb-6 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    Are you sure you want to delete this message? This action
+                    cannot be undone.
+                  </p>
+
+                  {messageToDelete && (
+                    <div
+                      className={`rounded-lg p-3 mb-6 ${
+                        theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-medium ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
+                        From: {messageToDelete.name}
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        Subject: {messageToDelete.subject}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => setShowDeleteModal(false)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        theme === "dark"
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleConfirmDelete}
+                      disabled={isDeleting}
+                      className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isDeleting ? "Deleting..." : "Delete Message"}
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </motion.div>
   );
 }
