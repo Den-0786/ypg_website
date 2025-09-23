@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 import { ystoreAPI } from "../../../utils/api";
 
 export default function YStoreSection() {
@@ -213,7 +214,7 @@ export default function YStoreSection() {
                       <Image
                         src={
                           item.image
-                            ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`
+                            ? buildImageSrc(item.image)
                             : "/placeholder-item.jpg"
                         }
                         alt={item.name}

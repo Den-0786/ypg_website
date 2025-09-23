@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { buildImageSrc } from "../../utils/config";
 import Link from "next/link";
 
 async function fetchBlogPosts() {
@@ -47,7 +48,7 @@ export default async function BlogListPage() {
                     <Image
                       src={
                         post.image
-                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${post.image}`
+                          ? buildImageSrc(post.image)
                           : "/placeholder-item.jpg"
                       }
                       alt={post.title}

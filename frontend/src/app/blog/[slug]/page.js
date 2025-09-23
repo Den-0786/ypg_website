@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 
 async function fetchPost(slug) {
   try {
@@ -47,11 +48,7 @@ export default async function BlogDetailPage({ params }) {
       {/* Image */}
       <div className="relative h-96 md:h-[28rem] rounded-xl overflow-hidden mb-6 shadow-md">
         <Image
-          src={
-            post.image
-              ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${post.image}`
-              : "/placeholder-item.jpg"
-          }
+          src={post.image ? buildImageSrc(post.image) : "/placeholder-item.jpg"}
           alt={post.title}
           fill
           className="object-cover"
