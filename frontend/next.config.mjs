@@ -28,6 +28,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "d2gmd4btla74l2.cloudfront.net",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
   async rewrites() {
