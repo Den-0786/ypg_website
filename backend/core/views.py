@@ -1032,24 +1032,21 @@ def api_delete_team_member(request, member_id):
 @permission_classes([AllowAny])
 def api_create_council_member(request):
     try:
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = {
-                'name': request.POST.get('name'),
-                'position': request.POST.get('position'),
-                'congregation': request.POST.get('congregation', ''),
-                'quote': request.POST.get('quote', ''),
-                'is_active': True,
-                'order': int(request.POST.get('order', 0) or 0)
-            }
-            if 'image' in request.FILES:
-                data['image'] = request.FILES['image']
+        # Use request.data for both JSON and multipart form data
+        data = request.data.copy()
+        
+        # Handle file upload
+        if 'image' in request.FILES:
+            data['image'] = request.FILES['image']
+        
+        # Set default values
+        data['is_active'] = True
+        data['is_council'] = True
 
         serializer = TeamMemberSerializer(data=data)
 
         if serializer.is_valid():
-            member = serializer.save(is_council=True)
+            member = serializer.save()
             return Response({
                 'success': True,
                 'message': 'Council member created successfully',
@@ -1071,21 +1068,16 @@ def api_update_council_member(request, member_id):
     try:
         member = get_object_or_404(TeamMember, id=member_id, is_council=True)
 
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = {
-                'name': request.POST.get('name'),
-                'position': request.POST.get('position'),
-                'congregation': request.POST.get('congregation', ''),
-                'quote': request.POST.get('quote', ''),
-            }
-            if 'image' in request.FILES:
-                data['image'] = request.FILES['image']
+        # Use request.data for both JSON and multipart form data
+        data = request.data.copy()
+        
+        # Handle file upload
+        if 'image' in request.FILES:
+            data['image'] = request.FILES['image']
 
         serializer = TeamMemberSerializer(member, data=data, partial=True)
         if serializer.is_valid():
-            updated = serializer.save(is_council=True)
+            updated = serializer.save()
             return Response({
                 'success': True,
                 'message': 'Council member updated successfully',
