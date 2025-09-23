@@ -2197,7 +2197,26 @@ def api_update_gallery_item(request, item_id):
     """Update a gallery item"""
     try:
         item = get_object_or_404(GalleryItem, id=item_id)
-        data = json.loads(request.body)
+        # Support both JSON and multipart form updates with files
+        if request.FILES:
+            data = request.data.copy()
+            # Map generic 'file' to the right field based on category
+            if data.get('category') == 'video' and 'file' in request.FILES:
+                data['video'] = request.FILES['file']
+                if 'image' in data:
+                    del data['image']
+            elif data.get('category') == 'image' and 'file' in request.FILES:
+                data['image'] = request.FILES['file']
+                if 'video' in data:
+                    del data['video']
+            # Avoid sending both fields
+            if 'image' in data and 'video' in data:
+                if data.get('category') == 'video':
+                    del data['image']
+                else:
+                    del data['video']
+        else:
+            data = json.loads(request.body)
         serializer = GalleryItemSerializer(item, data=data, partial=True)
         
         if serializer.is_valid():
