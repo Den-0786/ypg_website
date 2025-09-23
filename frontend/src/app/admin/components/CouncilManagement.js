@@ -46,7 +46,7 @@ export default function CouncilManagement({ theme }) {
   useEffect(() => {
     const fetchCouncilMembers = async () => {
       try {
-        const response = await fetch("http://localhost:8002/api/council");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/`);
         const data = await response.json();
         if (data.success) {
           setCouncilMembers(data.councilMembers);
@@ -173,14 +173,14 @@ export default function CouncilManagement({ theme }) {
       if (editingMember) {
         formDataToSend.append("id", editingMember.id);
         response = await fetch(
-          `http://localhost:8002/api/council/${editingMember.id}/update/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/${editingMember.id}/update/`,
           {
             method: "PUT",
             body: formDataToSend,
           }
         );
       } else {
-        response = await fetch("http://localhost:8002/api/council/create/", {
+        response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/create/`, {
           method: "POST",
           body: formDataToSend,
         });
@@ -222,7 +222,7 @@ export default function CouncilManagement({ theme }) {
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/council/${memberToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/${memberToDelete.id}/delete/`,
         { method: "DELETE" }
       );
 
@@ -266,10 +266,10 @@ export default function CouncilManagement({ theme }) {
     "Kokobriko",
   ];
 
-  const getImageUrl = (url) => {
-    if (!url) return "/placeholder-item.jpg";
-    if (url.startsWith("http")) return url;
-    return `http://localhost:8002${url.startsWith("/") ? url : "/" + url}`;
+  const buildImageSrc = (imagePath) => {
+    if (!imagePath) return "/placeholder-item.jpg";
+    if (imagePath.startsWith("http")) return imagePath;
+    return `https://d2gmd4btla74l2.cloudfront.net${imagePath.startsWith("/") ? imagePath : "/" + imagePath}`;
   };
 
   const getPositionIcon = (position) => {
@@ -396,7 +396,7 @@ export default function CouncilManagement({ theme }) {
             {/* Member Image */}
             <div className="relative h-72 bg-gray-200">
               <img
-                src={getImageUrl(member.image)}
+                src={buildImageSrc(member.image)}
                 alt={member.name}
                 className="w-full h-full object-cover"
               />
