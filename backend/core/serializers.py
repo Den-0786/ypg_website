@@ -32,6 +32,9 @@ class EventSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TeamMemberSerializer(serializers.ModelSerializer):
+    # Expose 'description' as a read-only alias of 'quote' for frontend compatibility
+    description = serializers.CharField(source='quote', read_only=True)
+
     class Meta:
         model = TeamMember
         fields = '__all__'

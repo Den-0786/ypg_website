@@ -938,7 +938,9 @@ def api_create_team_member(request):
                 'name': request.POST.get('name'),
                 'position': request.POST.get('position'),
                 'congregation': request.POST.get('congregation', ''),
-                'quote': request.POST.get('quote', ''),
+                'phone': request.POST.get('phone', ''),
+                'email': request.POST.get('email', ''),
+                'quote': request.POST.get('quote', request.POST.get('description', '')),
                 'is_active': True,
                 'order': 0
             }
@@ -983,7 +985,9 @@ def api_update_team_member(request, member_id):
                 'name': request.POST.get('name'),
                 'position': request.POST.get('position'),
                 'congregation': request.POST.get('congregation', ''),
-                'quote': request.POST.get('quote', ''),
+                'phone': request.POST.get('phone', ''),
+                'email': request.POST.get('email', ''),
+                'quote': request.POST.get('quote', request.POST.get('description', '')),
             }
             # Handle image upload
             if 'image' in request.FILES:
@@ -1039,6 +1043,10 @@ def api_create_council_member(request):
         if 'image' in request.FILES:
             data['image'] = request.FILES['image']
         
+        # Map description -> quote for compatibility
+        if 'description' in data and not data.get('quote'):
+            data['quote'] = data.get('description')
+
         # Set default values
         data['is_active'] = True
         data['is_council'] = True
@@ -1071,6 +1079,10 @@ def api_update_council_member(request, member_id):
         # Use request.data for both JSON and multipart form data
         data = request.data.copy()
         
+        # Map description -> quote for compatibility
+        if 'description' in data and not data.get('quote'):
+            data['quote'] = data.get('description')
+
         # Handle file upload
         if 'image' in request.FILES:
             data['image'] = request.FILES['image']

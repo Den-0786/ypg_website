@@ -76,6 +76,8 @@ class TeamMember(models.Model):
     name = models.CharField(max_length=100)
     position = models.CharField(max_length=100)
     congregation = models.CharField(max_length=200, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
     quote = models.TextField(blank=True, help_text="Favorite quote or motto")
     image = models.ImageField(upload_to='team/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
