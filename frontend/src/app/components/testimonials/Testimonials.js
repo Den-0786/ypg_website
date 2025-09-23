@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect } from "react";
 import TestimonialSubmissionForm from "./TestimonialSubmissionForm";
+import { buildImageSrc } from "../../../utils/config";
 
 export default function TestimonialsSection() {
   const [showContactModal, setShowContactModal] = useState(false);
@@ -118,11 +119,7 @@ export default function TestimonialsSection() {
                 <div className="p-6">
                   <div className="flex items-center mb-6">
                     <img
-                      src={
-                        t.image
-                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${t.image}`
-                          : "/placeholder-item.jpg"
-                      }
+                      src={buildImageSrc(t.image)}
                       alt={t.name}
                       className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-md"
                     />

@@ -331,6 +331,13 @@ function AdminDashboardInner() {
     };
   }, [isAuthenticated]);
 
+  // Expose refresh functions globally for cross-component communication
+  useEffect(() => {
+    window.refreshDashboardTestimonials = () => {
+      fetchData(buildApiUrl("api/testimonials"), setTestimonials);
+    };
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated) return;
     let channel;
