@@ -89,10 +89,15 @@ export default function TestimonialSubmissionForm({ onClose }) {
         if (window.refreshTestimonials) {
           window.refreshTestimonials();
         }
-        
+
         // Trigger refresh on dashboard if available
         if (window.refreshDashboardTestimonials) {
           window.refreshDashboardTestimonials();
+        }
+        
+        // Trigger refresh of contact messages if available
+        if (window.refreshContactMessages) {
+          window.refreshContactMessages();
         }
 
         toast.success(

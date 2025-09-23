@@ -80,6 +80,11 @@ export default function ContactSection() {
       });
 
       if (result.success) {
+        // Trigger refresh on dashboard if available
+        if (window.refreshContactMessages) {
+          window.refreshContactMessages();
+        }
+        
         setSubmissionStatus("success");
         setFormData({
           name: "",

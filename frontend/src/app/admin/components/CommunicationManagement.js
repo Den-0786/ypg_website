@@ -11,8 +11,8 @@ export default function CommunicationManagement({
   setContactMessages,
   theme,
 }) {
-  const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState(null);
@@ -41,7 +41,7 @@ export default function CommunicationManagement({
 
         // Call API to update on server
         const response = await fetch(
-          `http://localhost:8002/api/contact/${message.id}/read/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${message.id}/read/`,
           {
             method: "POST",
             headers: {
@@ -88,7 +88,7 @@ export default function CommunicationManagement({
     try {
       // Call API to delete on server
       const response = await fetch(
-        `http://localhost:8002/api/contact/${messageToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${messageToDelete.id}/delete/`,
         {
           method: "DELETE",
         }

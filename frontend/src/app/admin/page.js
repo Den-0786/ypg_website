@@ -336,6 +336,16 @@ function AdminDashboardInner() {
     window.refreshDashboardTestimonials = () => {
       fetchData(buildApiUrl("api/testimonials"), setTestimonials);
     };
+    window.refreshContactMessages = () => {
+      fetchData(buildApiUrl("api/contact"), (data) => {
+        const transformedData = data.map((message) => ({
+          ...message,
+          date: message.created_at,
+          status: message.is_read ? "read" : "unread",
+        }));
+        setContactMessages(transformedData);
+      });
+    };
   }, []);
 
   useEffect(() => {
