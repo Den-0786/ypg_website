@@ -141,6 +141,11 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prevent double submission
+    if (isSubmitting) {
+      return;
+    }
+
     // Validate form before submission
     if (!validateForm()) {
       toast.error("Please fix the validation errors before submitting");
