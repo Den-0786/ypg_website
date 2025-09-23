@@ -88,12 +88,13 @@ def api_create_advertisement(request):
                     
                     # Save the file
                     saved_path = default_storage.save(file_path, file)
+                    file_url = default_storage.url(saved_path)
                     
                     # Add to images list
                     image_files.append({
                         'name': file.name,
                         'path': saved_path,
-                        'url': f"/media/{saved_path}",
+                        'url': file_url,
                         'size': file.size,
                         'content_type': file.content_type
                     })
