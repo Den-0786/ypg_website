@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import { useState } from "react";
+import { buildImageSrc } from "../../../utils/config";
 import {
   Image,
   Plus,
@@ -250,13 +251,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             <div className="h-64 relative overflow-hidden">
               {item.image ? (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`}
+                  src={buildImageSrc(item.image)}
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />
               ) : item.video ? (
                 <video
-                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.video}`}
+                  src={buildImageSrc(item.video)}
                   className="w-full h-full object-cover"
                   controls
                   preload="metadata"

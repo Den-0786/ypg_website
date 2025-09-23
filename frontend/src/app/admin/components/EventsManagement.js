@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { buildImageSrc } from "../../../utils/config";
 import {
   Calendar,
   Plus,
@@ -292,7 +293,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             >
               {event.image ? (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${event.image}`}
+                  src={buildImageSrc(event.image)}
                   alt={event.title}
                   className="w-full h-full object-cover object-center"
                   style={{ objectPosition: "center 25%" }}

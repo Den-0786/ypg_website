@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { buildImageSrc } from "../../../utils/config";
 import { Plus, Edit, Trash2, Eye, EyeOff, X } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -286,7 +287,7 @@ export default function PastExecutivesManagement({ theme }) {
               >
                 {executive.image ? (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${executive.image}`}
+                    src={buildImageSrc(executive.image)}
                     alt={executive.name}
                     className="w-full h-40 object-cover"
                   />

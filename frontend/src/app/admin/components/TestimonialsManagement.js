@@ -14,6 +14,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { buildImageSrc } from "../../../utils/config";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import toast from "react-hot-toast";
@@ -492,7 +493,7 @@ const TestimonialsManagement = ({
                           <img
                             src={
                               selectedTestimonial.image
-                                ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${selectedTestimonial.image}`
+                                ? buildImageSrc(selectedTestimonial.image)
                                 : "/placeholder-item.jpg"
                             }
                             alt={selectedTestimonial.name}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { buildImageSrc } from "../../../utils/config";
 import { FileText, Plus, Edit, Trash2, X, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -223,7 +224,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                 <div className="h-64 relative overflow-hidden">
                   {post.image ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${post.image}`}
+                      src={buildImageSrc(post.image)}
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone,
@@ -234,7 +235,7 @@ export default function AdvertisementSection() {
                         <img
                           src={
                             hasImages && ad.images[currentIndex]
-                              ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${ad.images[currentIndex].url}`
+                              ? buildImageSrc(ad.images[currentIndex].url)
                               : "/placeholder-item.jpg"
                           }
                           alt={`${ad.title} - Image ${currentIndex + 1}`}

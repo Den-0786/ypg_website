@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -567,7 +568,7 @@ export default function YStoreManagement({ theme }) {
               <img
                 src={
                   item.image
-                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`
+                    ? buildImageSrc(item.image)
                     : "/placeholder-item.jpg"
                 }
                 alt={item.name}
