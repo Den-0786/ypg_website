@@ -814,6 +814,8 @@ def api_delete_event(request, event_id):
 def api_team_members(request):
     """Get all team members"""
     try:
+        # Trash support: return only deleted when ?deleted=true
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
         # Fixed hierarchy order
         hierarchy_order = [
             'president',
@@ -841,7 +843,11 @@ def api_team_members(request):
             'protocol secretary': 'protocol officer',
         }
 
-        team_members = TeamMember.objects.filter(is_active=True, is_council=False)
+        if deleted_only:
+            team_members = TeamMember.objects.filter(is_deleted=True, is_council=False)
+        else:
+            # Default: non-deleted active members for dashboard
+            team_members = TeamMember.objects.filter(is_deleted=False, is_council=False, is_active=True)
 
         def normalize_position(raw_position: str) -> str:
             if not raw_position:
@@ -1129,6 +1135,23 @@ def api_delete_council_member(request, member_id):
 def api_donations(request):
     """Get all donations with analytics"""
     try:
+        # Trash support: donations are not soft-deleted; when deleted=true return empty
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
+        if deleted_only:
+            return Response({
+                'success': True,
+                'donations': [],
+                'analytics': {
+                    'total_amount': 0,
+                    'total_count': 0,
+                    'monthly_amount': 0,
+                    'monthly_count': 0,
+                    'purpose_breakdown': [],
+                    'payment_breakdown': [],
+                    'status_breakdown': [],
+                }
+            })
+
         from django.db.models import Sum, Count
         from django.utils import timezone
         from datetime import timedelta
@@ -1559,7 +1582,11 @@ YPG Ministry Team
 def api_contact_messages(request):
     """Get all contact messages"""
     try:
-        messages = ContactMessage.objects.all().order_by('-created_at')
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
+        if deleted_only:
+            messages = ContactMessage.objects.filter(is_deleted=True).order_by('-created_at')
+        else:
+            messages = ContactMessage.objects.filter(is_deleted=False).order_by('-created_at')
         serializer = ContactMessageSerializer(messages, many=True)
         return Response({
             'success': True,
@@ -1644,7 +1671,12 @@ def api_delete_contact(request, message_id):
 def api_ministry_registrations(request):
     """Get all ministry registrations"""
     try:
-        registrations = MinistryRegistration.objects.all().order_by('-created_at')
+        # No soft-delete implemented; support deleted=true by returning empty
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
+        if deleted_only:
+            registrations = MinistryRegistration.objects.none()
+        else:
+            registrations = MinistryRegistration.objects.all().order_by('-created_at')
         serializer = MinistryRegistrationSerializer(registrations, many=True)
         return Response({
             'success': True,
@@ -1728,7 +1760,11 @@ def api_delete_ministry_registration(request, registration_id):
 @permission_classes([AllowAny])
 def api_ministries(request):
     try:
-        items = Ministry.objects.filter(dashboard_deleted=False).order_by('-created_at')
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
+        if deleted_only:
+            items = Ministry.objects.filter(dashboard_deleted=True).order_by('-created_at')
+        else:
+            items = Ministry.objects.filter(dashboard_deleted=False).order_by('-created_at')
         return Response({'success': True, 'ministries': MinistrySerializer(items, many=True).data})
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1790,11 +1826,14 @@ def api_blog_posts(request):
     try:
         # Check if this is for the website (published only) or dashboard (all posts)
         for_website = request.GET.get('forWebsite', 'false').lower() == 'true'
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
         
-        if for_website:
+        if deleted_only:
+            posts = BlogPost.objects.filter(is_deleted=True).order_by('-created_at')
+        elif for_website:
             posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')
         else:
-            posts = BlogPost.objects.all().order_by('-created_at')
+            posts = BlogPost.objects.filter(is_deleted=False).order_by('-created_at')
             
         serializer = BlogPostSerializer(posts, many=True)
         return Response({
@@ -2124,7 +2163,12 @@ def api_deny_testimonial(request, testimonial_id):
 def api_gallery_items(request):
     """Get all gallery items"""
     try:
-        items = GalleryItem.objects.all().order_by('-created_at')
+        # Gallery does not currently support soft-delete; deleted=true returns empty
+        deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
+        if deleted_only:
+            items = GalleryItem.objects.none()
+        else:
+            items = GalleryItem.objects.all().order_by('-created_at')
         serializer = GalleryItemSerializer(items, many=True)
         return Response({
             'success': True,
