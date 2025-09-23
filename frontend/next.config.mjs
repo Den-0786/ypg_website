@@ -7,17 +7,26 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Django Render media (legacy)
       {
         protocol: "https",
         hostname: "ypg-website.onrender.com",
         port: "",
         pathname: "/media/**",
       },
+      // S3 bucket direct access
       {
         protocol: "https",
-        hostname: "ypg-website-backend.onrender.com",
+        hostname: "dennis-opoku-bucket.s3.eu-central-1.amazonaws.com",
         port: "",
-        pathname: "/media/**",
+        pathname: "/**",
+      },
+      // CloudFront
+      {
+        protocol: "https",
+        hostname: "cdn.mydennis.com",
+        port: "",
+        pathname: "/**",
       },
     ],
   },
