@@ -151,7 +151,8 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         formData.append("date", editingMedia.date);
         formData.append("youtube_url", editingMedia.youtubeUrl);
         formData.append("tiktok_url", editingMedia.tiktokUrl);
-        formData.append("image", editingMedia.file);
+        // Always send as generic 'file' and let backend map to image/video
+        formData.append("file", editingMedia.file);
 
         response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
