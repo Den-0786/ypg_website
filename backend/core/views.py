@@ -2143,34 +2143,26 @@ def api_create_gallery_item(request):
     """Create a new gallery item"""
     try:
         if request.FILES:
-            # Handle file upload
-            data = request.data.copy()
+            # Handle file upload WITHOUT copying request.data (avoid deepcopy of files)
+            category_value = (request.POST.get('category') or '').strip().lower()
+            payload = {
+                'title': request.POST.get('title'),
+                'description': request.POST.get('description', ''),
+                'category': category_value or 'image',
+                'congregation': request.POST.get('congregation', ''),
+                'date': request.POST.get('date'),
+                'youtube_url': request.POST.get('youtube_url', ''),
+                'tiktok_url': request.POST.get('tiktok_url', ''),
+                'is_featured': request.POST.get('is_featured', False),
+            }
 
-            category_value = (data.get('category') or '').strip().lower()
-
-            # Handle video files properly
+            # Map generic 'file' to correct field
             if category_value == 'video' and 'file' in request.FILES:
-                data['video'] = request.FILES['file']
-                # Remove unrelated fields to avoid serializer seeing raw file values
-                if 'image' in data:
-                    del data['image']
+                payload['video'] = request.FILES['file']
             elif category_value == 'image' and 'file' in request.FILES:
-                data['image'] = request.FILES['file']
-                if 'video' in data:
-                    del data['video']
+                payload['image'] = request.FILES['file']
 
-            # Ensure we don't have both image and video fields
-            if 'image' in data and 'video' in data:
-                if category_value == 'video':
-                    del data['image']
-                else:
-                    del data['video']
-
-            # Remove generic 'file' key entirely so DRF doesn't try to serialize it
-            if 'file' in data:
-                del data['file']
-
-            serializer = GalleryItemSerializer(data=data)
+            serializer = GalleryItemSerializer(data=payload)
         else:
             # Handle JSON data
             data = json.loads(request.body)
@@ -2206,29 +2198,28 @@ def api_update_gallery_item(request, item_id):
         item = get_object_or_404(GalleryItem, id=item_id)
         # Support both JSON and multipart form updates with files
         if request.FILES:
-            data = request.data.copy()
-            category_value = (data.get('category') or '').strip().lower()
-            # Map generic 'file' to the right field based on category
+            category_value = (request.POST.get('category') or '').strip().lower()
+            payload = {
+                'title': request.POST.get('title'),
+                'description': request.POST.get('description', ''),
+                'category': category_value or None,
+                'congregation': request.POST.get('congregation', ''),
+                'date': request.POST.get('date'),
+                'youtube_url': request.POST.get('youtube_url', ''),
+                'tiktok_url': request.POST.get('tiktok_url', ''),
+                'is_featured': request.POST.get('is_featured', None),
+            }
+
+            # Attach uploaded file
             if category_value == 'video' and 'file' in request.FILES:
-                data['video'] = request.FILES['file']
-                if 'image' in data:
-                    del data['image']
+                payload['video'] = request.FILES['file']
             elif category_value == 'image' and 'file' in request.FILES:
-                data['image'] = request.FILES['file']
-                if 'video' in data:
-                    del data['video']
-            # Avoid sending both fields
-            if 'image' in data and 'video' in data:
-                if category_value == 'video':
-                    del data['image']
-                else:
-                    del data['video']
-            # Remove generic 'file' key entirely so DRF doesn't see raw file
-            if 'file' in data:
-                del data['file']
+                payload['image'] = request.FILES['file']
+
+            serializer = GalleryItemSerializer(item, data=payload, partial=True)
         else:
             data = json.loads(request.body)
-        serializer = GalleryItemSerializer(item, data=data, partial=True)
+            serializer = GalleryItemSerializer(item, data=data, partial=True)
         
         if serializer.is_valid():
             serializer.save()
