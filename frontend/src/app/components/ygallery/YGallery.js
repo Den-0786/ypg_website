@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { Play, Download, MapPin, Calendar, ImageIcon } from "lucide-react";
 
@@ -193,7 +194,7 @@ export default function GallerySection() {
                     <div className="relative w-full h-80 sm:h-96">
                       {item.image ? (
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`}
+                          src={buildImageSrc(item.image)}
                           alt={item.title}
                           fill
                           className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -202,7 +203,7 @@ export default function GallerySection() {
                         />
                       ) : item.video ? (
                         <video
-                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.video}`}
+                          src={buildImageSrc(item.video)}
                           className="w-full h-full object-cover"
                           controls
                           preload="metadata"

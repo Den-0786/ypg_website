@@ -22,6 +22,14 @@ export const buildApiUrl = (endpoint) => {
   return `${baseUrl}/${cleanEndpoint}`;
 };
 
+export const buildImageSrc = (pathOrUrl) => {
+  if (!pathOrUrl) return "";
+  if (pathOrUrl.startsWith("http")) return pathOrUrl;
+  const baseUrl = getApiBaseUrl();
+  const clean = pathOrUrl.startsWith("/") ? pathOrUrl.slice(1) : pathOrUrl;
+  return `${baseUrl}/${clean}`;
+};
+
 // Helper function to build Quiz API URLs
 export const buildQuizApiUrl = (endpoint) => {
   const baseUrl = getQuizApiBaseUrl();

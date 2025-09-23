@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function PastExecutives() {
@@ -223,7 +224,7 @@ export default function PastExecutives() {
                             <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
                               {executive.image ? (
                                 <Image
-                                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${executive.image}`}
+                                  src={buildImageSrc(executive.image)}
                                   alt={executive.name}
                                   fill
                                   className="object-cover group-hover:scale-105 transition-transform duration-300"

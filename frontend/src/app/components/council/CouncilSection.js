@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
@@ -93,8 +94,7 @@ export default function CouncilSection() {
 
   const getImageUrl = (url) => {
     if (!url) return "/placeholder-item.jpg";
-    if (url.startsWith("http")) return url;
-    return `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${url.startsWith("/") ? url : "/" + url}`;
+    return buildImageSrc(url);
   };
 
   useEffect(() => {

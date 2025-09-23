@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { buildImageSrc } from "../../../utils/config";
 
 function formatEventDate(start, end) {
   const startDate = new Date(start);
@@ -155,11 +156,7 @@ export default function EventSection() {
               >
                 <div className="relative w-full h-72 overflow-hidden rounded-t-2xl">
                   <Image
-                    src={
-                      event.image
-                        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${event.image}`
-                        : "/hero.jpg"
-                    }
+                    src={event.image ? buildImageSrc(event.image) : "/hero.jpg"}
                     alt={event.title}
                     width={400}
                     height={288}

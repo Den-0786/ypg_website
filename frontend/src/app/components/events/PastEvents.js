@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -153,11 +154,7 @@ export default function PastEvents() {
               >
                 <div className="relative h-80 w-full overflow-hidden rounded-t-xl">
                   <Image
-                    src={
-                      event.image
-                        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${event.image}`
-                        : "/hero.jpg"
-                    }
+                    src={event.image ? buildImageSrc(event.image) : "/hero.jpg"}
                     alt={event.title}
                     width={400}
                     height={320}

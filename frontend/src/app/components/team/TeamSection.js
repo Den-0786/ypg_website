@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -259,7 +260,7 @@ export default function TeamSection() {
                                 <Image
                                   src={
                                     member.image
-                                      ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${member.image}`
+                                      ? buildImageSrc(member.image)
                                       : "/placeholder-item.jpg"
                                   }
                                   alt={member.name}
