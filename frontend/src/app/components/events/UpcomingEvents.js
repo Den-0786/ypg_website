@@ -137,8 +137,10 @@ export default function EventSection() {
           Join us for these exciting upcoming events in our youth ministry
         </motion.p>
 
-        <div className="flex justify-center gap-6 px-2">
-          {events.map((event) => {
+        <div className="relative">
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex gap-6 px-2 pb-4" style={{ width: 'max-content' }}>
+              {events.map((event) => {
             const isExpanded = expandedEvents.has(event.id);
             const shortDescription =
               event.description.length > 40
@@ -148,7 +150,7 @@ export default function EventSection() {
             return (
               <motion.div
                 key={event.id}
-                className="w-full max-w-80 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 flex-shrink-0"
+                className="w-80 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 flex-shrink-0"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
@@ -246,6 +248,8 @@ export default function EventSection() {
               </motion.div>
             );
           })}
+            </div>
+          </div>
         </div>
       </div>
     </section>

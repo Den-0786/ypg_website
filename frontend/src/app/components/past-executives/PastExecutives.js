@@ -8,8 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function PastExecutives() {
   const [pastExecutives, setPastExecutives] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentSet, setCurrentSet] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     fetchPastExecutives();
@@ -32,39 +30,6 @@ export default function PastExecutives() {
     };
   }, []);
 
-  // Handle responsive design
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Create sets based on screen size
-  const cardsPerSet = isMobile ? 1 : 4;
-  const totalSets = Math.ceil(pastExecutives.length / cardsPerSet);
-  const sets = [];
-
-  for (let i = 0; i < pastExecutives.length; i += cardsPerSet) {
-    sets.push(pastExecutives.slice(i, i + cardsPerSet));
-  }
-
-  // If we have fewer cards than the set size, show all cards in one set
-  const shouldShowAllCards = pastExecutives.length <= cardsPerSet;
-
-  // Auto-advance carousel
-  useEffect(() => {
-    if (totalSets > 1) {
-      const interval = setInterval(() => {
-        setCurrentSet((prev) => (prev + 1) % totalSets);
-      }, 5000); // Change slide every 5 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [totalSets]);
 
   const fetchPastExecutives = async () => {
     try {
@@ -185,106 +150,62 @@ export default function PastExecutives() {
         </div>
 
         {pastExecutives.length > 0 && (
-          <div className="relative h-[340px] sm:h-[440px] lg:h-[440px]">
-            <AnimatePresence mode="wait">
-              {sets.map(
-                (set, setIndex) =>
-                  currentSet === setIndex && (
-                    <motion.div
-                      key={`set-${setIndex}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className={`flex justify-center items-center gap-2 sm:gap-4 absolute inset-0 ${
-                        shouldShowAllCards ? "flex-wrap" : ""
-                      }`}
-                    >
-                      {set.map((executive, index) => {
-                        const direction = index % 2 === 0 ? "left" : "right";
-                        return (
-                          <motion.div
-                            key={executive.id}
-                            initial={{
-                              opacity: 0,
-                              x: direction === "left" ? -50 : 50,
-                              y: 20,
-                            }}
-                            animate={{
-                              opacity: 1,
-                              x: 0,
-                              y: 0,
-                            }}
-                            transition={{
-                              duration: 0.6,
-                              delay: index * 0.1,
-                            }}
-                            className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 w-full max-w-[16rem] flex-shrink-0"
-                          >
-                            <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
-                              {executive.image ? (
-                                <Image
-                                  src={buildImageSrc(executive.image)}
-                                  alt={executive.name}
-                                  fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <div className="w-20 h-20 bg-gradient-to-r from-purple-200 to-blue-200 rounded-full flex items-center justify-center">
-                                    <svg
-                                      className="h-10 w-10 text-gray-500"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                      />
-                                    </svg>
-                                  </div>
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </div>
-                            <div className="p-4">
-                              <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors duration-300">
-                                {executive.name}
-                              </h3>
-                              <p className="text-gray-600 mb-2">
-                                {executive.position_display}
-                              </p>
-                              <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-3 py-1.5 rounded-full text-sm font-medium border border-purple-200">
-                                {executive.reign_period}
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </motion.div>
-                  )
-              )}
-            </AnimatePresence>
-
-            {/* Navigation dots */}
-            {!shouldShowAllCards && totalSets > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                {sets.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSet(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      currentSet === index
-                        ? "bg-purple-600 scale-125"
-                        : "bg-white/50 hover:bg-white/70"
-                    }`}
-                  />
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide">
+              <div className="flex gap-6 px-2 pb-4" style={{ width: 'max-content' }}>
+                {pastExecutives.map((executive, index) => (
+                  <motion.div
+                    key={executive.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 w-64 flex-shrink-0"
+                  >
+                    <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
+                      {executive.image ? (
+                        <Image
+                          src={buildImageSrc(executive.image)}
+                          alt={executive.name}
+                          width={256}
+                          height={208}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="w-20 h-20 bg-gradient-to-r from-purple-200 to-blue-200 rounded-full flex items-center justify-center">
+                            <svg
+                              className="h-10 w-10 text-gray-500"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors duration-300">
+                        {executive.name}
+                      </h3>
+                      <p className="text-gray-600 mb-2">
+                        {executive.position_display}
+                      </p>
+                      <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-3 py-1.5 rounded-full text-sm font-medium border border-purple-200">
+                        {executive.reign_period}
+                      </div>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>

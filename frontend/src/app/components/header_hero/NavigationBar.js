@@ -234,7 +234,7 @@ export default function NavigationBar() {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-md text-gray-700 hover:bg-gray-100"
+              className="p-3 rounded-md text-gray-700 hover:bg-gray-100 text-2xl font-bold"
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               {isOpen ? "✕" : "☰"}
