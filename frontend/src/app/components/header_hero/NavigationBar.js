@@ -71,6 +71,7 @@ export default function NavigationBar() {
 
   const handleNavClick = (href) => {
     setIsOpen(false);
+    setDropdownOpen(false);
     const element = document.querySelector(href);
     if (element) {
       window.scrollTo({
@@ -85,7 +86,8 @@ export default function NavigationBar() {
     const handleClickOutside = (event) => {
       if (
         mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target)
+        !mobileMenuRef.current.contains(event.target) &&
+        !event.target.closest('[aria-label*="menu"]') // Don't close when clicking the hamburger button
       ) {
         setIsOpen(false);
       }
@@ -246,9 +248,9 @@ export default function NavigationBar() {
         {isOpen && (
           <div
             ref={mobileMenuRef}
-            className="md:hidden bg-blue-50 border-t border-blue-200"
+            className="md:hidden bg-blue-50 border-t border-blue-200 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100"
           >
-            <ul className="flex flex-col py-2 px-4">
+            <ul className="flex flex-col py-2 px-4 space-y-2">
               {/* Main Navigation Links */}
               {mainNavLinks.map((link) => (
                 <li key={link.name}>
@@ -299,7 +301,7 @@ export default function NavigationBar() {
 
                 {/* Mobile Dropdown Menu */}
                 {dropdownOpen && (
-                  <ul className="pl-4 border-l-2 border-gray-200 ml-4">
+                  <ul className="pl-4 border-l-2 border-gray-200 ml-4 space-y-1 mt-2">
                     {dropdownLinks.map((link) => (
                       <li key={link.name}>
                         <a
@@ -307,8 +309,9 @@ export default function NavigationBar() {
                           onClick={(e) => {
                             e.preventDefault();
                             handleNavClick(link.href);
+                            setDropdownOpen(false);
                           }}
-                          className={`block py-2 px-4 rounded-lg font-medium text-sm border transition-all duration-200 ${
+                          className={`block py-2 px-3 rounded-lg font-medium text-sm border transition-all duration-200 ${
                             activeSection === link.name
                               ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 shadow-lg shadow-green-500/30"
                               : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
