@@ -87,7 +87,49 @@ export default function AdvertisementManagement({ theme }) {
   };
 
   const handleDelete = async (adId) => {
-    if (window.confirm("Are you sure you want to delete this advertisement?")) {
+    // Show custom confirmation toast
+    const confirmed = await new Promise((resolve) => {
+      const toastId = toast(
+        (t) => (
+          <div className="flex flex-col items-center space-y-3">
+            <p className="text-sm font-medium text-gray-900">
+              Are you sure you want to delete this advertisement?
+            </p>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => {
+                  toast.dismiss(toastId);
+                  resolve(true);
+                }}
+                className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  toast.dismiss(toastId);
+                  resolve(false);
+                }}
+                className="px-3 py-1 bg-gray-300 text-gray-700 text-xs rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: Infinity,
+          style: {
+            background: "#fff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "8px",
+            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+          },
+        }
+      );
+    });
+
+    if (confirmed) {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/delete/`,
@@ -97,10 +139,14 @@ export default function AdvertisementManagement({ theme }) {
         );
         const data = await response.json();
         if (data.success) {
+          toast.success("Advertisement deleted successfully");
           setAdvertisements((prev) => prev.filter((ad) => ad.id !== adId));
+        } else {
+          toast.error("Failed to delete advertisement");
         }
       } catch (error) {
         console.error("Error deleting advertisement:", error);
+        toast.error("Error deleting advertisement");
       }
     }
   };
