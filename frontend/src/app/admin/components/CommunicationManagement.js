@@ -40,15 +40,15 @@ export default function CommunicationManagement({
         );
 
         // Call API to update on server
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${message.id}/read/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${message.id}/read/`;
+        console.log("Marking message as read with URL:", apiUrl);
+        
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) {
           // Revert local state if API call fails
@@ -87,12 +87,12 @@ export default function CommunicationManagement({
 
     try {
       // Call API to delete on server
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${messageToDelete.id}/delete/`,
-        {
-          method: "DELETE",
-        }
-      );
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${messageToDelete.id}/delete/`;
+      console.log("Deleting message with URL:", apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: "DELETE",
+      });
 
       console.log("Delete response status:", response.status);
 
