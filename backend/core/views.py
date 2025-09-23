@@ -2145,28 +2145,31 @@ def api_create_gallery_item(request):
         if request.FILES:
             # Handle file upload
             data = request.data.copy()
-            
+
+            category_value = (data.get('category') or '').strip().lower()
+
             # Handle video files properly
-            if data.get('category') == 'video' and 'file' in request.FILES:
-                # Move the file from 'file' to 'video' field
+            if category_value == 'video' and 'file' in request.FILES:
                 data['video'] = request.FILES['file']
-                # Remove image field to avoid conflicts
+                # Remove unrelated fields to avoid serializer seeing raw file values
                 if 'image' in data:
                     del data['image']
-            elif data.get('category') == 'image' and 'file' in request.FILES:
-                # Move the file from 'file' to 'image' field
+            elif category_value == 'image' and 'file' in request.FILES:
                 data['image'] = request.FILES['file']
-                # Remove video field to avoid conflicts
                 if 'video' in data:
                     del data['video']
-            
+
             # Ensure we don't have both image and video fields
             if 'image' in data and 'video' in data:
-                if data.get('category') == 'video':
+                if category_value == 'video':
                     del data['image']
                 else:
                     del data['video']
-            
+
+            # Remove generic 'file' key entirely so DRF doesn't try to serialize it
+            if 'file' in data:
+                del data['file']
+
             serializer = GalleryItemSerializer(data=data)
         else:
             # Handle JSON data
@@ -2204,21 +2207,25 @@ def api_update_gallery_item(request, item_id):
         # Support both JSON and multipart form updates with files
         if request.FILES:
             data = request.data.copy()
+            category_value = (data.get('category') or '').strip().lower()
             # Map generic 'file' to the right field based on category
-            if data.get('category') == 'video' and 'file' in request.FILES:
+            if category_value == 'video' and 'file' in request.FILES:
                 data['video'] = request.FILES['file']
                 if 'image' in data:
                     del data['image']
-            elif data.get('category') == 'image' and 'file' in request.FILES:
+            elif category_value == 'image' and 'file' in request.FILES:
                 data['image'] = request.FILES['file']
                 if 'video' in data:
                     del data['video']
             # Avoid sending both fields
             if 'image' in data and 'video' in data:
-                if data.get('category') == 'video':
+                if category_value == 'video':
                     del data['image']
                 else:
                     del data['video']
+            # Remove generic 'file' key entirely so DRF doesn't see raw file
+            if 'file' in data:
+                del data['file']
         else:
             data = json.loads(request.body)
         serializer = GalleryItemSerializer(item, data=data, partial=True)
