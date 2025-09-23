@@ -35,6 +35,7 @@ export default function TrashManagement({ theme }) {
     testimonials: [],
     ministry: [],
     contact: [],
+    "past-executives": [],
   });
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -69,7 +70,7 @@ export default function TrashManagement({ theme }) {
       const promises = categories.map(async (category) => {
         try {
           const response = await fetch(
-            `http://localhost:8002/api/${category}/?deleted=true`
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${category}/?deleted=true`
           );
           const data = await response.json();
           return {
@@ -85,9 +86,21 @@ export default function TrashManagement({ theme }) {
       });
 
       const results = await Promise.all(promises);
-      const newDeletedItems = {};
+      const newDeletedItems = {
+        team: [],
+        events: [],
+        donations: [],
+        blog: [],
+        media: [],
+        testimonials: [],
+        ministry: [],
+        contact: [],
+        "past-executives": [],
+      };
       results.forEach(({ category, data }) => {
-        newDeletedItems[category] = data;
+        // Map 'gallery' API category to 'media' state key
+        const stateKey = category === "gallery" ? "media" : category;
+        newDeletedItems[stateKey] = data;
       });
 
       setDeletedItems(newDeletedItems);
@@ -101,8 +114,10 @@ export default function TrashManagement({ theme }) {
 
   const handleRestore = async (item, category) => {
     try {
+      // Translate state category to API category where needed
+      const apiCategory = category === "media" ? "gallery" : category;
       const response = await fetch(
-        `http://localhost:8002/api/${category}/${item.id}/restore/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${item.id}/restore/`,
         {
           method: "POST",
           headers: {
@@ -139,8 +154,9 @@ export default function TrashManagement({ theme }) {
 
   const handlePermanentDelete = async (item, category) => {
     try {
+      const apiCategory = category === "media" ? "gallery" : category;
       const response = await fetch(
-        `http://localhost:8002/api/${category}/${item.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${item.id}/delete/`,
         {
           method: "DELETE",
         }
@@ -182,15 +198,22 @@ export default function TrashManagement({ theme }) {
 
     try {
       const promises = itemsToProcess.map(({ category, id }) => {
+        const apiCategory = category === "media" ? "gallery" : category;
         if (action === "restore") {
-          return fetch(`http://localhost:8002/api/${category}/${id}/restore/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          });
+          return fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${id}/restore/`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
         } else {
-          return fetch(`http://localhost:8002/api/${category}/${id}/delete/`, {
-            method: "DELETE",
-          });
+          return fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${id}/delete/`,
+            {
+              method: "DELETE",
+            }
+          );
         }
       });
 
@@ -206,7 +229,7 @@ export default function TrashManagement({ theme }) {
         setDeletedItems((prev) => {
           const newItems = { ...prev };
           itemsToProcess.forEach(({ category, id }) => {
-            newItems[category] = newItems[category].filter(
+            newItems[category] = (newItems[category] || []).filter(
               (item) => item.id !== id
             );
           });
