@@ -318,7 +318,7 @@ export default function DonateSection() {
     <section id="donate" className="bg-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Donation Section - Two Column Layout */}
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Side - Donation Form */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
@@ -365,7 +365,7 @@ export default function DonateSection() {
               <h3 className="text-xl font-semibold text-gray-900 mb-6">
                 Amount
               </h3>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 {donationAmounts.map((item, index) => (
                   <motion.button
                     key={index}
@@ -406,7 +406,7 @@ export default function DonateSection() {
               <h3 className="text-xl font-semibold text-gray-900 mb-6">
                 Purpose
               </h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {purposeOptions.map((option) => {
                   const IconComponent = option.icon;
                   return (
@@ -444,7 +444,7 @@ export default function DonateSection() {
               <h3 className="text-xl font-semibold text-gray-900 mb-6">
                 Payment Method
               </h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   {
                     method: "momo",
@@ -639,7 +639,7 @@ export default function DonateSection() {
               </p>
 
               {/* Impact Stats */}
-              <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">
                     {impactStats.youth_reached}+
@@ -726,7 +726,7 @@ export default function DonateSection() {
                     placeholder="Enter your full name"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-white/90 mb-2">
                       Email *

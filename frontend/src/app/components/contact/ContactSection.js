@@ -84,7 +84,7 @@ export default function ContactSection() {
         if (window.refreshContactMessages) {
           window.refreshContactMessages();
         }
-        
+
         setSubmissionStatus("success");
         setFormData({
           name: "",
@@ -212,7 +212,7 @@ export default function ContactSection() {
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl shadow-xl p-8"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-2 font-medium text-gray-700">
                   Full Name *
