@@ -129,6 +129,13 @@ const MinistryManagement = ({
 
   const handleUpdateRegistration = async () => {
     try {
+      const registrationId = editingRegistration.id ?? editingRegistration.registration_id;
+      if (!registrationId) {
+        console.error("Missing registration ID for update:", editingRegistration);
+        toast.error("Cannot update: missing registration ID");
+        return;
+      }
+
       const payload = {
         name: editingRegistration.name,
         email: editingRegistration.email || "",
@@ -137,18 +144,17 @@ const MinistryManagement = ({
         ministry: editingRegistration.ministry,
       };
 
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/`;
+      console.log("Updating registration URL:", url);
       console.log("Updating registration with payload:", payload);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${editingRegistration.id}/`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
       console.log("Response status:", response.status);
 
@@ -157,7 +163,9 @@ const MinistryManagement = ({
         console.log("Updated registration:", updatedRegistration);
         setMinistryRegistrations(
           ministryRegistrations.map((reg) =>
-            reg.id === editingRegistration.id ? updatedRegistration : reg
+            (reg.id ?? reg.registration_id) === registrationId
+              ? updatedRegistration
+              : reg
           )
         );
         setEditingRegistration(null);
@@ -1127,26 +1135,6 @@ const MinistryManagement = ({
                       </option>
                     ))}
                   </select>
-                </div>
-
-                <div>
-                  <label
-                    className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}
-                  >
-                    Additional Message (Optional)
-                  </label>
-                  <textarea
-                    value={editingRegistration.message || ""}
-                    onChange={(e) =>
-                      setEditingRegistration({
-                        ...editingRegistration,
-                        message: e.target.value,
-                      })
-                    }
-                    rows={3}
-                    placeholder="Any additional information or special requests..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                  />
                 </div>
               </div>
 
