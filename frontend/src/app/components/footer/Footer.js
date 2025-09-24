@@ -17,6 +17,7 @@ export default function Footer() {
   // Enhanced Tooltip component
   const Tooltip = ({ children, content, position = "top" }) => {
     const [showTooltip, setShowTooltip] = useState(false);
+    const [hideTimeoutId, setHideTimeoutId] = useState(null);
 
     const positionClasses = {
       top: "bottom-full left-1/2 transform -translate-x-1/2 mb-3",
@@ -37,6 +38,22 @@ export default function Footer() {
         <div
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
+          onClick={(e) => {
+            // Show tooltip on tap/click for mobile
+            e.preventDefault();
+            setShowTooltip(true);
+            if (hideTimeoutId) clearTimeout(hideTimeoutId);
+            const id = setTimeout(() => setShowTooltip(false), 2000);
+            setHideTimeoutId(id);
+          }}
+          onTouchStart={(e) => {
+            // Ensure tooltip shows on touch devices without navigating
+            e.preventDefault();
+            setShowTooltip(true);
+            if (hideTimeoutId) clearTimeout(hideTimeoutId);
+            const id = setTimeout(() => setShowTooltip(false), 2000);
+            setHideTimeoutId(id);
+          }}
           className="cursor-help"
         >
           {children}
@@ -155,7 +172,10 @@ export default function Footer() {
                         e.preventDefault();
                         const el = document.querySelector(link.href);
                         if (el) {
-                          window.scrollTo({ top: el.offsetTop - 80, behavior: "smooth" });
+                          window.scrollTo({
+                            top: el.offsetTop - 80,
+                            behavior: "smooth",
+                          });
                         }
                       }}
                       className="hover:text-blue-300 transition flex items-center gap-2"
