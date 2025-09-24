@@ -129,9 +129,13 @@ const MinistryManagement = ({
 
   const handleUpdateRegistration = async () => {
     try {
-      const registrationId = editingRegistration.id ?? editingRegistration.registration_id;
+      const registrationId =
+        editingRegistration.id ?? editingRegistration.registration_id;
       if (!registrationId) {
-        console.error("Missing registration ID for update:", editingRegistration);
+        console.error(
+          "Missing registration ID for update:",
+          editingRegistration
+        );
         toast.error("Cannot update: missing registration ID");
         return;
       }
@@ -144,7 +148,7 @@ const MinistryManagement = ({
         ministry: editingRegistration.ministry,
       };
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/update/`;
       console.log("Updating registration URL:", url);
       console.log("Updating registration with payload:", payload);
 
