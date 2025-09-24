@@ -131,11 +131,13 @@ const MinistryManagement = ({
     try {
       const payload = {
         name: editingRegistration.name,
-        email: editingRegistration.email,
-        phone: editingRegistration.phone,
+        email: editingRegistration.email || "",
+        phone: editingRegistration.phone || "",
         congregation: editingRegistration.congregation,
         ministry: editingRegistration.ministry,
       };
+
+      console.log("Updating registration with payload:", payload);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${editingRegistration.id}/`,
@@ -148,8 +150,11 @@ const MinistryManagement = ({
         }
       );
 
+      console.log("Response status:", response.status);
+
       if (response.ok) {
         const updatedRegistration = await response.json();
+        console.log("Updated registration:", updatedRegistration);
         setMinistryRegistrations(
           ministryRegistrations.map((reg) =>
             reg.id === editingRegistration.id ? updatedRegistration : reg
@@ -161,8 +166,11 @@ const MinistryManagement = ({
         let errorMsg = "Failed to update ministry registration";
         try {
           const errorData = await response.json();
+          console.log("Error response:", errorData);
           errorMsg = errorData.error || errorMsg;
-        } catch {}
+        } catch (e) {
+          console.log("Error parsing error response:", e);
+        }
         toast.error(errorMsg);
       }
     } catch (error) {
@@ -944,20 +952,11 @@ const MinistryManagement = ({
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   >
                     <option value="">Select a ministry</option>
-                    <option value="Y-Singers 🎤">Y-Singers 🎤</option>
-                    <option value="Y-Jama Troop 🪘">Y-Jama Troop 🪘</option>
-                    <option value="Choreography Group 💃">
-                      Choreography Group 💃
-                    </option>
-                    <option value="Evangelism & Prayer Team 🙏">
-                      Evangelism & Prayer Team 🙏
-                    </option>
-                    <option value="Y-Media 🎥">Y-Media 🎥</option>
-                    <option value="Dancing Group 🕺">Dancing Group 🕺</option>
-                    <option value="Ushering Wing 👥">Ushering Wing 👥</option>
-                    <option value="Youth Bible Study 📖">
-                      Youth Bible Study 📖
-                    </option>
+                    {ministries.map((m) => (
+                      <option key={m.id ?? m.name} value={m.name}>
+                        {m.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -1122,20 +1121,11 @@ const MinistryManagement = ({
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   >
                     <option value="">Select a ministry</option>
-                    <option value="Y-Singers 🎤">Y-Singers 🎤</option>
-                    <option value="Y-Jama Troop 🪘">Y-Jama Troop 🪘</option>
-                    <option value="Choreography Group 💃">
-                      Choreography Group 💃
-                    </option>
-                    <option value="Evangelism & Prayer Team 🙏">
-                      Evangelism & Prayer Team 🙏
-                    </option>
-                    <option value="Y-Media 🎥">Y-Media 🎥</option>
-                    <option value="Dancing Group 🕺">Dancing Group 🕺</option>
-                    <option value="Ushering Wing 👥">Ushering Wing 👥</option>
-                    <option value="Youth Bible Study 📖">
-                      Youth Bible Study 📖
-                    </option>
+                    {ministries.map((m) => (
+                      <option key={m.id ?? m.name} value={m.name}>
+                        {m.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
