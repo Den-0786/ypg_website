@@ -1,17 +1,21 @@
-// Conditionally enable PWA if the dependency is available in the current build environment
-let withPWA;
-try {
-  // Top-level dynamic import to avoid hard failure when the package isn't installed (e.g., wrong root on CI)
-  withPWA = (await import("next-pwa")).default;
-} catch {
-  withPWA = null;
-}
+const withPWA = (() => {
+  try {
+    return require('next-pwa');
+  } catch (e) {
+    console.warn("next-pwa not found, PWA features will be disabled.");
+    return (config) => config; // Return a no-op function if next-pwa is not found
+  }
+})();
 
 /** @type {import('next').NextConfig} */
-const baseConfig = {
+const nextConfig = withPWA({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
+})({
   output: "standalone",
   eslint: {
-    // Temporarily ignore ESLint during builds to unblock deployments
     ignoreDuringBuilds: true,
   },
   images: {
@@ -58,15 +62,6 @@ const baseConfig = {
       },
     ];
   },
-};
-
-const nextConfig = withPWA
-  ? withPWA({
-      dest: "public",
-      disable: process.env.NODE_ENV === "development",
-      register: true,
-      skipWaiting: true,
-    })(baseConfig)
-  : baseConfig;
+});
 
 export default nextConfig;
