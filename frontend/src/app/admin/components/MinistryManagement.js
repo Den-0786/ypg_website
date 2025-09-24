@@ -62,7 +62,9 @@ const MinistryManagement = ({
   useEffect(() => {
     const fetchMinistries = async () => {
       try {
-        const res = await fetch("http://localhost:8002/api/ministries/");
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/`
+        );
         const data = await res.json();
         if (data.success && Array.isArray(data.ministries)) {
           setMinistries(data.ministries);
@@ -79,7 +81,7 @@ const MinistryManagement = ({
   const handleAddRegistration = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8002/api/ministry/register/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/register/`,
         {
           method: "POST",
           headers: {
@@ -127,13 +129,16 @@ const MinistryManagement = ({
 
   const handleUpdateRegistration = async () => {
     try {
-      const response = await fetch(`/api/ministry/${editingRegistration.id}`, {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${editingRegistration.id}/`,
+        {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(editingRegistration),
-      });
+        }
+      );
 
       if (response.ok) {
         const updatedRegistration = await response.json();
@@ -161,10 +166,8 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `/api/ministry?id=${registrationToDelete.id}`,
-        {
-          method: "DELETE",
-        }
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationToDelete.id}/delete/`,
+        { method: "DELETE" }
       );
 
       if (response.ok) {
