@@ -7,16 +7,14 @@
   "theme_color": "#1E88E5",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/logo/ypg.jpeg",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/logo/ypg.jpeg",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
-
-
