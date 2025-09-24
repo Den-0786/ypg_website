@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "YPG - Presbyterian Young People's Guild",
+  title: "ADYPG - Ahinsan District YPG",
   description:
     "Empowering young people aged 18-30 in faith, leadership, and community service",
 };
@@ -25,6 +25,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1E88E5" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         {/* <DefaultSeo {...SEO} /> */}
         {children}
         <Toaster
