@@ -1,4 +1,11 @@
-import withPWA from 'next-pwa';
+// Conditionally enable PWA if the dependency is available in the current build environment
+let withPWA;
+try {
+  // Top-level dynamic import to avoid hard failure when the package isn't installed (e.g., wrong root on CI)
+  withPWA = (await import("next-pwa")).default;
+} catch {
+  withPWA = null;
+}
 
 /** @type {import('next').NextConfig} */
 const baseConfig = {
@@ -53,11 +60,13 @@ const baseConfig = {
   },
 };
 
-const nextConfig = withPWA({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-})(baseConfig);
+const nextConfig = withPWA
+  ? withPWA({
+      dest: "public",
+      disable: process.env.NODE_ENV === "development",
+      register: true,
+      skipWaiting: true,
+    })(baseConfig)
+  : baseConfig;
 
 export default nextConfig;
