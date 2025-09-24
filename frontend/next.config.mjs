@@ -1,19 +1,5 @@
-const withPWA = (() => {
-  try {
-    return require('next-pwa');
-  } catch (e) {
-    console.warn("next-pwa not found, PWA features will be disabled.");
-    return (config) => config; // Return a no-op function if next-pwa is not found
-  }
-})();
-
 /** @type {import('next').NextConfig} */
-const nextConfig = withPWA({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-  skipWaiting: true,
-})({
+const nextConfig = {
   output: "standalone",
   eslint: {
     ignoreDuringBuilds: true,
@@ -62,6 +48,6 @@ const nextConfig = withPWA({
       },
     ];
   },
-});
+};
 
 export default nextConfig;
