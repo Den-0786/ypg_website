@@ -114,7 +114,7 @@ export default function TeamSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSet((prev) => (prev + 1) % totalSets);
-    }, 30000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [totalSets]);
@@ -268,7 +268,7 @@ export default function TeamSection() {
                                   className="object-cover"
                                   style={{ objectPosition: "center 10%" }}
                                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
-                                  unoptimized
+                                  priority={index === 0}
                                 />
                                 {/* Color overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />

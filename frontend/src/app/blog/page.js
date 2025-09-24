@@ -54,6 +54,7 @@ export default async function BlogListPage() {
                       alt={post.title}
                       fill
                       className="object-cover"
+                      priority
                     />
                   </div>
                 </Link>

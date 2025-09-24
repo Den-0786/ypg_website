@@ -150,6 +150,14 @@ export default function Footer() {
                   <Tooltip content={link.tooltip}>
                     <a
                       href={link.href}
+                      onClick={(e) => {
+                        // Prevent navigation; only show tooltip and optionally scroll
+                        e.preventDefault();
+                        const el = document.querySelector(link.href);
+                        if (el) {
+                          window.scrollTo({ top: el.offsetTop - 80, behavior: "smooth" });
+                        }
+                      }}
                       className="hover:text-blue-300 transition flex items-center gap-2"
                     >
                       <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
@@ -197,6 +205,7 @@ export default function Footer() {
                   <Tooltip content={ministry.tooltip}>
                     <a
                       href="#"
+                      onClick={(e) => e.preventDefault()}
                       className="hover:text-blue-300 transition flex items-center gap-2"
                     >
                       <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
