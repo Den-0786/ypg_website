@@ -129,6 +129,14 @@ const MinistryManagement = ({
 
   const handleUpdateRegistration = async () => {
     try {
+      const payload = {
+        name: editingRegistration.name,
+        email: editingRegistration.email,
+        phone: editingRegistration.phone,
+        congregation: editingRegistration.congregation,
+        ministry: editingRegistration.ministry,
+      };
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${editingRegistration.id}/`,
         {
@@ -136,7 +144,7 @@ const MinistryManagement = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(editingRegistration),
+          body: JSON.stringify(payload),
         }
       );
 
@@ -150,8 +158,12 @@ const MinistryManagement = ({
         setEditingRegistration(null);
         toast.success("Ministry registration updated successfully!");
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.error || "Failed to update ministry registration");
+        let errorMsg = "Failed to update ministry registration";
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } catch {}
+        toast.error(errorMsg);
       }
     } catch (error) {
       console.error("Error updating ministry registration:", error);
