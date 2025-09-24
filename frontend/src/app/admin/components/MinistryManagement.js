@@ -132,23 +132,30 @@ const MinistryManagement = ({
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${editingRegistration.id}/`,
         {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingRegistration),
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editingRegistration),
         }
       );
 
       if (response.ok) {
-        const updatedRegistration = await response.json();
-        setMinistryRegistrations(
-          ministryRegistrations.map((reg) =>
-            reg.id === editingRegistration.id ? updatedRegistration : reg
-          )
-        );
-        setEditingRegistration(null);
-        toast.success("Ministry registration updated successfully!");
+        const data = await response.json();
+        if (data.success && data.registration) {
+          setMinistryRegistrations(
+            ministryRegistrations.map((reg) =>
+              reg.id === editingRegistration.id ? data.registration : reg
+            )
+          );
+          setEditingRegistration(null);
+          toast.success("Ministry registration updated successfully!");
+        } else {
+          toast.error(data.error || "Failed to update ministry registration");
+        }
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to update ministry registration");
       }
     } catch (error) {
       console.error("Error updating ministry registration:", error);
@@ -216,7 +223,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        "http://localhost:8002/api/ministries/create/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/create/`,
         {
           method: "POST",
           headers: {
@@ -295,7 +302,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/ministries/${editingMinistry.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/${editingMinistry.id}/update/`,
         {
           method: "PUT",
           headers: {
@@ -365,7 +372,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `http://localhost:8002/api/ministries/${ministryToDelete.id}/delete/?type=${deleteType}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/${ministryToDelete.id}/delete/?type=${deleteType}`,
         { method: "DELETE" }
       );
 
