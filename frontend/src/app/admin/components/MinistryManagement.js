@@ -148,7 +148,7 @@ const MinistryManagement = ({
         ministry: editingRegistration.ministry,
       };
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/update/`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/`;
       console.log("Updating registration URL:", url);
       console.log("Updating registration with payload:", payload);
 

@@ -303,11 +303,6 @@ export default function CouncilSection() {
                                 <p className="text-gray-700 font-medium text-[11px] mb-2">
                                   {member.congregation}
                                 </p>
-                                {member.phone && (
-                                  <p className="text-amber-700 font-medium text-[11px] mb-2">
-                                    {member.phone}
-                                  </p>
-                                )}
                                 {member.description && (
                                   <p className="text-gray-700 mb-2 italic text-[11px] sm:text-sm line-clamp-2">
                                     &quot;{member.description}&quot;
