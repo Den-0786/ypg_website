@@ -148,7 +148,7 @@ const MinistryManagement = ({
         ministry: editingRegistration.ministry,
       };
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}`;
       console.log("Updating registration URL:", url);
       console.log("Updating registration with payload:", payload);
 
@@ -638,6 +638,7 @@ const MinistryManagement = ({
         >
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
+            <div className="min-w-full">
             <table className="w-full">
               <thead
                 className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} text-center`}
@@ -749,10 +750,11 @@ const MinistryManagement = ({
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden">
+          <div className="md:hidden overflow-x-auto">
             {!Array.isArray(ministryRegistrations) ? (
               <div className="text-center py-8">
                 <BookOpen
