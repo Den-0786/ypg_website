@@ -1716,6 +1716,23 @@ def api_submit_ministry_registration(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_update_ministry_registration(request, registration_id):
+    """Update a ministry registration"""
+    try:
+        registration = get_object_or_404(MinistryRegistration, id=registration_id)
+        data = json.loads(request.body)
+        serializer = MinistryRegistrationSerializer(registration, data=data, partial=True)
+        if serializer.is_valid():
+            updated = serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response({'success': False, 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_approve_ministry_registration(request, registration_id):
