@@ -58,6 +58,7 @@ urlpatterns = [
     
     # Ministry API endpoints
     path('api/ministry/register/', views.api_submit_ministry_registration, name='api_submit_ministry_registration'),
+    path('api/ministry/update/<int:registration_id>/', views.api_update_ministry_registration, name='api_update_ministry_registration_update'),
     path('api/ministry/<int:registration_id>/', views.api_update_ministry_registration, name='api_update_ministry_registration'),
     path('api/ministry/<int:registration_id>/approve/', views.api_approve_ministry_registration, name='api_approve_ministry_registration'),
     path('api/ministry/<int:registration_id>/delete/', views.api_delete_ministry_registration, name='api_delete_ministry_registration'),
