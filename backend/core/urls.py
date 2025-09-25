@@ -3,6 +3,11 @@ from . import views
 from advertisement_views import api_advertisements, api_advertisements_admin, api_create_advertisement, api_update_advertisement, api_delete_advertisement
 from settings_views import api_settings_profile, api_settings_website
 from ystore_views import api_ystore_items, api_ystore_item_detail
+from .finance_views import (
+    api_sales, api_create_sale, api_update_sale, api_delete_sale,
+    api_expenses, api_create_expense, api_update_expense, api_delete_expense,
+    api_contributions, api_create_contribution, api_update_contribution, api_delete_contribution
+)
 
 urlpatterns = [
     # Authentication API endpoints
@@ -129,6 +134,25 @@ urlpatterns = [
     path('api/past-executives/create/', views.api_past_executive_create, name='api_past_executive_create'),
     path('api/past-executives/<int:executive_id>/update/', views.api_past_executive_update, name='api_past_executive_update'),
     path('api/past-executives/<int:executive_id>/delete/', views.api_past_executive_delete, name='api_past_executive_delete'),
+    
+    # Finance Management API endpoints
+    # Sales endpoints
+    path('api/sales/', api_sales, name='api_sales'),
+    path('api/sales/create/', api_create_sale, name='api_create_sale'),
+    path('api/sales/<int:sale_id>/update/', api_update_sale, name='api_update_sale'),
+    path('api/sales/<int:sale_id>/delete/', api_delete_sale, name='api_delete_sale'),
+    
+    # Expenses endpoints
+    path('api/expenses/', api_expenses, name='api_expenses'),
+    path('api/expenses/create/', api_create_expense, name='api_create_expense'),
+    path('api/expenses/<int:expense_id>/update/', api_update_expense, name='api_update_expense'),
+    path('api/expenses/<int:expense_id>/delete/', api_delete_expense, name='api_delete_expense'),
+    
+    # Contributions endpoints
+    path('api/contributions/', api_contributions, name='api_contributions'),
+    path('api/contributions/create/', api_create_contribution, name='api_create_contribution'),
+    path('api/contributions/<int:contribution_id>/update/', api_update_contribution, name='api_update_contribution'),
+    path('api/contributions/<int:contribution_id>/delete/', api_delete_contribution, name='api_delete_contribution'),
 ]
 
 

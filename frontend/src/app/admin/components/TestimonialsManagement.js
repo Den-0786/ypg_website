@@ -803,5 +803,3 @@ const TestimonialsManagement = ({
 };
 
 export default TestimonialsManagement;
-
-

@@ -3,7 +3,7 @@ from .models import (
     Quiz, QuizSubmission, Event, TeamMember, Donation, 
     ContactMessage, MinistryRegistration, BlogPost, 
     Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem,
-    Ministry
+    Ministry, Sale, Expense, Contribution
 )
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -97,4 +97,20 @@ class AdvertisementSerializer(serializers.ModelSerializer):
 class YStoreItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = YStoreItem
+        fields = '__all__'
+
+# Finance Management Serializers
+class SaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sale
+        fields = '__all__'
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Expense
+        fields = '__all__'
+
+class ContributionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contribution
         fields = '__all__'

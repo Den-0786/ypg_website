@@ -30,7 +30,6 @@ export default function PastExecutives() {
     };
   }, []);
 
-
   const fetchPastExecutives = async () => {
     try {
       const response = await fetch(
@@ -152,7 +151,10 @@ export default function PastExecutives() {
         {pastExecutives.length > 0 && (
           <div className="relative">
             <div className="overflow-x-auto scrollbar-hide">
-              <div className="flex gap-6 px-2 pb-4" style={{ width: 'max-content' }}>
+              <div
+                className="flex gap-6 px-2 pb-4"
+                style={{ width: "max-content" }}
+              >
                 {pastExecutives.map((executive, index) => (
                   <motion.div
                     key={executive.id}

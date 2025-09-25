@@ -383,3 +383,102 @@ class YStoreItem(models.Model):
     
     class Meta:
         db_table = 'core_ystore_item'
+
+# Finance Management Models
+class Sale(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    item_name = models.CharField(max_length=200)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    sold_by = models.CharField(max_length=100)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        self.total_amount = self.price * self.quantity
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.item_name} - {self.sold_by}"
+    
+    class Meta:
+        verbose_name = "Sale"
+        verbose_name_plural = "Sales"
+
+class Expense(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ('general', 'General'),
+        ('events', 'Events'),
+        ('equipment', 'Equipment'),
+        ('transportation', 'Transportation'),
+        ('food', 'Food & Refreshments'),
+        ('utilities', 'Utilities'),
+        ('other', 'Other'),
+    ]
+    
+    date = models.DateField()
+    description = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid_by = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='approved')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.description} - {self.amount}"
+    
+    class Meta:
+        verbose_name = "Expense"
+        verbose_name_plural = "Expenses"
+
+class Contribution(models.Model):
+    TYPE_CHOICES = [
+        ('renewal', 'Renewal'),
+        ('offertory', 'Offertory'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # For renewals
+    congregation = models.CharField(max_length=200, blank=True, null=True)
+    number_of_people = models.PositiveIntegerField(blank=True, null=True)
+    
+    # For offertories
+    program_type = models.CharField(max_length=200, blank=True, null=True)
+    venue = models.CharField(max_length=200, blank=True, null=True)
+    
+    def __str__(self):
+        if self.type == 'renewal':
+            return f"Renewal - {self.congregation} - {self.amount}"
+        else:
+            return f"Offertory - {self.program_type} - {self.amount}"
+    
+    class Meta:
+        verbose_name = "Contribution"
+        verbose_name_plural = "Contributions"

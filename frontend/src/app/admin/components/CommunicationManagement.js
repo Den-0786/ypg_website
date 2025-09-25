@@ -42,7 +42,7 @@ export default function CommunicationManagement({
         // Call API to update on server
         const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${message.id}/read/`;
         console.log("Marking message as read with URL:", apiUrl);
-        
+
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
@@ -89,7 +89,7 @@ export default function CommunicationManagement({
       // Call API to delete on server
       const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact/${messageToDelete.id}/delete/`;
       console.log("Deleting message with URL:", apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         method: "DELETE",
       });

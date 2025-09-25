@@ -38,7 +38,7 @@ const Sidebar = ({
     { id: "overview", name: "Overview", icon: Home },
     { id: "team", name: "District Executives", icon: Users },
     { id: "events", name: "Events", icon: Calendar },
-    { id: "donations", name: "Donations", icon: DollarSign },
+    { id: "donations", name: "Finance", icon: DollarSign },
     { id: "ministry", name: "Ministry", icon: BookOpen },
     { id: "council", name: "Council Members", icon: Crown },
     { id: "past-executives", name: "Past Executives", icon: History },

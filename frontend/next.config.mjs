@@ -6,6 +6,13 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Local development
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8002",
+        pathname: "/media/**",
+      },
       // Django Render media (legacy)
       {
         protocol: "https",
