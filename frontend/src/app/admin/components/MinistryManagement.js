@@ -148,7 +148,7 @@ const MinistryManagement = ({
         ministry: editingRegistration.ministry,
       };
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationId}/`;
       console.log("Updating registration URL:", url);
       console.log("Updating registration with payload:", payload);
 
@@ -778,7 +778,8 @@ const MinistryManagement = ({
                 </p>
               </div>
             ) : (
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-4 overflow-x-auto">
+                <div className="min-w-full">
                 {ministryRegistrations.map((registration) => (
                   <motion.div
                     key={registration.id}
@@ -839,6 +840,7 @@ const MinistryManagement = ({
                     </div>
                   </motion.div>
                 ))}
+                </div>
               </div>
             )}
           </div>
