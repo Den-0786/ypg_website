@@ -637,9 +637,9 @@ const MinistryManagement = ({
           className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border overflow-hidden`}
         >
           {/* Desktop Table */}
-          <div className="hidden md:block overflow-x-auto">
+          <div className="overflow-x-auto">
             <div className="min-w-full">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]">
               <thead
                 className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} text-center`}
               >
@@ -754,7 +754,7 @@ const MinistryManagement = ({
           </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden overflow-x-auto">
+          <div className="hidden">
             {!Array.isArray(ministryRegistrations) ? (
               <div className="text-center py-8">
                 <BookOpen
@@ -778,14 +778,13 @@ const MinistryManagement = ({
                 </p>
               </div>
             ) : (
-              <div className="p-4 space-y-4 overflow-x-auto">
-                <div className="min-w-full">
+              <div className="p-4 space-y-4">
                 {ministryRegistrations.map((registration) => (
                   <motion.div
                     key={registration.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} rounded-lg p-4 border`}
+                    className={`${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} rounded-lg p-4 border w-full overflow-hidden`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h3
@@ -800,21 +799,21 @@ const MinistryManagement = ({
                     <div
                       className={`space-y-1 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
                     >
-                      <p>
+                      <p className="break-words">
                         <span className="font-medium">Email:</span>{" "}
                         {registration.email}
                       </p>
-                      <p>
+                      <p className="break-words">
                         <span className="font-medium">Phone:</span>{" "}
                         {registration.phone}
                       </p>
-                      <p>
+                      <p className="break-words">
                         <span className="font-medium">Congregation:</span>{" "}
                         {registration.congregation}
                       </p>
 
                       {registration.message && (
-                        <p>
+                        <p className="break-words">
                           <span className="font-medium">Message:</span>{" "}
                           {registration.message}
                         </p>
@@ -840,7 +839,6 @@ const MinistryManagement = ({
                     </div>
                   </motion.div>
                 ))}
-                </div>
               </div>
             )}
           </div>
