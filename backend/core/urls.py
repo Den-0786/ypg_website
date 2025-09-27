@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/auth/logout/', views.api_supervisor_logout, name='api_supervisor_logout'),
     path('api/auth/status/', views.api_supervisor_status, name='api_supervisor_status'),
     path('api/auth/credentials/', views.api_supervisor_change_credentials, name='api_supervisor_change_credentials'),
+    path('api/auth/create-supervisor/', views.api_create_supervisor, name='api_create_supervisor'),
     
     # Quiz API endpoints
     path('api/quizzes/active/', views.api_active_quiz, name='api_active_quiz'),

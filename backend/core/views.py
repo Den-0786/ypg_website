@@ -296,10 +296,15 @@ def api_supervisor_status(request):
 def api_supervisor_change_credentials(request):
     """Get or change supervisor credentials"""
     try:
+        # Debug: Check if there are any users and supervisors in the database
+        from django.contrib.auth.models import User
+        user_count = User.objects.count()
+        supervisor_count = Supervisor.objects.count()
+        
         if not request.user.is_authenticated:
             return Response({
                 'success': False,
-                'error': 'Authentication required'
+                'error': f'Authentication required. User count: {user_count}, Supervisor count: {supervisor_count}, User: {request.user}'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
@@ -367,6 +372,48 @@ def api_supervisor_change_credentials(request):
             'credentials': {
                 'username': request.user.username,
                 'hasPassword': True
+            }
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_create_supervisor(request):
+    """Create a supervisor user if none exists"""
+    try:
+        from django.contrib.auth.models import User
+        
+        # Check if any supervisor exists
+        if Supervisor.objects.exists():
+            return Response({
+                'success': False,
+                'error': 'Supervisor already exists'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create supervisor user
+        user = User.objects.create_user(
+            username='supervisor',
+            password='admin123',
+            is_staff=True,
+            is_superuser=True,
+            is_active=True
+        )
+        
+        # Create supervisor profile
+        supervisor = Supervisor.objects.create(user=user)
+        
+        return Response({
+            'success': True,
+            'message': 'Supervisor created successfully',
+            'credentials': {
+                'username': 'supervisor',
+                'password': 'admin123'
             }
         })
         
