@@ -213,7 +213,8 @@ def api_supervisor_login(request):
             session_key = request.session.session_key
             session_data = dict(request.session)
             
-            return Response({
+            # Create response
+            response = Response({
                 'success': True,
                 'user': {
                     'username': user.username,
@@ -228,6 +229,19 @@ def api_supervisor_login(request):
                     'user_authenticated': request.user.is_authenticated
                 }
             })
+            
+            # Ensure session cookie is set properly
+            if session_key:
+                response.set_cookie(
+                    'sessionid',
+                    session_key,
+                    max_age=86400,  # 24 hours
+                    secure=True,
+                    samesite='None',
+                    httponly=True
+                )
+            
+            return response
         else:
             return Response({
                 'success': False,
