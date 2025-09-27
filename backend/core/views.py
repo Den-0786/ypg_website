@@ -209,6 +209,10 @@ def api_supervisor_login(request):
             supervisor.last_login_ip = get_client_ip(request)
             session_token = supervisor.generate_session_token()
             
+            # Debug session information
+            session_key = request.session.session_key
+            session_data = dict(request.session)
+            
             return Response({
                 'success': True,
                 'user': {
@@ -217,7 +221,12 @@ def api_supervisor_login(request):
                     'loginTime': timezone.now().isoformat(),
                     'session_token': session_token
                 },
-                'message': 'Login successful'
+                'message': 'Login successful',
+                'debug': {
+                    'session_key': session_key,
+                    'session_data': session_data,
+                    'user_authenticated': request.user.is_authenticated
+                }
             })
         else:
             return Response({
@@ -301,10 +310,15 @@ def api_supervisor_change_credentials(request):
         user_count = User.objects.count()
         supervisor_count = Supervisor.objects.count()
         
+        # Debug session information
+        session_key = request.session.session_key
+        session_data = dict(request.session)
+        cookies = request.COOKIES
+        
         if not request.user.is_authenticated:
             return Response({
                 'success': False,
-                'error': f'Authentication required. User count: {user_count}, Supervisor count: {supervisor_count}, User: {request.user}'
+                'error': f'Authentication required. User count: {user_count}, Supervisor count: {supervisor_count}, User: {request.user}, Session key: {session_key}, Session data: {session_data}, Cookies: {list(cookies.keys())}'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
@@ -375,6 +389,33 @@ def api_supervisor_change_credentials(request):
             }
         })
         
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_debug_session(request):
+    """Debug session information"""
+    try:
+        return Response({
+            'success': True,
+            'debug': {
+                'user': str(request.user),
+                'is_authenticated': request.user.is_authenticated,
+                'session_key': request.session.session_key,
+                'session_data': dict(request.session),
+                'cookies': list(request.COOKIES.keys()),
+                'headers': {
+                    'origin': request.META.get('HTTP_ORIGIN'),
+                    'referer': request.META.get('HTTP_REFERER'),
+                    'user_agent': request.META.get('HTTP_USER_AGENT'),
+                }
+            }
+        })
     except Exception as e:
         return Response({
             'success': False,

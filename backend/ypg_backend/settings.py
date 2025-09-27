@@ -195,6 +195,13 @@ REST_FRAMEWORK = {
     ],
 }
 
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 # Security Settings for Production
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
@@ -207,6 +214,7 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'None'  # Allow cross-site cookies
     CSRF_COOKIE_SAMESITE = 'None'     # Allow cross-site cookies
+    SESSION_COOKIE_DOMAIN = None  # Allow cookies for all domains
 else:
     # Development settings
     SECURE_SSL_REDIRECT = False
@@ -214,3 +222,4 @@ else:
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_DOMAIN = None
