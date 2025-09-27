@@ -324,15 +324,25 @@ def api_supervisor_change_credentials(request):
         user_count = User.objects.count()
         supervisor_count = Supervisor.objects.count()
         
-        # Debug session information
-        session_key = request.session.session_key
-        session_data = dict(request.session)
-        cookies = request.COOKIES
+        # Check for session token in Authorization header
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        session_token = None
+        
+        if auth_header.startswith('Bearer '):
+            session_token = auth_header.split(' ')[1]
+        
+        # Try to authenticate using session token
+        if session_token:
+            try:
+                supervisor = Supervisor.objects.get(session_token=session_token)
+                request.user = supervisor.user
+            except Supervisor.DoesNotExist:
+                pass
         
         if not request.user.is_authenticated:
             return Response({
                 'success': False,
-                'error': f'Authentication required. User count: {user_count}, Supervisor count: {supervisor_count}, User: {request.user}, Session key: {session_key}, Session data: {session_data}, Cookies: {list(cookies.keys())}'
+                'error': 'Authentication required'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
@@ -430,6 +440,34 @@ def api_debug_session(request):
                 }
             }
         })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_test_cookie(request):
+    """Test cookie setting"""
+    try:
+        response = Response({
+            'success': True,
+            'message': 'Test cookie set'
+        })
+        
+        # Set a test cookie
+        response.set_cookie(
+            'test_cookie',
+            'test_value',
+            max_age=3600,  # 1 hour
+            secure=True,
+            samesite='None',
+            httponly=False  # Allow JavaScript access for testing
+        )
+        
+        return response
     except Exception as e:
         return Response({
             'success': False,
