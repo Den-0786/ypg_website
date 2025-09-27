@@ -35,6 +35,7 @@ const LoginScreen = ({ onLogin }) => {
         localStorage.setItem("ypg_admin_authenticated", "true");
         localStorage.setItem("ypg_admin_user", data.user.username);
         localStorage.setItem("ypg_admin_login_time", data.user.loginTime);
+        localStorage.setItem("ypg_admin_session_token", data.user.session_token);
 
         toast.success("Login successful! Welcome to YPG Admin Dashboard.");
         onLogin();

@@ -49,6 +49,7 @@ export default function AdminLogin() {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/login/`,
         {
           method: "POST",
+          credentials: 'include', // Include cookies for session authentication
           headers: {
             "Content-Type": "application/json",
           },
@@ -62,6 +63,7 @@ export default function AdminLogin() {
         localStorage.setItem("ypg_admin_authenticated", "true");
         localStorage.setItem("ypg_admin_user", data.user.username);
         localStorage.setItem("ypg_admin_login_time", data.user.loginTime);
+        localStorage.setItem("ypg_admin_session_token", data.user.session_token);
 
         toast.success("Login successful! Redirecting...");
 

@@ -94,7 +94,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials/`,
           {
-            signal: controller,
+            signal: controller.signal,
             credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
@@ -466,11 +466,12 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           break;
 
         case "security":
+          const sessionToken = localStorage.getItem("ypg_admin_session_token");
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials`, {
             method: "PUT",
-            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
+              ...(sessionToken && { "Authorization": `Bearer ${sessionToken}` }),
             },
             body: JSON.stringify({
               currentPassword: security.currentPassword,
