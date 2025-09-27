@@ -29,6 +29,7 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
+  Menu,
 } from "lucide-react";
 
 export default function SettingsComponent({ onClose, theme, setTheme }) {
@@ -37,6 +38,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPin, setShowPin] = useState(false);
   const [securityMethod, setSecurityMethod] = useState("password");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Loading and feedback states
   const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +57,21 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [onClose]);
+
+  // Set sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    handleResize(); // Set initial state
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Clear save status after 3 seconds
   useEffect(() => {
@@ -75,7 +92,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
         const response = await fetch(
-          "http://localhost:8002/api/auth/credentials/",
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials/`,
           {
             signal: controller,
             headers: {
@@ -176,7 +193,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       setIsProfileLoading(true);
       try {
         const response = await fetch(
-          "http://localhost:8002/api/settings/profile"
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -204,7 +221,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     const loadWebsiteSettings = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8002/api/settings/website"
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -437,7 +454,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       let response;
       switch (section) {
         case "profile":
-          response = await fetch("http://localhost:8002/api/settings/profile", {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -447,7 +464,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           break;
 
         case "security":
-          response = await fetch("http://localhost:8002/api/auth/credentials", {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -461,7 +478,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           break;
 
         case "website":
-          response = await fetch("http://localhost:8002/api/settings/website", {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -479,7 +496,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           break;
 
         case "appearance":
-          response = await fetch("http://localhost:8002/api/settings/website", {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -744,7 +761,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         // Save restored settings to database
         try {
           // Save profile settings
-          await fetch("http://localhost:8002/api/settings/profile", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -753,7 +770,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           });
 
           // Save website settings
-          await fetch("http://localhost:8002/api/settings/website", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -833,7 +850,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
         // Save the avatar to the database
         const response = await fetch(
-          "http://localhost:8002/api/settings/profile",
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`,
           {
             method: "PUT",
             headers: {
@@ -974,9 +991,25 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
           {/* Modal Content */}
           <div className="flex h-96">
+            {/* Mobile Sidebar Toggle Button */}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className={`lg:hidden fixed top-20 left-4 z-50 p-2 rounded-lg transition-colors ${
+                theme === "dark"
+                  ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+              } shadow-lg border ${
+                theme === "dark" ? "border-gray-700" : "border-gray-200"
+              }`}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
             {/* Settings Sidebar */}
             <div
-              className={`w-48 border-r ${
+              className={`${
+                sidebarOpen ? "w-48" : "w-0"
+              } transition-all duration-300 border-r overflow-hidden ${
                 theme === "dark"
                   ? "border-gray-700 bg-gray-900"
                   : "border-gray-200 bg-gray-50"
@@ -989,7 +1022,13 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        // Close sidebar on mobile after selecting tab
+                        if (window.innerWidth < 1024) {
+                          setSidebarOpen(false);
+                        }
+                      }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         isActive
                           ? theme === "dark"
@@ -1196,13 +1235,15 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
                   {/* Authentication Info */}
                   <div
-                    className={`rounded-lg p-4 ${
-                      theme === "dark" ? "bg-gray-700" : "bg-gray-50"
+                    className={`rounded-lg p-4 border ${
+                      theme === "dark" 
+                        ? "bg-gray-700 border-gray-600" 
+                        : "bg-blue-50 border-blue-200"
                     }`}
                   >
                     <h4
                       className={`text-xs sm:text-sm font-medium mb-2 ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-blue-900"
                       }`}
                     >
                       Authentication Method
@@ -1211,7 +1252,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       <Key className="w-4 h-4 mr-2 text-blue-600" />
                       <span
                         className={`text-sm ${
-                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                          theme === "dark" ? "text-gray-300" : "text-blue-800"
                         }`}
                       >
                         Username & Password Authentication
