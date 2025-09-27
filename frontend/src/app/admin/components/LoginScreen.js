@@ -20,6 +20,7 @@ const LoginScreen = ({ onLogin }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/login/`,
         {
           method: "POST",
+          credentials: 'include', // Include cookies for session authentication
           headers: {
             "Content-Type": "application/json",
           },

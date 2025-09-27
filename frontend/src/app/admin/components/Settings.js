@@ -95,6 +95,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials/`,
           {
             signal: controller,
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
@@ -456,6 +457,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         case "profile":
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
             method: "PUT",
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
@@ -466,6 +468,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         case "security":
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials`, {
             method: "PUT",
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
@@ -480,6 +483,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         case "website":
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
@@ -498,6 +502,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         case "appearance":
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
@@ -763,6 +768,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           // Save profile settings
           await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
             method: "PUT",
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
@@ -772,6 +778,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           // Save website settings
           await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
+            credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
