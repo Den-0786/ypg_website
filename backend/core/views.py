@@ -331,10 +331,18 @@ def api_supervisor_change_credentials(request):
         if auth_header.startswith('Bearer '):
             session_token = auth_header.split(' ')[1]
         
+        # Debug logging
+        print(f"DEBUG: User authenticated: {request.user.is_authenticated}")
+        print(f"DEBUG: Session token: {session_token}")
+        print(f"DEBUG: User count: {user_count}, Supervisor count: {supervisor_count}")
+        
         # Try to authenticate using session token
         if session_token:
             try:
                 supervisor = Supervisor.objects.get(session_token=session_token)
+                # Properly authenticate the user
+                from django.contrib.auth import login
+                login(request, supervisor.user)
                 request.user = supervisor.user
             except Supervisor.DoesNotExist:
                 pass
