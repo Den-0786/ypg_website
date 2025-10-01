@@ -219,7 +219,7 @@ export default function AdvertisementSection() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 w-[260px] flex-shrink-0 self-start"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 w-[260px] flex-shrink-0 self-start h-fit"
                   >
                     {/* Image Carousel */}
                     <div
@@ -315,12 +315,16 @@ export default function AdvertisementSection() {
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-gray-800 mb-3">
-                        {ad.title}
+                      <h3 className={`text-lg font-bold text-gray-800 mb-3 ${!isExpanded ? "h-7" : ""}`}>
+                        {isExpanded || ad.title.length <= 16
+                          ? ad.title
+                          : `${ad.title.substring(0, 16)}...`}
                       </h3>
 
-                      <p className="text-gray-600 mb-4 line-clamp-3">
-                        {ad.description}
+                      <p className={`text-gray-600 mb-4 ${!isExpanded ? "h-12" : ""}`}>
+                        {isExpanded || ad.description.length <= 20
+                          ? ad.description
+                          : `${ad.description.substring(0, 20)}...`}
                       </p>
 
                       {isExpanded && (
