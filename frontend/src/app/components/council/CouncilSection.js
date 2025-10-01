@@ -77,7 +77,7 @@ export default function CouncilSection() {
   }, []);
 
   // Create sets based on screen size
-  const cardsPerSet = isMobile ? 2 : 4;
+  const cardsPerSet = isMobile ? 1 : 4;
   const totalSets = Math.ceil(councilMembers.length / cardsPerSet);
   const sets = [];
 
@@ -252,7 +252,7 @@ export default function CouncilSection() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -50 }}
                     transition={{ duration: 0.5 }}
-                    className={`grid gap-5 px-2 ${set.length === 1 ? "grid-cols-1 place-items-center" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 justify-items-center"}`}
+                    className={`grid gap-2 px-2 ${set.length === 1 ? "grid-cols-1 place-items-center" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center"}`}
                   >
                     {set.map((member, index) => {
                       const direction = index % 2 === 0 ? "left" : "right";

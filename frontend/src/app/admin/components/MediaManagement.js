@@ -184,16 +184,44 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
       }
 
       if (response.ok) {
-        const updatedMedia = await response.json();
-        setMedia(
-          media.map((item) =>
-            item.id === editingMedia.id ? updatedMedia.media : item
-          )
+        const result = await response.json();
+        if (result.success) {
+          // Update local state with the edited data
+          setMedia(
+            media.map((item) =>
+              item.id === editingMedia.id
+                ? {
+                    ...item,
+                    title: editingMedia.title,
+                    description: editingMedia.description,
+                    category: editingMedia.type,
+                    congregation: editingMedia.congregation,
+                    date: editingMedia.date,
+                    youtube_url: editingMedia.youtubeUrl,
+                    tiktok_url: editingMedia.tiktokUrl,
+                  }
+                : item
+            )
+          );
+          setEditingMedia(null);
+          showToast("Media updated successfully!");
+        } else {
+          showToast(
+            `Error: ${result.error || "Failed to update media"}`,
+            "error"
+          );
+        }
+      } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        showToast(
+          `Error: ${errorData.error || "Failed to update media"}`,
+          "error"
         );
-        setEditingMedia(null);
       }
     } catch (error) {
       console.error("Error updating media:", error);
+      showToast(`Error: ${error.message}`, "error");
     }
   };
 

@@ -391,7 +391,7 @@ function AdminDashboardInner() {
       return isNaN(amount) ? sum : sum + amount;
     }, 0);
     setStats({
-      totalVisitors: analytics?.analytics?.visitors?.total || 0,
+      totalVisitors: analytics?.unique_visitors || 0,
       totalDonations: isNaN(totalDonations) ? 0 : totalDonations,
       totalEvents: events.length,
       totalMedia: media.length,
