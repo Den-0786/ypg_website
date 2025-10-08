@@ -1,8 +1,8 @@
 from django.urls import path
 from . import views
-from ..advertisement_views import api_advertisements, api_advertisements_admin, api_create_advertisement, api_update_advertisement, api_delete_advertisement
-from ..settings_views import api_settings_profile, api_settings_website
-from ..ystore_views import api_ystore_items, api_ystore_item_detail
+from advertisement_views import api_advertisements, api_advertisements_admin, api_create_advertisement, api_update_advertisement, api_delete_advertisement
+from settings_views import api_settings_profile, api_settings_website
+from ystore_views import api_ystore_items, api_ystore_item_detail
 from .finance_views import (
     api_sales, api_create_sale, api_update_sale, api_delete_sale,
     api_expenses, api_create_expense, api_update_expense, api_delete_expense,
