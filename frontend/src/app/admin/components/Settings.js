@@ -862,6 +862,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`,
           {
             method: "PUT",
+            credentials: 'include',
             headers: {
               "Content-Type": "application/json",
             },
@@ -961,7 +962,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               theme === "dark" ? "border-gray-700" : "border-gray-200"
             }`}
           >
-            <div className="flex-1">
+            <div className="flex items-center space-x-3 flex-1">
               <h2
                 className={`text-lg sm:text-xl font-semibold ${
                   theme === "dark" ? "text-white" : "text-gray-900"
@@ -969,6 +970,16 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               >
                 Settings
               </h2>
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className={`lg:hidden p-1 rounded-lg transition-colors ${
+                  theme === "dark"
+                    ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700"
+                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Menu className="w-5 h-5" />
+              </button>
               {saveStatus.type && (
                 <div
                   className={`flex items-center mt-2 text-sm ${
@@ -1000,19 +1011,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
           {/* Modal Content */}
           <div className="flex h-96">
-            {/* Mobile Sidebar Toggle Button */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className={`lg:hidden fixed top-20 left-4 z-50 p-2 rounded-lg transition-colors ${
-                theme === "dark"
-                  ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                  : "bg-white text-gray-600 hover:bg-gray-100"
-              } shadow-lg border ${
-                theme === "dark" ? "border-gray-700" : "border-gray-200"
-              }`}
-            >
-              <Menu className="w-5 h-5" />
-            </button>
 
             {/* Settings Sidebar */}
             <div
