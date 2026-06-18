@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Edit, Upload, X, Save, Image as ImageIcon } from "lucide-react";
-import { getBaseUrl } from "@/app/utils/baseUrl";
+import { getBaseUrl } from "../../../utils/baseUrl";
 
 export default function VisionMissionManagement() {
   const [data, setData] = useState(null);

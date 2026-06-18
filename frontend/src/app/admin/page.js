@@ -18,6 +18,7 @@ import MediaManagement from "./components/MediaManagement";
 import PeopleManagement from "./components/PeopleManagement";
 import ContentManagement from "./components/ContentManagement";
 import VisionMissionManagement from "./components/VisionMissionManagement";
+import { getBaseUrl } from "../../utils/baseUrl";
 import Settings from "./components/Settings";
 import AnalyticsSettings from "./components/AnalyticsSettings";
 import FinancialManagement from "./components/FinancialManagement";

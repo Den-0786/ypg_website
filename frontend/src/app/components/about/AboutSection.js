@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { getBaseUrl } from '@/app/utils/baseUrl';
+import { getBaseUrl } from '../../../utils/baseUrl';
 
 export default function AboutSection() {
     const [visionMission, setVisionMission] = useState(null);
