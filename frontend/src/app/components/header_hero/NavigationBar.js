@@ -16,22 +16,10 @@ export default function NavigationBar() {
     { name: "Home", href: "#home" },
     { name: "About", href: "#about" },
     { name: "Events", href: "#events" },
-    { name: "Quiz", href: "#quiz" },
     { name: "Contact", href: "#contact" },
   ];
 
-  const dropdownLinks = [
-    { name: "Gallery", href: "#gallery" },
-    { name: "Blog", href: "#blog" },
-    { name: "YStore", href: "#ystore" },
-    { name: "Testimonials", href: "#testimonials" },
-    { name: "Ministries", href: "#ministries" },
-    { name: "Team", href: "#team" },
-    { name: "Welfare", href: "#welfare" },
-    { name: "Join Us", href: "#join" },
-  ];
-
-  const allNavLinks = [...mainNavLinks, ...dropdownLinks];
+  const allNavLinks = [...mainNavLinks];
 
   useEffect(() => {
     const onScroll = () => {
@@ -140,10 +128,10 @@ export default function NavigationBar() {
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 border-2 ${
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                     activeSection === link.name
-                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 shadow-lg shadow-green-500/30"
-                      : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                   }`}
                 >
                   {link.name}
@@ -151,84 +139,14 @@ export default function NavigationBar() {
               </li>
             ))}
 
-            {/* Admin Link */}
+            {/* Login Link */}
             <li>
               <a
                 href="/admin/login"
-                className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 border-2 text-gray-600 bg-gray-100 border-gray-300 hover:bg-gray-200 hover:border-gray-400"
+                className="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 text-gray-600 hover:text-blue-600 hover:bg-gray-50"
               >
-                Admin
+                Login
               </a>
-            </li>
-
-            {/* Dropdown */}
-            <li className="relative">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                onMouseEnter={() => {
-                  if (dropdownTimeout) {
-                    clearTimeout(dropdownTimeout);
-                    setDropdownTimeout(null);
-                  }
-                  setDropdownOpen(true);
-                }}
-                onMouseLeave={() => {
-                  const timeout = setTimeout(() => setDropdownOpen(false), 500);
-                  setDropdownTimeout(timeout);
-                }}
-                className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 border-2 flex items-center space-x-1 ${
-                  dropdownLinks.some((link) => activeSection === link.name)
-                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 shadow-lg shadow-green-500/30"
-                    : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
-                }`}
-              >
-                <span>More</span>
-                <span
-                  className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
-                >
-                  ▼
-                </span>
-              </button>
-
-              {/* Dropdown Menu */}
-              {dropdownOpen && (
-                <div
-                  className="absolute top-full right-0 mt-1 w-56 bg-blue-50 rounded-xl shadow-xl border border-blue-200 py-3 z-50 backdrop-blur-sm"
-                  onMouseEnter={() => {
-                    if (dropdownTimeout) {
-                      clearTimeout(dropdownTimeout);
-                      setDropdownTimeout(null);
-                    }
-                    setDropdownOpen(true);
-                  }}
-                  onMouseLeave={() => {
-                    const timeout = setTimeout(
-                      () => setDropdownOpen(false),
-                      500
-                    );
-                    setDropdownTimeout(timeout);
-                  }}
-                >
-                  {dropdownLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavClick(link.href);
-                        setDropdownOpen(false);
-                      }}
-                      className={`block px-4 py-3 mx-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        activeSection === link.name
-                          ? "bg-gradient-to-r from-green-500 to-green-600 text-white border border-green-400 shadow-lg shadow-green-500/30"
-                          : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
-                      }`}
-                    >
-                      {link.name}
-                    </a>
-                  ))}
-                </div>
-              )}
             </li>
           </ul>
 
@@ -248,7 +166,7 @@ export default function NavigationBar() {
         {isOpen && (
           <div
             ref={mobileMenuRef}
-            className="md:hidden bg-blue-50 border-t border-blue-200 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100"
+            className="md:hidden bg-white border-t border-gray-200 max-h-[80vh] overflow-y-auto"
           >
             <ul className="flex flex-col py-2 px-4 space-y-2">
               {/* Main Navigation Links */}
@@ -260,10 +178,10 @@ export default function NavigationBar() {
                       e.preventDefault();
                       handleNavClick(link.href);
                     }}
-                    className={`block py-3 px-4 rounded-xl font-semibold border-2 transition-all duration-300 ${
+                    className={`block py-3 px-4 rounded-lg font-medium transition-colors duration-200 ${
                       activeSection === link.name
-                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 shadow-lg shadow-green-500/30"
-                        : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                     }`}
                   >
                     {link.name}
@@ -271,58 +189,14 @@ export default function NavigationBar() {
                 </li>
               ))}
 
-              {/* Admin Link - Mobile */}
+              {/* Login Link - Mobile */}
               <li>
                 <a
                   href="/admin/login"
-                  className="block py-3 px-4 rounded-xl font-semibold border-2 transition-all duration-300 text-gray-600 bg-gray-100 border-gray-300 hover:bg-gray-200 hover:border-gray-400"
+                  className="block py-3 px-4 rounded-lg font-medium transition-colors duration-200 text-gray-600 hover:text-blue-600 hover:bg-gray-50"
                 >
-                  Admin
+                  Login
                 </a>
-              </li>
-
-              {/* Mobile Dropdown */}
-              <li>
-                <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className={`w-full text-left py-3 px-4 rounded-xl font-semibold border-2 transition-all duration-300 flex items-center justify-between ${
-                    dropdownLinks.some((link) => activeSection === link.name)
-                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 shadow-lg shadow-green-500/30"
-                      : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
-                  }`}
-                >
-                  <span>More</span>
-                  <span
-                    className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
-                  >
-                    ▼
-                  </span>
-                </button>
-
-                {/* Mobile Dropdown Menu */}
-                {dropdownOpen && (
-                  <ul className="pl-4 border-l-2 border-gray-200 ml-4 space-y-1 mt-2">
-                    {dropdownLinks.map((link) => (
-                      <li key={link.name}>
-                        <a
-                          href={link.href}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleNavClick(link.href);
-                            setDropdownOpen(false);
-                          }}
-                          className={`block py-2 px-3 rounded-lg font-medium text-sm border transition-all duration-200 ${
-                            activeSection === link.name
-                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 shadow-lg shadow-green-500/30"
-                              : "text-white bg-gradient-to-r from-blue-400 to-blue-500 border-blue-300 hover:from-blue-500 hover:to-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/25"
-                          }`}
-                        >
-                          {link.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </li>
             </ul>
           </div>
