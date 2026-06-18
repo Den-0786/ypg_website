@@ -20,6 +20,10 @@ module.exports = {
           800: '#1e40af',
           900: '#1e3a8a',
         },
+        // Brand color palette extracted from reference design
+        'brand-primary': '#F59E0B',    // Vibrant amber/orange - buttons, stats, highlights
+        'brand-dark': '#0F172A',       // Deep navy/slate-blue - hero bg, footer, titles
+        'brand-teal': '#14B8A6',       // Teal/sea-green - secondary banners, accents
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
