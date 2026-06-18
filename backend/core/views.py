@@ -17,18 +17,19 @@ import re
 from datetime import datetime, timedelta
 from .models import Supervisor
 from .models import (
-    Quiz, QuizSubmission, Event, TeamMember, Donation, 
-    ContactMessage, MinistryRegistration, BlogPost, 
+    Quiz, QuizSubmission, Event, TeamMember, Donation,
+    ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive,
-    Ministry, Sale, Expense, Contribution
+    Ministry, Sale, Expense, Contribution, VisionMission
 )
 from .serializers import (
-    QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer, 
+    QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer,
     QuizResultsSerializer, EventSerializer, TeamMemberSerializer,
     DonationSerializer, ContactMessageSerializer, MinistryRegistrationSerializer,
     BlogPostSerializer, TestimonialSerializer, GalleryItemSerializer,
     CongregationSerializer, AnalyticsSerializer, AdvertisementSerializer,
-    MinistrySerializer, SaleSerializer, ExpenseSerializer, ContributionSerializer
+    MinistrySerializer, SaleSerializer, ExpenseSerializer, ContributionSerializer,
+    VisionMissionSerializer
 )
 import json
 
@@ -2964,3 +2965,7 @@ def api_past_executive_delete(request, executive_id):
             'success': False,
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Vision and Mission API endpoints
+

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .vision_mission_views import api_vision_mission, api_vision_mission_update
 from advertisement_views import api_advertisements, api_advertisements_admin, api_create_advertisement, api_update_advertisement, api_delete_advertisement
 from settings_views import api_settings_profile, api_settings_website
 from ystore_views import api_ystore_items, api_ystore_item_detail
@@ -156,6 +157,10 @@ urlpatterns = [
     path('api/contributions/create/', api_create_contribution, name='api_create_contribution'),
     path('api/contributions/<int:contribution_id>/update/', api_update_contribution, name='api_update_contribution'),
     path('api/contributions/<int:contribution_id>/delete/', api_delete_contribution, name='api_delete_contribution'),
+
+    # Vision & Mission API endpoints
+    path('api/vision-mission/', api_vision_mission, name='api_vision_mission'),
+    path('api/vision-mission/update/', api_vision_mission_update, name='api_vision_mission_update'),
 ]
 
 

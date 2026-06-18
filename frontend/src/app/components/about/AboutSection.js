@@ -2,8 +2,40 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { getBaseUrl } from '@/app/utils/baseUrl';
 
 export default function AboutSection() {
+    const [visionMission, setVisionMission] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchVisionMission = async () => {
+            try {
+                const baseUrl = getBaseUrl();
+                const response = await fetch(`${baseUrl}/api/vision-mission/`);
+                const data = await response.json();
+                if (data.success) {
+                    setVisionMission(data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching vision/mission:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchVisionMission();
+    }, []);
+
+    // Default values if API fails
+    const missionText = visionMission?.mission_text || "To nurture the spiritual, moral, and social growth of young people within the Presbyterian Church by engaging them in activities that strengthen their faith and equip them for leadership and service.";
+    const visionText = visionMission?.vision_text || "To raise a generation of spiritually grounded and socially responsible youth who actively contribute to the growth of the church and the transformation of society.";
+    const motto = visionMission?.motto || "YPG! Service All The Way, You! Practice Godliness";
+    const themeTitle = visionMission?.theme_title || "2025 Theme";
+    const themeText = visionMission?.theme_text || "Celebrating our Heritage, Persisting in Mission, Embracing our Missionary Legacy as Youth (Colossians 1:58)";
+    const missionImage = visionMission?.mission_image_url || "/mission-vision/pres.jpg";
+    const visionImage = visionMission?.vision_image_url || "/mission-vision/priscy.jpg";
+
     return (
         <section id="about" className="bg-white py-12 px-4 md:px-12 lg:px-24">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
@@ -27,7 +59,7 @@ export default function AboutSection() {
                 <div className="flex flex-col items-center gap-8">
                 <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-blue-200">
                     <Image
-                    src="/mission-vision/pres.jpg"
+                    src={missionImage}
                     alt="Mission"
                     fill
                     className="object-cover object-top"
@@ -39,9 +71,7 @@ export default function AboutSection() {
                 <div className="text-center">
                     <h3 className="text-2xl font-bold mb-4 text-blue-800">Our Mission</h3>
                     <p className="text-gray-700 leading-relaxed text-lg">
-                    To nurture the spiritual, moral, and social growth of young people within
-                    the Presbyterian Church by engaging them in activities that strengthen
-                    their faith and equip them for leadership and service.
+                    {missionText}
                     </p>
                 </div>
                 </div>
@@ -56,14 +86,12 @@ export default function AboutSection() {
                 <div className="text-center">
                     <h3 className="text-2xl font-bold mb-4 text-blue-800">Our Vision</h3>
                     <p className="text-gray-700 leading-relaxed text-lg">
-                    To raise a generation of spiritually grounded and socially responsible
-                    youth who actively contribute to the growth of the church and the
-                    transformation of society.
+                    {visionText}
                     </p>
                 </div>
                 <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-blue-200">
                     <Image
-                    src="/mission-vision/priscy.jpg"
+                    src={visionImage}
                     alt="Vision"
                     fill
                     className="object-cover"
@@ -87,7 +115,7 @@ export default function AboutSection() {
             className="flex-1 border-2 border-yellow-700 rounded-xl p-6 bg-blue-50 text-center shadow-md"
             >
             <h3 className="text-xl font-bold mb-2 text-gray-800">Our Motto</h3>
-            <p className="text-lg italic text-blue-900">YPG! Service All The Way, You! Practice Godliness</p>
+            <p className="text-lg italic text-blue-900">{motto}</p>
             </motion.div>
 
 
@@ -98,9 +126,9 @@ export default function AboutSection() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex-1 border-2 border-yellow-700 rounded-xl p-6 bg-green-50 text-center shadow-md"
             >
-            <h3 className="text-xl font-bold mb-2 text-gray-800">2025 Theme</h3>
+            <h3 className="text-xl font-bold mb-2 text-gray-800">{themeTitle}</h3>
             <p className="text-lg text-green-900">
-                Celebrating our Heritage, Persisting in Mission, Embracing our Missionary Legacy as Youth (Colossians 1:58)
+                {themeText}
             </p>
             </motion.div>
         </div>

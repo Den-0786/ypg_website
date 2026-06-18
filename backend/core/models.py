@@ -482,3 +482,53 @@ class Contribution(models.Model):
     class Meta:
         verbose_name = "Contribution"
         verbose_name_plural = "Contributions"
+
+
+class VisionMission(models.Model):
+    """
+    Model to store Mission and Vision content with images
+    Only one instance should exist (use get_or_create)
+    """
+    mission_text = models.TextField(
+        default="To nurture the spiritual, moral, and social growth of young people within the Presbyterian Church by engaging them in activities that strengthen their faith and equip them for leadership and service."
+    )
+    mission_image = models.ImageField(
+        upload_to='mission-vision/',
+        blank=True,
+        null=True,
+        help_text="Image for the Mission section"
+    )
+    vision_text = models.TextField(
+        default="To raise a generation of spiritually grounded and socially responsible youth who actively contribute to the growth of the church and the transformation of society."
+    )
+    vision_image = models.ImageField(
+        upload_to='mission-vision/',
+        blank=True,
+        null=True,
+        help_text="Image for the Vision section"
+    )
+    motto = models.CharField(
+        max_length=200,
+        default="YPG! Service All The Way, You! Practice Godliness"
+    )
+    theme_title = models.CharField(
+        max_length=200,
+        default="2025 Theme"
+    )
+    theme_text = models.TextField(
+        default="Celebrating our Heritage, Persisting in Mission, Embracing our Missionary Legacy as Youth (Colossians 1:58)"
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Vision & Mission (updated: {self.updated_at})"
+    
+    class Meta:
+        verbose_name = "Vision & Mission"
+        verbose_name_plural = "Vision & Mission"
+
+    @classmethod
+    def get_instance(cls):
+        """Get or create the singleton instance"""
+        instance, created = cls.objects.get_or_create(pk=1)
+        return instance

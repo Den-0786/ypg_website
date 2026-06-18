@@ -17,6 +17,7 @@ import TestimonialsManagement from "./components/TestimonialsManagement";
 import MediaManagement from "./components/MediaManagement";
 import PeopleManagement from "./components/PeopleManagement";
 import ContentManagement from "./components/ContentManagement";
+import VisionMissionManagement from "./components/VisionMissionManagement";
 import Settings from "./components/Settings";
 import AnalyticsSettings from "./components/AnalyticsSettings";
 import FinancialManagement from "./components/FinancialManagement";
@@ -51,6 +52,7 @@ function AdminDashboardInner() {
     "media",
     "people",
     "content",
+    "vision-mission",
     "settings",
     "analytics",
     "financial",
@@ -545,6 +547,9 @@ function AdminDashboardInner() {
                   setMedia={setMedia}
                   theme={theme}
                 />
+              )}
+              {activeTab === "vision-mission" && (
+                <VisionMissionManagement />
               )}
               {activeTab === "financial" && (
                 <FinancialManagement

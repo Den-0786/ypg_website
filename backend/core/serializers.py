@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from .models import (
-    Quiz, QuizSubmission, Event, TeamMember, Donation, 
-    ContactMessage, MinistryRegistration, BlogPost, 
+    Quiz, QuizSubmission, Event, TeamMember, Donation,
+    ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem,
-    Ministry, Sale, Expense, Contribution
+    Ministry, Sale, Expense, Contribution, VisionMission
 )
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -114,3 +114,29 @@ class ContributionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contribution
         fields = '__all__'
+
+class VisionMissionSerializer(serializers.ModelSerializer):
+    mission_image_url = serializers.SerializerMethodField()
+    vision_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VisionMission
+        fields = ['id', 'mission_text', 'mission_image', 'mission_image_url',
+                  'vision_text', 'vision_image', 'vision_image_url',
+                  'motto', 'theme_title', 'theme_text', 'updated_at']
+
+    def get_mission_image_url(self, obj):
+        if obj.mission_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.mission_image.url)
+            return obj.mission_image.url
+        return None
+
+    def get_vision_image_url(self, obj):
+        if obj.vision_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.vision_image.url)
+            return obj.vision_image.url
+        return None

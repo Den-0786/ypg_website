@@ -95,7 +95,7 @@ python manage.py createsuperuser
 
 Or use the build script that automatically creates an admin user:
 
-- Username: `admin`
+- Username: `district_admin`
 - Password: `admin123`
 
 ### 2. Test API Endpoints
@@ -190,3 +190,118 @@ Render provides automatic backups for paid plans.
 2. **Database**: Optimize queries and use indexing
 3. **Caching**: Implement Redis for caching (paid feature)
 4. **Images**: Optimize images and use WebP format
+
+
+
+
+
+
+📋 Overview
+This document provides login credentials and access instructions for the YPG website administration dashboard.
+
+🔐 Admin Credentials
+Frontend Admin Dashboard
+URL: https://ypg-website.vercel.app/admin/login
+
+Username: district_admin
+
+Password: admin123
+
+Django Admin Panel (Backend)
+URL: https://ypg-website.onrender.com/admin/
+
+Username: district_admin
+
+Password: admin123
+
+🛠️ Access Levels
+Frontend Admin Dashboard
+Manage website content
+
+View user data
+
+Access reporting features
+
+Update site information
+
+Django Admin Panel
+Full database access
+
+User management
+
+Database model administration
+
+System configuration
+
+Advanced administrative functions
+
+⚠️ Important Security Notes
+Change Password Immediately
+
+It is highly recommended to change the password after first login
+
+Use a strong, unique password
+
+Access Restrictions
+
+Keep these credentials secure and confidential
+
+Do not share with unauthorized personnel
+
+Limit access to trusted administrators only
+
+Backup Credentials
+
+Store credentials in a secure password manager
+
+Have a recovery process in place
+
+🔄 Password Reset Procedure
+If You Forget Password:
+Currently, password reset requires technical assistance since email functionality is not yet configured. Contact your developer for password resets.
+
+Future Enhancement:
+When email service is integrated, you'll be able to:
+
+Use "Forgot Password" feature
+
+Receive reset links via email
+
+Self-service password changes
+
+📞 Support Contact
+For technical issues or password resets, contact:
+
+Developer: [Your Name/Contact]
+
+Backup Access Method: Database administrator access required
+
+🗂️ System Architecture
+Frontend: React.js (Vercel)
+
+Backend: Django (Render)
+
+Database: PostgreSQL (Neon)
+
+File Storage: AWS S3
+
+🔒 Security Best Practices
+Regularly update passwords (every 90 days recommended)
+
+Use different passwords for frontend and backend if possible
+
+Enable 2-factor authentication when available
+
+Monitor admin access logs regularly
+
+Limit login attempts to prevent brute force attacks
+
+📝 Additional Notes
+The admin dashboard provides real-time analytics and reporting
+
+Django admin offers complete database management capabilities
+
+Both interfaces are mobile-responsive
+
+Regular backups are performed automatically
+

@@ -20,6 +20,7 @@ import {
   Crown,
   History,
   Tag,
+  Eye,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -47,6 +48,7 @@ const Sidebar = ({
     { id: "blog", name: "Blog", icon: FileText },
     { id: "testimonials", name: "Testimonials", icon: MessageCircle },
     { id: "media", name: "Media", icon: Image },
+    { id: "vision-mission", name: "Vision & Mission", icon: Eye },
     { id: "communication", name: "Contact Messages", icon: Mail },
     { id: "branch-presidents", name: "Branch Presidents", icon: UserCheck },
     { id: "trash", name: "Trash", icon: Trash2 },
