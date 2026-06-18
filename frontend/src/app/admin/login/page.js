@@ -82,89 +82,145 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm"
-      >
-        <div className="bg-white/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/30 p-6">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-white mb-1">YPG Admin</h1>
-            <p className="text-white/80 text-sm">Sign in to your dashboard</p>
-          </div>
+    <div className="min-h-screen flex">
+      {/* Left Side - Dark Navy Background with decorative elements */}
+      <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 bg-gray-800 relative items-center justify-center overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute top-20 left-20 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-700/50 rounded-full blur-2xl"></div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Username
-              </label>
-              <input
-                type="text"
-                value={credentials.username}
-                onChange={(e) =>
-                  setCredentials({ ...credentials, username: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-white/30 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent bg-white/20 backdrop-blur-sm text-white placeholder-white/70"
-                placeholder="Enter username"
-                required
-              />
+        {/* Content */}
+        <div className="relative z-10 text-center px-12">
+          <div className="mb-8">
+            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-400 to-teal-400 rounded-2xl flex items-center justify-center shadow-2xl">
+              <span className="text-4xl font-bold text-white">YPG</span>
             </div>
+          </div>
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Welcome Back
+          </h2>
+          <p className="text-gray-400 text-lg max-w-md">
+            Sign in to access your admin dashboard and manage your youth ministry platform
+          </p>
 
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={credentials.password}
-                  onChange={(e) =>
-                    setCredentials({ ...credentials, password: e.target.value })
-                  }
-                  className="w-full px-3 py-2 pr-10 border border-white/30 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent bg-white/20 backdrop-blur-sm text-white placeholder-white/70"
-                  placeholder="Enter password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
+          {/* Feature badges */}
+          <div className="flex flex-wrap justify-center gap-3 mt-12">
+            <div className="bg-gray-700/50 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-gray-300">
+              Manage Events
+            </div>
+            <div className="bg-gray-700/50 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-gray-300">
+              Track Donations
+            </div>
+            <div className="bg-gray-700/50 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-gray-300">
+              Member Database
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - White Card with Login Form */}
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center bg-gray-50 p-4 sm:p-8">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            {/* Mobile logo - only visible on small screens */}
+            <div className="lg:hidden text-center mb-6">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400 to-teal-400 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-2xl font-bold text-white">YPG</span>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white py-3 px-4 rounded-lg font-medium hover:bg-white/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Signing In...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </button>
-          </form>
-          <div className="mt-4 text-center">
-            <a
-              href="/"
-              className="text-white/70 hover:text-white text-sm transition-colors"
-            >
-              ← Back to Website
-            </a>
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">Admin Login</h1>
+              <p className="text-gray-500 text-sm">Enter your credentials to continue</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={credentials.username}
+                  onChange={(e) =>
+                    setCredentials({ ...credentials, username: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-800 placeholder-gray-400 transition-all duration-200"
+                  placeholder="Enter your username"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={credentials.password}
+                    onChange={(e) =>
+                      setCredentials({ ...credentials, password: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-800 placeholder-gray-400 transition-all duration-200"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 px-4 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+              <a
+                href="/"
+                className="inline-flex items-center text-gray-500 hover:text-blue-600 text-sm font-medium transition-colors"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Website
+              </a>
+            </div>
           </div>
-        </div>
-      </motion.div>
+
+          {/* Security note */}
+          <p className="text-center text-gray-400 text-xs mt-6">
+            Secure admin access. Unauthorized use is prohibited.
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 }
