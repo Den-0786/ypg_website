@@ -97,7 +97,7 @@ export default function VisionMissionManagement() {
         formDataToSend.append("vision_image", visionImage);
       }
 
-      const sessionToken = localStorage.getItem("session_token");
+      const sessionToken = localStorage.getItem("ypg_admin_session_token");
       const response = await fetch(`${baseUrl}/api/vision-mission/update/`, {
         method: "PUT",
         headers: {
