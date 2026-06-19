@@ -222,14 +222,14 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2
-          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
         >
           Events Management
         </h2>
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setShowDeletedEvents(!showDeletedEvents)}
-            className={`flex items-center space-x-2 px-3 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+            className={`flex items-center space-x-2 px-3 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
           >
             {showDeletedEvents ? (
               <>
@@ -245,7 +245,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center space-x-2 bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Add Event</span>
@@ -254,13 +254,13 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
       </div>
 
       {/* Event Type Tabs */}
-      <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg w-fit">
+      <div className="flex space-x-1 bg-blue-50 dark:bg-gray-700 p-1 rounded-lg w-fit">
         <button
           onClick={() => setActiveEventTab("upcoming")}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeEventTab === "upcoming"
-              ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-              : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              ? "bg-white dark:bg-gray-600 text-navy-950 dark:text-white shadow-sm"
+              : "text-gray-600 dark:text-gray-300 hover:text-navy-950 dark:hover:text-white"
           }`}
         >
           Upcoming Events ({upcomingEvents.length})
@@ -269,8 +269,8 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
           onClick={() => setActiveEventTab("past")}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeEventTab === "past"
-              ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-              : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              ? "bg-white dark:bg-gray-600 text-navy-950 dark:text-white shadow-sm"
+              : "text-gray-600 dark:text-gray-300 hover:text-navy-950 dark:hover:text-white"
           }`}
         >
           Past Events ({pastEvents.length})
@@ -289,7 +289,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             }`}
           >
             <div
-              className={`h-72 ${theme === "dark" ? "bg-gradient-to-r from-blue-600 to-purple-700" : "bg-gradient-to-r from-blue-500 to-purple-600"} flex items-center justify-center relative overflow-hidden rounded-t-xl`}
+              className={`h-72 ${theme === "dark" ? "bg-gradient-to-r from-gold-500 to-purple-700" : "bg-gradient-to-r from-gold-500 to-purple-600"} flex items-center justify-center relative overflow-hidden rounded-t-xl`}
             >
               {event.image ? (
                 <img
@@ -314,7 +314,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             </div>
             <div className="p-6">
               <h3
-                className={`font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                className={`font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
               >
                 {event.title}
               </h3>
@@ -341,11 +341,11 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                   className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     event.type === "upcoming"
                       ? theme === "dark"
-                        ? "bg-blue-900/30 text-blue-300"
-                        : "bg-blue-100 text-blue-800"
+                        ? "bg-navy-950/30 text-gold-300"
+                        : "bg-gold-100 text-navy-950"
                       : theme === "dark"
                         ? "bg-gray-700 text-gray-300"
-                        : "bg-gray-100 text-gray-800"
+                        : "bg-blue-50 text-navy-950"
                   }`}
                 >
                   {event.type}
@@ -368,7 +368,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                           end_time: endDate.toTimeString().slice(0, 5),
                         });
                       }}
-                      className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                      className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-blue-50 text-gray-600 hover:bg-gray-100"}`}
                     >
                       <Edit className="w-3 h-3" />
                       <span>Edit</span>
@@ -414,7 +414,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             >
               {/* Header with gradient */}
               <div
-                className={`relative p-6 pb-4 ${theme === "dark" ? "bg-gradient-to-r from-purple-600/20 to-blue-600/20" : "bg-gradient-to-r from-purple-50 to-blue-50"} rounded-t-3xl`}
+                className={`relative p-6 pb-4 ${theme === "dark" ? "bg-gradient-to-r from-purple-600/20 to-gold-500/20" : "bg-gradient-to-r from-purple-50 to-blue-50"} rounded-t-3xl`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -427,7 +427,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                     </div>
                     <div>
                       <h3
-                        className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                        className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                       >
                         Create New Event
                       </h3>
@@ -440,7 +440,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                   </div>
                   <button
                     onClick={() => setShowAddModal(false)}
-                    className={`p-2 rounded-full transition-all duration-200 ${theme === "dark" ? "hover:bg-gray-700/50 text-gray-300 hover:text-white" : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"}`}
+                    className={`p-2 rounded-full transition-all duration-200 ${theme === "dark" ? "hover:bg-gray-700/50 text-gray-300 hover:text-white" : "hover:bg-blue-50 text-gray-500 hover:text-gray-700"}`}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -463,14 +463,14 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                     onChange={(e) =>
                       setNewEvent({ ...newEvent, title: e.target.value })
                     }
-                    className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-purple-500/20 focus:border-purple-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 hover:border-purple-300"}`}
+                    className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-purple-500/20 focus:border-purple-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-navy-950 placeholder-gray-500 hover:border-purple-300"}`}
                   />
                 </div>
                 <div>
                   <label
                     className={`block text-sm font-semibold mb-2 flex items-center space-x-2 ${theme === "dark" ? "text-gray-200" : "text-gray-700"}`}
                   >
-                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-gold-500"></span>
                     <span>Description</span>
                   </label>
                   <textarea
@@ -480,7 +480,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                       setNewEvent({ ...newEvent, description: e.target.value })
                     }
                     rows={2}
-                    className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all duration-200 resize-none ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 hover:border-blue-300"}`}
+                    className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-gold-500/20 focus:border-gold-500 text-sm transition-all duration-200 resize-none ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-navy-950 placeholder-gray-500 hover:border-blue-300"}`}
                   />
                 </div>
                 <div>
@@ -501,7 +501,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                             start_date: e.target.value,
                           })
                         }
-                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-green-500/20 focus:border-green-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-gray-900 hover:border-green-300"}`}
+                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-green-500/20 focus:border-green-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-navy-950 hover:border-green-300"}`}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <Calendar
@@ -519,7 +519,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                             start_time: e.target.value,
                           })
                         }
-                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-green-500/20 focus:border-green-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-gray-900 hover:border-green-300"}`}
+                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-green-500/20 focus:border-green-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-navy-950 hover:border-green-300"}`}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <svg
@@ -554,7 +554,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                         onChange={(e) =>
                           setNewEvent({ ...newEvent, end_date: e.target.value })
                         }
-                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-orange-500/20 focus:border-orange-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-gray-900 hover:border-orange-300"}`}
+                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-orange-500/20 focus:border-orange-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-navy-950 hover:border-orange-300"}`}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <Calendar
@@ -577,7 +577,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                         onChange={(e) =>
                           setNewEvent({ ...newEvent, end_time: e.target.value })
                         }
-                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-orange-500/20 focus:border-orange-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-gray-900 hover:border-orange-300"}`}
+                        className={`w-full px-3 py-2.5 border-2 rounded-lg focus:ring-3 focus:ring-orange-500/20 focus:border-orange-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white" : "bg-white border-gray-200 text-navy-950 hover:border-orange-300"}`}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <svg
@@ -612,7 +612,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                       onChange={(e) =>
                         setNewEvent({ ...newEvent, location: e.target.value })
                       }
-                      className={`w-full px-3 py-2.5 pl-10 border-2 rounded-lg focus:ring-3 focus:ring-pink-500/20 focus:border-pink-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 hover:border-pink-300"}`}
+                      className={`w-full px-3 py-2.5 pl-10 border-2 rounded-lg focus:ring-3 focus:ring-pink-500/20 focus:border-pink-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-navy-950 placeholder-gray-500 hover:border-pink-300"}`}
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                       <svg
@@ -656,7 +656,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                         })
                       }
                       min="0"
-                      className={`w-full px-3 py-2.5 pl-10 border-2 rounded-lg focus:ring-3 focus:ring-yellow-500/20 focus:border-yellow-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 hover:border-yellow-300"}`}
+                      className={`w-full px-3 py-2.5 pl-10 border-2 rounded-lg focus:ring-3 focus:ring-yellow-500/20 focus:border-yellow-500 text-sm transition-all duration-200 ${theme === "dark" ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-200 text-navy-950 placeholder-gray-500 hover:border-yellow-300"}`}
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                       <svg
@@ -685,7 +685,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                   <div className="flex gap-3">
                     {/* Image Preview */}
                     <div
-                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 ${theme === "dark" ? "bg-gray-700/30 border-gray-600 hover:border-indigo-500" : "bg-gray-50 border-gray-300 hover:border-indigo-400"}`}
+                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 ${theme === "dark" ? "bg-gray-700/30 border-gray-600 hover:border-indigo-500" : "bg-white border-gray-300 hover:border-indigo-400"}`}
                     >
                       {newEvent.image ? (
                         <div className="text-center">
@@ -772,13 +772,13 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
               <div className="flex space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`flex-1 px-6 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700/50 hover:border-gray-500" : "border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"}`}
+                  className={`flex-1 px-6 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700/50 hover:border-gray-500" : "border-gray-300 text-gray-700 hover:bg-white hover:border-gray-400"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddEvent}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 text-sm shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-gold-500 text-white rounded-xl font-medium hover:from-purple-700 hover:to-gold-600 transition-all duration-200 text-sm shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   <div className="flex items-center justify-center space-x-2">
                     <Plus className="w-4 h-4" />
@@ -808,13 +808,13 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3
-                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Edit Event
                 </h3>
                 <button
                   onClick={() => setEditingEvent(null)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
+                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-blue-50 text-navy-950"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -836,7 +836,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                         title: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -854,7 +854,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                       })
                     }
                     rows={2}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -873,7 +873,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                           start_date: e.target.value,
                         })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                     />
                   </div>
                   <div>
@@ -891,7 +891,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                           start_time: e.target.value,
                         })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                     />
                   </div>
                 </div>
@@ -911,7 +911,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                           end_date: e.target.value,
                         })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                     />
                   </div>
                   <div>
@@ -929,7 +929,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                           end_time: e.target.value,
                         })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                     />
                   </div>
                 </div>
@@ -948,7 +948,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                         location: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -967,7 +967,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                       })
                     }
                     min="0"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                     placeholder="Enter number of participants..."
                   />
                 </div>
@@ -980,7 +980,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                   <div className="flex gap-3">
                     {/* Left side - Media preview */}
                     <div
-                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-300"}`}
+                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                     >
                       {editingEvent.image ? (
                         <div className="text-center">
@@ -1031,10 +1031,10 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                     {/* Right side - Upload button */}
                     <div className="flex-1">
                       <label
-                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-blue-500 hover:border-blue-400 hover:bg-blue-900/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
+                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-gold-500 hover:border-blue-400 hover:bg-navy-950/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
                       >
                         <svg
-                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -1047,7 +1047,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                           />
                         </svg>
                         <span
-                          className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                          className={`text-xs font-medium ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         >
                           Upload
                         </span>
@@ -1070,13 +1070,13 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
               <div className="flex space-x-3 mt-5">
                 <button
                   onClick={() => setEditingEvent(null)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateEvent}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors text-sm"
                 >
                   Update Event
                 </button>
@@ -1102,7 +1102,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1111,7 +1111,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                     setShowDeleteModal(false);
                     setEventToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1158,7 +1158,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                     setShowDeleteModal(false);
                     setEventToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>

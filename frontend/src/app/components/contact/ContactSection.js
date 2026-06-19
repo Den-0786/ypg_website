@@ -97,11 +97,11 @@ export default function ContactSection() {
           <div className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-navy-950">
                 Message Sent Successfully!
               </p>
               <p className="text-sm text-gray-600">
-                Thank you for contacting us. We'll get back to you soon!
+                Thank you for contacting us. We&apos;ll get back to you soon!
               </p>
             </div>
           </div>,
@@ -126,7 +126,7 @@ export default function ContactSection() {
               <span className="text-red-600 text-xs font-bold">!</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-navy-950">
                 Message Failed to Send
               </p>
               <p className="text-sm text-gray-600">
@@ -157,7 +157,7 @@ export default function ContactSection() {
             <span className="text-red-600 text-xs font-bold">!</span>
           </div>
           <div>
-            <p className="font-semibold text-gray-900">
+            <p className="font-semibold text-navy-950">
               Message Failed to Send
             </p>
             <p className="text-sm text-gray-600">
@@ -195,8 +195,8 @@ export default function ContactSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold mb-4 text-gray-900">
-            Get in <span className="text-blue-600">Touch</span>
+          <h2 className="text-4xl font-bold mb-4 text-navy-950">
+            Get in <span className="text-gold-500">Touch</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Have questions, suggestions, or want to join our group? We&apos;d
@@ -223,7 +223,7 @@ export default function ContactSection() {
                   placeholder="Your name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                     errors.name ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -242,7 +242,7 @@ export default function ContactSection() {
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                     errors.email ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -261,7 +261,7 @@ export default function ContactSection() {
                   placeholder="Subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                     errors.subject ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -280,7 +280,7 @@ export default function ContactSection() {
                   placeholder="Write your message here..."
                   value={formData.message}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                     errors.message ? "border-red-500" : "border-gray-300"
                   }`}
                 ></textarea>
@@ -295,7 +295,7 @@ export default function ContactSection() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-500 text-white font-medium rounded-lg hover:from-gold-600 hover:to-gold-500 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send size={18} />
                   {isSubmitting ? "Sending..." : "Send Message"}
@@ -310,18 +310,18 @@ export default function ContactSection() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-white rounded-2xl shadow-xl p-8"
           >
-            <h3 className="text-2xl font-bold mb-6 text-gray-800">
+            <h3 className="text-2xl font-bold mb-6 text-navy-950">
               Contact Information
             </h3>
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <MapPin
-                  className="mt-1 flex-shrink-0 text-blue-600"
+                  className="mt-1 flex-shrink-0 text-gold-500"
                   size={20}
                 />
                 <div>
-                  <h4 className="font-semibold text-gray-800">Location</h4>
+                  <h4 className="font-semibold text-navy-950">Location</h4>
                   <p className="text-gray-600">
                     Presbyterian Church Of Ghana, Ahinsan Kumasi
                   </p>
@@ -329,12 +329,12 @@ export default function ContactSection() {
               </div>
 
               <div className="flex items-start gap-4">
-                <Phone className="mt-1 flex-shrink-0 text-blue-600" size={20} />
+                <Phone className="mt-1 flex-shrink-0 text-gold-500" size={20} />
                 <div>
-                  <h4 className="font-semibold text-gray-800">Phone</h4>
+                  <h4 className="font-semibold text-navy-950">Phone</h4>
                   <a
                     href="tel:+233541107445"
-                    className="text-blue-600 hover:underline flex items-center gap-1"
+                    className="text-gold-500 hover:underline flex items-center gap-1"
                   >
                     +233531427671
                   </a>
@@ -347,7 +347,7 @@ export default function ContactSection() {
                   size={20}
                 />
                 <div>
-                  <h4 className="font-semibold text-gray-800">WhatsApp</h4>
+                  <h4 className="font-semibold text-navy-950">WhatsApp</h4>
                   <a
                     href="https://wa.me/233531427671"
                     target="_blank"
@@ -360,12 +360,12 @@ export default function ContactSection() {
               </div>
 
               <div className="flex items-start gap-4">
-                <Mail className="mt-1 flex-shrink-0 text-blue-600" size={20} />
+                <Mail className="mt-1 flex-shrink-0 text-gold-500" size={20} />
                 <div>
-                  <h4 className="font-semibold text-gray-800">Email</h4>
+                  <h4 className="font-semibold text-navy-950">Email</h4>
                   <a
                     href="mailto:ypg.ahinsan@gmail.com"
-                    className="text-blue-600 hover:underline"
+                    className="text-gold-500 hover:underline"
                   >
                     ahinsandistrictypg@gmail.com
                   </a>
@@ -374,7 +374,7 @@ export default function ContactSection() {
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-200">
-              <h4 className="font-semibold text-gray-800 mb-3">
+              <h4 className="font-semibold text-navy-950 mb-3">
                 Connect With Us
               </h4>
               <div className="flex gap-4">
@@ -382,7 +382,7 @@ export default function ContactSection() {
                   href="https://facebook.com/ypgahinsan"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 bg-gray-100 rounded-full text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition"
+                  className="p-2 bg-blue-50 rounded-full text-gray-700 hover:bg-gold-100 hover:text-gold-500 transition"
                 >
                   <svg
                     className="w-5 h-5"
@@ -396,7 +396,7 @@ export default function ContactSection() {
                   href="https://instagram.com/ypgahinsan"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 bg-gray-100 rounded-full text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition"
+                  className="p-2 bg-blue-50 rounded-full text-gray-700 hover:bg-gold-100 hover:text-gold-500 transition"
                 >
                   <svg
                     className="w-5 h-5"
@@ -410,7 +410,7 @@ export default function ContactSection() {
                   href="https://wa.me/233541107445"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 bg-gray-100 rounded-full text-gray-700 hover:bg-green-100 hover:text-green-600 transition"
+                  className="p-2 bg-blue-50 rounded-full text-gray-700 hover:bg-green-100 hover:text-green-600 transition"
                 >
                   <svg
                     className="w-5 h-5"

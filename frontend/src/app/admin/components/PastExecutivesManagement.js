@@ -187,13 +187,13 @@ export default function PastExecutivesManagement({ theme }) {
   return (
     <div
       className={`rounded-lg shadow-md p-6 ${
-        theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-800"
+        theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-navy-950"
       }`}
     >
       <div className="flex justify-between items-center mb-6">
         <h2
           className={`text-2xl font-bold ${
-            theme === "dark" ? "text-white" : "text-gray-800"
+            theme === "dark" ? "text-white" : "text-navy-950"
           }`}
         >
           Past Executives Management
@@ -204,7 +204,7 @@ export default function PastExecutivesManagement({ theme }) {
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               theme === "dark"
                 ? "text-gray-300 bg-gray-700 hover:bg-gray-600"
-                : "text-gray-600 bg-gray-100 hover:bg-gray-200"
+                : "text-gray-600 bg-blue-50 hover:bg-gray-100"
             }`}
           >
             {showDeleted ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -212,7 +212,7 @@ export default function PastExecutivesManagement({ theme }) {
           </button>
           <button
             onClick={openModal}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gold-500 rounded-lg hover:bg-gold-600 transition-colors"
           >
             <Plus size={16} />
             Add Past Executive
@@ -243,7 +243,7 @@ export default function PastExecutivesManagement({ theme }) {
           </div>
           <h3
             className={`text-lg font-medium mb-2 ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+              theme === "dark" ? "text-white" : "text-navy-950"
             }`}
           >
             {showDeleted
@@ -262,7 +262,7 @@ export default function PastExecutivesManagement({ theme }) {
           {!showDeleted && (
             <button
               onClick={openModal}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gold-500 rounded-lg hover:bg-gold-600 transition-colors"
             >
               <Plus size={16} />
               Add Your First Past Executive
@@ -282,7 +282,7 @@ export default function PastExecutivesManagement({ theme }) {
             >
               <div
                 className={`aspect-w-16 aspect-h-9 ${
-                  theme === "dark" ? "bg-gray-600" : "bg-gray-100"
+                  theme === "dark" ? "bg-gray-600" : "bg-blue-50"
                 }`}
               >
                 {executive.image ? (
@@ -294,7 +294,7 @@ export default function PastExecutivesManagement({ theme }) {
                 ) : (
                   <div
                     className={`w-full h-40 flex items-center justify-center ${
-                      theme === "dark" ? "bg-gray-600" : "bg-gray-200"
+                      theme === "dark" ? "bg-gray-600" : "bg-gray-100"
                     }`}
                   >
                     <svg
@@ -318,7 +318,7 @@ export default function PastExecutivesManagement({ theme }) {
               <div className="p-4">
                 <h3
                   className={`text-lg font-semibold mb-1 ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
+                    theme === "dark" ? "text-white" : "text-navy-950"
                   }`}
                 >
                   {executive.name}
@@ -330,7 +330,7 @@ export default function PastExecutivesManagement({ theme }) {
                 >
                   {executive.position}
                 </p>
-                <p className="text-sm font-medium text-blue-600 mb-3">
+                <p className="text-sm font-medium text-gold-500 mb-3">
                   {executive.reign_period}
                 </p>
                 <div className="flex gap-2">
@@ -338,8 +338,8 @@ export default function PastExecutivesManagement({ theme }) {
                     onClick={() => handleEdit(executive)}
                     className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                       theme === "dark"
-                        ? "text-blue-400 bg-blue-900/20 hover:bg-blue-900/30"
-                        : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                        ? "text-gold-300 bg-navy-950/20 hover:bg-navy-950/30"
+                        : "text-gold-500 bg-blue-50 hover:bg-gold-100"
                     }`}
                   >
                     <Edit size={14} />
@@ -374,15 +374,15 @@ export default function PastExecutivesManagement({ theme }) {
             <div className="flex justify-between items-center mb-4">
               <h3
                 className={`text-lg font-semibold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
+                  theme === "dark" ? "text-white" : "text-navy-950"
                 }`}
               >
                 {isEditMode ? "Edit Past Executive" : "Add Past Executive"}
               </h3>
               <button
                 onClick={closeModal}
-                className={`p-1 rounded-full hover:bg-gray-200 transition-colors ${
-                  theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"
+                className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${
+                  theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"
                 }`}
               >
                 <X
@@ -408,10 +408,10 @@ export default function PastExecutivesManagement({ theme }) {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 ${
                     theme === "dark"
                       ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                      : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"
                   }`}
                   required
                 />
@@ -430,10 +430,10 @@ export default function PastExecutivesManagement({ theme }) {
                   onChange={(e) =>
                     setFormData({ ...formData, position: e.target.value })
                   }
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 ${
                     theme === "dark"
                       ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                      : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"
                   }`}
                   required
                 />
@@ -453,10 +453,10 @@ export default function PastExecutivesManagement({ theme }) {
                     setFormData({ ...formData, reign_period: e.target.value })
                   }
                   placeholder="2019 - 2022"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 ${
                     theme === "dark"
                       ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                      : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"
                   }`}
                   required
                 />
@@ -473,10 +473,10 @@ export default function PastExecutivesManagement({ theme }) {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 ${
                     theme === "dark"
                       ? "bg-gray-700 border-gray-600 text-gray-300"
-                      : "bg-white border-gray-300 text-gray-900"
+                      : "bg-white border-gray-300 text-navy-950"
                   }`}
                 />
                 {imagePreview && (
@@ -496,7 +496,7 @@ export default function PastExecutivesManagement({ theme }) {
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     theme === "dark"
                       ? "text-gray-300 bg-gray-700 hover:bg-gray-600"
-                      : "text-gray-700 bg-gray-100 hover:bg-gray-200"
+                      : "text-gray-700 bg-blue-50 hover:bg-gray-100"
                   }`}
                 >
                   Cancel
@@ -504,7 +504,7 @@ export default function PastExecutivesManagement({ theme }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-gold-500 rounded-md hover:bg-gold-600 transition-colors disabled:opacity-50"
                 >
                   {loading ? "Saving..." : isEditMode ? "Update" : "Add"}
                 </button>
@@ -525,7 +525,7 @@ export default function PastExecutivesManagement({ theme }) {
             <div className="flex items-center justify-between mb-4">
               <h3
                 className={`text-lg font-semibold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
+                  theme === "dark" ? "text-white" : "text-navy-950"
                 }`}
               >
                 Confirm Deletion
@@ -538,7 +538,7 @@ export default function PastExecutivesManagement({ theme }) {
                 className={`p-1 rounded-lg transition-colors ${
                   theme === "dark"
                     ? "hover:bg-gray-700 text-white"
-                    : "hover:bg-gray-100 text-gray-800"
+                    : "hover:bg-blue-50 text-navy-950"
                 }`}
               >
                 <X className="w-4 h-4" />
@@ -558,7 +558,7 @@ export default function PastExecutivesManagement({ theme }) {
                 className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${
                   theme === "dark"
                     ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                    : "border-gray-300 text-gray-700 hover:bg-white"
                 }`}
               >
                 Cancel

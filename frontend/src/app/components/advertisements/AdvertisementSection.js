@@ -119,10 +119,10 @@ export default function AdvertisementSection() {
 
   if (loading) {
     return (
-      <section className="py-16 px-4 bg-green-50">
+      <section className="py-16 px-4 bg-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading advertisements...</p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function AdvertisementSection() {
   }
 
   return (
-    <section className="py-16 px-4 bg-green-50">
+    <section className="py-16 px-4 bg-blue-50">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -139,7 +139,7 @@ export default function AdvertisementSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          <h2 className="text-4xl font-bold text-navy-950 mb-4">
             Member Advertisements
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
@@ -157,14 +157,14 @@ export default function AdvertisementSection() {
                 placeholder="Search advertisements..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               />
             </div>
             <div className="flex items-center gap-3">
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full max-w-md px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full max-w-md px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               >
                 {categories.map((category) => (
                   <option key={category.value} value={category.value}>
@@ -174,7 +174,7 @@ export default function AdvertisementSection() {
               </select>
               <button
                 onClick={() => setShowForm(true)}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 min-w-[140px]"
+                className="px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-500 text-white rounded-lg hover:from-gold-500 hover:to-gold-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 min-w-[140px]"
               >
                 <Plus className="w-5 h-5" />
                 Add Ad
@@ -193,7 +193,7 @@ export default function AdvertisementSection() {
           <div className="text-center py-12">
             <div className="bg-white rounded-lg p-8 shadow-lg max-w-md mx-auto">
               <Tag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-xl font-semibold text-navy-950 mb-2">
                 {searchTerm || categoryFilter !== "all"
                   ? "No Advertisements Found"
                   : "No Advertisements Yet"}
@@ -223,7 +223,7 @@ export default function AdvertisementSection() {
                   >
                     {/* Image Carousel */}
                     <div
-                      className="relative h-64 bg-gray-100"
+                      className="relative h-64 bg-blue-50"
                       onMouseEnter={() =>
                         setAutoPlay((prev) => ({ ...prev, [ad.id]: false }))
                       }
@@ -310,12 +310,12 @@ export default function AdvertisementSection() {
 
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        <span className="px-3 py-1 bg-gold-100 text-navy-950 rounded-full text-sm font-medium">
                           {ad.category}
                         </span>
                       </div>
 
-                      <h3 className={`text-lg font-bold text-gray-800 mb-3 ${!isExpanded ? "h-7" : ""}`}>
+                      <h3 className={`text-lg font-bold text-navy-950 mb-3 ${!isExpanded ? "h-7" : ""}`}>
                         {isExpanded || ad.title.length <= 16
                           ? ad.title
                           : `${ad.title.substring(0, 16)}...`}
@@ -357,7 +357,7 @@ export default function AdvertisementSection() {
                       )}
 
                       <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                        <div className="text-lg font-bold text-blue-600">
+                        <div className="text-lg font-bold text-gold-500">
                           {ad.price_type === "fixed"
                             ? `GHS ${ad.price_fixed}`
                             : `GHS ${ad.price_min} - ${ad.price_max}`}
@@ -368,7 +368,7 @@ export default function AdvertisementSection() {
                             e.stopPropagation();
                             toggleExpanded(ad.id);
                           }}
-                          className="text-blue-600 hover:text-blue-700 transition-colors p-1 rounded-full hover:bg-blue-50"
+                          className="text-gold-500 hover:text-navy-950 transition-colors p-1 rounded-full hover:bg-blue-50"
                           title={isExpanded ? "Show Less" : "Show More"}
                         >
                           <svg

@@ -147,19 +147,19 @@ export default function BlogSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="inline-block mb-3 text-sm font-semibold text-blue-600 uppercase tracking-wider">
+          <span className="inline-block mb-3 text-sm font-semibold text-gold-500 uppercase tracking-wider">
             Latest Updates
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            From Our <span className="text-blue-600">Blog</span>
+          <h2 className="text-4xl font-bold text-navy-950 mb-4">
+            From Our <span className="text-gold-500">Blog</span>
           </h2>
-          <div className="w-20 h-1 bg-blue-500 mx-auto"></div>
+          <div className="w-20 h-1 bg-gold-500 mx-auto"></div>
         </motion.div>
 
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
           </div>
         )}
 
@@ -169,7 +169,7 @@ export default function BlogSection() {
             {/* Navigation Buttons */}
             <button
               onClick={handlePrevious}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:scale-110"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white/90 hover:bg-white text-navy-950 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:scale-110"
               aria-label="Previous slide"
             >
               <span className="text-xl">‹</span>
@@ -177,7 +177,7 @@ export default function BlogSection() {
 
             <button
               onClick={handleNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:scale-110"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white/90 hover:bg-white text-navy-950 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:scale-110"
               aria-label="Next slide"
             >
               <span className="text-xl">›</span>
@@ -230,7 +230,7 @@ export default function BlogSection() {
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <span className="absolute top-4 right-4 px-3 py-1 text-xs font-medium rounded-full bg-blue-600 text-white">
+                        <span className="absolute top-4 right-4 px-3 py-1 text-xs font-medium rounded-full bg-gold-500 text-white">
                           {post.category}
                         </span>
                       </div>
@@ -239,10 +239,10 @@ export default function BlogSection() {
                         <div className="flex items-center text-sm text-gray-500 mb-3">
                           <span>{post.date}</span>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 leading-snug">
+                        <h3 className="text-xl font-bold text-navy-950 mb-3 leading-snug">
                           <a
                             href={`/blog/${post.slug}`}
-                            className="hover:text-blue-600 transition-colors"
+                            className="hover:text-gold-500 transition-colors"
                           >
                             {post.title}
                           </a>
@@ -255,7 +255,7 @@ export default function BlogSection() {
                         </p>
                         <a
                           href={`/blog/${post.slug}`}
-                          className="inline-flex items-center text-blue-600 font-medium group-hover:text-blue-700 transition-colors"
+                          className="inline-flex items-center text-gold-500 font-medium group-hover:text-navy-950 transition-colors"
                         >
                           Read More
                           <svg
@@ -286,7 +286,7 @@ export default function BlogSection() {
                   onClick={() => handleDotClick(i)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     currentSlide === i
-                      ? "bg-blue-600 scale-125"
+                      ? "bg-gold-500 scale-125"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to slide ${i + 1}`}
@@ -307,8 +307,8 @@ export default function BlogSection() {
             onClick={() => setIsAutoPlaying(!isAutoPlaying)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
               isAutoPlaying
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-gold-500 text-white hover:bg-gold-600"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-300"
             }`}
           >
             {isAutoPlaying ? "Pause Auto-play" : "Start Auto-play"}

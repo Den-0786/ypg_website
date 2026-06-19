@@ -316,7 +316,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
             className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+            <div className="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-white">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">Submit Advertisement</h2>
                 <button
@@ -343,7 +343,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     value={formData.title}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     placeholder="Enter advertisement title"
                   />
                 </div>
@@ -357,7 +357,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     value={formData.category}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   >
                     <option value="">Select category</option>
                     {categories.map((cat) => (
@@ -379,7 +379,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                   onChange={handleChange}
                   required
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="Describe your product or service"
                 />
               </div>
@@ -395,7 +395,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     value={formData.advertiser_name}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     placeholder="Enter your name"
                   />
                 </div>
@@ -411,7 +411,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     onChange={handleChange}
                     maxLength="30"
                     required
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${
                       validationErrors.advertiser_contact
                         ? "border-red-500"
                         : "border-gray-300"
@@ -447,7 +447,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     name="advertiser_email"
                     value={formData.advertiser_email}
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${
                       validationErrors.advertiser_email
                         ? "border-red-500"
                         : "border-gray-300"
@@ -471,7 +471,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     value={formData.location}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     placeholder="City, Region"
                   />
                 </div>
@@ -484,7 +484,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                     name="is_member"
                     checked={formData.is_member}
                     onChange={handleChange}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-gold-500 border-gray-300 rounded focus:ring-gold-500"
                   />
                   <label className="ml-2 text-sm font-medium text-gray-700">
                     Are you a YPG member? (Members get discounted rates!)
@@ -501,7 +501,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                       name="member_congregation"
                       value={formData.member_congregation}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                       placeholder="Enter your congregation name"
                     />
                   </div>
@@ -521,7 +521,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                         value="fixed"
                         checked={formData.price_type === "fixed"}
                         onChange={handleChange}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        className="w-4 h-4 text-gold-500 border-gray-300 focus:ring-gold-500"
                       />
                       <span className="ml-2 text-sm text-gray-700">
                         Fixed Price
@@ -534,7 +534,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                         value="range"
                         checked={formData.price_type === "range"}
                         onChange={handleChange}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        className="w-4 h-4 text-gold-500 border-gray-300 focus:ring-gold-500"
                       />
                       <span className="ml-2 text-sm text-gray-700">
                         Price Range
@@ -555,7 +555,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                         required
                         min="0"
                         step="0.01"
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                         placeholder="0.00"
                       />
                     </div>
@@ -573,7 +573,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                           required
                           min="0"
                           step="0.01"
-                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                           placeholder="Min price"
                         />
                       </div>
@@ -589,7 +589,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                           required
                           min="0"
                           step="0.01"
-                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                           placeholder="Max price"
                         />
                       </div>
@@ -625,7 +625,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                   />
                   <label
                     htmlFor="image-upload"
-                    className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer text-sm"
+                    className="px-3 py-1.5 bg-gold-500 text-white rounded-md hover:bg-gold-600 transition cursor-pointer text-sm"
                   >
                     Choose Images
                   </label>
@@ -638,7 +638,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                         {formData.images.map((file, index) => (
                           <div
                             key={index}
-                            className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs"
+                            className="flex items-center gap-1 px-1.5 py-0.5 bg-gold-100 text-navy-950 rounded text-xs"
                           >
                             <span className="truncate max-w-20">
                               {file.name}
@@ -669,14 +669,14 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition disabled:opacity-50"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Advertisement"}
                 </button>

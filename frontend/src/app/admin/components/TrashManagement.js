@@ -409,7 +409,7 @@ export default function TrashManagement({ theme }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
       </div>
     );
   }
@@ -420,7 +420,7 @@ export default function TrashManagement({ theme }) {
       <div className="flex items-center justify-between">
         <div>
           <h2
-            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Trash Management
           </h2>
@@ -448,11 +448,11 @@ export default function TrashManagement({ theme }) {
               className={`p-3 rounded-lg border transition-all ${
                 isActive
                   ? theme === "dark"
-                    ? "bg-blue-600 border-blue-500 text-white"
-                    : "bg-blue-600 border-blue-500 text-white"
+                    ? "bg-gold-500 border-gold-500 text-white"
+                    : "bg-gold-500 border-gold-500 text-white"
                   : theme === "dark"
                     ? "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-white"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -461,10 +461,10 @@ export default function TrashManagement({ theme }) {
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded-full ${
                     isActive
-                      ? "bg-blue-500 text-white"
+                      ? "bg-gold-500 text-white"
                       : theme === "dark"
                         ? "bg-gray-700 text-gray-300"
-                        : "bg-gray-100 text-gray-600"
+                        : "bg-blue-50 text-gray-600"
                   }`}
                 >
                   {category.count}
@@ -491,7 +491,7 @@ export default function TrashManagement({ theme }) {
                   type="checkbox"
                   checked={allSelected}
                   onChange={handleSelectAll}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-gold-500 bg-blue-50 border-gray-300 rounded focus:ring-gold-500"
                 />
                 <span
                   className={`text-sm font-medium ${
@@ -537,7 +537,7 @@ export default function TrashManagement({ theme }) {
           <div className="text-center py-12">
             <Trash2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3
-              className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+              className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
             >
               No Deleted Items
             </h3>
@@ -564,11 +564,11 @@ export default function TrashManagement({ theme }) {
                 className={`p-4 rounded-lg border transition-all ${
                   isSelected
                     ? theme === "dark"
-                      ? "bg-blue-900/20 border-blue-500"
+                      ? "bg-navy-950/20 border-gold-500"
                       : "bg-blue-50 border-blue-300"
                     : theme === "dark"
                       ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
-                      : "bg-white border-gray-200 hover:bg-gray-50"
+                      : "bg-white border-gray-200 hover:bg-white"
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -577,7 +577,7 @@ export default function TrashManagement({ theme }) {
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => handleSelectItem(itemKey)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-gold-500 bg-blue-50 border-gray-300 rounded focus:ring-gold-500"
                   />
 
                   {/* Icon */}
@@ -589,7 +589,7 @@ export default function TrashManagement({ theme }) {
                   <div className="flex-1 min-w-0">
                     <h4
                       className={`font-medium truncate ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       {item.name ||
@@ -612,7 +612,7 @@ export default function TrashManagement({ theme }) {
                         className={`text-xs px-2 py-1 rounded-full ${
                           theme === "dark"
                             ? "bg-gray-700 text-gray-300"
-                            : "bg-gray-100 text-gray-600"
+                            : "bg-blue-50 text-gray-600"
                         }`}
                       >
                         {getCategoryLabel(item.category)}
@@ -638,10 +638,10 @@ export default function TrashManagement({ theme }) {
                           showItemMenu === itemKey ? null : itemKey
                         )
                       }
-                      className={`p-2 rounded-lg hover:bg-gray-100 ${
+                      className={`p-2 rounded-lg hover:bg-blue-50 ${
                         theme === "dark"
                           ? "hover:bg-gray-700"
-                          : "hover:bg-gray-100"
+                          : "hover:bg-blue-50"
                       }`}
                     >
                       <MoreVertical className="w-4 h-4" />
@@ -662,7 +662,7 @@ export default function TrashManagement({ theme }) {
                               setShowRestoreModal(true);
                               setShowItemMenu(null);
                             }}
-                            className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 ${
+                            className={`w-full px-4 py-2 text-left text-sm hover:bg-blue-50 ${
                               theme === "dark"
                                 ? "text-gray-300 hover:bg-gray-700"
                                 : "text-gray-700"
@@ -677,10 +677,10 @@ export default function TrashManagement({ theme }) {
                               setShowDeleteModal(true);
                               setShowItemMenu(null);
                             }}
-                            className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 text-red-600 ${
+                            className={`w-full px-4 py-2 text-left text-sm hover:bg-blue-50 text-red-600 ${
                               theme === "dark"
                                 ? "hover:bg-gray-700"
-                                : "hover:bg-gray-100"
+                                : "hover:bg-blue-50"
                             }`}
                           >
                             <Trash2 className="w-4 h-4 inline mr-2" />
@@ -744,7 +744,7 @@ export default function TrashManagement({ theme }) {
                     <Dialog.Title
                       as="h3"
                       className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       Restore Item
@@ -761,7 +761,7 @@ export default function TrashManagement({ theme }) {
                   {selectedItem && (
                     <div
                       className={`rounded-lg p-3 mb-6 ${
-                        theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                        theme === "dark" ? "bg-gray-700/50" : "bg-white"
                       }`}
                     >
                       <p
@@ -786,7 +786,7 @@ export default function TrashManagement({ theme }) {
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         theme === "dark"
                           ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                       }`}
                     >
                       Cancel
@@ -855,7 +855,7 @@ export default function TrashManagement({ theme }) {
                     <Dialog.Title
                       as="h3"
                       className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       Delete Permanently
@@ -872,7 +872,7 @@ export default function TrashManagement({ theme }) {
                   {selectedItem && (
                     <div
                       className={`rounded-lg p-3 mb-6 ${
-                        theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                        theme === "dark" ? "bg-gray-700/50" : "bg-white"
                       }`}
                     >
                       <p
@@ -897,7 +897,7 @@ export default function TrashManagement({ theme }) {
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         theme === "dark"
                           ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                       }`}
                     >
                       Cancel
@@ -983,7 +983,7 @@ export default function TrashManagement({ theme }) {
                     <Dialog.Title
                       as="h3"
                       className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       {bulkAction === "restore"
@@ -1006,7 +1006,7 @@ export default function TrashManagement({ theme }) {
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         theme === "dark"
                           ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                       }`}
                     >
                       Cancel

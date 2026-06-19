@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { buildImageSrc } from "../../../utils/config";
 
 async function fetchPost(slug) {
@@ -34,13 +35,13 @@ export default async function BlogDetailPage({ params }) {
       {/* Header Section */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 text-sm text-gray-500 mb-4">
-          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+          <span className="px-3 py-1 bg-gold-100 text-navy-950 rounded-full font-medium">
             {post.category}
           </span>
           <span>•</span>
           <span>{post.date}</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+        <h1 className="text-2xl md:text-3xl font-bold text-navy-950 mb-4 leading-tight">
           {post.title}
         </h1>
       </div>
@@ -58,16 +59,16 @@ export default async function BlogDetailPage({ params }) {
 
       {/* Content */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline">
+        <div className="prose prose-lg max-w-none prose-headings:text-navy-950 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-gold-500 prose-a:no-underline hover:prose-a:underline">
           <div className="whitespace-pre-line">{post.content}</div>
         </div>
       </div>
 
       {/* Back Button */}
       <div className="text-center mt-8">
-        <a
+        <Link
           href="/#blog"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors"
         >
           <svg
             className="w-4 h-4"
@@ -83,7 +84,7 @@ export default async function BlogDetailPage({ params }) {
             />
           </svg>
           Back to Blog
-        </a>
+        </Link>
       </div>
     </article>
   );

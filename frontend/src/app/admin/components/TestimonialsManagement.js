@@ -181,7 +181,7 @@ const TestimonialsManagement = ({
         icon: Clock,
         text: "Pending",
         className: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        iconClassName: "text-yellow-600",
+        iconClassName: "text-gold-500",
       },
       approved: {
         icon: CheckCircle,
@@ -229,7 +229,7 @@ const TestimonialsManagement = ({
           />
           <div>
             <h3
-              className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+              className={`font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
             >
               {testimonial.name}
             </h3>
@@ -258,8 +258,8 @@ const TestimonialsManagement = ({
           onClick={() => handleViewTestimonial(testimonial)}
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
             theme === "dark"
-              ? "bg-blue-600 hover:bg-blue-700 text-white"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+              ? "bg-gold-500 hover:bg-gold-600 text-white"
+              : "bg-gold-500 hover:bg-gold-600 text-white"
           }`}
         >
           <Eye className="w-3 h-3 inline mr-1" />
@@ -275,7 +275,7 @@ const TestimonialsManagement = ({
       <div className="flex items-center justify-between">
         <div>
           <h2
-            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Testimonials Management
           </h2>
@@ -298,11 +298,11 @@ const TestimonialsManagement = ({
         >
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-yellow-100">
-              <Clock className="w-5 h-5 text-yellow-600" />
+              <Clock className="w-5 h-5 text-gold-500" />
             </div>
             <div>
               <p
-                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
               >
                 {pendingTestimonials.length}
               </p>
@@ -328,7 +328,7 @@ const TestimonialsManagement = ({
             </div>
             <div>
               <p
-                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
               >
                 {approvedTestimonials.length}
               </p>
@@ -354,7 +354,7 @@ const TestimonialsManagement = ({
             </div>
             <div>
               <p
-                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
               >
                 {deniedTestimonials.length}
               </p>
@@ -372,7 +372,7 @@ const TestimonialsManagement = ({
       {pendingTestimonials.length > 0 && (
         <div>
           <h3
-            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Pending Review ({pendingTestimonials.length})
           </h3>
@@ -388,7 +388,7 @@ const TestimonialsManagement = ({
       {approvedTestimonials.length > 0 && (
         <div>
           <h3
-            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Approved ({approvedTestimonials.length})
           </h3>
@@ -404,7 +404,7 @@ const TestimonialsManagement = ({
       {deniedTestimonials.length > 0 && (
         <div>
           <h3
-            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Denied ({deniedTestimonials.length})
           </h3>
@@ -421,7 +421,7 @@ const TestimonialsManagement = ({
         <div className="text-center py-12">
           <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3
-            className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             No Testimonials Yet
           </h3>
@@ -475,7 +475,7 @@ const TestimonialsManagement = ({
                         <Dialog.Title
                           as="h3"
                           className={`text-xl font-semibold ${
-                            theme === "dark" ? "text-white" : "text-gray-900"
+                            theme === "dark" ? "text-white" : "text-navy-950"
                           }`}
                         >
                           Testimonial Review
@@ -497,7 +497,7 @@ const TestimonialsManagement = ({
                           />
                           <div className="flex-1">
                             <h4
-                              className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                              className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                             >
                               {selectedTestimonial.name}
                             </h4>
@@ -517,7 +517,7 @@ const TestimonialsManagement = ({
                         {/* Testimonial Content */}
                         <div>
                           <h5
-                            className={`font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                            className={`font-medium mb-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                           >
                             Testimonial
                           </h5>
@@ -638,7 +638,7 @@ const TestimonialsManagement = ({
                     <Dialog.Title
                       as="h3"
                       className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       Deny Testimonial
@@ -658,7 +658,7 @@ const TestimonialsManagement = ({
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition ${
                       theme === "dark"
                         ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-white border-gray-300 text-gray-900"
+                        : "bg-white border-gray-300 text-navy-950"
                     }`}
                     placeholder="Enter reason for denial..."
                   />
@@ -669,7 +669,7 @@ const TestimonialsManagement = ({
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         theme === "dark"
                           ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                       }`}
                     >
                       Cancel
@@ -738,7 +738,7 @@ const TestimonialsManagement = ({
                     <Dialog.Title
                       as="h3"
                       className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       Delete Testimonial
@@ -755,7 +755,7 @@ const TestimonialsManagement = ({
                   {selectedTestimonial && (
                     <div
                       className={`rounded-lg p-3 mb-6 ${
-                        theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                        theme === "dark" ? "bg-gray-700/50" : "bg-white"
                       }`}
                     >
                       <p
@@ -777,7 +777,7 @@ const TestimonialsManagement = ({
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         theme === "dark"
                           ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                       }`}
                     >
                       Cancel

@@ -126,7 +126,7 @@ export default function VisionMissionManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
       </div>
     );
   }
@@ -151,12 +151,12 @@ export default function VisionMissionManagement() {
       )}
 
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-navy-950">
           Vision & Mission Management
         </h2>
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors flex items-center gap-2"
         >
           {isEditing ? (
             <>
@@ -174,8 +174,8 @@ export default function VisionMissionManagement() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Mission Section */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-navy-950 mb-4 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-gold-500" />
               Mission Section
             </h3>
 
@@ -189,7 +189,7 @@ export default function VisionMissionManagement() {
                   value={formData.mission_text}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   required
                 />
               </div>
@@ -206,7 +206,7 @@ export default function VisionMissionManagement() {
                       className="w-20 h-20 rounded-full object-cover border-2 border-blue-200"
                     />
                   )}
-                  <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-gold-500 rounded-lg cursor-pointer hover:bg-gold-100 transition-colors">
                     <Upload className="w-4 h-4" />
                     <span>Upload Image</span>
                     <input
@@ -223,8 +223,8 @@ export default function VisionMissionManagement() {
 
           {/* Vision Section */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-navy-950 mb-4 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-gold-500" />
               Vision Section
             </h3>
 
@@ -238,7 +238,7 @@ export default function VisionMissionManagement() {
                   value={formData.vision_text}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   required
                 />
               </div>
@@ -255,7 +255,7 @@ export default function VisionMissionManagement() {
                       className="w-20 h-20 rounded-full object-cover border-2 border-blue-200"
                     />
                   )}
-                  <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-gold-500 rounded-lg cursor-pointer hover:bg-gold-100 transition-colors">
                     <Upload className="w-4 h-4" />
                     <span>Upload Image</span>
                     <input
@@ -272,7 +272,7 @@ export default function VisionMissionManagement() {
 
           {/* Motto & Theme Section */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <h3 className="text-lg font-semibold text-navy-950 mb-4">
               Motto & Theme
             </h3>
 
@@ -286,7 +286,7 @@ export default function VisionMissionManagement() {
                   name="motto"
                   value={formData.motto}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   required
                 />
               </div>
@@ -300,7 +300,7 @@ export default function VisionMissionManagement() {
                   name="theme_title"
                   value={formData.theme_title}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   required
                 />
               </div>
@@ -314,7 +314,7 @@ export default function VisionMissionManagement() {
                   value={formData.theme_text}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   required
                 />
               </div>
@@ -347,7 +347,7 @@ export default function VisionMissionManagement() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Mission Preview */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              <h3 className="text-lg font-semibold text-navy-950 mb-4">
                 Mission
               </h3>
               <div className="flex flex-col items-center gap-4">
@@ -364,7 +364,7 @@ export default function VisionMissionManagement() {
 
             {/* Vision Preview */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              <h3 className="text-lg font-semibold text-navy-950 mb-4">
                 Vision
               </h3>
               <div className="flex flex-col items-center gap-4">
@@ -383,15 +383,15 @@ export default function VisionMissionManagement() {
           {/* Motto & Theme Preview */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-blue-50 rounded-xl border border-blue-200 p-6 text-center">
-              <h4 className="font-semibold text-gray-800 mb-2">Motto</h4>
-              <p className="text-blue-900 italic">{data?.motto}</p>
+              <h4 className="font-semibold text-navy-950 mb-2">Motto</h4>
+              <p className="text-navy-950 italic">{data?.motto}</p>
             </div>
 
-            <div className="bg-green-50 rounded-xl border border-green-200 p-6">
-              <h4 className="font-semibold text-gray-800 mb-2 text-center">
+            <div className="bg-blue-50 rounded-xl border border-green-200 p-6">
+              <h4 className="font-semibold text-navy-950 mb-2 text-center">
                 {data?.theme_title}
               </h4>
-              <p className="text-green-900 text-center text-sm">
+              <p className="text-blue-900 text-center text-sm">
                 {data?.theme_text}
               </p>
             </div>

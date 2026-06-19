@@ -163,7 +163,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       value: "events",
       label: "Events & Activities",
       icon: Users,
-      color: "bg-blue-500",
+      color: "bg-gold-500",
     },
     {
       value: "welfare",
@@ -867,9 +867,9 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       case "momo":
         return <Smartphone className="w-5 h-5 text-green-600" />;
       case "cash":
-        return <Banknote className="w-5 h-5 text-yellow-600" />;
+        return <Banknote className="w-5 h-5 text-gold-500" />;
       case "bank":
-        return <Building className="w-5 h-5 text-blue-600" />;
+        return <Building className="w-5 h-5 text-gold-500" />;
       case "card":
         return <CreditCard className="w-5 h-5 text-purple-600" />;
       default:
@@ -882,7 +882,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-navy-950">
             Finance Management
           </h2>
           <p className="text-gray-600">
@@ -907,7 +907,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
             </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap min-w-[140px]"
+              className="flex items-center space-x-2 px-6 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors whitespace-nowrap min-w-[140px]"
             >
               <Plus className="w-5 h-5" />
               <span>Add Donation</span>
@@ -925,7 +925,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <p className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"} truncate`}>
                 Total Donations
               </p>
-              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"} truncate`}>
+              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"} truncate`}>
                 ₵{calculateFinancialSummary().totalDonations.toLocaleString()}
               </p>
             </div>
@@ -939,7 +939,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <p className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"} truncate`}>
                 Total Contributions
               </p>
-              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"} truncate`}>
+              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"} truncate`}>
                 ₵{calculateFinancialSummary().totalContributions.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 truncate">Renewals + Offertories</p>
@@ -954,7 +954,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <p className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"} truncate`}>
                 Total Sales Revenue
               </p>
-              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"} truncate`}>
+              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"} truncate`}>
                 ₵{calculateFinancialSummary().totalSales.toLocaleString()}
               </p>
             </div>
@@ -968,7 +968,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <p className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"} truncate`}>
                 Total Expenses
               </p>
-              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"} truncate`}>
+              <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"} truncate`}>
                 ₵{calculateFinancialSummary().totalExpenses.toLocaleString()}
               </p>
             </div>
@@ -980,7 +980,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       <div className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-sm border p-4 sm:p-6 mb-8`}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className={`text-base sm:text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            <p className={`text-base sm:text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
               Current Balance
             </p>
             <p className={`text-2xl sm:text-3xl font-bold ${calculateFinancialSummary().currentBalance >= 0 ? 'text-green-600' : 'text-red-600'} truncate`}>
@@ -999,7 +999,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       <div className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-sm border p-4 sm:p-6 mb-8`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div className="flex-1 min-w-0">
-            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} whitespace-nowrap`}>
+            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} whitespace-nowrap`}>
               Contributions Management
             </h3>
             <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} whitespace-nowrap`}>
@@ -1009,7 +1009,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
           <div className="flex flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={() => setShowRenewalsModal(true)}
-              className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm whitespace-nowrap flex-1 sm:flex-none"
+              className="flex items-center justify-center gap-1 px-3 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition text-sm whitespace-nowrap flex-1 sm:flex-none"
             >
               <Plus className="w-3 h-3" />
               Add Renewals
@@ -1041,7 +1041,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                 const isExpanded = expandedYear === year;
 
                 return (
-                  <div key={year} className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
+                  <div key={year} className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
                     {/* Year Header - Clickable */}
                     <button
                       onClick={() => setExpandedYear(isExpanded ? null : year)}
@@ -1049,11 +1049,11 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${theme === "dark" ? "bg-blue-600" : "bg-blue-500"}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${theme === "dark" ? "bg-gold-500" : "bg-gold-500"}`}>
                             <span className="text-white font-bold text-sm">{year}</span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} whitespace-nowrap`}>
+                            <h4 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} whitespace-nowrap`}>
                               Renewals Summary
                             </h4>
                             <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} whitespace-nowrap`}>
@@ -1098,26 +1098,26 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                             <tbody>
                               {Object.values(congregations).map((congregation, index) => (
                                 <tr key={index} className={`${theme === "dark" ? "border-gray-600" : "border-gray-200"} border-b`}>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                                     <div className="flex items-center gap-2">
-                                      <div className={`w-2 h-2 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-blue-500"}`}></div>
+                                      <div className={`w-2 h-2 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-gold-500"}`}></div>
                                       {congregation.congregation}
                                     </div>
                                   </td>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${theme === "dark" ? "bg-blue-900 text-blue-200" : "bg-blue-100 text-blue-800"}`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${theme === "dark" ? "bg-navy-950 text-gold-300" : "bg-gold-100 text-navy-950"}`}>
                                       {congregation.count} renewals
                                     </span>
                                   </td>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"} font-semibold`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"} font-semibold`}>
                                     ₵{congregation.totalAmount.toLocaleString()}
                                   </td>
                                   <td className="py-3 px-4">
                                     <div className="flex items-center gap-2">
-                                      <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                                      <button className="p-1 text-gold-500 hover:bg-blue-50 rounded">
                                         <Eye className="w-4 h-4" />
                                       </button>
-                                      <button className="p-1 text-green-600 hover:bg-green-50 rounded">
+                                      <button className="p-1 text-green-600 hover:bg-blue-50 rounded">
                                         <Edit className="w-4 h-4" />
                                       </button>
                                     </div>
@@ -1138,7 +1138,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
         {/* Offertories Summary - Collapsible by Year */}
         <div className="space-y-4 mt-8">
           <div className="flex items-center justify-between mb-4">
-            <h4 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            <h4 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
               Offertories Summary
             </h4>
           </div>
@@ -1158,7 +1158,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                 const isExpanded = expandedYear === `offertory-${year}`;
 
                 return (
-                  <div key={year} className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
+                  <div key={year} className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
                     {/* Year Header - Clickable */}
                     <button
                       onClick={() => setExpandedYear(isExpanded ? null : `offertory-${year}`)}
@@ -1170,7 +1170,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                             <span className="text-white font-bold text-sm">{year}</span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} whitespace-nowrap`}>
+                            <h4 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} whitespace-nowrap`}>
                               Offertories Summary
                             </h4>
                             <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} whitespace-nowrap`}>
@@ -1218,7 +1218,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                             <tbody>
                               {Object.values(programs).map((program, index) => (
                                 <tr key={index} className={`${theme === "dark" ? "border-gray-600" : "border-gray-200"} border-b`}>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                                     <div className="flex items-center gap-2">
                                       <div className={`w-2 h-2 rounded-full ${theme === "dark" ? "bg-green-400" : "bg-green-500"}`}></div>
                                       <div>
@@ -1229,24 +1229,24 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                                     <div className="flex items-center gap-1">
                                       <MapPin className="w-3 h-3" />
                                       {program.venue}
                                     </div>
                                   </td>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                                     {program.offertories.length > 0 && new Date(program.offertories[0].date).toLocaleDateString()}
                                   </td>
-                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"} font-semibold`}>
+                                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"} font-semibold`}>
                                     ₵{program.totalAmount.toLocaleString()}
                                   </td>
                                   <td className="py-3 px-4">
                                     <div className="flex items-center gap-2">
-                                      <button className="p-1 text-green-600 hover:bg-green-50 rounded">
+                                      <button className="p-1 text-green-600 hover:bg-blue-50 rounded">
                                         <Eye className="w-4 h-4" />
                                       </button>
-                                      <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                                      <button className="p-1 text-gold-500 hover:bg-blue-50 rounded">
                                         <Edit className="w-4 h-4" />
                                       </button>
                                     </div>
@@ -1264,7 +1264,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                               <div className={`w-6 h-6 rounded-full flex items-center justify-center ${theme === "dark" ? "bg-green-600" : "bg-green-500"}`}>
                                 <Gift className="w-3 h-3 text-white" />
                               </div>
-                              <span className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                              <span className={`font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                                 Total Offertories for {year}
                               </span>
                             </div>
@@ -1286,7 +1286,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       <div className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-sm border p-4 sm:p-6 mb-8`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div className="flex-1 min-w-0">
-            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} whitespace-nowrap`}>
+            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} whitespace-nowrap`}>
               Sales Management
             </h3>
             <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} whitespace-nowrap`}>
@@ -1334,22 +1334,22 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
             <tbody>
               {sales.map((sale) => (
                 <tr key={sale.id} className={`${theme === "dark" ? "border-gray-700" : "border-gray-200"} border-b`}>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     {sale.item_name}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     {sale.quantity}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     ₵{sale.unit_price}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     ₵{sale.total_amount}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     {new Date(sale.date).toLocaleDateString()}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       sale.status === 'completed' 
                         ? 'bg-green-100 text-green-800' 
@@ -1362,7 +1362,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => handleEditSale(sale)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                        className="p-1 text-gold-500 hover:bg-blue-50 rounded"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -1386,7 +1386,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       <div className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-sm border p-4 sm:p-6 mb-8`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div className="flex-1 min-w-0">
-            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} whitespace-nowrap`}>
+            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} whitespace-nowrap`}>
               Expenses Management
             </h3>
             <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"} whitespace-nowrap`}>
@@ -1431,27 +1431,27 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
             <tbody>
               {expenses.map((expense) => (
                 <tr key={expense.id} className={`${theme === "dark" ? "border-gray-700" : "border-gray-200"} border-b`}>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     {expense.description}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       expense.category === 'events' 
-                        ? 'bg-blue-100 text-blue-800' 
+                        ? 'bg-gold-100 text-navy-950' 
                         : expense.category === 'equipment'
                         ? 'bg-purple-100 text-purple-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-blue-50 text-navy-950'
                     }`}>
                       {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}
                     </span>
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     ₵{expense.amount}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     {new Date(expense.date).toLocaleDateString()}
                   </td>
-                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <td className={`py-3 px-4 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       expense.status === 'approved' 
                         ? 'bg-green-100 text-green-800' 
@@ -1464,7 +1464,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => handleEditExpense(expense)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                        className="p-1 text-gold-500 hover:bg-blue-50 rounded"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -1493,7 +1493,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
             exit={{ opacity: 0, height: 0 }}
             className="bg-white rounded-2xl shadow-lg p-6 space-y-6"
           >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">
+            <h3 className="text-2xl font-bold text-navy-950 mb-6">
               Donation Analytics
             </h3>
 
@@ -1516,24 +1516,24 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-600 text-sm font-medium">
+                    <p className="text-gold-500 text-sm font-medium">
                       Total Donations
                     </p>
-                    <p className="text-3xl font-bold text-blue-700">
+                    <p className="text-3xl font-bold text-navy-950">
                       {donations.length}
                     </p>
                   </div>
-                  <Users className="w-12 h-12 text-blue-500" />
+                  <Users className="w-12 h-12 text-gold-500" />
                 </div>
               </div>
 
               <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-yellow-600 text-sm font-medium">
+                    <p className="text-gold-500 text-sm font-medium">
                       Pending
                     </p>
-                    <p className="text-3xl font-bold text-yellow-700">
+                    <p className="text-3xl font-bold text-gold-600">
                       {analytics.pendingCount}
                     </p>
                   </div>
@@ -1559,7 +1559,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
             {/* Payment Method Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                <h4 className="text-lg font-semibold text-navy-950 mb-4">
                   Payment Methods
                 </h4>
                 <div className="space-y-4">
@@ -1580,7 +1580,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       method: "Bank Transfer",
                       amount: analytics.bankTotal,
                       icon: Building,
-                      color: "bg-blue-500",
+                      color: "bg-gold-500",
                     },
                     {
                       method: "Card",
@@ -1610,7 +1610,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                           </span>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-navy-950">
                             ₵{item.amount.toLocaleString()}
                           </p>
                           <p className="text-sm text-gray-500">
@@ -1625,7 +1625,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
 
               {/* Purpose Breakdown */}
               <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                <h4 className="text-lg font-semibold text-navy-950 mb-4">
                   Purpose Breakdown
                 </h4>
                 <div className="space-y-4">
@@ -1656,7 +1656,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-navy-950">
                             ₵{purpose.amount.toLocaleString()}
                           </p>
                           <p className="text-sm text-gray-500">
@@ -1672,7 +1672,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
 
             {/* Monthly Trends */}
             <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">
+              <h4 className="text-lg font-semibold text-navy-950 mb-4">
                 Monthly Trends (Last 6 Months)
               </h4>
               <div className="flex items-end space-x-4 h-32">
@@ -1688,11 +1688,11 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className="flex-1 flex flex-col items-center"
                     >
                       <div
-                        className="w-full bg-gray-200 rounded-t-lg relative"
+                        className="w-full bg-gray-100 rounded-t-lg relative"
                         style={{ height: "100px" }}
                       >
                         <div
-                          className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg w-full transition-all duration-500"
+                          className="bg-gradient-to-t from-gold-500 to-gold-400 rounded-t-lg w-full transition-all duration-500"
                           style={{ height: `${height}%` }}
                         />
                       </div>
@@ -1724,7 +1724,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                 placeholder="Search donations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -1732,7 +1732,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
           <select
             value={selectedPurpose}
             onChange={(e) => setSelectedPurpose(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
           >
             <option value="all">All Purposes</option>
             {purposeOptions.map((option) => (
@@ -1745,7 +1745,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -1759,7 +1759,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                 type="checkbox"
                 checked={showPendingOnly}
                 onChange={(e) => setShowPendingOnly(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-gold-500 rounded focus:ring-gold-500"
               />
               <span className="text-sm text-gray-700">Pending Only</span>
             </label>
@@ -1771,7 +1771,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Donor
@@ -1802,11 +1802,11 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                   key={donation.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-gray-50"
+                  className="hover:bg-white"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-navy-950">
                         {donation.donor_name}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -1820,7 +1820,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-gray-900">
+                    <div className="text-sm font-bold text-navy-950">
                       ₵{donation.amount}
                     </div>
                     <div className="text-xs text-gray-500">
@@ -1879,7 +1879,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     {donation.payment_status === "pending" && (
                       <button
                         onClick={() => handleVerifyDonation(donation)}
-                        className="text-green-600 hover:text-green-900 p-1 rounded"
+                        className="text-green-600 hover:text-blue-900 p-1 rounded"
                         title="Verify Donation"
                       >
                         <CheckCircle className="w-5 h-5" />
@@ -1902,7 +1902,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
         {filteredDonations.length === 0 && (
           <div className="text-center py-12">
             <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-navy-950 mb-2">
               No donations found
             </h3>
             <p className="text-gray-500">
@@ -1928,7 +1928,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                   Add New Donation
                 </h3>
                 <button
@@ -1961,7 +1961,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                         })
                       }
                       required
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     />
                   </div>
 
@@ -1980,7 +1980,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       }
                       required
                       min="1"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     />
                   </div>
 
@@ -1999,7 +1999,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                         validateEmail(e.target.value);
                       }}
                       required
-                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${
                         emailError ? "border-red-500" : "border-gray-300"
                       }`}
                     />
@@ -2022,7 +2022,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                         });
                         validatePhone(e.target.value);
                       }}
-                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${
                         phoneError ? "border-red-500" : "border-gray-300"
                       }`}
                     />
@@ -2043,7 +2043,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                           purpose: e.target.value,
                         })
                       }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     >
                       {purposeOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -2065,7 +2065,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                           payment_method: e.target.value,
                         })
                       }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     >
                       <option value="momo">Mobile Money</option>
                       <option value="cash">Cash</option>
@@ -2088,7 +2088,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       })
                     }
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   />
                 </div>
 
@@ -2096,13 +2096,13 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-6 py-3 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors"
                   >
                     Add Donation
                   </button>
@@ -2129,7 +2129,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                   Add Renewals
                 </h3>
                 <button
@@ -2157,10 +2157,10 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       onChange={(e) =>
                         setRenewalsData({ ...renewalsData, congregation: e.target.value })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       required
                     >
@@ -2183,10 +2183,10 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       onChange={(e) =>
                         setRenewalsData({ ...renewalsData, date: e.target.value })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       required
                     />
@@ -2204,10 +2204,10 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       onChange={(e) =>
                         setRenewalsData({ ...renewalsData, amount: e.target.value })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="0.00"
                       required
@@ -2225,10 +2225,10 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       onChange={(e) =>
                         setRenewalsData({ ...renewalsData, number_of_people: e.target.value })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="1"
                       required
@@ -2243,14 +2243,14 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     className={`px-6 py-2 border rounded-lg font-medium transition-colors ${
                       theme === "dark"
                         ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "border-gray-300 text-gray-700 hover:bg-white"
                     }`}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    className="px-6 py-2 bg-gold-500 text-white rounded-lg font-medium hover:bg-gold-600 transition-colors"
                   >
                     Add Renewals
                   </button>
@@ -2277,7 +2277,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                   Add Offertory
                 </h3>
                 <button
@@ -2309,7 +2309,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       required
                     />
@@ -2328,7 +2328,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="e.g., Sunday Service, Youth Conference, etc."
                       required
@@ -2348,7 +2348,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="e.g., Church Auditorium, Conference Hall, etc."
                       required
@@ -2370,7 +2370,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="0.00"
                       required
@@ -2385,7 +2385,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     className={`px-6 py-2 border rounded-lg font-medium transition-colors ${
                       theme === "dark"
                         ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "border-gray-300 text-gray-700 hover:bg-white"
                     }`}
                   >
                     Cancel
@@ -2419,7 +2419,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                   Add Sale
                 </h3>
                 <button
@@ -2451,7 +2451,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="Dennis Opoku"
                       required
@@ -2473,7 +2473,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="0.00"
                       required
@@ -2493,7 +2493,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       required
                     />
@@ -2512,7 +2512,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="Dennis Opoku"
                       required
@@ -2527,7 +2527,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     className={`px-6 py-2 border rounded-lg font-medium transition-colors ${
                       theme === "dark"
                         ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "border-gray-300 text-gray-700 hover:bg-white"
                     }`}
                   >
                     Cancel
@@ -2561,7 +2561,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                <h3 className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                   Add Expense
                 </h3>
                 <button
@@ -2593,7 +2593,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       required
                     />
@@ -2614,7 +2614,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="0.00"
                       required
@@ -2633,7 +2633,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="Dennis Opoku"
                       rows={3}
@@ -2654,7 +2654,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white"
-                          : "bg-white border-gray-300 text-gray-900"
+                          : "bg-white border-gray-300 text-navy-950"
                       }`}
                       placeholder="Dennis Opoku"
                       required
@@ -2669,7 +2669,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     className={`px-6 py-2 border rounded-lg font-medium transition-colors ${
                       theme === "dark"
                         ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "border-gray-300 text-gray-700 hover:bg-white"
                     }`}
                   >
                     Cancel

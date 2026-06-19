@@ -255,13 +255,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2
-          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
         >
           Media Management
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center space-x-2 bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Add Media</span>
@@ -301,7 +301,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             </div>
             <div className="p-4">
               <h3
-                className={`font-semibold mb-2 line-clamp-1 ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                className={`font-semibold mb-2 line-clamp-1 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
               >
                 {item.title}
               </h3>
@@ -312,7 +312,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
               </p>
               {item.congregation && (
                 <p
-                  className={`text-xs mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                  className={`text-xs mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                 >
                   📍 {item.congregation}
                 </p>
@@ -335,7 +335,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                       file: null,
                     })
                   }
-                  className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-blue-50 text-gray-600 hover:bg-gray-100"}`}
                 >
                   <Edit className="w-3 h-3" />
                   <span>Edit</span>
@@ -370,13 +370,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Add Media
                 </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
+                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-blue-50 text-navy-950"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -396,7 +396,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                       setNewMedia({ ...newMedia, title: e.target.value })
                     }
                     placeholder="Enter a descriptive title for your media"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -412,7 +412,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     }
                     rows={3}
                     placeholder="Describe the media content and include congregation details"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -426,7 +426,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     onChange={(e) =>
                       setNewMedia({ ...newMedia, type: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                   >
                     <option value="image">Image</option>
                     <option value="video">Video</option>
@@ -441,7 +441,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                   <div className="flex gap-3">
                     {/* Left side - Media preview */}
                     <div
-                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-300"}`}
+                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                     >
                       {newMedia.file ? (
                         <div className="text-center">
@@ -488,13 +488,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     {/* Right side - Upload button */}
                     <div className="flex-1">
                       <label
-                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-blue-500 hover:border-blue-400 hover:bg-blue-900/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
+                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-gold-500 hover:border-blue-400 hover:bg-navy-950/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
                       >
                         <Upload
-                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         />
                         <span
-                          className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                          className={`text-xs font-medium ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         >
                           Upload
                         </span>
@@ -528,7 +528,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                       setNewMedia({ ...newMedia, congregation: e.target.value })
                     }
                     placeholder="e.g., Emmanuel Congregation Ahinsan"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -543,7 +543,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     onChange={(e) =>
                       setNewMedia({ ...newMedia, date: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                   />
                 </div>
                 {newMedia.type === "video" && (
@@ -564,7 +564,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                           })
                         }
                         placeholder="https://youtube.com/watch?v=..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                       />
                     </div>
                     <div>
@@ -583,7 +583,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                           })
                         }
                         placeholder="https://tiktok.com/@username/video/..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                       />
                     </div>
                   </div>
@@ -593,13 +593,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
               <div className="flex space-x-3 mt-4">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddMedia}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors text-sm"
                 >
                   Add Media
                 </button>
@@ -626,13 +626,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Edit Media
                 </h3>
                 <button
                   onClick={() => setEditingMedia(null)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
+                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-blue-50 text-navy-950"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -655,7 +655,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                       })
                     }
                     placeholder="Enter a descriptive title for your media"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -674,7 +674,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     }
                     rows={3}
                     placeholder="Describe the media content and include congregation details"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -688,7 +688,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     onChange={(e) =>
                       setEditingMedia({ ...editingMedia, type: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                   >
                     <option value="image">Image</option>
                     <option value="video">Video</option>
@@ -703,7 +703,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                   <div className="flex gap-3">
                     {/* Left side - Media preview */}
                     <div
-                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-300"}`}
+                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                     >
                       {editingMedia.file ? (
                         <div className="text-center">
@@ -750,13 +750,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     {/* Right side - Upload button */}
                     <div className="flex-1">
                       <label
-                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-blue-500 hover:border-blue-400 hover:bg-blue-900/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
+                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-gold-500 hover:border-blue-400 hover:bg-navy-950/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
                       >
                         <Upload
-                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         />
                         <span
-                          className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                          className={`text-xs font-medium ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         >
                           Upload
                         </span>
@@ -795,7 +795,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                       })
                     }
                     placeholder="e.g., Emmanuel Congregation Ahinsan"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -810,7 +810,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                     onChange={(e) =>
                       setEditingMedia({ ...editingMedia, date: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "border-gray-300 bg-white text-navy-950"}`}
                   />
                 </div>
                 {editingMedia.type === "video" && (
@@ -831,7 +831,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                           })
                         }
                         placeholder="https://youtube.com/watch?v=..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                       />
                     </div>
                     <div>
@@ -850,7 +850,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                           })
                         }
                         placeholder="https://tiktok.com/@username/video/..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                       />
                     </div>
                   </div>
@@ -860,13 +860,13 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
               <div className="flex space-x-3 mt-4">
                 <button
                   onClick={() => setEditingMedia(null)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateMedia}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors text-sm"
                 >
                   Update Media
                 </button>
@@ -897,7 +897,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                 </div>
                 <div className="text-center">
                   <h3
-                    className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                    className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                   >
                     Delete Media Item
                   </h3>
@@ -914,7 +914,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
                         setShowDeleteModal(false);
                         setItemToDelete(null);
                       }}
-                      className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                      className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                     >
                       Cancel
                     </button>

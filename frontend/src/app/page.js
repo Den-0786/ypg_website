@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import HeroCarousel from "./components/header_hero/HeroCarousel";
 import FeatureCards from "./components/header_hero/FeatureCards";
 import NavigationBar from "./components/header_hero/NavigationBar";
@@ -16,9 +15,6 @@ import BlogSection from "./components/blog/BlogSection";
 import ContactSection from "./components/contact/ContactSection";
 import Footer from "./components/footer/Footer";
 import DonateSection from "./components/donations/DonateSection";
-import QuizList from "./components/quiz/QuizList";
-import QuizResults from "./components/quiz/QuizResults";
-import CongregationLeaderboard from "./components/quiz/CongregationLeaderboard";
 import CongregationalExecutives from "./components/congregations/Congregations";
 import CouncilSection from "./components/council/CouncilSection";
 import PastExecutives from "./components/past-executives/PastExecutives";
@@ -27,17 +23,14 @@ import AdvertisementSection from "./components/advertisements/AdvertisementSecti
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white">
       <NavigationBar />
-      <div className="pt-20">
+      <div>
         <HeroCarousel />
         <FeatureCards />
         <AboutSection />
         <EventSection />
         <PastEvents />
-        <QuizList />
-        <QuizResults />
-        <CongregationLeaderboard />
         <TeamSection />
         <YStoreSection />
         <CongregationalExecutives />

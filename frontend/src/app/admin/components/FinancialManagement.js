@@ -129,9 +129,9 @@ export default function FinancialManagement({ donations, setDonations }) {
       className="space-y-6"
     >
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900">Donations</h2>
+        <h2 className="text-xl font-semibold text-navy-950">Donations</h2>
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
           onClick={() => {
             setEditingDonation(null);
             setNewDonation({
@@ -170,7 +170,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                 leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900 mb-4">
+                  <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-navy-950 mb-4">
                     {editingDonation ? 'Edit Donation' : 'Add Donation'}
                   </Dialog.Title>
                   <form onSubmit={editingDonation ? handleUpdateDonation : handleAddDonation} className="space-y-4">
@@ -179,7 +179,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                       <input
                         type="text"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.donor}
                         onChange={e => setNewDonation({ ...newDonation, donor: e.target.value })}
                       />
@@ -189,7 +189,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                       <input
                         type="tel"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.phone}
                         onChange={e => setNewDonation({ ...newDonation, phone: e.target.value })}
                       />
@@ -198,7 +198,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                       <input
                         type="email"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.email}
                         onChange={e => setNewDonation({ ...newDonation, email: e.target.value })}
                       />
@@ -210,7 +210,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                         required
                         min="1"
                         step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.amount}
                         onChange={e => setNewDonation({ ...newDonation, amount: parseFloat(e.target.value) || '' })}
                       />
@@ -218,7 +218,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
                       <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.payment_method}
                         onChange={e => setNewDonation({ ...newDonation, payment_method: e.target.value })}
                       >
@@ -232,7 +232,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                       <input
                         type="date"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.date}
                         onChange={e => setNewDonation({ ...newDonation, date: e.target.value })}
                       />
@@ -242,7 +242,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                       <input
                         type="text"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={newDonation.purpose}
                         onChange={e => setNewDonation({ ...newDonation, purpose: e.target.value })}
                       />
@@ -250,14 +250,14 @@ export default function FinancialManagement({ donations, setDonations }) {
                     <div className="flex justify-end gap-2 mt-6">
                       <button
                         type="button"
-                        className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                         onClick={() => setShowAddDonation(false)}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                        className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                       >
                         {editingDonation ? 'Update' : 'Add'} Donation
                       </button>
@@ -279,7 +279,7 @@ export default function FinancialManagement({ donations, setDonations }) {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Donations</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-navy-950">
                 ${donations.reduce((sum, donation) => sum + donation.amount, 0)}
               </p>
             </div>
@@ -288,12 +288,12 @@ export default function FinancialManagement({ donations, setDonations }) {
         
         <div className="bg-white p-6 rounded-xl shadow-md border">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-gold-100 rounded-lg">
+              <DollarSign className="w-6 h-6 text-gold-500" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Online Donations</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-navy-950">
                 ${donations.filter(d => d.payment_method === 'online').reduce((sum, donation) => sum + donation.amount, 0)}
               </p>
             </div>
@@ -307,7 +307,7 @@ export default function FinancialManagement({ donations, setDonations }) {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Check Donations</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-navy-950">
                 ${donations.filter(d => d.payment_method === 'check').reduce((sum, donation) => sum + donation.amount, 0)}
               </p>
             </div>
@@ -318,7 +318,7 @@ export default function FinancialManagement({ donations, setDonations }) {
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Donor
@@ -346,7 +346,7 @@ export default function FinancialManagement({ donations, setDonations }) {
             <tbody className="bg-white divide-y divide-gray-200">
               {donations.map((donation) => (
                 <tr key={donation.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy-950">
                     {donation.donor}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -360,7 +360,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                       donation.payment_method === 'online'
                         ? 'bg-green-100 text-green-800'
                         : donation.payment_method === 'check'
-                        ? 'bg-blue-100 text-blue-800'
+                        ? 'bg-gold-100 text-navy-950'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
                       {donation.payment_method}
@@ -374,7 +374,7 @@ export default function FinancialManagement({ donations, setDonations }) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
-                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      className="text-gold-500 hover:text-navy-950 mr-3"
                       onClick={() => {
                         setEditingDonation(donation);
                         setNewDonation({

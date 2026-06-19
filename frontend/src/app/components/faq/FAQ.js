@@ -73,7 +73,7 @@ export default function FAQ() {
     <>
       <button
         onClick={() => setShowFaqModal(true)}
-        className="hover:text-blue-200 transition"
+        className="hover:text-gold-300 transition"
       >
         FAQ
       </button>
@@ -94,7 +94,7 @@ export default function FAQ() {
               className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+              <div className="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">?</span>
@@ -128,13 +128,13 @@ export default function FAQ() {
                         onClick={() =>
                           setOpenFaq(openFaq === index ? null : index)
                         }
-                        className="w-full p-4 text-left bg-gray-50 hover:bg-gray-100 transition flex items-center justify-between"
+                        className="w-full p-4 text-left bg-white hover:bg-blue-50 transition flex items-center justify-between"
                       >
-                        <span className="font-semibold text-gray-800 pr-4">
+                        <span className="font-semibold text-navy-950 pr-4">
                           {faq.question}
                         </span>
                         {openFaq === index ? (
-                          <span className="w-5 h-5 text-blue-600 flex-shrink-0">
+                          <span className="w-5 h-5 text-gold-500 flex-shrink-0">
                             ▲
                           </span>
                         ) : (
@@ -163,7 +163,7 @@ export default function FAQ() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-6 border-t border-gray-200">
+              <div className="bg-white p-6 border-t border-gray-200">
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
                     Still have questions? We&apos;d love to help!
@@ -171,13 +171,13 @@ export default function FAQ() {
                   <div className="flex gap-4 justify-center">
                     <a
                       href="mailto:ahinsandistrictypg@gmail.com"
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                      className="px-6 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition"
                     >
                       Email Us
                     </a>
                     <a
                       href="tel:+233531427671"
-                      className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition"
+                      className="px-6 py-2 border border-gold-500 text-gold-500 rounded-lg hover:bg-blue-50 transition"
                     >
                       Call Us
                     </a>

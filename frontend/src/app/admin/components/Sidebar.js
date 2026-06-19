@@ -84,11 +84,7 @@ const Sidebar = ({
       <aside
         className={`fixed lg:relative lg:top-60px top-0 lg:translate-x-0 z-50 h-full transition-all duration-300 ease-in-out ${
           sidebarOpen ? "w-64" : sidebarCollapsed ? "w-16" : "w-64"
-        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} ${
-          theme === "dark"
-            ? "bg-gray-800 border-gray-700"
-            : "bg-white border-gray-200"
-        } border-r shadow-xl lg:shadow-lg`}
+        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} bg-navy-950/50 backdrop-blur-xl border-r border-white/10 shadow-xl lg:shadow-lg`}
         style={{
           height: "calc(100vh - 60px)",
           top: "10px",
@@ -96,18 +92,10 @@ const Sidebar = ({
         }}
       >
         <div className="flex flex-col h-full">
-          <div
-            className={`hidden lg:flex items-center justify-end p-2 border-b ${
-              theme === "dark" ? "border-gray-700" : "border-gray-200"
-            }`}
-          >
+          <div className="hidden lg:flex items-center justify-end p-2 border-b border-white/10">
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className={`p-2 rounded-lg transition-colors ${
-                theme === "dark"
-                  ? "hover:bg-gray-700 text-white"
-                  : "hover:bg-gray-100 text-gray-800"
-              }`}
+              className="p-2 rounded-lg transition-colors text-blue-100 hover:text-gold-300 hover:bg-white/10"
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {sidebarCollapsed ? (
@@ -140,12 +128,8 @@ const Sidebar = ({
                   }}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === item.id
-                      ? theme === "dark"
-                        ? "bg-blue-900 text-blue-300 border border-blue-700"
-                        : "bg-blue-50 text-blue-600 border border-blue-200"
-                      : theme === "dark"
-                        ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                      ? "bg-white/10 text-gold-300 border border-gold-500/50 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                      : "text-blue-100 hover:bg-white/10 hover:text-white"
                   }`}
                   title={sidebarCollapsed ? item.name : ""}
                 >
@@ -161,12 +145,7 @@ const Sidebar = ({
           </nav>
 
           {/* Bottom section */}
-          <div
-            className={`p-4 border-t space-y-3 flex-shrink-0 mt-auto ${
-              theme === "dark"
-                ? "border-gray-700 bg-gray-900"
-                : "border-gray-200 bg-gray-50"
-            }`}
+          <div className="p-4 border-t border-white/10 space-y-3 flex-shrink-0 mt-auto bg-white/5 backdrop-blur-md"
           >
             {/* Theme toggle */}
             <button
@@ -174,11 +153,7 @@ const Sidebar = ({
                 e.stopPropagation();
                 toggleTheme();
               }}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors shadow-sm ${
-                theme === "dark"
-                  ? "bg-gray-800 hover:bg-gray-700 text-white"
-                  : "bg-white hover:bg-gray-100 text-gray-700"
-              }`}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors shadow-sm bg-white/10 text-blue-100 hover:bg-white/15 hover:text-white"
               title={sidebarCollapsed ? "Theme" : ""}
             >
               {(sidebarOpen || !sidebarCollapsed) && (
@@ -200,11 +175,7 @@ const Sidebar = ({
                   setSidebarOpen(false);
                 }
               }}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors shadow-sm ${
-                theme === "dark"
-                  ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                  : "text-gray-600 hover:bg-white hover:text-gray-800"
-              }`}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors shadow-sm bg-white/10 text-blue-100 hover:bg-white/15 hover:text-white"
               title={sidebarCollapsed ? "Settings" : ""}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />

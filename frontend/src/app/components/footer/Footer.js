@@ -68,14 +68,14 @@ export default function Footer() {
                 duration: 0.2,
                 ease: "easeOut",
               }}
-              className={`absolute z-50 px-6 py-4 text-sm text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-2xl border border-blue-500/20 backdrop-blur-sm ${positionClasses[position]} min-w-48 max-w-64`}
+              className={`absolute z-50 px-6 py-4 text-sm text-white bg-gradient-to-r from-gold-500 to-gold-600 rounded-xl shadow-2xl border border-gold-500/20 backdrop-blur-sm ${positionClasses[position]} min-w-48 max-w-64`}
             >
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                 <span className="font-medium">{content}</span>
               </div>
               <div
-                className={`absolute w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-700 transform rotate-45 border-l border-t border-blue-500/20 ${arrowClasses[position]}`}
+                className={`absolute w-3 h-3 bg-gradient-to-r from-gold-500 to-gold-600 transform rotate-45 border-l border-t border-gold-500/20 ${arrowClasses[position]}`}
               ></div>
             </motion.div>
           )}
@@ -85,7 +85,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-b from-blue-900 to-blue-950 text-white py-16 px-4">
+    <footer className="bg-gradient-to-b from-navy-950 to-blue-950 text-white py-16 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand Section */}
@@ -95,7 +95,7 @@ export default function Footer() {
             transition={{ duration: 0.5 }}
           >
             <h2 className="text-3xl font-bold tracking-wide mb-4">
-              <span className="bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-gold-400 to-gold-300 bg-clip-text text-transparent">
                 PCG Ahinsan District YPG
               </span>
             </h2>
@@ -106,14 +106,14 @@ export default function Footer() {
             <div className="flex gap-4 mt-6">
               <a
                 href="#"
-                className="px-4 py-2 bg-blue-800 hover:bg-blue-700 rounded-lg text-sm font-medium transition"
+                className="px-4 py-2 bg-navy-900 hover:bg-gold-600 rounded-lg text-sm font-medium transition"
               >
                 Join Us
               </a>
               <Tooltip content="Click to go to our donation section">
                 <a
                   href="#donate"
-                  className="px-4 py-2 border border-blue-700 hover:bg-blue-800/30 rounded-lg text-sm font-medium transition"
+                  className="px-4 py-2 border border-gold-600 hover:bg-navy-900/30 rounded-lg text-sm font-medium transition"
                 >
                   Donate
                 </a>
@@ -127,7 +127,7 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h3 className="text-xl font-semibold mb-5 text-blue-200">
+            <h3 className="text-xl font-semibold mb-5 text-gold-300">
               Quick Links
             </h3>
             <ul className="space-y-3 text-blue-100/90">
@@ -178,9 +178,9 @@ export default function Footer() {
                           });
                         }
                       }}
-                      className="hover:text-blue-300 transition flex items-center gap-2"
+                      className="hover:text-gold-300 transition flex items-center gap-2"
                     >
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                       {link.name}
                     </a>
                   </Tooltip>
@@ -195,7 +195,7 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h3 className="text-xl font-semibold mb-5 text-blue-200">
+            <h3 className="text-xl font-semibold mb-5 text-gold-300">
               Our Ministries
             </h3>
             <ul className="space-y-3 text-blue-100/90">
@@ -226,9 +226,9 @@ export default function Footer() {
                     <a
                       href="#"
                       onClick={(e) => e.preventDefault()}
-                      className="hover:text-blue-300 transition flex items-center gap-2"
+                      className="hover:text-gold-300 transition flex items-center gap-2"
                     >
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                       {ministry.name}
                     </a>
                   </Tooltip>
@@ -243,29 +243,29 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <h3 className="text-xl font-semibold mb-5 text-blue-200">
+            <h3 className="text-xl font-semibold mb-5 text-gold-300">
               Contact Us
             </h3>
             <ul className="text-blue-100/90 space-y-4">
               <li className="flex items-start gap-3">
-                <Phone className="mt-1 flex-shrink-0 text-blue-300" size={18} />
+                <Phone className="mt-1 flex-shrink-0 text-gold-300" size={18} />
                 <div>
                   <p className="font-medium">Call Us</p>
                   <a
                     href="tel:+233531427671"
-                    className="hover:text-blue-300 transition"
+                    className="hover:text-gold-300 transition"
                   >
                     +233 531427671
                   </a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <Mail className="mt-1 flex-shrink-0 text-blue-300" size={18} />
+                <Mail className="mt-1 flex-shrink-0 text-gold-300" size={18} />
                 <div>
                   <p className="font-medium">Email Us</p>
                   <a
                     href="mailto:ypg@example.com"
-                    className="hover:text-blue-300 transition"
+                    className="hover:text-gold-300 transition"
                   >
                     ahinsandistrictypg@gmail.com
                   </a>
@@ -273,7 +273,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin
-                  className="mt-1 flex-shrink-0 text-blue-300"
+                  className="mt-1 flex-shrink-0 text-gold-300"
                   size={18}
                 />
                 <div>
@@ -284,10 +284,10 @@ export default function Footer() {
             </ul>
 
             <div className="mt-6">
-              <h4 className="text-blue-200 mb-3">Follow Us</h4>
+              <h4 className="text-gold-300 mb-3">Follow Us</h4>
               <div className="flex gap-4">
                 {[
-                  { icon: Facebook, color: "hover:text-blue-400", href: "#" },
+                  { icon: Facebook, color: "hover:text-gold-300", href: "#" },
                   { icon: Instagram, color: "hover:text-pink-400", href: "#" },
                   { icon: Twitter, color: "hover:text-sky-400", href: "#" },
                   { icon: Youtube, color: "hover:text-red-400", href: "#" },
@@ -297,7 +297,7 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2 bg-blue-900/50 rounded-full ${social.color} transition`}
+                    className={`p-2 bg-navy-950/50 rounded-full ${social.color} transition`}
                   >
                     <social.icon size={20} />
                   </a>
@@ -314,20 +314,20 @@ export default function Footer() {
           transition={{ delay: 0.4 }}
           className="mt-16 text-center border-t border-blue-800 pt-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center text-blue-300/80 text-sm">
+          <div className="flex flex-col md:flex-row justify-between items-center text-gold-300/80 text-sm">
             <p>
               &copy; {new Date().getFullYear()} Ahinsan District YPG. All rights
               reserved.
             </p>
             <div className="flex gap-6 mt-4 md:mt-0">
               <FAQ />
-              <Link href="/privacy" className="hover:text-blue-200 transition">
+              <Link href="/privacy" className="hover:text-gold-300 transition">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="hover:text-blue-200 transition">
+              <Link href="/terms" className="hover:text-gold-300 transition">
                 Terms of Service
               </Link>
-              <Link href="/sitemap" className="hover:text-blue-200 transition">
+              <Link href="/sitemap" className="hover:text-gold-300 transition">
                 Sitemap
               </Link>
             </div>

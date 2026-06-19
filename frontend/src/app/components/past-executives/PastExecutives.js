@@ -52,7 +52,7 @@ export default function PastExecutives() {
       <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gradient-to-r from-purple-600 to-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gradient-to-r from-purple-600 to-gold-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading past executives...</p>
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function PastExecutives() {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+              <h3 className="text-2xl font-semibold text-navy-950 mb-4">
                 No Past Executives Yet
               </h3>
               <p className="text-gray-600 mb-8 text-lg">
@@ -194,7 +194,7 @@ export default function PastExecutives() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="p-4">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors duration-300">
+                      <h3 className="text-xl font-semibold text-navy-950 mb-1 group-hover:text-purple-600 transition-colors duration-300">
                         {executive.name}
                       </h3>
                       <p className="text-gray-600 mb-2">

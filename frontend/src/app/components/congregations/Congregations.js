@@ -50,7 +50,7 @@ export default function CongregationalExecutives() {
       <section className="py-12 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-blue-800 mb-3">
+            <h2 className="text-3xl font-bold text-navy-950 mb-3">
               Connect With Our Branches
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -60,7 +60,7 @@ export default function CongregationalExecutives() {
             </p>
           </div>
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
           </div>
         </div>
       </section>
@@ -71,7 +71,7 @@ export default function CongregationalExecutives() {
     <section className="py-12 px-4 bg-white">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-blue-800 mb-3">
+          <h2 className="text-3xl font-bold text-navy-950 mb-3">
             Connect With Our Branches
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -83,7 +83,7 @@ export default function CongregationalExecutives() {
 
         <div className="overflow-x-auto rounded-lg shadow-md bg-white">
           <table className="w-full min-w-[900px] border-collapse">
-            <thead className="bg-blue-600 text-white">
+            <thead className="bg-gold-500 text-white">
               <tr>
                 <th className="py-3 px-4 text-center min-w-[180px] whitespace-nowrap">
                   Name
@@ -106,7 +106,7 @@ export default function CongregationalExecutives() {
               {presidents.map((president, index) => (
                 <tr
                   key={president.id}
-                  className={`hover:bg-blue-50 transition-colors ${index % 2 === 1 ? "bg-gray-50" : ""}`}
+                  className={`hover:bg-blue-50 transition-colors ${index % 2 === 1 ? "bg-white" : ""}`}
                 >
                   <td className="py-4 px-4 font-medium text-gray-700 min-w-[180px] whitespace-nowrap">
                     {president.name}
@@ -120,7 +120,7 @@ export default function CongregationalExecutives() {
                   <td className="py-4 px-4 min-w-[160px] whitespace-nowrap text-center">
                     <a
                       href={`tel:${president.phone}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-gold-500 hover:underline"
                     >
                       {president.phone}
                     </a>
@@ -128,7 +128,7 @@ export default function CongregationalExecutives() {
                   <td className="py-4 px-4 min-w-[220px] whitespace-nowrap">
                     <a
                       href={`mailto:${president.email}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-gold-500 hover:underline"
                     >
                       {president.email}
                     </a>

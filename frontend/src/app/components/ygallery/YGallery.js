@@ -90,9 +90,9 @@ export default function GallerySection() {
 
   if (loading) {
     return (
-      <section id="gallery" className="py-8 bg-gray-50">
+      <section id="gallery" className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading gallery...</p>
         </div>
       </section>
@@ -101,7 +101,7 @@ export default function GallerySection() {
 
   if (galleryItems.length === 0) {
     return (
-      <section id="gallery" className="py-8 bg-gray-50">
+      <section id="gallery" className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-red-600">No gallery items available</p>
         </div>
@@ -110,7 +110,7 @@ export default function GallerySection() {
   }
 
   return (
-    <section id="gallery" className="py-8 bg-gray-50">
+    <section id="gallery" className="py-8 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -119,7 +119,7 @@ export default function GallerySection() {
           viewport={{ once: true }}
           className="text-center mb-6"
         >
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Gallery</h2>
+          <h2 className="text-3xl font-bold text-navy-950 mb-2">Gallery</h2>
           <p className="text-base text-gray-600 max-w-2xl mx-auto mb-4">
             Explore our collection of photos and videos from various events and
             activities.
@@ -134,8 +134,8 @@ export default function GallerySection() {
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 contentType === "photos"
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "bg-gold-500 text-white shadow-sm"
+                  : "text-gray-600 hover:text-navy-950"
               }`}
             >
               Photos
@@ -147,8 +147,8 @@ export default function GallerySection() {
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 contentType === "videos"
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "bg-gold-500 text-white shadow-sm"
+                  : "text-gray-600 hover:text-navy-950"
               }`}
             >
               Videos
@@ -166,7 +166,7 @@ export default function GallerySection() {
                 height={64}
                 className="mx-auto mb-4 opacity-60"
               />
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-xl font-semibold text-navy-950 mb-2">
                 No Media Available
               </h3>
               <p className="text-gray-600">
@@ -209,7 +209,7 @@ export default function GallerySection() {
                           preload="metadata"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                           <Image
                             src="/placeholder-item.jpg"
                             alt="No media"

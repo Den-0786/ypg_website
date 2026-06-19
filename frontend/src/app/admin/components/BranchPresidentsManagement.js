@@ -155,7 +155,7 @@ export default function BranchPresidentsManagement({ theme }) {
       name: "Total Presidents",
       value: presidents.length,
       icon: UserCheck,
-      color: "text-blue-600",
+      color: "text-gold-500",
     },
     {
       name: "Active Presidents",
@@ -174,7 +174,7 @@ export default function BranchPresidentsManagement({ theme }) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
       </div>
     );
   }
@@ -185,7 +185,7 @@ export default function BranchPresidentsManagement({ theme }) {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
         <div>
           <h1
-            className={`text-3xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`text-3xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Branch Presidents Management
           </h1>
@@ -197,7 +197,7 @@ export default function BranchPresidentsManagement({ theme }) {
         </div>
         <button
           onClick={() => openModal()}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
+          className="bg-gold-500 hover:bg-gold-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
         >
           <Plus className="w-5 h-5" />
           Add New President
@@ -226,7 +226,7 @@ export default function BranchPresidentsManagement({ theme }) {
                   {stat.name}
                 </p>
                 <p
-                  className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   {stat.value}
                 </p>
@@ -250,7 +250,7 @@ export default function BranchPresidentsManagement({ theme }) {
         >
           <h3
             className={`text-lg font-semibold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+              theme === "dark" ? "text-white" : "text-navy-950"
             }`}
           >
             Branch Presidents
@@ -262,7 +262,7 @@ export default function BranchPresidentsManagement({ theme }) {
               theme === "dark" ? "divide-gray-700" : "divide-gray-200"
             }`}
           >
-            <thead className={theme === "dark" ? "bg-gray-700" : "bg-gray-50"}>
+            <thead className={theme === "dark" ? "bg-gray-700" : "bg-white"}>
               <tr>
                 <th
                   className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${
@@ -329,13 +329,13 @@ export default function BranchPresidentsManagement({ theme }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                   className={
-                    theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                    theme === "dark" ? "hover:bg-gray-700" : "hover:bg-white"
                   }
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div
                       className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       {president.name}
@@ -344,7 +344,7 @@ export default function BranchPresidentsManagement({ theme }) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div
                       className={`text-sm font-medium ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       {president.congregation}
@@ -355,7 +355,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
                       <span
                         className={`text-sm ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
+                          theme === "dark" ? "text-white" : "text-navy-950"
                         }`}
                       >
                         {president.location || "Not specified"}
@@ -367,7 +367,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       <Phone className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
                       <a
                         href={`tel:${president.phone}`}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm text-gold-500 hover:underline"
                       >
                         {president.phone}
                       </a>
@@ -378,7 +378,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       <Mail className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
                       <a
                         href={`mailto:${president.email}`}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm text-gold-500 hover:underline"
                       >
                         {president.email}
                       </a>
@@ -399,7 +399,7 @@ export default function BranchPresidentsManagement({ theme }) {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => openModal(president)}
-                        className="text-blue-600 hover:text-blue-900 p-1 rounded"
+                        className="text-gold-500 hover:text-navy-950 p-1 rounded"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -408,7 +408,7 @@ export default function BranchPresidentsManagement({ theme }) {
                         className={`p-1 rounded ${
                           president.is_active
                             ? "text-red-600 hover:text-red-900"
-                            : "text-green-600 hover:text-green-900"
+                            : "text-green-600 hover:text-blue-900"
                         }`}
                       >
                         {president.is_active ? (
@@ -444,7 +444,7 @@ export default function BranchPresidentsManagement({ theme }) {
           >
             {/* Decorative gradient background */}
             <div
-              className={`absolute inset-0 bg-gradient-to-br ${theme === "dark" ? "from-blue-900/20 to-purple-900/20" : "from-blue-50 to-purple-50"} opacity-50`}
+              className={`absolute inset-0 bg-gradient-to-br ${theme === "dark" ? "from-navy-950/20 to-purple-900/20" : "from-blue-50 to-purple-50"} opacity-50`}
             ></div>
 
             {/* Content */}
@@ -452,15 +452,15 @@ export default function BranchPresidentsManagement({ theme }) {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-3">
                   <div
-                    className={`p-3 rounded-2xl ${theme === "dark" ? "bg-blue-600/20" : "bg-blue-100"}`}
+                    className={`p-3 rounded-2xl ${theme === "dark" ? "bg-gold-500/20" : "bg-gold-100"}`}
                   >
                     <UserCheck
-                      className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                      className={`w-6 h-6 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                     />
                   </div>
                   <div>
                     <h3
-                      className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                      className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                     >
                       {editingPresident
                         ? "Edit President"
@@ -477,7 +477,7 @@ export default function BranchPresidentsManagement({ theme }) {
                 </div>
                 <button
                   onClick={closeModal}
-                  className={`p-2 rounded-lg transition-all duration-200 ${theme === "dark" ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
+                  className={`p-2 rounded-lg transition-all duration-200 ${theme === "dark" ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700" : "text-gray-400 hover:text-gray-600 hover:bg-blue-50"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -502,7 +502,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       onChange={(e) =>
                         handleInputChange("name", e.target.value)
                       }
-                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"}`}
                       placeholder="Enter president's full name"
                       required
                     />
@@ -524,7 +524,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       onChange={(e) =>
                         handleInputChange("congregation", e.target.value)
                       }
-                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"}`}
                       placeholder="Enter congregation name"
                       required
                     />
@@ -549,7 +549,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       onChange={(e) =>
                         handleInputChange("location", e.target.value)
                       }
-                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"}`}
                       placeholder="Enter location"
                     />
                   </motion.div>
@@ -571,7 +571,7 @@ export default function BranchPresidentsManagement({ theme }) {
                       onChange={(e) =>
                         handleInputChange("phone", e.target.value)
                       }
-                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"}`}
                       placeholder="Enter phone number"
                       required
                     />
@@ -593,7 +593,7 @@ export default function BranchPresidentsManagement({ theme }) {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
-                    className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all duration-200 ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-navy-950 placeholder-gray-500"}`}
                     placeholder="Enter email address (optional)"
                   />
                 </motion.div>
@@ -621,7 +621,7 @@ export default function BranchPresidentsManagement({ theme }) {
                         onChange={() =>
                           setFormData({ ...formData, is_active: true })
                         }
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        className="w-4 h-4 text-gold-500 bg-blue-50 border-gray-300 focus:ring-gold-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
                         htmlFor="active"
@@ -642,7 +642,7 @@ export default function BranchPresidentsManagement({ theme }) {
                         onChange={() =>
                           setFormData({ ...formData, is_active: false })
                         }
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        className="w-4 h-4 text-gold-500 bg-blue-50 border-gray-300 focus:ring-gold-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
                         htmlFor="inactive"
@@ -664,7 +664,7 @@ export default function BranchPresidentsManagement({ theme }) {
                 >
                   <button
                     type="submit"
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
+                    className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-navy-900 text-white py-2.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     <Save className="w-4 h-4" />
                     {editingPresident ? "Update President" : "Create President"}
@@ -672,7 +672,7 @@ export default function BranchPresidentsManagement({ theme }) {
                   <button
                     type="button"
                     onClick={closeModal}
-                    className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-700"}`}
+                    className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-100 hover:bg-gray-300 text-gray-700"}`}
                   >
                     Cancel
                   </button>
@@ -695,7 +695,7 @@ export default function BranchPresidentsManagement({ theme }) {
             <div className="text-center">
               <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
               <h3
-                className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}
+                className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} mb-2`}
               >
                 Delete President
               </h3>

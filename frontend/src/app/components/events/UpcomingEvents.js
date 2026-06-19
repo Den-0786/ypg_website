@@ -79,10 +79,10 @@ export default function EventSection() {
 
   if (loading) {
     return (
-      <section id="events" className="px-4 py-16 bg-blue-50">
+      <section id="events" className="px-4 py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading events...</p>
           </div>
         </div>
@@ -92,50 +92,48 @@ export default function EventSection() {
 
   if (events.length === 0) {
     return (
-      <section id="events" className="px-4 py-16 bg-blue-50">
+      <section id="events" className="px-4 py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto">
-          <motion.h2
-            className="text-4xl font-bold text-center mb-4 text-blue-800"
+          <motion.div
+            className="text-center max-w-3xl mx-auto mb-16"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            Upcoming Events
-          </motion.h2>
-
-          <motion.p
-            className="text-lg text-gray-600 text-center mb-12 max-w-3xl mx-auto"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            No upcoming events at the moment. Check back soon for new events!
-          </motion.p>
+            <span className="inline-block text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">
+              What&apos;s Happening
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-navy-950 mb-4">
+              Upcoming Events
+            </h2>
+            <p className="text-lg text-gray-600">
+              No upcoming events at the moment. Check back soon for new events!
+            </p>
+          </motion.div>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="events" className="px-4 py-16 bg-blue-50">
+    <section id="events" className="px-4 py-20 lg:py-28 bg-white">
       <div className="max-w-7xl mx-auto">
-        <motion.h2
-          className="text-4xl font-bold text-center mb-4 text-blue-800"
+        <motion.div
+          className="text-center max-w-3xl mx-auto mb-16"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          Upcoming Events
-        </motion.h2>
-
-        <motion.p
-          className="text-lg text-gray-600 text-center mb-12 max-w-3xl mx-auto"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-        >
-          Join us for these exciting upcoming events in our youth ministry
-        </motion.p>
+          <span className="inline-block text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">
+            What&apos;s Happening
+          </span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-navy-950 mb-4">
+            Upcoming Events
+          </h2>
+          <p className="text-lg text-gray-600">
+            Join us for these exciting upcoming events in our youth ministry
+          </p>
+        </motion.div>
 
         <div className="relative">
           <div className="overflow-x-auto scrollbar-hide">
@@ -150,7 +148,7 @@ export default function EventSection() {
             return (
               <motion.div
                 key={event.id}
-                className="w-80 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 flex-shrink-0"
+                className="w-80 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border-t-4 border-gold-500 flex-shrink-0"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
@@ -177,7 +175,7 @@ export default function EventSection() {
                 <div className="px-4 py-4 flex-1 flex flex-col">
                   <div className="flex items-center mb-2">
                     <svg
-                      className="w-4 h-4 text-blue-600 mr-2"
+                      className="w-4 h-4 text-gold-500 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -189,18 +187,18 @@ export default function EventSection() {
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    <span className="text-xs font-medium text-blue-600">
+                    <span className="text-xs font-medium text-gold-500">
                       {formatEventDate(event.start_date, event.end_date)}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+                  <h3 className="text-lg font-bold text-navy-950 mb-2 line-clamp-2">
                     {event.title}
                   </h3>
 
                   <div className="flex items-center mb-3">
                     <svg
-                      className="w-4 h-4 text-gray-500 mr-2"
+                      className="w-4 h-4 text-gold-500 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -229,7 +227,7 @@ export default function EventSection() {
                       {event.description.length > 40 && (
                         <button
                           onClick={() => toggleExpanded(event.id)}
-                          className="inline-flex items-center justify-center w-6 h-6 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-all duration-200 group relative ml-2 -mt-2"
+                          className="inline-flex items-center justify-center w-6 h-6 text-gold-500 hover:text-navy-950 hover:bg-gold-100 rounded-full transition-all duration-200 group relative ml-2 -mt-2"
                         >
                           {isExpanded ? (
                             <ChevronUp className="w-4 h-4" />

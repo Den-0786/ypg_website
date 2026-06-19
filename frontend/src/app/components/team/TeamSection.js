@@ -120,7 +120,7 @@ export default function TeamSection() {
   }, [totalSets]);
 
   return (
-    <section id="team" className="py-16 bg-gray-50 px-4 overflow-hidden">
+    <section id="team" className="py-16 bg-white px-4 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -129,7 +129,7 @@ export default function TeamSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          <h2 className="text-4xl font-bold text-navy-950 mb-4">
             Meet Our Executives
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -140,7 +140,7 @@ export default function TeamSection() {
 
         {loading && (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold-500"></div>
           </div>
         )}
 
@@ -161,9 +161,9 @@ export default function TeamSection() {
             className="text-center py-16"
           >
             <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gold-100 rounded-full flex items-center justify-center">
                 <svg
-                  className="w-12 h-12 text-blue-600"
+                  className="w-12 h-12 text-gold-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -176,7 +176,7 @@ export default function TeamSection() {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-navy-950 mb-4">
                 Meet Our Leadership
               </h3>
               <p className="text-gray-600 mb-6">
@@ -184,7 +184,7 @@ export default function TeamSection() {
                 guiding the youth ministry with vision, passion, and purpose.
               </p>
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-navy-950">
                   <strong>
                     No district executives available at the moment.
                   </strong>
@@ -271,7 +271,7 @@ export default function TeamSection() {
                                   priority={index === 0}
                                 />
                                 {/* Color overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
                                 {/* Text overlay with background */}
                                 <div
@@ -282,14 +282,14 @@ export default function TeamSection() {
                                   }`}
                                 >
                                   <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
-                                    <h3 className="text-sm sm:text-lg font-bold text-gray-800 mb-1">
+                                    <h3 className="text-sm sm:text-lg font-bold text-navy-950 mb-1">
                                       {member.name}
                                     </h3>
-                                    <p className="text-blue-600 font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                                    <p className="text-gold-500 font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
                                       {member.position}
                                     </p>
                                     {member.congregation && (
-                                      <p className="text-amber-600 font-light text-xs mb-2">
+                                      <p className="text-gold-500 font-light text-xs mb-2">
                                         {member.congregation}
                                       </p>
                                     )}
@@ -315,7 +315,7 @@ export default function TeamSection() {
                 <button
                   key={`dot-${index}`}
                   onClick={() => setCurrentSet(index)}
-                  className={`w-3 h-3 rounded-full ${currentSet === index ? "bg-blue-600" : "bg-gray-300"}`}
+                  className={`w-3 h-3 rounded-full ${currentSet === index ? "bg-gold-500" : "bg-gray-300"}`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}

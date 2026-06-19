@@ -74,8 +74,8 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Real Stories, <span className="text-blue-600">Real Impact</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-navy-950 mb-4">
+            Real Stories, <span className="text-gold-500">Real Impact</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Hear from youth just like you about their experiences in our
@@ -85,7 +85,7 @@ export default function TestimonialsSection() {
 
         {loading ? (
           <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto"></div>
             <p className="text-gray-600 mt-4">Loading testimonials...</p>
           </div>
         ) : testimonials.length === 0 ? (
@@ -96,7 +96,7 @@ export default function TestimonialsSection() {
             className="text-center py-16"
           >
             <div className="max-w-md mx-auto">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-navy-950 mb-4">
                 No Testimonials Yet
               </h3>
               <p className="text-gray-600 mb-6">
@@ -124,8 +124,8 @@ export default function TestimonialsSection() {
                       className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-md"
                     />
                     <div className="ml-4">
-                      <h4 className="font-bold text-gray-900">{t.name}</h4>
-                      <p className="text-sm text-blue-600">{t.congregation}</p>
+                      <h4 className="font-bold text-navy-950">{t.name}</h4>
+                      <p className="text-sm text-gold-500">{t.congregation}</p>
                     </div>
                   </div>
 
@@ -151,7 +151,7 @@ export default function TestimonialsSection() {
                         </svg>
                       ))}
                     </div>
-                    <div className="text-blue-500">
+                    <div className="text-gold-500">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
@@ -179,7 +179,7 @@ export default function TestimonialsSection() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-gold-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all"
             onClick={() => setShowContactModal(true)}
           >
             Share Your Story
@@ -218,7 +218,7 @@ export default function TestimonialsSection() {
                   <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-2xl font-bold leading-6 text-gray-900 mb-6"
+                      className="text-2xl font-bold leading-6 text-navy-950 mb-6"
                     >
                       Share Your Testimonial
                     </Dialog.Title>

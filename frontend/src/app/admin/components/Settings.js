@@ -309,7 +309,15 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
   });
 
   // Additional states for new features
-  const [settingsHistory, setSettingsHistory] = useState([]);
+  const [settingsHistory, setSettingsHistory] = useState(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("ypg_admin_audit_log");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupData, setBackupData] = useState(null);
@@ -575,6 +583,9 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
       // Clear form fields for security
       if (section === "security") {
+        if (security.newPin) {
+          localStorage.setItem("ypg_admin_pin", security.newPin);
+        }
         setSecurity({
           ...security,
           currentPassword: "",
@@ -601,19 +612,23 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
   // Function to add history entry
   const addHistoryEntry = (action, details) => {
+    const username = localStorage.getItem("ypg_admin_user") || "Admin User";
     const newEntry = {
-      id: Date.now(),
-      action,
-      timestamp: new Date().toLocaleString(),
-      user: profile.fullName || "Admin User",
-      details,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      action: `${action}${details ? `: ${details}` : ""}`,
+      timestamp: new Date().toISOString(),
+      username,
     };
-    setSettingsHistory((prev) => [newEntry, ...prev.slice(0, 19)]); // Keep only last 20 entries
+    const updated = [newEntry, ...settingsHistory].slice(0, 100);
+    localStorage.setItem("ypg_admin_audit_log", JSON.stringify(updated));
+    setSettingsHistory(updated);
   };
 
   // Function to delete history entry
   const deleteHistoryEntry = (id) => {
-    setSettingsHistory((prev) => prev.filter((entry) => entry.id !== id));
+    const updated = settingsHistory.filter((entry) => entry.id !== id);
+    localStorage.setItem("ypg_admin_audit_log", JSON.stringify(updated));
+    setSettingsHistory(updated);
   };
 
   // Backup and Restore functions
@@ -912,10 +927,10 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
   };
 
   const getInputClassName = (fieldName) => {
-    const baseClass = `w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-base ${
+    const baseClass = `w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-xs sm:text-base ${
       theme === "dark"
         ? "bg-gray-700 text-white border-gray-600"
-        : "bg-white text-gray-900 border-gray-300"
+        : "bg-white text-navy-950 border-gray-300"
     }`;
     const errorClass = "border-red-500 focus:ring-red-500";
     const normalClass =
@@ -953,7 +968,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           className={`rounded-lg shadow-xl w-full max-w-lg sm:max-w-2xl max-h-[95vh] overflow-hidden ${
             theme === "dark"
               ? "bg-gray-800 text-white"
-              : "bg-white text-gray-900"
+              : "bg-white text-navy-950"
           }`}
         >
           {/* Modal Header */}
@@ -965,7 +980,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             <div className="flex items-center space-x-3 flex-1">
               <h2
                 className={`text-lg sm:text-xl font-semibold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
+                  theme === "dark" ? "text-white" : "text-navy-950"
                 }`}
               >
                 Settings
@@ -975,7 +990,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 className={`lg:hidden p-1 rounded-lg transition-colors ${
                   theme === "dark"
                     ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700"
-                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    : "text-gray-400 hover:text-gray-600 hover:bg-blue-50"
                 }`}
               >
                 <Menu className="w-5 h-5" />
@@ -1002,7 +1017,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               className={`p-1 rounded-lg transition-colors ${
                 theme === "dark"
                   ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-blue-50"
               }`}
             >
               <X className="w-5 h-5" />
@@ -1019,7 +1034,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               } transition-all duration-300 border-r overflow-hidden ${
                 theme === "dark"
                   ? "border-gray-700 bg-gray-900"
-                  : "border-gray-200 bg-gray-50"
+                  : "border-gray-200 bg-white"
               }`}
             >
               <nav className="p-4 space-y-2">
@@ -1039,11 +1054,11 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         isActive
                           ? theme === "dark"
-                            ? "bg-blue-900 text-blue-300"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-navy-950 text-gold-300"
+                            : "bg-gold-100 text-navy-950"
                           : theme === "dark"
                             ? "text-gray-300 hover:bg-gray-700"
-                            : "text-gray-700 hover:bg-gray-100"
+                            : "text-gray-700 hover:bg-blue-50"
                       }`}
                     >
                       <Icon className="w-4 h-4 inline mr-2" />
@@ -1061,7 +1076,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Profile Settings
@@ -1069,7 +1084,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                   {isProfileLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="text-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+                        <Loader2 className="w-8 h-8 animate-spin text-gold-500 mx-auto mb-4" />
                         <p
                           className={`text-sm ${
                             theme === "dark" ? "text-gray-400" : "text-gray-600"
@@ -1092,7 +1107,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                         <div className="flex items-center space-x-4">
                           <div
                             className={`w-16 h-16 rounded-full flex items-center justify-center overflow-hidden ${
-                              theme === "dark" ? "bg-gray-700" : "bg-gray-200"
+                              theme === "dark" ? "bg-gray-700" : "bg-gray-100"
                             }`}
                           >
                             {profile.avatar ? (
@@ -1106,7 +1121,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                             )}
                           </div>
                           <div>
-                            <label className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm flex items-center cursor-pointer">
+                            <label className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors text-xs sm:text-sm flex items-center cursor-pointer">
                               <Save className="w-4 h-4 mr-2" />
                               Upload Photo
                               <input
@@ -1198,7 +1213,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       <button
                         onClick={() => handleSave("profile")}
                         disabled={isLoading}
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                       >
                         {isLoading ? (
                           <>
@@ -1234,7 +1249,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Security Settings
@@ -1250,16 +1265,16 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                   >
                     <h4
                       className={`text-xs sm:text-sm font-medium mb-2 ${
-                        theme === "dark" ? "text-white" : "text-blue-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       Authentication Method
                     </h4>
                     <div className="flex items-center">
-                      <Key className="w-4 h-4 mr-2 text-blue-600" />
+                      <Key className="w-4 h-4 mr-2 text-gold-500" />
                       <span
                         className={`text-sm ${
-                          theme === "dark" ? "text-gray-300" : "text-blue-800"
+                          theme === "dark" ? "text-gray-300" : "text-navy-950"
                         }`}
                       >
                         Username & Password Authentication
@@ -1269,11 +1284,11 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
                   {/* Password Authentication */}
                   <div className="space-y-3 sm:space-y-4">
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                    <h4 className="text-sm font-medium text-navy-950 dark:text-white">
                       Supervisor Credentials
                     </h4>
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
-                      <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <div className="bg-blue-50 dark:bg-navy-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-navy-950 dark:text-gold-300">
                         Current Username:{" "}
                         <strong>
                           {currentCredentials.username || "Loading..."}
@@ -1411,7 +1426,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <button
                       onClick={() => handleSave("security")}
                       disabled={isLoading}
-                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      className="w-full bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                       {isLoading ? (
                         <>
@@ -1446,7 +1461,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Privacy Policy
@@ -1462,11 +1477,11 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       with third parties. For more details, contact your
                       administrator.
                     </p>
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <h4 className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+                    <div className="bg-blue-50 dark:bg-navy-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <h4 className="text-xs sm:text-sm font-medium text-navy-950 dark:text-gold-300 mb-2">
                         Data Protection
                       </h4>
-                      <ul className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                      <ul className="text-xs sm:text-sm text-navy-950 dark:text-gold-300 space-y-1">
                         <li>
                           • All personal data is encrypted and stored securely
                         </li>
@@ -1486,7 +1501,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Appearance Settings
@@ -1524,7 +1539,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <button
                       onClick={() => handleSave("appearance")}
                       disabled={isLoading}
-                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      className="w-full bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                       {isLoading ? (
                         <>
@@ -1559,7 +1574,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     About
@@ -1568,34 +1583,34 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <div
                       className={`border rounded-lg p-4 ${
                         theme === "dark"
-                          ? "bg-blue-900/20 border-blue-800"
+                          ? "bg-navy-950/20 border-blue-800"
                           : "bg-blue-50 border-blue-200"
                       }`}
                     >
                       <h4
                         className={`text-xs sm:text-sm font-medium mb-2 ${
-                          theme === "dark" ? "text-blue-300" : "text-blue-900"
+                          theme === "dark" ? "text-gold-300" : "text-navy-950"
                         }`}
                       >
                         YPG Official Website
                       </h4>
                       <p
                         className={`text-xs sm:text-sm mb-2 ${
-                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                          theme === "dark" ? "text-gold-300" : "text-navy-950"
                         }`}
                       >
                         Version: 1.1.0
                       </p>
                       <p
                         className={`text-xs sm:text-sm mb-2 ${
-                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                          theme === "dark" ? "text-gold-300" : "text-navy-950"
                         }`}
                       >
                         Built for PCG Ahinsan District YPG
                       </p>
                       <p
                         className={`text-xs sm:text-sm ${
-                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                          theme === "dark" ? "text-gold-300" : "text-navy-950"
                         }`}
                       >
                         © 2025 PCG Ahinsan District YPG
@@ -1604,7 +1619,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <div className="space-y-2">
                       <h4
                         className={`text-xs sm:text-sm font-medium ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
+                          theme === "dark" ? "text-white" : "text-navy-950"
                         }`}
                       >
                         Features
@@ -1631,7 +1646,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Website Content
@@ -1641,7 +1656,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <div>
                       <h4
                         className={`text-xs sm:text-sm font-medium mb-3 ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
+                          theme === "dark" ? "text-white" : "text-navy-950"
                         }`}
                       >
                         General Settings
@@ -1752,7 +1767,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <div>
                       <h4
                         className={`text-xs sm:text-sm font-medium mb-3 ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
+                          theme === "dark" ? "text-white" : "text-navy-950"
                         }`}
                       >
                         Social Media
@@ -1760,7 +1775,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       <div className="grid grid-cols-1 gap-3 sm:gap-4">
                         <div>
                           <label className={getLabelWithIconClassName()}>
-                            <Facebook className="w-4 h-4 mr-2 text-blue-600" />
+                            <Facebook className="w-4 h-4 mr-2 text-gold-500" />
                             Facebook URL
                           </label>
                           <input
@@ -1804,7 +1819,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                         </div>
                         <div>
                           <label className={getLabelWithIconClassName()}>
-                            <Twitter className="w-4 h-4 mr-2 text-blue-400" />
+                            <Twitter className="w-4 h-4 mr-2 text-gold-300" />
                             Twitter URL
                           </label>
                           <input
@@ -1852,7 +1867,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <button
                       onClick={() => handleSave("website")}
                       disabled={isLoading}
-                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      className="w-full bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                       {isLoading ? (
                         <>
@@ -1887,7 +1902,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Backup & Restore
@@ -1896,20 +1911,20 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                     <div
                       className={`border rounded-lg p-4 ${
                         theme === "dark"
-                          ? "bg-blue-900/20 border-blue-800"
+                          ? "bg-navy-950/20 border-blue-800"
                           : "bg-blue-50 border-blue-200"
                       }`}
                     >
                       <h4
                         className={`text-xs sm:text-sm font-medium mb-2 ${
-                          theme === "dark" ? "text-blue-300" : "text-blue-900"
+                          theme === "dark" ? "text-gold-300" : "text-navy-950"
                         }`}
                       >
                         Backup Settings
                       </h4>
                       <p
                         className={`text-xs sm:text-sm mb-4 ${
-                          theme === "dark" ? "text-blue-200" : "text-blue-800"
+                          theme === "dark" ? "text-gold-300" : "text-navy-950"
                         }`}
                       >
                         Create a backup of all your current settings. This will
@@ -1918,7 +1933,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       </p>
                       <button
                         onClick={handleBackup}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm flex items-center"
+                        className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors text-xs sm:text-sm flex items-center"
                       >
                         <Save className="w-4 h-4 mr-2" />
                         Create Backup
@@ -1929,12 +1944,12 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       className={`border rounded-lg p-4 ${
                         theme === "dark"
                           ? "bg-green-900/20 border-green-800"
-                          : "bg-green-50 border-green-200"
+                          : "bg-blue-50 border-green-200"
                       }`}
                     >
                       <h4
                         className={`text-xs sm:text-sm font-medium mb-2 ${
-                          theme === "dark" ? "text-green-300" : "text-green-900"
+                          theme === "dark" ? "text-green-300" : "text-blue-900"
                         }`}
                       >
                         Restore Settings
@@ -2000,102 +2015,89 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                 <div className="space-y-4 sm:space-y-6">
                   <h3
                     className={`text-base sm:text-lg font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-navy-950"
                     }`}
                   >
                     Settings History
                   </h3>
-                  <div className="space-y-3">
-                    {settingsHistory.length === 0 ? (
-                      <div
-                        className={`rounded-lg p-8 border text-center ${
-                          theme === "dark"
-                            ? "bg-gray-700 border-gray-600"
-                            : "bg-gray-50 border-gray-200"
+                  {settingsHistory.length === 0 ? (
+                    <div
+                      className={`rounded-lg p-8 border text-center ${
+                        theme === "dark"
+                          ? "bg-gray-700 border-gray-600"
+                          : "bg-white border-gray-200"
+                      }`}
+                    >
+                      <Info className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p
+                        className={`text-sm ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        <Info className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p
-                          className={`text-sm ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-600"
-                          }`}
-                        >
-                          No settings changes recorded yet.
-                        </p>
-                        <p
-                          className={`text-xs mt-1 ${
-                            theme === "dark" ? "text-gray-500" : "text-gray-500"
-                          }`}
-                        >
-                          Changes will appear here after you save settings.
-                        </p>
+                        No settings changes recorded yet.
+                      </p>
+                      <p
+                        className={`text-xs mt-1 ${
+                          theme === "dark" ? "text-gray-500" : "text-gray-500"
+                        }`}
+                      >
+                        Changes will appear here after you save settings.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={`rounded-xl border overflow-hidden ${
+                      theme === "dark" ? "border-gray-600" : "border-gray-200"
+                    }`}>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className={`${theme === "dark" ? "bg-navy-950" : "bg-blue-50"}`}>
+                              <th className={`px-4 py-3 text-xs font-bold uppercase tracking-wider ${theme === "dark" ? "text-gold-400" : "text-navy-950"}`}>
+                                Date
+                              </th>
+                              <th className={`px-4 py-3 text-xs font-bold uppercase tracking-wider ${theme === "dark" ? "text-gold-400" : "text-navy-950"}`}>
+                                Time
+                              </th>
+                              <th className={`px-4 py-3 text-xs font-bold uppercase tracking-wider ${theme === "dark" ? "text-gold-400" : "text-navy-950"}`}>
+                                Username
+                              </th>
+                              <th className={`px-4 py-3 text-xs font-bold uppercase tracking-wider ${theme === "dark" ? "text-gold-400" : "text-navy-950"}`}>
+                                Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className={`divide-y ${theme === "dark" ? "divide-gray-600" : "divide-gray-200"}`}>
+                            {settingsHistory.map((item) => {
+                              const dateObj = new Date(item.timestamp);
+                              return (
+                                <tr
+                                  key={item.id}
+                                  className={`${
+                                    theme === "dark"
+                                      ? "bg-gray-800 hover:bg-gray-700"
+                                      : "bg-white hover:bg-gray-50"
+                                  } transition-colors`}
+                                >
+                                  <td className={`px-4 py-3 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                                    {dateObj.toLocaleDateString()}
+                                  </td>
+                                  <td className={`px-4 py-3 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                                    {dateObj.toLocaleTimeString()}
+                                  </td>
+                                  <td className={`px-4 py-3 text-sm font-medium ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
+                                    {item.username}
+                                  </td>
+                                  <td className={`px-4 py-3 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                                    {item.action}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {settingsHistory.map((item) => (
-                          <div
-                            key={item.id}
-                            className={`rounded-lg p-4 border ${
-                              theme === "dark"
-                                ? "bg-gray-700 border-gray-600"
-                                : "bg-gray-50 border-gray-200"
-                            }`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4
-                                  className={`text-xs sm:text-sm font-medium ${
-                                    theme === "dark"
-                                      ? "text-white"
-                                      : "text-gray-900"
-                                  }`}
-                                >
-                                  {item.action}
-                                </h4>
-                                <p
-                                  className={`text-xs mt-1 ${
-                                    theme === "dark"
-                                      ? "text-gray-400"
-                                      : "text-gray-600"
-                                  }`}
-                                >
-                                  {item.details}
-                                </p>
-                                <p
-                                  className={`text-xs mt-2 ${
-                                    theme === "dark"
-                                      ? "text-gray-500"
-                                      : "text-gray-500"
-                                  }`}
-                                >
-                                  By: {item.user} • {item.timestamp}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => deleteHistoryEntry(item.id)}
-                                className={`ml-2 p-1 text-gray-400 hover:text-red-600 rounded transition-colors ${
-                                  theme === "dark"
-                                    ? "hover:bg-red-900/20"
-                                    : "hover:bg-red-50"
-                                }`}
-                                title="Delete this entry"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                        <div className="text-center pt-2">
-                          <button
-                            onClick={() => setSettingsHistory([])}
-                            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:underline"
-                          >
-                            Clear All History
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
 

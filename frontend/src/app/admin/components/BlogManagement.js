@@ -176,13 +176,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2
-          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+          className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
         >
           Blog Management
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center space-x-2 bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Add Post</span>
@@ -193,13 +193,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
       {!blogPosts || blogPosts.length === 0 ? (
         <div className="text-center py-12">
           <div
-            className={`${theme === "dark" ? "bg-gray-800" : "bg-gray-50"} rounded-lg p-8`}
+            className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-lg p-8`}
           >
             <FileText
               className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-gray-600" : "text-gray-400"}`}
             />
             <h3
-              className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-900"}`}
+              className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-navy-950"}`}
             >
               No Blog Posts Yet
             </h3>
@@ -230,7 +230,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     />
                   ) : (
                     <div
-                      className={`h-full ${theme === "dark" ? "bg-gradient-to-r from-blue-600 to-purple-700" : "bg-gradient-to-r from-blue-500 to-purple-600"} flex items-center justify-center`}
+                      className={`h-full ${theme === "dark" ? "bg-gradient-to-r from-gold-500 to-purple-700" : "bg-gradient-to-r from-gold-500 to-purple-600"} flex items-center justify-center`}
                     >
                       <FileText className="w-12 h-12 text-white" />
                     </div>
@@ -238,7 +238,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                 </div>
                 <div className="p-6">
                   <h3
-                    className={`font-semibold mb-2 line-clamp-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                    className={`font-semibold mb-2 line-clamp-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                   >
                     {post.title}
                   </h3>
@@ -268,7 +268,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => setEditingPost(post)}
-                      className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                      className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${theme === "dark" ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-blue-50 text-gray-600 hover:bg-gray-100"}`}
                     >
                       <Edit className="w-3 h-3" />
                       <span>Edit</span>
@@ -304,13 +304,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Add Blog Post
                 </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
+                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-blue-50 text-navy-950"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -329,7 +329,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     onChange={(e) =>
                       setNewPost({ ...newPost, title: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -344,7 +344,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       setNewPost({ ...newPost, content: e.target.value })
                     }
                     rows={6}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -360,7 +360,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     }
                     rows={3}
                     placeholder="Enter a short excerpt for the blog post"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -376,7 +376,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       onChange={(e) =>
                         setNewPost({ ...newPost, author: e.target.value })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                     />
                   </div>
                   <div>
@@ -391,7 +391,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       onChange={(e) =>
                         setNewPost({ ...newPost, category: e.target.value })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                     />
                   </div>
                 </div>
@@ -423,7 +423,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     onChange={(e) =>
                       setNewPost({ ...newPost, date: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -435,7 +435,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                   <div className="flex gap-3">
                     {/* Left side - Media preview */}
                     <div
-                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-300"}`}
+                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                     >
                       {newPost.image ? (
                         <div className="text-center">
@@ -486,10 +486,10 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     {/* Right side - Upload button */}
                     <div className="flex-1">
                       <label
-                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-blue-500 hover:border-blue-400 hover:bg-blue-900/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
+                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-gold-500 hover:border-blue-400 hover:bg-navy-950/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
                       >
                         <svg
-                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -502,7 +502,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                           />
                         </svg>
                         <span
-                          className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                          className={`text-xs font-medium ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         >
                           Upload
                         </span>
@@ -525,13 +525,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
               <div className="flex space-x-3 mt-4">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddPost}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors text-sm"
                 >
                   Add Post
                 </button>
@@ -558,13 +558,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Edit Blog Post
                 </h3>
                 <button
                   onClick={() => setEditingPost(null)}
-                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-gray-100 text-gray-800"}`}
+                  className={`p-1 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700 text-white" : "hover:bg-blue-50 text-navy-950"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -583,7 +583,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     onChange={(e) =>
                       setEditingPost({ ...editingPost, title: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div>
@@ -601,7 +601,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                       })
                     }
                     rows={6}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -620,7 +620,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                           author: e.target.value,
                         })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                     />
                   </div>
                   <div>
@@ -638,7 +638,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                           category: e.target.value,
                         })
                       }
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"}`}
                     />
                   </div>
                 </div>
@@ -670,7 +670,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                   <div className="flex gap-3">
                     {/* Left side - Media preview */}
                     <div
-                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-300"}`}
+                      className={`flex-1 h-16 border-2 border-dashed rounded-lg flex items-center justify-center ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                     >
                       {editingPost.image ? (
                         <div className="text-center">
@@ -721,10 +721,10 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     {/* Right side - Upload button */}
                     <div className="flex-1">
                       <label
-                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-blue-500 hover:border-blue-400 hover:bg-blue-900/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
+                        className={`h-16 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${theme === "dark" ? "border-gold-500 hover:border-blue-400 hover:bg-navy-950/20" : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"}`}
                       >
                         <svg
-                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                          className={`w-4 h-4 mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -737,7 +737,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                           />
                         </svg>
                         <span
-                          className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                          className={`text-xs font-medium ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                         >
                           Upload
                         </span>
@@ -760,13 +760,13 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
               <div className="flex space-x-3 mt-4">
                 <button
                   onClick={() => setEditingPost(null)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdatePost}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors text-sm"
                 >
                   Update Post
                 </button>
@@ -792,7 +792,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -801,7 +801,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     setShowDeleteModal(false);
                     setPostToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -848,7 +848,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
                     setShowDeleteModal(false);
                     setPostToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>

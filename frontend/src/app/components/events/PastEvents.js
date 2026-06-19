@@ -89,10 +89,10 @@ export default function PastEvents() {
 
   if (loading) {
     return (
-      <section id="past-events" className="py-16 px-4 bg-gray-50">
+      <section id="past-events" className="py-20 lg:py-28 px-4 bg-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading past events...</p>
           </div>
         </div>
@@ -102,18 +102,21 @@ export default function PastEvents() {
 
   if (pastEvents.length === 0) {
     return (
-      <section id="past-events" className="py-16 px-4 bg-gray-50">
+      <section id="past-events" className="py-20 lg:py-28 px-4 bg-blue-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <span className="inline-block text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">
+              Highlights
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-navy-950 mb-4">
               Past Events
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600">
               No past events to display at the moment.
             </p>
           </motion.div>
@@ -123,16 +126,21 @@ export default function PastEvents() {
   }
 
   return (
-    <section id="past-events" className="py-16 px-4 bg-gray-50">
+    <section id="past-events" className="py-20 lg:py-28 px-4 bg-blue-50">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center max-w-3xl mx-auto mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Past Events</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <span className="inline-block text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">
+            Highlights
+          </span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-navy-950 mb-4">
+            Past Events
+          </h2>
+          <p className="text-lg text-gray-600">
             Relive the powerful moments from our recent events — spiritual
             retreats, evangelism outreaches, and more.
           </p>
@@ -151,7 +159,7 @@ export default function PastEvents() {
             return (
               <motion.div
                 key={event.id}
-                className="w-80 bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0"
+                className="w-80 bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 border-t-4 border-gold-500"
                 whileHover={{ y: -10 }}
               >
                 <div className="relative h-80 w-full overflow-hidden rounded-t-xl">
@@ -171,7 +179,7 @@ export default function PastEvents() {
                 <div className="p-6">
                   <div className="flex items-center text-xs sm:text-sm text-gray-500 mb-2">
                     <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1"
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gold-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -188,13 +196,13 @@ export default function PastEvents() {
                     </span>
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-navy-950 mb-2">
                     {event.title}
                   </h3>
 
                   <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-3">
                     <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1"
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gold-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -221,7 +229,7 @@ export default function PastEvents() {
                       {event.description.length > 40 && (
                         <button
                           onClick={() => toggleExpanded(event.id)}
-                          className="inline-flex items-center justify-center w-6 h-6 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-all duration-200 group relative ml-2 -mt-2"
+                          className="inline-flex items-center justify-center w-6 h-6 text-gold-500 hover:text-navy-950 hover:bg-gold-100 rounded-full transition-all duration-200 group relative ml-2 -mt-2"
                         >
                           {isExpanded ? (
                             <ChevronUp className="w-4 h-4" />
@@ -239,7 +247,7 @@ export default function PastEvents() {
 
                   <div className="flex items-center text-xs sm:text-sm text-gray-500">
                     <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1"
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gold-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

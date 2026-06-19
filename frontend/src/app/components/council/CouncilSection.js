@@ -121,7 +121,7 @@ export default function CouncilSection() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-4 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-96 mx-auto animate-pulse"></div>
+            <div className="h-4 bg-gray-100 rounded w-96 mx-auto animate-pulse"></div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
@@ -132,8 +132,8 @@ export default function CouncilSection() {
                 <div className="h-56 bg-gray-300 animate-pulse"></div>
                 <div className="p-4 space-y-3">
                   <div className="h-4 bg-gray-300 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                  <div className="h-3 bg-gray-100 rounded animate-pulse"></div>
+                  <div className="h-3 bg-gray-100 rounded w-2/3 animate-pulse"></div>
                 </div>
               </div>
             ))}
@@ -161,13 +161,13 @@ export default function CouncilSection() {
     return (
       <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
             <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600">
               No council members available at the moment.
             </p>
             <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-navy-950">
                 <strong>Coming Soon:</strong> The council members profiles will
                 be available here. Stay tuned!
               </p>
@@ -182,7 +182,7 @@ export default function CouncilSection() {
     <section className="py-12 bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5">
-        <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-blue-600 mix-blend-multiply filter blur-xl"></div>
+        <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-gold-500 mix-blend-multiply filter blur-xl"></div>
         <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-purple-600 mix-blend-multiply filter blur-xl"></div>
       </div>
 
@@ -195,7 +195,7 @@ export default function CouncilSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          <h2 className="text-4xl font-bold text-navy-950 mb-4">
             Council Members
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -212,7 +212,7 @@ export default function CouncilSection() {
               className="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:bg-blue-50"
               aria-label="Previous set"
             >
-              <ChevronLeft className="w-5 h-5 text-blue-600" />
+              <ChevronLeft className="w-5 h-5 text-gold-500" />
             </button>
 
             <div className="flex space-x-2">
@@ -222,7 +222,7 @@ export default function CouncilSection() {
                   onClick={() => setCurrentSet(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-200 ${
                     index === currentSet
-                      ? "bg-blue-600 scale-110"
+                      ? "bg-gold-500 scale-110"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to set ${index + 1}`}
@@ -235,7 +235,7 @@ export default function CouncilSection() {
               className="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:bg-blue-50"
               aria-label="Next set"
             >
-              <ChevronRight className="w-5 h-5 text-blue-600" />
+              <ChevronRight className="w-5 h-5 text-gold-500" />
             </button>
           </div>
         )}
@@ -289,15 +289,15 @@ export default function CouncilSection() {
                               loading="lazy"
                             />
                             {/* Color overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-800/40 to-blue-700/20" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
                             {/* Text overlay with background */}
                             <div className="absolute bottom-0 top-[13rem] left-0 right-0 p-3 sm:p-4">
                               <div className="bg-white/60 backdrop-blur-md rounded-xl p-2 sm:p-3 shadow-lg border border-white/70">
-                                <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-1 line-clamp-1">
+                                <h3 className="text-sm sm:text-base font-bold text-navy-950 mb-1 line-clamp-1">
                                   {member.name}
                                 </h3>
-                                <p className="text-blue-600 font-semibold mb-1 sm:mb-2 text-[11px] sm:text-sm">
+                                <p className="text-gold-500 font-semibold mb-1 sm:mb-2 text-[11px] sm:text-sm">
                                   {member.position}
                                 </p>
                                 <p className="text-gray-700 font-medium text-[11px] mb-2">

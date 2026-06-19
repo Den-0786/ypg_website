@@ -9,7 +9,11 @@
 @layer base {
   :root {
     --color-background: #ffffff;
-    --color-foreground: #171717;
+    --color-foreground: #0a1025;
+    --brand-navy: #050817;
+    --brand-blue: #172554;
+    --brand-gold: #f59e0b;
+    --brand-gold-light: #fcd34d;
   }
 
   .dark {
@@ -30,7 +34,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     overflow-x: hidden;
   }
 

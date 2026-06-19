@@ -19,6 +19,7 @@ import PeopleManagement from "./components/PeopleManagement";
 import ContentManagement from "./components/ContentManagement";
 import VisionMissionManagement from "./components/VisionMissionManagement";
 import { getBaseUrl } from "../../utils/baseUrl";
+import { addAuditLog } from "../../utils/auditLog";
 import Settings from "./components/Settings";
 import AnalyticsSettings from "./components/AnalyticsSettings";
 import FinancialManagement from "./components/FinancialManagement";
@@ -29,6 +30,7 @@ import BranchPresidentsManagement from "./components/BranchPresidentsManagement"
 import CouncilManagement from "./components/CouncilManagement";
 import PastExecutivesManagement from "./components/PastExecutivesManagement";
 import AdvertisementManagement from "./components/AdvertisementManagement";
+import PinGuard from "./components/PinGuard";
 
 function AdminDashboardInner() {
   const router = useRouter();
@@ -76,6 +78,13 @@ function AdminDashboardInner() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [theme, setTheme] = useState("light");
+
+  const [pinGuard, setPinGuard] = useState({
+    open: false,
+    action: "",
+    onConfirm: null,
+    onCancel: null,
+  });
 
   // Function to handle tab changes with URL updates
   const handleTabChange = (newTab) => {
@@ -221,6 +230,127 @@ function AdminDashboardInner() {
       setTheme(savedTheme);
     }
   }, []);
+
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
+
+    window.fetch = async (input, init) => {
+      const url = typeof input === "string" ? input : input.url;
+      const method = (init?.method || "GET").toUpperCase();
+
+      if (
+        ["POST", "PUT", "DELETE", "PATCH"].includes(method) &&
+        url.startsWith(baseUrl)
+      ) {
+        const excluded = [
+          "/api/auth/",
+          "/api/settings/",
+          "/api/analytics/track",
+          "/api/donations/submit",
+          "/api/donations/process-payment",
+          "/api/contact",
+          "/api/ministry/register",
+        ];
+        if (!excluded.some((e) => url.includes(e))) {
+          const storedPin = localStorage.getItem("ypg_admin_pin");
+          const action = describeAction(url, method, init?.body);
+          if (storedPin) {
+            return new Promise((resolve, reject) => {
+              setPinGuard({
+                open: true,
+                action,
+                onConfirm: () => {
+                  setPinGuard((prev) => ({ ...prev, open: false }));
+                  originalFetch(input, init)
+                    .then((res) => {
+                      addAuditLog(action);
+                      resolve(res);
+                    })
+                    .catch(reject);
+                },
+                onCancel: () => {
+                  setPinGuard((prev) => ({ ...prev, open: false }));
+                  reject(new Error("Action cancelled"));
+                },
+              });
+            });
+          }
+          const res = await originalFetch(input, init);
+          addAuditLog(action);
+          return res;
+        }
+      }
+      return originalFetch(input, init);
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, []);
+
+  const getEntityNameFromBody = (body) => {
+    if (!body) return "";
+    if (typeof body === "string") {
+      try {
+        const parsed = JSON.parse(body);
+        return (
+          parsed.title ||
+          parsed.name ||
+          parsed.username ||
+          (parsed.description && parsed.description.slice(0, 40)) ||
+          ""
+        );
+      } catch {
+        return "";
+      }
+    }
+    if (body instanceof FormData) {
+      return (
+        body.get("title") ||
+        body.get("name") ||
+        body.get("username") ||
+        ""
+      );
+    }
+    return "";
+  };
+
+  const describeAction = (url, method, body) => {
+    const name = getEntityNameFromBody(body);
+    const path = new URL(url).pathname;
+    const segments = path.split("/").filter(Boolean);
+    const resource = segments[1] || "resource";
+    const resourceMap = {
+      team: "team member",
+      events: "event",
+      blog: "blog post",
+      testimonials: "testimonial",
+      gallery: "gallery item",
+      advertisements: "advertisement",
+      ystore: "Y-Store item",
+      council: "council member",
+      "past-executives": "past executive",
+      "branch-presidents": "branch president",
+      ministry: "ministry registration",
+      people: "person",
+      contact: "contact message",
+      donations: "donation",
+      finance: "finance record",
+      content: "content item",
+      vision: "vision/mission",
+    };
+    const label = resourceMap[resource] || resource;
+    const actionMap = {
+      POST: "Created",
+      PUT: "Updated",
+      DELETE: "Deleted",
+      PATCH: "Updated",
+    };
+    const action = actionMap[method.toUpperCase()] || method.toUpperCase();
+    return `${action} ${label}${name ? `: ${name}` : ""}`;
+  };
 
   const fetchData = async (endpoint, setter) => {
     try {
@@ -403,10 +533,10 @@ function AdminDashboardInner() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#050b2e] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400 mx-auto"></div>
+          <p className="mt-4 text-blue-100">Loading...</p>
         </div>
       </div>
     );
@@ -417,11 +547,14 @@ function AdminDashboardInner() {
   }
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-200 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
-      }`}
-    >
+    <div className="min-h-screen relative overflow-x-hidden bg-[#050b2e] text-white">
+      {/* Ambient background shapes */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-[120px]" />
+        <div className="absolute top-1/3 -right-32 w-[400px] h-[400px] rounded-full bg-gold-500/10 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/3 w-[600px] h-[600px] rounded-full bg-indigo-700/20 blur-[140px]" />
+      </div>
+
       {/* Header - Fixed at top */}
       <div className="fixed top-0 left-0 right-0 z-50">
         <Header
@@ -434,7 +567,7 @@ function AdminDashboardInner() {
       </div>
 
       {/* Main layout with top padding for header */}
-      <div className="flex pt-16">
+      <div className="flex pt-16 relative z-10">
         <div className="fixed left-0 top-16 bottom-0 z-[60]">
           <Sidebar
             sidebarOpen={sidebarOpen}
@@ -466,6 +599,7 @@ function AdminDashboardInner() {
               {activeTab === "overview" && (
                 <OverviewDashboard
                   stats={stats}
+                  analytics={analytics}
                   theme={theme}
                   setActiveTab={handleTabChange}
                   teamMembers={teamMembers}
@@ -583,7 +717,7 @@ function AdminDashboardInner() {
 
               {activeTab === "Settings" && (
                 <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  <h2 className="text-2xl font-bold text-navy-950 mb-4">
                     Settings
                   </h2>
                   <p className="text-gray-600">
@@ -602,6 +736,23 @@ function AdminDashboardInner() {
           onClose={() => setSettingsOpen(false)}
           theme={theme}
           setTheme={setTheme}
+        />
+      )}
+
+      {/* Global PIN Guard */}
+      {pinGuard.open && (
+        <PinGuard
+          isOpen={pinGuard.open}
+          onClose={() => {
+            pinGuard.onCancel?.();
+            setPinGuard((prev) => ({ ...prev, open: false }));
+          }}
+          onConfirm={() => {
+            pinGuard.onConfirm?.();
+            setPinGuard((prev) => ({ ...prev, open: false }));
+          }}
+          action={pinGuard.action}
+          theme={theme}
         />
       )}
     </div>

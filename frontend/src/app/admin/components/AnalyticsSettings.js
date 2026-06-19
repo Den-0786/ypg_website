@@ -29,13 +29,13 @@ export default function AnalyticsSettings({
         animate={{ opacity: 1 }}
         className="space-y-6"
       >
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-navy-950">
           Website Analytics
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-navy-950 mb-4">
               Visitor Statistics
             </h3>
             <div className="space-y-4">
@@ -55,7 +55,7 @@ export default function AnalyticsSettings({
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-navy-950 mb-4">
               Content Performance
             </h3>
             <div className="space-y-4">
@@ -85,14 +85,14 @@ export default function AnalyticsSettings({
         animate={{ opacity: 1 }}
         className="space-y-6"
       >
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-navy-950">
           Website Settings
         </h2>
 
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-6 space-y-6">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-navy-950 mb-4">
                 General Settings
               </h3>
               <div className="space-y-4">
@@ -106,7 +106,7 @@ export default function AnalyticsSettings({
                     onChange={(e) =>
                       setSettings({ ...settings, websiteTitle: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -119,7 +119,7 @@ export default function AnalyticsSettings({
                     onChange={(e) =>
                       setSettings({ ...settings, contactEmail: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -132,14 +132,14 @@ export default function AnalyticsSettings({
                     onChange={(e) =>
                       setSettings({ ...settings, phoneNumber: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   />
                 </div>
               </div>
             </div>
 
             <div className="pt-6 border-t">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-navy-950 mb-4">
                 Social Media
               </h3>
               <div className="space-y-4">
@@ -153,7 +153,7 @@ export default function AnalyticsSettings({
                     onChange={(e) =>
                       setSettings({ ...settings, facebookUrl: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -166,7 +166,7 @@ export default function AnalyticsSettings({
                     onChange={(e) =>
                       setSettings({ ...settings, instagramUrl: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function AnalyticsSettings({
             <div className="pt-6 border-t">
               <button
                 onClick={handleSaveSettings}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-gold-500 text-white px-6 py-2 rounded-lg hover:bg-gold-600 transition-colors"
               >
                 Save Settings
               </button>

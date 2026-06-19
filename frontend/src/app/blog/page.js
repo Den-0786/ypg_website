@@ -65,7 +65,7 @@ export default async function BlogListPage() {
                   <h2 className="text-lg font-semibold mb-2">
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="hover:text-blue-600"
+                      className="hover:text-gold-500"
                     >
                       {post.title}
                     </Link>

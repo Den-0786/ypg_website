@@ -144,11 +144,11 @@ export default function ContentManagement({
         className="space-y-6"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-navy-950">
             Events Management
           </h2>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
             onClick={() => setShowAddEvent(true)}
           >
             <Plus className="w-4 h-4 inline mr-2" />
@@ -183,7 +183,7 @@ export default function ContentManagement({
                   <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-lg font-bold leading-6 text-navy-950 mb-4"
                     >
                       Add Upcoming Event
                     </Dialog.Title>
@@ -195,7 +195,7 @@ export default function ContentManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newEvent.title}
                           onChange={(e) =>
                             setNewEvent({ ...newEvent, title: e.target.value })
@@ -209,7 +209,7 @@ export default function ContentManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newEvent.venue}
                           onChange={(e) =>
                             setNewEvent({ ...newEvent, venue: e.target.value })
@@ -223,7 +223,7 @@ export default function ContentManagement({
                         <div className="flex items-center gap-2">
                           {/* Left: Icon + Preview or No file chosen */}
                           <div className="flex items-center text-xs text-gray-500 min-w-[110px] max-w-[140px] truncate gap-1">
-                            <ImageIcon className="w-4 h-4 text-blue-400" />
+                            <ImageIcon className="w-4 h-4 text-gold-300" />
                             {newEvent.image ? (
                               <span>
                                 {typeof newEvent.image === "string"
@@ -235,7 +235,7 @@ export default function ContentManagement({
                             )}
                           </div>
                           {/* Right: Browse/Upload button */}
-                          <label className="px-2 py-1 rounded bg-blue-50 text-blue-600 font-semibold cursor-pointer text-xs hover:bg-blue-100 border border-blue-100">
+                          <label className="px-2 py-1 rounded bg-blue-50 text-gold-500 font-semibold cursor-pointer text-xs hover:bg-gold-100 border border-blue-100">
                             Upload
                             <input
                               type="file"
@@ -260,7 +260,7 @@ export default function ContentManagement({
                           <input
                             type="date"
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                             value={newEvent.startDate}
                             onChange={(e) =>
                               setNewEvent({
@@ -277,7 +277,7 @@ export default function ContentManagement({
                           <input
                             type="date"
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                             value={newEvent.endDate}
                             onChange={(e) =>
                               setNewEvent({
@@ -294,7 +294,7 @@ export default function ContentManagement({
                         </label>
                         <textarea
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           rows={3}
                           value={newEvent.description}
                           onChange={(e) =>
@@ -309,14 +309,14 @@ export default function ContentManagement({
                       <div className="flex justify-end gap-2 mt-6">
                         <button
                           type="button"
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowAddEvent(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                          className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                         >
                           Add Event
                         </button>
@@ -332,7 +332,7 @@ export default function ContentManagement({
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Event
@@ -358,7 +358,7 @@ export default function ContentManagement({
                 {events.map((event) => (
                   <tr key={event.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-navy-950">
                         {event.title}
                       </div>
                     </td>
@@ -369,8 +369,8 @@ export default function ContentManagement({
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           event.type === "upcoming"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-gold-100 text-navy-950"
+                            : "bg-blue-50 text-navy-950"
                         }`}
                       >
                         {event.type}
@@ -384,14 +384,14 @@ export default function ContentManagement({
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           event.status === "active"
                             ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            : "bg-blue-50 text-navy-950"
                         }`}
                       >
                         {event.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-3">
+                      <button className="text-gold-500 hover:text-navy-950 mr-3">
                         <Edit className="w-4 h-4" />
                       </button>
                       <button className="text-red-600 hover:text-red-900">
@@ -416,11 +416,11 @@ export default function ContentManagement({
         className="space-y-6"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-navy-950">
             Media Management
           </h2>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
             onClick={() => setShowAddMedia(true)}
           >
             <Upload className="w-4 h-4 inline mr-2" />
@@ -455,7 +455,7 @@ export default function ContentManagement({
                   <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-lg font-bold leading-6 text-navy-950 mb-4"
                     >
                       Add Media
                     </Dialog.Title>
@@ -465,7 +465,7 @@ export default function ContentManagement({
                           Media Type
                         </label>
                         <select
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newMedia.type}
                           onChange={(e) =>
                             setNewMedia({ ...newMedia, type: e.target.value })
@@ -483,9 +483,9 @@ export default function ContentManagement({
                           {/* Left: Icon + Preview or No file chosen */}
                           <div className="flex items-center text-xs text-gray-500 min-w-[110px] max-w-[140px] truncate gap-1">
                             {newMedia.type === "image" ? (
-                              <ImageIcon className="w-4 h-4 text-blue-400" />
+                              <ImageIcon className="w-4 h-4 text-gold-300" />
                             ) : (
-                              <VideoIcon className="w-4 h-4 text-blue-400" />
+                              <VideoIcon className="w-4 h-4 text-gold-300" />
                             )}
                             {newMedia.file ? (
                               <span>
@@ -498,7 +498,7 @@ export default function ContentManagement({
                             )}
                           </div>
                           {/* Right: Browse/Upload button */}
-                          <label className="px-2 py-1 rounded bg-blue-50 text-blue-600 font-semibold cursor-pointer text-xs hover:bg-blue-100 border border-blue-100">
+                          <label className="px-2 py-1 rounded bg-blue-50 text-gold-500 font-semibold cursor-pointer text-xs hover:bg-gold-100 border border-blue-100">
                             Upload
                             <input
                               type="file"
@@ -526,7 +526,7 @@ export default function ContentManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newMedia.title}
                           onChange={(e) =>
                             setNewMedia({ ...newMedia, title: e.target.value })
@@ -539,7 +539,7 @@ export default function ContentManagement({
                         </label>
                         <textarea
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           rows={2}
                           value={newMedia.description}
                           onChange={(e) =>
@@ -553,14 +553,14 @@ export default function ContentManagement({
                       <div className="flex justify-end gap-2 mt-6">
                         <button
                           type="button"
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowAddMedia(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                          className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                         >
                           Add Media
                         </button>
@@ -588,7 +588,7 @@ export default function ContentManagement({
                   />
                 ) : (
                   <div
-                    className={`h-full ${theme === "dark" ? "bg-gray-700" : "bg-gray-200"} flex items-center justify-center`}
+                    className={`h-full ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"} flex items-center justify-center`}
                   >
                     {item.category === "video" ? (
                       <Video
@@ -604,7 +604,7 @@ export default function ContentManagement({
               </div>
               <div className="p-4">
                 <h3
-                  className={`font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  className={`font-medium mb-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   {item.title}
                 </h3>
@@ -615,7 +615,7 @@ export default function ContentManagement({
                 </p>
                 {item.congregation && (
                   <p
-                    className={`text-xs mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                    className={`text-xs mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                   >
                     📍 {item.congregation}
                   </p>
@@ -629,7 +629,7 @@ export default function ContentManagement({
                 )}
                 <div className="flex space-x-2">
                   <button
-                    className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-900"}`}
+                    className={`${theme === "dark" ? "text-gold-300 hover:text-gold-300" : "text-gold-500 hover:text-navy-950"}`}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
@@ -649,7 +649,7 @@ export default function ContentManagement({
               key={item.id}
               className="min-w-[260px] bg-white rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden flex-shrink-0"
             >
-              <div className="aspect-video bg-gray-200 flex items-center justify-center">
+              <div className="aspect-video bg-gray-100 flex items-center justify-center">
                 {item.type === "video" ? (
                   <Video className="w-12 h-12 text-gray-400" />
                 ) : (
@@ -657,10 +657,10 @@ export default function ContentManagement({
                 )}
               </div>
               <div className="p-4">
-                <h3 className="font-medium text-gray-900 mb-2">{item.title}</h3>
+                <h3 className="font-medium text-navy-950 mb-2">{item.title}</h3>
                 <p className="text-sm text-gray-500 mb-3">{item.type}</p>
                 <div className="flex space-x-2">
-                  <button className="text-blue-600 hover:text-blue-900">
+                  <button className="text-gold-500 hover:text-navy-950">
                     <Edit className="w-4 h-4" />
                   </button>
                   <button className="text-red-600 hover:text-red-900">
@@ -683,9 +683,9 @@ export default function ContentManagement({
         className="space-y-6"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">Blog Posts</h2>
+          <h2 className="text-xl font-semibold text-navy-950">Blog Posts</h2>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
             onClick={() => setShowAddBlog(true)}
           >
             <BookOpen className="w-4 h-4 inline mr-2" />
@@ -720,7 +720,7 @@ export default function ContentManagement({
                   <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-lg font-bold leading-6 text-navy-950 mb-4"
                     >
                       Add Blog Post
                     </Dialog.Title>
@@ -732,7 +732,7 @@ export default function ContentManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newBlog.title}
                           onChange={(e) =>
                             setNewBlog({ ...newBlog, title: e.target.value })
@@ -746,7 +746,7 @@ export default function ContentManagement({
                         </label>
                         <textarea
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           rows={3}
                           value={newBlog.excerpt}
                           onChange={(e) =>
@@ -760,7 +760,7 @@ export default function ContentManagement({
                           Full Content
                         </label>
                         <textarea
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           rows={4}
                           value={newBlog.content}
                           onChange={(e) =>
@@ -776,7 +776,7 @@ export default function ContentManagement({
                           </label>
                           <input
                             type="text"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                             value={newBlog.author}
                             onChange={(e) =>
                               setNewBlog({ ...newBlog, author: e.target.value })
@@ -790,7 +790,7 @@ export default function ContentManagement({
                           </label>
                           <select
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                             value={newBlog.category}
                             onChange={(e) =>
                               setNewBlog({
@@ -820,7 +820,7 @@ export default function ContentManagement({
                         <input
                           type="date"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newBlog.date}
                           onChange={(e) =>
                             setNewBlog({ ...newBlog, date: e.target.value })
@@ -833,7 +833,7 @@ export default function ContentManagement({
                         </label>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-xs text-gray-500 min-w-[110px] max-w-[140px] truncate gap-1">
-                            <ImageIcon className="w-4 h-4 text-blue-400" />
+                            <ImageIcon className="w-4 h-4 text-gold-300" />
                             {newBlog.image ? (
                               <span>
                                 {typeof newBlog.image === "string"
@@ -844,7 +844,7 @@ export default function ContentManagement({
                               <span>No file chosen</span>
                             )}
                           </div>
-                          <label className="px-2 py-1 rounded bg-blue-50 text-blue-600 font-semibold cursor-pointer text-xs hover:bg-blue-100 border border-blue-100">
+                          <label className="px-2 py-1 rounded bg-blue-50 text-gold-500 font-semibold cursor-pointer text-xs hover:bg-gold-100 border border-blue-100">
                             Upload
                             <input
                               type="file"
@@ -863,14 +863,14 @@ export default function ContentManagement({
                       <div className="flex justify-end gap-2 mt-6">
                         <button
                           type="button"
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowAddBlog(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                          className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                         >
                           Add Blog Post
                         </button>
@@ -903,11 +903,11 @@ export default function ContentManagement({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-500">{post.date}</span>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                  <span className="text-xs bg-gold-100 text-navy-950 px-2 py-1 rounded-full">
                     {post.category}
                   </span>
                 </div>
-                <h4 className="font-bold text-gray-900 mb-1 text-base">
+                <h4 className="font-bold text-navy-950 mb-1 text-base">
                   {post.title}
                 </h4>
                 <p className="text-gray-700 text-sm line-clamp-3">
@@ -1004,7 +1004,7 @@ export default function ContentManagement({
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1013,7 +1013,7 @@ export default function ContentManagement({
                     setShowDeleteModal(false);
                     setItemToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1063,7 +1063,7 @@ export default function ContentManagement({
                     setShowDeleteModal(false);
                     setItemToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -1081,11 +1081,11 @@ export default function ContentManagement({
           className="space-y-6"
         >
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-navy-950">
               Events Management
             </h2>
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
               onClick={() => setShowAddEvent(true)}
             >
               <Plus className="w-4 h-4 inline mr-2" />
@@ -1097,7 +1097,7 @@ export default function ContentManagement({
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Event
@@ -1123,7 +1123,7 @@ export default function ContentManagement({
                   {visibleEvents.map((event) => (
                     <tr key={event.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-navy-950">
                           {event.title}
                         </div>
                       </td>
@@ -1134,8 +1134,8 @@ export default function ContentManagement({
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             event.type === "upcoming"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-gray-100 text-gray-800"
+                              ? "bg-gold-100 text-navy-950"
+                              : "bg-blue-50 text-navy-950"
                           }`}
                         >
                           {event.type}
@@ -1149,14 +1149,14 @@ export default function ContentManagement({
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             event.status === "active"
                               ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
+                              : "bg-blue-50 text-navy-950"
                           }`}
                         >
                           {event.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900 mr-3">
+                        <button className="text-gold-500 hover:text-navy-950 mr-3">
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
@@ -1182,11 +1182,11 @@ export default function ContentManagement({
           className="space-y-6"
         >
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-navy-950">
               Media Management
             </h2>
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
               onClick={() => setShowAddMedia(true)}
             >
               <Upload className="w-4 h-4 inline mr-2" />
@@ -1201,7 +1201,7 @@ export default function ContentManagement({
                 key={item.id}
                 className="bg-white rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden"
               >
-                <div className="aspect-video bg-gray-200 flex items-center justify-center">
+                <div className="aspect-video bg-gray-100 flex items-center justify-center">
                   {item.type === "video" ? (
                     <Video className="w-12 h-12 text-gray-400" />
                   ) : (
@@ -1209,12 +1209,12 @@ export default function ContentManagement({
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">
+                  <h3 className="font-medium text-navy-950 mb-2">
                     {item.title}
                   </h3>
                   <p className="text-sm text-gray-500 mb-3">{item.type}</p>
                   <div className="flex space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button className="text-gold-500 hover:text-navy-950">
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
@@ -1238,9 +1238,9 @@ export default function ContentManagement({
           className="space-y-6"
         >
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-900">Blog Posts</h2>
+            <h2 className="text-xl font-semibold text-navy-950">Blog Posts</h2>
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
               onClick={() => setShowAddBlog(true)}
             >
               <BookOpen className="w-4 h-4 inline mr-2" />
@@ -1269,11 +1269,11 @@ export default function ContentManagement({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-gray-500">{post.date}</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-gold-100 text-navy-950 px-2 py-1 rounded-full">
                       {post.category}
                     </span>
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1 text-base">
+                  <h4 className="font-bold text-navy-950 mb-1 text-base">
                     {post.title}
                   </h4>
                   <p className="text-gray-700 text-sm line-clamp-3">
@@ -1285,7 +1285,7 @@ export default function ContentManagement({
                     </p>
                   )}
                   <div className="flex space-x-2 mt-2">
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button className="text-gold-500 hover:text-navy-950">
                       <Edit className="w-4 h-4" />
                     </button>
                     <button

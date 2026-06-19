@@ -128,7 +128,7 @@ export default function CommunicationManagement({
     >
       <div className="flex justify-between items-center">
         <h2
-          className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
         >
           Contact Messages
         </h2>
@@ -142,8 +142,8 @@ export default function CommunicationManagement({
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
               className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                 showUnreadOnly
-                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                  : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                  ? "bg-gold-100 text-navy-950 dark:bg-navy-950 dark:text-gold-300"
+                  : "bg-blue-50 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
               }`}
             >
               {showUnreadOnly
@@ -181,7 +181,7 @@ export default function CommunicationManagement({
               <div>
                 <span
                   className={`text-sm font-medium ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
+                    theme === "dark" ? "text-white" : "text-navy-950"
                   }`}
                 >
                   {unreadMessages.length} unread message
@@ -213,7 +213,7 @@ export default function CommunicationManagement({
             className={`px-4 py-3 border-b ${
               theme === "dark"
                 ? "border-gray-700 bg-gray-700/50"
-                : "border-gray-200 bg-gray-50"
+                : "border-gray-200 bg-white"
             }`}
           >
             <div className="flex items-center justify-between">
@@ -236,7 +236,7 @@ export default function CommunicationManagement({
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   theme === "dark"
                     ? "bg-gray-600 hover:bg-gray-500 text-gray-300"
-                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    : "bg-gray-100 hover:bg-gray-300 text-gray-700"
                 }`}
               >
                 ← Back to All Messages
@@ -247,7 +247,7 @@ export default function CommunicationManagement({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead
-              className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}
+              className={`${theme === "dark" ? "bg-gray-700" : "bg-white"}`}
             >
               <tr>
                 <th
@@ -291,7 +291,7 @@ export default function CommunicationManagement({
                     <div className="flex flex-col items-center gap-3">
                       <div
                         className={`p-3 rounded-full ${
-                          theme === "dark" ? "bg-gray-700" : "bg-gray-100"
+                          theme === "dark" ? "bg-gray-700" : "bg-blue-50"
                         }`}
                       >
                         <MessageSquare
@@ -325,8 +325,8 @@ export default function CommunicationManagement({
                           onClick={() => setShowUnreadOnly(false)}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                             theme === "dark"
-                              ? "bg-blue-600 hover:bg-blue-700 text-white"
-                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                              ? "bg-gold-500 hover:bg-gold-600 text-white"
+                              : "bg-gold-500 hover:bg-gold-600 text-white"
                           }`}
                         >
                           ← View All Messages
@@ -339,10 +339,10 @@ export default function CommunicationManagement({
                 displayMessages.map((message) => (
                   <tr
                     key={message.id}
-                    className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}
+                    className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-white"}`}
                   >
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                      className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                     >
                       {message.name}
                     </td>
@@ -374,7 +374,7 @@ export default function CommunicationManagement({
                                 : "bg-green-100 text-green-800"
                               : theme === "dark"
                                 ? "bg-gray-700 text-gray-300"
-                                : "bg-gray-100 text-gray-800"
+                                : "bg-blue-50 text-navy-950"
                         }`}
                       >
                         {message.status}
@@ -385,11 +385,11 @@ export default function CommunicationManagement({
                         className={`mr-3 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                           message.status === "unread"
                             ? theme === "dark"
-                              ? "bg-blue-600 hover:bg-blue-700 text-white"
-                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                              ? "bg-gold-500 hover:bg-gold-600 text-white"
+                              : "bg-gold-500 hover:bg-gold-600 text-white"
                             : theme === "dark"
                               ? "bg-gray-600 hover:bg-gray-700 text-gray-300"
-                              : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                              : "bg-gray-100 hover:bg-gray-300 text-gray-700"
                         }`}
                         onClick={() => handleViewMessage(message)}
                         title="View full message"
@@ -460,15 +460,15 @@ export default function CommunicationManagement({
                           <div
                             className={`p-2 rounded-full ${
                               theme === "dark"
-                                ? "bg-blue-900/30"
-                                : "bg-blue-100"
+                                ? "bg-navy-950/30"
+                                : "bg-gold-100"
                             }`}
                           >
                             <Mail
                               className={`w-5 h-5 ${
                                 theme === "dark"
-                                  ? "text-blue-400"
-                                  : "text-blue-600"
+                                  ? "text-gold-300"
+                                  : "text-gold-500"
                               }`}
                             />
                           </div>
@@ -478,7 +478,7 @@ export default function CommunicationManagement({
                               className={`text-lg font-semibold ${
                                 theme === "dark"
                                   ? "text-white"
-                                  : "text-gray-900"
+                                  : "text-navy-950"
                               }`}
                             >
                               {selectedMessage.subject}
@@ -500,7 +500,7 @@ export default function CommunicationManagement({
                           className={`p-2 rounded-full transition-colors ${
                             theme === "dark"
                               ? "hover:bg-gray-700"
-                              : "hover:bg-gray-100"
+                              : "hover:bg-blue-50"
                           }`}
                         >
                           <X
@@ -515,7 +515,7 @@ export default function CommunicationManagement({
 
                       <div
                         className={`rounded-lg p-4 ${
-                          theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                          theme === "dark" ? "bg-gray-700/50" : "bg-white"
                         }`}
                       >
                         <h4
@@ -551,7 +551,7 @@ export default function CommunicationManagement({
                             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                               theme === "dark"
                                 ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                             }`}
                           >
                             Close
@@ -628,7 +628,7 @@ export default function CommunicationManagement({
                     <Dialog.Title
                       as="h3"
                       className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       Delete Message
@@ -647,7 +647,7 @@ export default function CommunicationManagement({
                   {messageToDelete && (
                     <div
                       className={`rounded-lg p-3 mb-6 ${
-                        theme === "dark" ? "bg-gray-700/50" : "bg-gray-50"
+                        theme === "dark" ? "bg-gray-700/50" : "bg-white"
                       }`}
                     >
                       <p
@@ -673,7 +673,7 @@ export default function CommunicationManagement({
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         theme === "dark"
                           ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-300"
                       }`}
                     >
                       Cancel

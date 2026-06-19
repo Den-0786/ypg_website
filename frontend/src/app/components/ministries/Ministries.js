@@ -231,7 +231,7 @@ export default function MinistriesSection() {
             transition={{ duration: 0.5 }}
             className="inline-block mb-4"
           >
-            <span className="text-lg font-medium text-blue-600 bg-blue-100 px-4 py-1 rounded-full">
+            <span className="text-lg font-medium text-gold-500 bg-gold-100 px-4 py-1 rounded-full">
               Find Your Calling
             </span>
           </motion.div>
@@ -240,9 +240,9 @@ export default function MinistriesSection() {
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl font-bold text-gray-900 mb-4"
+            className="text-4xl font-bold text-navy-950 mb-4"
           >
-            Our <span className="text-blue-600">Ministries</span>
+            Our <span className="text-gold-500">Ministries</span>
           </motion.h2>
 
           <motion.p
@@ -261,18 +261,18 @@ export default function MinistriesSection() {
             onClick={prevSlide}
             onMouseEnter={() => setAutoPlay(false)}
             onMouseLeave={() => setAutoPlay(true)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-blue-100 transition"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gold-100 transition"
           >
-            <span className="text-blue-600 font-bold">‹</span>
+            <span className="text-gold-500 font-bold">‹</span>
           </button>
 
           <button
             onClick={nextSlide}
             onMouseEnter={() => setAutoPlay(false)}
             onMouseLeave={() => setAutoPlay(true)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-blue-100 transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gold-100 transition"
           >
-            <span className="text-blue-600 font-bold">›</span>
+            <span className="text-gold-500 font-bold">›</span>
           </button>
 
           <div className="overflow-hidden">
@@ -302,7 +302,7 @@ export default function MinistriesSection() {
                       ></div>
 
                       <div className="relative bg-white rounded-[calc(1rem-2px)] p-6 h-full">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">
+                        <h3 className="text-xl font-bold text-navy-950 mb-3">
                           {ministry.name}
                         </h3>
                         <p className="text-gray-600 mb-4">
@@ -333,7 +333,7 @@ export default function MinistriesSection() {
                             onClick={() =>
                               toggleMinistryExpansion(ministry.name)
                             }
-                            className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center"
+                            className="text-sm font-medium text-gold-500 hover:text-navy-950 transition-colors flex items-center"
                           >
                             {expandedName === ministry.name
                               ? "Read Less"
@@ -374,7 +374,7 @@ export default function MinistriesSection() {
                   onClick={() => setCurrentIndex(idx)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     currentIndex === idx
-                      ? "bg-blue-600 w-6"
+                      ? "bg-gold-500 w-6"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to slide ${idx + 1}`}
@@ -390,18 +390,18 @@ export default function MinistriesSection() {
           transition={{ duration: 0.5 }}
         >
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl font-bold text-navy-950 mb-2">
               Ready to Join?
             </h3>
-            <p className="text-blue-600 font-medium">
+            <p className="text-gold-500 font-medium">
               Find purpose, community and growth
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h4 className="font-bold text-lg text-gray-800 mb-4 flex items-center">
-                <span className="bg-blue-100 text-blue-600 rounded-full p-2 mr-3">
+              <h4 className="font-bold text-lg text-navy-950 mb-4 flex items-center">
+                <span className="bg-gold-100 text-gold-500 rounded-full p-2 mr-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -486,8 +486,8 @@ export default function MinistriesSection() {
             </div>
 
             <div>
-              <h4 className="font-bold text-lg text-gray-800 mb-4 flex items-center">
-                <span className="bg-blue-100 text-blue-600 rounded-full p-2 mr-3">
+              <h4 className="font-bold text-lg text-navy-950 mb-4 flex items-center">
+                <span className="bg-gold-100 text-gold-500 rounded-full p-2 mr-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -514,7 +514,7 @@ export default function MinistriesSection() {
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
+                  className="w-full bg-gradient-to-r from-gold-500 to-gold-500 text-white py-3 px-6 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
                   onClick={() => setShowRegistrationModal(true)}
                 >
                   Register Interest
@@ -557,7 +557,7 @@ export default function MinistriesSection() {
                 <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                    className="text-lg font-bold leading-6 text-navy-950 mb-4"
                   >
                     Ministry Registration
                   </Dialog.Title>
@@ -572,7 +572,7 @@ export default function MinistriesSection() {
                       <input
                         type="text"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={registrationForm.name}
                         onChange={(e) =>
                           setRegistrationForm({
@@ -589,7 +589,7 @@ export default function MinistriesSection() {
                       <input
                         type="email"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={registrationForm.email}
                         onChange={(e) =>
                           setRegistrationForm({
@@ -606,7 +606,7 @@ export default function MinistriesSection() {
                       <input
                         type="tel"
                         required
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700 ${
                           phoneError ? "border-red-500" : "border-gray-300"
                         }`}
                         value={registrationForm.phone}
@@ -635,7 +635,7 @@ export default function MinistriesSection() {
                       <input
                         type="text"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={registrationForm.congregation}
                         onChange={(e) =>
                           setRegistrationForm({
@@ -651,7 +651,7 @@ export default function MinistriesSection() {
                       </label>
                       <select
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                         value={registrationForm.ministry}
                         onChange={(e) =>
                           setRegistrationForm({
@@ -672,14 +672,14 @@ export default function MinistriesSection() {
                     <div className="flex justify-end gap-2 mt-6">
                       <button
                         type="button"
-                        className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                         onClick={() => setShowRegistrationModal(false)}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                        className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                       >
                         Submit Registration
                       </button>
@@ -723,9 +723,9 @@ export default function MinistriesSection() {
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <div className="flex items-center mb-4">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-100">
                       <svg
-                        className="h-6 w-6 text-blue-600"
+                        className="h-6 w-6 text-gold-500"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
@@ -741,7 +741,7 @@ export default function MinistriesSection() {
                   </div>
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-bold leading-6 text-gray-900 text-center mb-2"
+                    className="text-lg font-bold leading-6 text-navy-950 text-center mb-2"
                   >
                     Confirm Registration
                   </Dialog.Title>
@@ -754,14 +754,14 @@ export default function MinistriesSection() {
                   <div className="mt-6 flex justify-center gap-3">
                     <button
                       type="button"
-                      className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                      className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100 transition-colors"
                       onClick={() => setShowConfirmModal(false)}
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
-                      className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+                      className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600 transition-colors"
                       onClick={confirmRegistration}
                     >
                       Confirm Registration

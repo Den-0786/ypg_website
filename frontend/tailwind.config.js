@@ -8,47 +8,39 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Blue scale mapped to brand amber/orange primary
+        // Royal / Navy blue palette for structural backgrounds and headings
         blue: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
+        },
+        // Vibrant gold palette for accents, buttons, highlights
+        gold: {
           50: '#fffbeb',
           100: '#fef3c7',
           200: '#fde68a',
           300: '#fcd34d',
           400: '#fbbf24',
-          500: '#f59e0b',  // brand-primary base
-          600: '#d97706',  // brand-primary dark (buttons)
+          500: '#f59e0b',
+          600: '#d97706',
           700: '#b45309',
           800: '#92400e',
           900: '#78350f',
         },
-        // Gray dark colors mapped to brand navy/slate
-        gray: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#0f172a',  // brand-dark (hero bg, footer, dark mode)
-          900: '#020617',
-          950: '#0f172a',  // brand-dark alias
+        // Deep navy for the darkest brand surfaces
+        navy: {
+          900: '#0a1025',
+          950: '#050817',
         },
-        // Teal scale for brand teal accent
-        teal: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',  // brand-teal base
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
-        },
-        // Legacy primary mapped to brand colors
+        // Legacy primary mapped to gold
         primary: {
           50: '#fffbeb',
           100: '#fef3c7',

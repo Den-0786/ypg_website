@@ -3,7 +3,6 @@ import { buildImageSrc } from "../../../utils/config";
 import { Users, Plus, Edit, Trash2, X, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-
 const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
   const [newMember, setNewMember] = useState({
     name: "",
@@ -179,15 +178,15 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
   };
 
   return (
-    <div className={`p-6 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>
+    <div className={`p-6 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Executive Management</h2>
         <button
           onClick={() => setIsModalOpen(true)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             theme === "dark"
-              ? "bg-blue-600 hover:bg-blue-700 text-white"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
+              ? "bg-gold-500 hover:bg-gold-600 text-white"
+              : "bg-gold-500 hover:bg-gold-500 text-white"
           }`}
         >
           Add District Executive
@@ -250,8 +249,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 onClick={() => openEditModal(member)}
                 className={`px-3 py-1 text-sm rounded transition-colors ${
                   theme === "dark"
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                    ? "bg-gold-500 hover:bg-gold-600 text-white"
+                    : "bg-gold-500 hover:bg-gold-500 text-white"
                 }`}
               >
                 Edit
@@ -397,8 +396,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   } ${
                     theme === "dark"
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                      ? "bg-gold-500 hover:bg-gold-600 text-white"
+                      : "bg-gold-500 hover:bg-gold-500 text-white"
                   }`}
                 >
                   {isLoading ? "Adding..." : "Add Executive"}
@@ -547,8 +546,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   } ${
                     theme === "dark"
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                      ? "bg-gold-500 hover:bg-gold-600 text-white"
+                      : "bg-gold-500 hover:bg-gold-500 text-white"
                   }`}
                 >
                   {isLoading ? "Updating..." : "Update Executive"}
@@ -581,7 +580,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
             <div className="flex items-center justify-between mb-4">
               <h3
                 className={`text-lg font-semibold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
+                  theme === "dark" ? "text-white" : "text-navy-950"
                 }`}
               >
                 Confirm Deletion
@@ -594,7 +593,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 className={`p-1 rounded-lg transition-colors ${
                   theme === "dark"
                     ? "hover:bg-gray-700 text-white"
-                    : "hover:bg-gray-100 text-gray-800"
+                    : "hover:bg-blue-50 text-navy-950"
                 }`}
               >
                 <X className="w-4 h-4" />
@@ -614,7 +613,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 className={`flex-1 px-4 py-2 border rounded-lg transition-colors text-sm ${
                   theme === "dark"
                     ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                    : "border-gray-300 text-gray-700 hover:bg-white"
                 }`}
               >
                 Cancel

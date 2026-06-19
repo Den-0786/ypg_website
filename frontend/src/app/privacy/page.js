@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16"
+        className="bg-gradient-to-r from-gold-500 to-purple-600 text-white py-16"
       >
         <div className="container mx-auto px-4">
           <Link
@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
       >
         <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 md:p-12">
           <div className="prose prose-lg max-w-none">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               1. Information We Collect
             </h2>
             <p className="text-gray-600 mb-6">
@@ -48,7 +48,7 @@ export default function PrivacyPolicy() {
               information.
             </p>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               2. How We Use Your Information
             </h2>
             <p className="text-gray-600 mb-4">
@@ -62,7 +62,7 @@ export default function PrivacyPolicy() {
               <li>Improve our website and services</li>
             </ul>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               3. Information Sharing
             </h2>
             <p className="text-gray-600 mb-6">
@@ -71,7 +71,7 @@ export default function PrivacyPolicy() {
               described in this policy or as required by law.
             </p>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               4. Data Security
             </h2>
             <p className="text-gray-600 mb-6">
@@ -80,7 +80,7 @@ export default function PrivacyPolicy() {
               disclosure, or destruction.
             </p>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               5. Cookies and Tracking
             </h2>
             <p className="text-gray-600 mb-6">
@@ -88,7 +88,7 @@ export default function PrivacyPolicy() {
               your browsing experience and analyze website traffic.
             </p>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               6. Your Rights
             </h2>
             <p className="text-gray-600 mb-6">
@@ -97,7 +97,7 @@ export default function PrivacyPolicy() {
               us at any time.
             </p>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            <h2 className="text-3xl font-bold text-navy-950 mb-6">
               7. Changes to This Policy
             </h2>
             <p className="text-gray-600 mb-6">
@@ -106,14 +106,14 @@ export default function PrivacyPolicy() {
             </p>
 
             <div className="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-200">
-              <h3 className="text-xl font-semibold text-blue-800 mb-3">
+              <h3 className="text-xl font-semibold text-navy-950 mb-3">
                 Contact Us
               </h3>
-              <p className="text-blue-700">
+              <p className="text-navy-950">
                 If you have any questions about this Privacy Policy, please
                 contact us at:
               </p>
-              <p className="text-blue-700 mt-2">
+              <p className="text-navy-950 mt-2">
                 Email: ahinsandistrictypg@gmail.com
                 <br />
                 Phone: +233 531427671

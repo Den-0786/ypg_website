@@ -98,7 +98,7 @@ export default function WelfareSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+          <h2 className="text-5xl font-bold bg-gradient-to-r from-gold-500 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
             YPG Welfare Program
           </h2>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
@@ -123,7 +123,7 @@ export default function WelfareSection() {
               transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
               className="bg-white rounded-2xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             >
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              <h3 className="text-xl font-semibold text-navy-950 mb-4">
                 {benefit.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">
@@ -138,7 +138,7 @@ export default function WelfareSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl px-4 py-6 md:px-6 md:py-8 mb-8 text-white"
+          className="bg-gradient-to-r from-gold-500 to-purple-600 rounded-3xl px-4 py-6 md:px-6 md:py-8 mb-8 text-white"
         >
           <div className="max-w-4xl mx-auto text-center">
             <h3 className="text-3xl md:text-4xl font-bold mb-4">
@@ -202,7 +202,7 @@ export default function WelfareSection() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+              <div className="bg-gradient-to-r from-gold-500 to-purple-600 text-white p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-2xl font-bold">
@@ -230,19 +230,19 @@ export default function WelfareSection() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-200"
+                      className="bg-white rounded-2xl overflow-hidden border border-gray-200"
                     >
                       <button
                         onClick={() =>
                           setOpenFaq(openFaq === index ? null : index)
                         }
-                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-100 transition"
+                        className="w-full p-6 text-left flex items-center justify-between hover:bg-blue-50 transition"
                       >
-                        <h4 className="text-lg font-semibold text-gray-800 pr-4">
+                        <h4 className="text-lg font-semibold text-navy-950 pr-4">
                           {faq.question}
                         </h4>
                         {openFaq === index ? (
-                          <ChevronUp className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                          <ChevronUp className="w-6 h-6 text-gold-500 flex-shrink-0" />
                         ) : (
                           <ChevronDown className="w-6 h-6 text-gray-400 flex-shrink-0" />
                         )}
@@ -266,7 +266,7 @@ export default function WelfareSection() {
               </div>
 
               {/* Modal Footer */}
-              <div className="bg-gray-50 p-6 border-t border-gray-200">
+              <div className="bg-white p-6 border-t border-gray-200">
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
                     Still have questions? Contact our welfare committee for more
@@ -274,7 +274,7 @@ export default function WelfareSection() {
                   </p>
                   <button
                     onClick={() => setShowFaqModal(false)}
-                    className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transition"
+                    className="px-8 py-3 bg-gradient-to-r from-gold-500 to-purple-600 text-white font-semibold rounded-full hover:from-gold-600 hover:to-purple-700 transition"
                   >
                     Close
                   </button>

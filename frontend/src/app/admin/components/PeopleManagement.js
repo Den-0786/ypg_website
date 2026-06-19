@@ -357,11 +357,11 @@ export default function PeopleManagement({
         className="space-y-6"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-navy-950">
             Team Management
           </h2>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
             onClick={() => {
               setEditingTeamMember(null);
               setNewTeamMember({
@@ -411,7 +411,7 @@ export default function PeopleManagement({
                   <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-lg font-bold leading-6 text-navy-950 mb-4"
                     >
                       {editingTeamMember
                         ? "Edit Team Member"
@@ -432,7 +432,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newTeamMember.name}
                           onChange={(e) =>
                             setNewTeamMember({
@@ -449,7 +449,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newTeamMember.role}
                           onChange={(e) =>
                             setNewTeamMember({
@@ -465,7 +465,7 @@ export default function PeopleManagement({
                         </label>
                         <input
                           type="tel"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newTeamMember.phone}
                           onChange={(e) =>
                             setNewTeamMember({
@@ -480,7 +480,7 @@ export default function PeopleManagement({
                           Quote
                         </label>
                         <textarea
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           rows={3}
                           value={newTeamMember.quote}
                           onChange={(e) =>
@@ -497,7 +497,7 @@ export default function PeopleManagement({
                         </label>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-xs text-gray-500 min-w-[110px] max-w-[140px] truncate gap-1">
-                            <Users className="w-4 h-4 text-blue-400" />
+                            <Users className="w-4 h-4 text-gold-300" />
                             {newTeamMember.image ? (
                               <span>
                                 {typeof newTeamMember.image === "string"
@@ -508,7 +508,7 @@ export default function PeopleManagement({
                               <span>No file chosen</span>
                             )}
                           </div>
-                          <label className="px-2 py-1 rounded bg-blue-50 text-blue-600 font-semibold cursor-pointer text-xs hover:bg-blue-100 border border-blue-100">
+                          <label className="px-2 py-1 rounded bg-blue-50 text-gold-500 font-semibold cursor-pointer text-xs hover:bg-gold-100 border border-blue-100">
                             Upload
                             <input
                               type="file"
@@ -527,14 +527,14 @@ export default function PeopleManagement({
                       <div className="flex justify-end gap-2 mt-6">
                         <button
                           type="button"
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowAddTeamMember(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                          className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                         >
                           {editingTeamMember ? "Update" : "Add"} Team Member
                         </button>
@@ -551,10 +551,10 @@ export default function PeopleManagement({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teamMembers.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center">
                 <Users className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-navy-950 mb-2">
                 No Team Members Yet
               </h3>
               <p className="text-gray-500 mb-6">
@@ -562,7 +562,7 @@ export default function PeopleManagement({
                 will appear here once added.
               </p>
               <button
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
                 onClick={() => {
                   setEditingTeamMember(null);
                   setNewTeamMember({
@@ -586,7 +586,7 @@ export default function PeopleManagement({
                 className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden`}
               >
                 <div
-                  className={`aspect-square ${theme === "dark" ? "bg-gray-700" : "bg-gray-200"} flex items-center justify-center`}
+                  className={`aspect-square ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"} flex items-center justify-center`}
                 >
                   {member.image ? (
                     <img
@@ -602,12 +602,12 @@ export default function PeopleManagement({
                 </div>
                 <div className="p-4">
                   <h3
-                    className={`font-bold mb-1 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                    className={`font-bold mb-1 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                   >
                     {member.name}
                   </h3>
                   <p
-                    className={`${theme === "dark" ? "text-blue-400" : "text-blue-600"} font-medium mb-2`}
+                    className={`${theme === "dark" ? "text-gold-300" : "text-gold-500"} font-medium mb-2`}
                   >
                     {member.role}
                   </p>
@@ -627,7 +627,7 @@ export default function PeopleManagement({
                   )}
                   <div className="flex space-x-2 mt-3">
                     <button
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-gold-500 hover:text-navy-950"
                       onClick={() => {
                         setEditingTeamMember(member);
                         setNewTeamMember({
@@ -666,11 +666,11 @@ export default function PeopleManagement({
         className="space-y-6"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-navy-950">
             Testimonial Management
           </h2>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
             onClick={() => {
               setEditingTestimonial(null);
               setNewTestimonial({
@@ -720,7 +720,7 @@ export default function PeopleManagement({
                   <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-lg font-bold leading-6 text-navy-950 mb-4"
                     >
                       {editingTestimonial
                         ? "Edit Testimonial"
@@ -741,7 +741,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newTestimonial.name}
                           onChange={(e) =>
                             setNewTestimonial({
@@ -758,7 +758,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newTestimonial.role}
                           onChange={(e) =>
                             setNewTestimonial({
@@ -774,7 +774,7 @@ export default function PeopleManagement({
                         </label>
                         <textarea
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           rows={4}
                           value={newTestimonial.quote}
                           onChange={(e) =>
@@ -792,7 +792,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newTestimonial.highlight}
                           onChange={(e) =>
                             setNewTestimonial({
@@ -808,7 +808,7 @@ export default function PeopleManagement({
                         </label>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-xs text-gray-500 min-w-[110px] max-w-[140px] truncate gap-1">
-                            <MessageCircle className="w-4 h-4 text-blue-400" />
+                            <MessageCircle className="w-4 h-4 text-gold-300" />
                             {newTestimonial.image ? (
                               <span>
                                 {typeof newTestimonial.image === "string"
@@ -819,7 +819,7 @@ export default function PeopleManagement({
                               <span>No file chosen</span>
                             )}
                           </div>
-                          <label className="px-2 py-1 rounded bg-blue-50 text-blue-600 font-semibold cursor-pointer text-xs hover:bg-blue-100 border border-blue-100">
+                          <label className="px-2 py-1 rounded bg-blue-50 text-gold-500 font-semibold cursor-pointer text-xs hover:bg-gold-100 border border-blue-100">
                             Upload
                             <input
                               type="file"
@@ -838,14 +838,14 @@ export default function PeopleManagement({
                       <div className="flex justify-end gap-2 mt-6">
                         <button
                           type="button"
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowAddTestimonial(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                          className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                         >
                           {editingTestimonial ? "Update" : "Add"} Testimonial
                         </button>
@@ -862,10 +862,10 @@ export default function PeopleManagement({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.length === 0 ? (
             <div className="text-center py-12 col-span-full">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center">
                 <MessageCircle className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-navy-950 mb-2">
                 No Testimonials Yet
               </h3>
               <p className="text-gray-500 mb-6">
@@ -873,7 +873,7 @@ export default function PeopleManagement({
                 stories can inspire others to join your community.
               </p>
               <button
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
                 onClick={() => {
                   setEditingTestimonial(null);
                   setNewTestimonial({
@@ -909,15 +909,15 @@ export default function PeopleManagement({
                         className="w-14 h-14 object-cover rounded-full border-2 border-white shadow-md"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
                         <MessageCircle className="w-6 h-6 text-gray-400" />
                       </div>
                     )}
                     <div className="ml-4">
-                      <h3 className="font-bold text-gray-900">
+                      <h3 className="font-bold text-navy-950">
                         {testimonial.name}
                       </h3>
-                      <p className="text-blue-600 text-sm">
+                      <p className="text-gold-500 text-sm">
                         {testimonial.role}
                       </p>
                     </div>
@@ -926,13 +926,13 @@ export default function PeopleManagement({
                     <p className="text-gray-700 text-sm italic line-clamp-3">
                       &quot;{testimonial.quote}&quot;
                     </p>
-                    <p className="text-blue-600 font-medium text-sm mt-2">
+                    <p className="text-gold-500 font-medium text-sm mt-2">
                       &quot;{testimonial.highlight}&quot;
                     </p>
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-gold-500 hover:text-navy-950"
                       onClick={() => {
                         setEditingTestimonial(testimonial);
                         setNewTestimonial({
@@ -971,11 +971,11 @@ export default function PeopleManagement({
         className="space-y-6"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-navy-950">
             Ministry Registrations
           </h2>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
             onClick={() => {
               setEditingMinistryRegistration(null);
               setNewMinistryRegistration({
@@ -1024,7 +1024,7 @@ export default function PeopleManagement({
                   <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold leading-6 text-gray-900 mb-4"
+                      className="text-lg font-bold leading-6 text-navy-950 mb-4"
                     >
                       {editingMinistryRegistration
                         ? "Edit Ministry Registration"
@@ -1045,7 +1045,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newMinistryRegistration.name}
                           onChange={(e) =>
                             setNewMinistryRegistration({
@@ -1062,7 +1062,7 @@ export default function PeopleManagement({
                         <input
                           type="tel"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newMinistryRegistration.phone}
                           onChange={(e) =>
                             setNewMinistryRegistration({
@@ -1079,7 +1079,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newMinistryRegistration.congregation}
                           onChange={(e) =>
                             setNewMinistryRegistration({
@@ -1096,7 +1096,7 @@ export default function PeopleManagement({
                         <input
                           type="text"
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                           value={newMinistryRegistration.ministry}
                           onChange={(e) =>
                             setNewMinistryRegistration({
@@ -1109,14 +1109,14 @@ export default function PeopleManagement({
                       <div className="flex justify-end gap-2 mt-6">
                         <button
                           type="button"
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded-lg bg-blue-50 text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowAddMinistryRegistration(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                          className="px-6 py-2 rounded-lg bg-gold-500 text-white font-semibold hover:bg-gold-600"
                         >
                           {editingMinistryRegistration ? "Update" : "Add"}{" "}
                           Registration
@@ -1134,7 +1134,7 @@ export default function PeopleManagement({
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name
@@ -1159,7 +1159,7 @@ export default function PeopleManagement({
               <tbody className="bg-white divide-y divide-gray-200">
                 {ministryRegistrations.map((registration) => (
                   <tr key={registration.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy-950">
                       {registration.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1176,7 +1176,7 @@ export default function PeopleManagement({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        className="text-blue-600 hover:text-blue-900 mr-3"
+                        className="text-gold-500 hover:text-navy-950 mr-3"
                         onClick={() => {
                           setEditingMinistryRegistration(registration);
                           setNewMinistryRegistration({
@@ -1227,7 +1227,7 @@ export default function PeopleManagement({
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1236,7 +1236,7 @@ export default function PeopleManagement({
                     setShowDeleteTeamModal(false);
                     setTeamMemberToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1284,7 +1284,7 @@ export default function PeopleManagement({
                     setShowDeleteTeamModal(false);
                     setTeamMemberToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -1310,7 +1310,7 @@ export default function PeopleManagement({
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1319,7 +1319,7 @@ export default function PeopleManagement({
                     setShowDeleteTestimonialModal(false);
                     setTestimonialToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1367,7 +1367,7 @@ export default function PeopleManagement({
                     setShowDeleteTestimonialModal(false);
                     setTestimonialToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -1393,7 +1393,7 @@ export default function PeopleManagement({
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1402,7 +1402,7 @@ export default function PeopleManagement({
                     setShowDeleteRegistrationModal(false);
                     setRegistrationToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1450,7 +1450,7 @@ export default function PeopleManagement({
                     setShowDeleteRegistrationModal(false);
                     setRegistrationToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>

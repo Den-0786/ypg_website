@@ -106,7 +106,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
               <span className="text-green-600 text-xs font-bold">✓</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-navy-950">
                 Testimonial Submitted!
               </p>
               <p className="text-sm text-gray-600">
@@ -145,7 +145,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
               <span className="text-red-600 text-xs font-bold">!</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Submission Failed</p>
+              <p className="font-semibold text-navy-950">Submission Failed</p>
               <p className="text-sm text-gray-600">
                 Please try again or contact us directly.
               </p>
@@ -193,7 +193,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                 errors.name ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Enter your full name"
@@ -214,7 +214,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                 errors.phone ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Enter your phone number"
@@ -235,7 +235,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
               name="congregation"
               value={formData.congregation}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition ${
                 errors.congregation ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Enter your congregation"
@@ -257,7 +257,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
             value={formData.content}
             onChange={handleChange}
             rows={6}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition resize-none ${
               errors.content ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="Share your experience with YPG. Tell us how it has impacted your life, what you've learned, or how it has helped you grow spiritually..."
@@ -288,7 +288,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
             />
             <label
               htmlFor="image-upload"
-              className="flex items-center px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition"
+              className="flex items-center px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-white transition"
             >
               <Camera className="w-5 h-5 mr-2 text-gray-500" />
               Choose Photo
@@ -317,7 +317,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition"
           >
             Cancel
           </button>
@@ -326,7 +326,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
             disabled={isSubmitting}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit Testimonial"}
           </motion.button>

@@ -427,12 +427,12 @@ export default function YStoreManagement({ theme }) {
   };
 
   return (
-    <div className={`p-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+    <div className={`p-6 ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
         <div className="flex-1">
           <h1 className="text-3xl font-bold flex items-center">
-            <ShoppingCart className="w-8 h-8 mr-3 text-blue-600" />
+            <ShoppingCart className="w-8 h-8 mr-3 text-gold-500" />
             Y-Store Management
           </h1>
           <p
@@ -443,7 +443,7 @@ export default function YStoreManagement({ theme }) {
         </div>
         <button
           onClick={() => openModal()}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors self-start lg:self-auto"
+          className="bg-gold-500 hover:bg-gold-600 text-white px-6 py-3 rounded-lg flex items-center transition-colors self-start lg:self-auto"
         >
           <Plus className="w-5 h-5 mr-2" />
           Add New Item
@@ -460,7 +460,7 @@ export default function YStoreManagement({ theme }) {
           }`}
         >
           <div className="flex items-center">
-            <Package className="w-8 h-8 text-blue-600 mr-3" />
+            <Package className="w-8 h-8 text-gold-500 mr-3" />
             <div>
               <p
                 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
@@ -527,7 +527,7 @@ export default function YStoreManagement({ theme }) {
           }`}
         >
           <div className="flex items-center">
-            <DollarSign className="w-8 h-8 text-yellow-600 mr-3" />
+            <DollarSign className="w-8 h-8 text-gold-500 mr-3" />
             <div>
               <p
                 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
@@ -564,7 +564,7 @@ export default function YStoreManagement({ theme }) {
             }`}
           >
             {/* Item Image */}
-            <div className="relative h-48 bg-gray-200">
+            <div className="relative h-48 bg-gray-100">
               <img
                 src={
                   item.image
@@ -604,7 +604,7 @@ export default function YStoreManagement({ theme }) {
                     {item.description}
                   </p>
                 </div>
-                <span className="text-blue-600 font-bold text-sm ml-2">
+                <span className="text-gold-500 font-bold text-sm ml-2">
                   ₵{item.price}
                   {item.pricingUnit ? ` ${item.pricingUnit}` : ""}
                 </span>
@@ -631,7 +631,7 @@ export default function YStoreManagement({ theme }) {
               </div>
 
               {/* Contact Info */}
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <div className="mb-4 p-3 bg-white rounded-lg">
                 <div className="flex items-center">
                   <Phone className="w-3 h-3 mr-2 text-gray-500" />
                   <span className="text-xs text-gray-600">
@@ -644,7 +644,7 @@ export default function YStoreManagement({ theme }) {
               <div className="flex space-x-2">
                 <button
                   onClick={() => openModal(item)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors"
+                  className="flex-1 bg-gold-500 hover:bg-gold-600 text-white px-3 py-2 rounded-lg text-sm transition-colors"
                 >
                   <Edit className="w-4 h-4 mr-1 inline" />
                   Edit
@@ -654,7 +654,7 @@ export default function YStoreManagement({ theme }) {
                   className={`flex-1 px-3 py-2 rounded-lg text-sm transition-colors ${
                     item.isOutOfStock
                       ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "bg-yellow-600 hover:bg-yellow-700 text-white"
+                      : "bg-yellow-600 hover:bg-gold-600 text-white"
                   }`}
                 >
                   {item.isOutOfStock ? "Restock" : "Mark Out"}
@@ -697,16 +697,16 @@ export default function YStoreManagement({ theme }) {
                   <div className="flex items-center space-x-3">
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
+                        theme === "dark" ? "bg-navy-950/30" : "bg-gold-100"
                       }`}
                     >
                       <ShoppingCart
-                        className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                        className={`w-5 h-5 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                       />
                     </div>
                     <div>
                       <h2
-                        className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                        className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                       >
                         {editingItem ? "Edit Store Item" : "Add New Store Item"}
                       </h2>
@@ -724,7 +724,7 @@ export default function YStoreManagement({ theme }) {
                     className={`p-2 rounded-lg transition-colors ${
                       theme === "dark"
                         ? "hover:bg-gray-700"
-                        : "hover:bg-gray-100"
+                        : "hover:bg-blue-50"
                     }`}
                   >
                     <X className="w-5 h-5" />
@@ -747,10 +747,10 @@ export default function YStoreManagement({ theme }) {
                           setFormData({ ...formData, name: e.target.value })
                         }
                         placeholder="Enter item name"
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                         }`}
                         required
                       />
@@ -768,10 +768,10 @@ export default function YStoreManagement({ theme }) {
                           setFormData({ ...formData, price: e.target.value })
                         }
                         placeholder="70"
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                         }`}
                         required
                       />
@@ -792,10 +792,10 @@ export default function YStoreManagement({ theme }) {
                           })
                         }
                         placeholder="per yard, per piece, etc."
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                         }`}
                       />
                     </div>
@@ -812,10 +812,10 @@ export default function YStoreManagement({ theme }) {
                           setFormData({ ...formData, contact: e.target.value })
                         }
                         placeholder="0xxxxxxxxx"
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                         }`}
                       />
                     </div>
@@ -837,10 +837,10 @@ export default function YStoreManagement({ theme }) {
                       }
                       placeholder="Describe your item..."
                       rows={3}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                         theme === "dark"
                           ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                          : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                          : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                       }`}
                       required
                     />
@@ -866,10 +866,10 @@ export default function YStoreManagement({ theme }) {
                         }
                         min="0"
                         placeholder="0"
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                         }`}
                       />
                     </div>
@@ -884,10 +884,10 @@ export default function YStoreManagement({ theme }) {
                         onChange={(e) =>
                           setFormData({ ...formData, category: e.target.value })
                         }
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                            : "border-gray-300 bg-white text-navy-950"
                         }`}
                       >
                         <option value="t-shirt">T-Shirt</option>
@@ -916,7 +916,7 @@ export default function YStoreManagement({ theme }) {
                           className={`w-24 h-12 border-2 border-dashed rounded-lg flex items-center justify-center ${
                             theme === "dark"
                               ? "bg-gray-700 border-gray-600"
-                              : "bg-gray-50 border-gray-300"
+                              : "bg-white border-gray-300"
                           }`}
                         >
                           {formData.image ? (
@@ -979,12 +979,12 @@ export default function YStoreManagement({ theme }) {
                           <label
                             className={`h-12 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 ${
                               theme === "dark"
-                                ? "border-blue-500 hover:border-blue-400 hover:bg-blue-900/20"
+                                ? "border-gold-500 hover:border-blue-400 hover:bg-navy-950/20"
                                 : "border-blue-300 hover:border-blue-400 hover:bg-blue-50"
                             }`}
                           >
                             <svg
-                              className={`w-2.5 h-2.5 mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
+                              className={`w-2.5 h-2.5 mb-1 ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -997,7 +997,7 @@ export default function YStoreManagement({ theme }) {
                               />
                             </svg>
                             <span
-                              className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                              className={`text-xs font-medium ${theme === "dark" ? "text-gold-300" : "text-gold-500"}`}
                             >
                               Upload
                             </span>
@@ -1024,7 +1024,7 @@ export default function YStoreManagement({ theme }) {
                           className={`px-3 py-2 rounded-md transition-colors font-medium text-xs ${
                             theme === "dark"
                               ? "bg-gray-600 hover:bg-gray-700 text-white"
-                              : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                              : "bg-gray-100 hover:bg-gray-300 text-navy-950"
                           }`}
                         >
                           Cancel
@@ -1032,7 +1032,7 @@ export default function YStoreManagement({ theme }) {
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-xs"
+                          className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-navy-900 text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-xs"
                         >
                           {isLoading ? (
                             <div className="flex items-center space-x-1">

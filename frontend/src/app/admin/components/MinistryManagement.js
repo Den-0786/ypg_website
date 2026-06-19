@@ -40,7 +40,7 @@ const MinistryManagement = ({
     description: "",
     leaderName: "",
     leaderPhone: "",
-    color: "from-blue-500 to-teal-500",
+    color: "from-gold-500 to-teal-500",
   });
 
   // Validation states
@@ -277,7 +277,7 @@ const MinistryManagement = ({
             description: "",
             leaderName: "",
             leaderPhone: "",
-            color: "from-blue-500 to-teal-500",
+            color: "from-gold-500 to-teal-500",
           });
           setValidationErrors({});
           toast.success("Ministry added successfully!");
@@ -530,7 +530,7 @@ const MinistryManagement = ({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2
-            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Ministry Management
           </h2>
@@ -561,7 +561,7 @@ const MinistryManagement = ({
               </div>
               <div className="p-4">
                 <h3
-                  className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"} mb-2 line-clamp-1`}
+                  className={`font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} mb-2 line-clamp-1`}
                 >
                   {ministry.name}
                 </h3>
@@ -593,10 +593,10 @@ const MinistryManagement = ({
                           ministry.leaderPhone ?? ministry.leader_phone ?? "",
                         name: ministry.name ?? "",
                         description: ministry.description ?? "",
-                        color: ministry.color ?? "from-blue-500 to-teal-500",
+                        color: ministry.color ?? "from-gold-500 to-teal-500",
                       })
                     }
-                    className="flex-1 flex items-center justify-center space-x-1 bg-gray-100 text-gray-600 px-3 py-2 rounded text-sm hover:bg-gray-200 transition-colors"
+                    className="flex-1 flex items-center justify-center space-x-1 bg-blue-50 text-gray-600 px-3 py-2 rounded text-sm hover:bg-gray-100 transition-colors"
                   >
                     <Edit className="w-3 h-3" />
                     <span>Edit</span>
@@ -619,13 +619,13 @@ const MinistryManagement = ({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2
-            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+            className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
           >
             Ministry Registrations
           </h2>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center space-x-2 bg-gold-500 text-white px-4 py-2 rounded-lg hover:bg-gold-600 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Add Registration</span>
@@ -641,7 +641,7 @@ const MinistryManagement = ({
             <div className="min-w-full">
             <table className="w-full min-w-[800px]">
               <thead
-                className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} text-center`}
+                className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} text-center`}
               >
                 <tr>
                   <th
@@ -688,13 +688,13 @@ const MinistryManagement = ({
                     className={
                       theme === "dark"
                         ? "hover:bg-gray-700"
-                        : "hover:bg-gray-50"
+                        : "hover:bg-white"
                     }
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div
-                          className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                          className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                         >
                           {registration.name}
                         </div>
@@ -732,7 +732,7 @@ const MinistryManagement = ({
                       <div className="flex space-x-2">
                         <button
                           onClick={() => setEditingRegistration(registration)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-gold-500 hover:text-navy-950"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -784,15 +784,15 @@ const MinistryManagement = ({
                     key={registration.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} rounded-lg p-4 border w-full overflow-hidden`}
+                    className={`${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-200"} rounded-lg p-4 border w-full overflow-hidden`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h3
-                        className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                        className={`font-medium ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                       >
                         {registration.name}
                       </h3>
-                      <span className="text-sm font-semibold text-blue-600">
+                      <span className="text-sm font-semibold text-gold-500">
                         {registration.ministry}
                       </span>
                     </div>
@@ -822,7 +822,7 @@ const MinistryManagement = ({
                     <div className="flex space-x-2 mt-3 pt-3 border-t border-gray-200">
                       <button
                         onClick={() => setEditingRegistration(registration)}
-                        className="flex items-center space-x-1 text-blue-600 hover:text-blue-900 text-sm"
+                        className="flex items-center space-x-1 text-gold-500 hover:text-navy-950 text-sm"
                       >
                         <Edit className="w-4 h-4" />
                         <span>Edit</span>
@@ -862,13 +862,13 @@ const MinistryManagement = ({
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Add Ministry Registration
                 </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-blue-50"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -890,7 +890,7 @@ const MinistryManagement = ({
                         name: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -908,7 +908,7 @@ const MinistryManagement = ({
                         email: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -927,7 +927,7 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="Enter phone number"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -946,7 +946,7 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="e.g., Emmanuel Congregation Ahinsan"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -963,7 +963,7 @@ const MinistryManagement = ({
                         ministry: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   >
                     <option value="">Select a ministry</option>
                     {ministries.map((m) => (
@@ -990,7 +990,7 @@ const MinistryManagement = ({
                     }
                     rows={3}
                     placeholder="Any additional information or special requests..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
               </div>
@@ -998,13 +998,13 @@ const MinistryManagement = ({
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddRegistration}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors"
                 >
                   Add Registration
                 </button>
@@ -1031,13 +1031,13 @@ const MinistryManagement = ({
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Edit Ministry Registration
                 </h3>
                 <button
                   onClick={() => setEditingRegistration(null)}
-                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-blue-50"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1059,7 +1059,7 @@ const MinistryManagement = ({
                         name: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -1077,7 +1077,7 @@ const MinistryManagement = ({
                         email: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -1096,7 +1096,7 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="Enter phone number"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -1115,7 +1115,7 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="e.g., Emmanuel Congregation Ahinsan"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   />
                 </div>
                 <div>
@@ -1132,7 +1132,7 @@ const MinistryManagement = ({
                         ministry: e.target.value,
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
                   >
                     <option value="">Select a ministry</option>
                     {ministries.map((m) => (
@@ -1147,13 +1147,13 @@ const MinistryManagement = ({
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={() => setEditingRegistration(null)}
-                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateRegistration}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-colors"
                 >
                   Update Registration
                 </button>
@@ -1180,13 +1180,13 @@ const MinistryManagement = ({
             >
               <div className="flex items-center justify-between mb-6">
                 <h3
-                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                  className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   Add Ministry
                 </h3>
                 <button
                   onClick={() => setShowAddMinistryModal(false)}
-                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-blue-50"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1207,7 +1207,7 @@ const MinistryManagement = ({
                       }
                     }}
                     placeholder="e.g., Y-Singers 🎤"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700 ${
                       validationErrors.name
                         ? "border-red-500"
                         : "border-gray-300"
@@ -1239,7 +1239,7 @@ const MinistryManagement = ({
                     }}
                     rows={3}
                     placeholder="Describe the ministry's purpose and activities..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700 ${
                       validationErrors.description
                         ? "border-red-500"
                         : "border-gray-300"
@@ -1271,7 +1271,7 @@ const MinistryManagement = ({
                       }
                     }}
                     placeholder="Enter leader's full name"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700 ${
                       validationErrors.leaderName
                         ? "border-red-500"
                         : "border-gray-300"
@@ -1304,7 +1304,7 @@ const MinistryManagement = ({
                       }
                     }}
                     placeholder=""
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700 ${
                       phoneError || validationErrors.leaderPhone
                         ? "border-red-500"
                         : "border-gray-300"
@@ -1325,7 +1325,7 @@ const MinistryManagement = ({
                     onChange={(e) =>
                       setNewMinistry({ ...newMinistry, color: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   >
                     <option value="from-purple-500 to-pink-500">
                       Purple to Pink
@@ -1333,7 +1333,7 @@ const MinistryManagement = ({
                     <option value="from-amber-500 to-orange-500">
                       Amber to Orange
                     </option>
-                    <option value="from-blue-500 to-teal-500">
+                    <option value="from-gold-500 to-teal-500">
                       Blue to Teal
                     </option>
                     <option value="from-green-500 to-emerald-500">
@@ -1369,7 +1369,7 @@ const MinistryManagement = ({
                     setShowAddMinistryModal(false);
                     setValidationErrors({});
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                   disabled={isSubmitting}
                 >
                   Cancel
@@ -1403,12 +1403,12 @@ const MinistryManagement = ({
               className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3 className="text-xl font-semibold text-navy-950">
                   Edit Ministry
                 </h3>
                 <button
                   onClick={() => setEditingMinistry(null)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1429,7 +1429,7 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="e.g., Y-Singers 🎤"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   />
                 </div>
                 <div>
@@ -1446,7 +1446,7 @@ const MinistryManagement = ({
                     }
                     rows={3}
                     placeholder="Describe the ministry's purpose and activities..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   />
                 </div>
                 <div>
@@ -1463,7 +1463,7 @@ const MinistryManagement = ({
                       })
                     }
                     placeholder="Enter leader's full name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   />
                 </div>
                 <div>
@@ -1481,7 +1481,7 @@ const MinistryManagement = ({
                       validatePhoneRealTime(e.target.value);
                     }}
                     placeholder=""
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700 ${
                       phoneError ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -1494,14 +1494,14 @@ const MinistryManagement = ({
                     Color Theme
                   </label>
                   <select
-                    value={editingMinistry.color ?? "from-blue-500 to-teal-500"}
+                    value={editingMinistry.color ?? "from-gold-500 to-teal-500"}
                     onChange={(e) =>
                       setEditingMinistry({
                         ...editingMinistry,
                         color: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-700"
                   >
                     <option value="from-purple-500 to-pink-500">
                       Purple to Pink
@@ -1509,7 +1509,7 @@ const MinistryManagement = ({
                     <option value="from-amber-500 to-orange-500">
                       Amber to Orange
                     </option>
-                    <option value="from-blue-500 to-teal-500">
+                    <option value="from-gold-500 to-teal-500">
                       Blue to Teal
                     </option>
                     <option value="from-green-500 to-emerald-500">
@@ -1534,7 +1534,7 @@ const MinistryManagement = ({
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={() => setEditingMinistry(null)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -1566,7 +1566,7 @@ const MinistryManagement = ({
               className="bg-white rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-950 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
                 </h3>
@@ -1575,7 +1575,7 @@ const MinistryManagement = ({
                     setShowDeleteMinistryModal(false);
                     setMinistryToDelete(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1623,7 +1623,7 @@ const MinistryManagement = ({
                     setShowDeleteMinistryModal(false);
                     setMinistryToDelete(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -1650,7 +1650,7 @@ const MinistryManagement = ({
             >
               <div className="flex items-center justify-between mb-4">
                 <h3
-                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} flex items-center gap-2`}
+                  className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"} flex items-center gap-2`}
                 >
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
@@ -1660,7 +1660,7 @@ const MinistryManagement = ({
                     setShowDeleteRegistrationModal(false);
                     setRegistrationToDelete(null);
                   }}
-                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} rounded-lg transition-colors`}
+                  className={`p-2 ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-blue-50"} rounded-lg transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1712,7 +1712,7 @@ const MinistryManagement = ({
                     setShowDeleteRegistrationModal(false);
                     setRegistrationToDelete(null);
                   }}
-                  className={`w-full px-4 py-2 border ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"} rounded-lg transition-colors`}
+                  className={`w-full px-4 py-2 border ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-white"} rounded-lg transition-colors`}
                 >
                   Cancel
                 </button>

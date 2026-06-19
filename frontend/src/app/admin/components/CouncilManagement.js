@@ -280,7 +280,7 @@ export default function CouncilManagement({ theme }) {
 
   return (
     <div
-      className={`w-full ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+      className={`w-full ${theme === "dark" ? "text-white" : "text-navy-950"}`}
     >
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
@@ -336,7 +336,7 @@ export default function CouncilManagement({ theme }) {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Crown className="w-8 h-8 text-yellow-600 mr-3" />
+              <Crown className="w-8 h-8 text-gold-500 mr-3" />
               <span
                 className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
               >
@@ -394,7 +394,7 @@ export default function CouncilManagement({ theme }) {
             }`}
           >
             {/* Member Image */}
-            <div className="relative h-72 bg-gray-200">
+            <div className="relative h-72 bg-gray-100">
               <img
                 src={buildImageSrc(member.image)}
                 alt={member.name}
@@ -434,7 +434,7 @@ export default function CouncilManagement({ theme }) {
 
               {/* Description */}
               {member.description && (
-                <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+                <div className="mb-3 p-2 bg-white rounded-lg">
                   <p
                     className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"} italic line-clamp-2`}
                   >
@@ -494,7 +494,7 @@ export default function CouncilManagement({ theme }) {
                   <div className="relative flex items-center justify-between">
                     <div>
                       <h2
-                        className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-800"}`}
+                        className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                       >
                         {editingMember
                           ? "Edit Council Member"
@@ -514,7 +514,7 @@ export default function CouncilManagement({ theme }) {
                       className={`p-2 rounded-full transition-all duration-200 hover:rotate-90 ${
                         theme === "dark"
                           ? "hover:bg-gray-700 text-gray-400 hover:text-white"
-                          : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                          : "hover:bg-blue-50 text-gray-500 hover:text-gray-700"
                       }`}
                     >
                       <X className="w-5 h-5" />
@@ -530,18 +530,18 @@ export default function CouncilManagement({ theme }) {
                   <div
                     className={`rounded-xl p-4 border ${
                       theme === "dark"
-                        ? "bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border-blue-700/50"
+                        ? "bg-gradient-to-r from-navy-950/30 to-indigo-900/30 border-gold-600/50"
                         : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100"
                     }`}
                   >
                     <h3
                       className={`text-lg font-semibold mb-3 flex items-center ${
-                        theme === "dark" ? "text-white" : "text-gray-800"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       <User
                         className={`w-5 h-5 mr-2 ${
-                          theme === "dark" ? "text-blue-400" : "text-blue-600"
+                          theme === "dark" ? "text-gold-300" : "text-gold-500"
                         }`}
                       />
                       Basic Information
@@ -563,7 +563,7 @@ export default function CouncilManagement({ theme }) {
                           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm ${
                             theme === "dark"
                               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                              : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                              : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                           }`}
                           required
                         />
@@ -585,7 +585,7 @@ export default function CouncilManagement({ theme }) {
                           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm ${
                             theme === "dark"
                               ? "bg-gray-700 border-gray-600 text-white"
-                              : "border-gray-300 bg-white text-gray-900"
+                              : "border-gray-300 bg-white text-navy-950"
                           }`}
                           required
                         >
@@ -618,7 +618,7 @@ export default function CouncilManagement({ theme }) {
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                            : "border-gray-300 bg-white text-navy-950"
                         }`}
                         required
                       >
@@ -642,7 +642,7 @@ export default function CouncilManagement({ theme }) {
                   >
                     <h3
                       className={`text-lg font-semibold mb-3 flex items-center ${
-                        theme === "dark" ? "text-white" : "text-gray-800"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       <Phone
@@ -670,10 +670,10 @@ export default function CouncilManagement({ theme }) {
                               validationErrors.phone
                                 ? "border-red-500 bg-red-50"
                                 : formData.phone && !validationErrors.phone
-                                  ? "border-green-500 bg-green-50"
+                                  ? "border-green-500 bg-blue-50"
                                   : theme === "dark"
                                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                                    : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                                    : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                             }`}
                           />
                           {formData.phone && !validationErrors.phone && (
@@ -704,10 +704,10 @@ export default function CouncilManagement({ theme }) {
                               validationErrors.email
                                 ? "border-red-500 bg-red-50"
                                 : formData.email && !validationErrors.email
-                                  ? "border-green-500 bg-green-50"
+                                  ? "border-green-500 bg-blue-50"
                                   : theme === "dark"
                                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                                    : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                                    : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                             }`}
                           />
                           {formData.email && !validationErrors.email && (
@@ -734,12 +734,12 @@ export default function CouncilManagement({ theme }) {
                   >
                     <h3
                       className={`text-lg font-semibold mb-3 flex items-center ${
-                        theme === "dark" ? "text-white" : "text-gray-800"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       <Edit
                         className={`w-5 h-5 mr-2 ${
-                          theme === "dark" ? "text-amber-400" : "text-amber-600"
+                          theme === "dark" ? "text-amber-400" : "text-gold-500"
                         }`}
                       />
                       Description & Quote
@@ -763,7 +763,7 @@ export default function CouncilManagement({ theme }) {
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm ${
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
                         }`}
                       />
                     </div>
@@ -779,7 +779,7 @@ export default function CouncilManagement({ theme }) {
                   >
                     <h3
                       className={`text-lg font-semibold mb-3 flex items-center ${
-                        theme === "dark" ? "text-white" : "text-gray-800"
+                        theme === "dark" ? "text-white" : "text-navy-950"
                       }`}
                     >
                       <Upload
@@ -845,10 +845,10 @@ export default function CouncilManagement({ theme }) {
                             formData.image
                               ? theme === "dark"
                                 ? "border-green-400 bg-green-900/20"
-                                : "border-green-400 bg-green-50"
+                                : "border-green-400 bg-blue-50"
                               : theme === "dark"
                                 ? "bg-gray-800 border-gray-600 hover:border-gray-500"
-                                : "bg-gray-50 border-gray-300 hover:border-gray-400"
+                                : "bg-white border-gray-300 hover:border-gray-400"
                           }`}
                         >
                           {formData.image ? (
@@ -886,7 +886,7 @@ export default function CouncilManagement({ theme }) {
                                 className={`w-6 h-6 rounded-full flex items-center justify-center mx-auto mb-1 ${
                                   theme === "dark"
                                     ? "bg-gray-700"
-                                    : "bg-gray-200"
+                                    : "bg-gray-100"
                                 }`}
                               >
                                 <Upload
@@ -921,7 +921,7 @@ export default function CouncilManagement({ theme }) {
                       className={`px-6 py-3 rounded-lg transition-colors font-medium ${
                         theme === "dark"
                           ? "bg-gray-600 hover:bg-gray-700 text-white"
-                          : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                          : "bg-gray-100 hover:bg-gray-300 text-navy-950"
                       }`}
                     >
                       Cancel
@@ -973,7 +973,7 @@ export default function CouncilManagement({ theme }) {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3
-                  className={`text-lg font-semibold flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  className={`text-lg font-semibold flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-navy-950"}`}
                 >
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   Confirm Deletion
@@ -983,7 +983,7 @@ export default function CouncilManagement({ theme }) {
                     setShowDeleteModal(false);
                     setMemberToDelete(null);
                   }}
-                  className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700" : ""}`}
+                  className={`p-2 hover:bg-blue-50 rounded-lg transition-colors ${theme === "dark" ? "hover:bg-gray-700" : ""}`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1034,7 +1034,7 @@ export default function CouncilManagement({ theme }) {
                     setShowDeleteModal(false);
                     setMemberToDelete(null);
                   }}
-                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors ${
+                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition-colors ${
                     theme === "dark"
                       ? "text-gray-300 border-gray-600 hover:bg-gray-700"
                       : "text-gray-700"

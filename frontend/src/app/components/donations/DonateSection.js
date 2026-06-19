@@ -321,13 +321,13 @@ export default function DonateSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Side - Donation Form */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            <h2 className="text-3xl font-bold text-navy-950 mb-8">
               Make a Donation
             </h2>
 
             {/* Donation Type */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold text-navy-950 mb-6">
                 Donation Type
               </h3>
               <div className="flex space-x-4">
@@ -338,8 +338,8 @@ export default function DonateSection() {
                   }
                   className={`px-8 py-4 rounded-lg font-medium transition-all text-lg ${
                     !formData.isRecurring
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-gold-500 text-white shadow-md"
+                      : "bg-blue-50 text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   One-Time
@@ -351,8 +351,8 @@ export default function DonateSection() {
                   }
                   className={`px-8 py-4 rounded-lg font-medium transition-all text-lg ${
                     formData.isRecurring
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-gold-500 text-white shadow-md"
+                      : "bg-blue-50 text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   Monthly
@@ -362,7 +362,7 @@ export default function DonateSection() {
 
             {/* Amount Selection */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold text-navy-950 mb-6">
                 Amount
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -373,7 +373,7 @@ export default function DonateSection() {
                     onClick={() => handleAmountSelect(item.amount)}
                     className={`p-6 rounded-xl border-2 transition-all text-left ${
                       selectedAmount === item.amount
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        ? "border-gold-500 bg-blue-50 text-navy-950"
                         : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                     }`}
                     whileHover={{ scale: 1.02 }}
@@ -385,7 +385,7 @@ export default function DonateSection() {
                 ))}
               </div>
 
-              <div className="bg-gray-50 p-6 rounded-xl">
+              <div className="bg-white p-6 rounded-xl">
                 <div className="flex items-center space-x-3">
                   <span className="text-xl font-bold text-gray-500">₵</span>
                   <input
@@ -403,7 +403,7 @@ export default function DonateSection() {
 
             {/* Purpose Selection */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold text-navy-950 mb-6">
                 Purpose
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -421,7 +421,7 @@ export default function DonateSection() {
                       }
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         formData.purpose === option.value
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          ? "border-gold-500 bg-blue-50 text-navy-950"
                           : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                       }`}
                       whileHover={{ scale: 1.02 }}
@@ -441,7 +441,7 @@ export default function DonateSection() {
 
             {/* Payment Method */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold text-navy-950 mb-6">
                 Payment Method
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -450,7 +450,7 @@ export default function DonateSection() {
                     method: "momo",
                     label: "Mobile Money",
                     icon: Smartphone,
-                    color: "bg-blue-500",
+                    color: "bg-gold-500",
                   },
                   {
                     method: "cash",
@@ -462,7 +462,7 @@ export default function DonateSection() {
                     method: "bank",
                     label: "Bank Transfer",
                     icon: Building,
-                    color: "bg-blue-500",
+                    color: "bg-gold-500",
                   },
                   {
                     method: "card",
@@ -481,7 +481,7 @@ export default function DonateSection() {
                       }
                       className={`p-4 rounded-xl border-2 transition-all text-center ${
                         formData.paymentMethod === payment.method
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          ? "border-gold-500 bg-blue-50 text-navy-950"
                           : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                       }`}
                       whileHover={{ scale: 1.02 }}
@@ -514,7 +514,7 @@ export default function DonateSection() {
                     }}
                   >
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="text-sm font-semibold text-blue-800">
+                      <h4 className="text-sm font-semibold text-navy-950">
                         Mobile Money Instructions
                       </h4>
                       <button
@@ -536,24 +536,24 @@ export default function DonateSection() {
                         </svg>
                       </button>
                     </div>
-                    <div className="space-y-2 text-sm text-blue-700">
+                    <div className="space-y-2 text-sm text-navy-950">
                       <p>1. Dial *170# on your phone</p>
-                      <p>2. Select "Send Money"</p>
+                      <p>2. Select &quot;Send Money&quot;</p>
                       <p>
                         3. Enter YPG number:{" "}
-                        <span className="font-bold text-blue-800">
+                        <span className="font-bold text-navy-950">
                           0541107445
                         </span>
                       </p>
                       <p>
                         4. Amount:{" "}
-                        <span className="font-bold text-blue-800">
+                        <span className="font-bold text-navy-950">
                           ₵{formData.amount || "___"}
                         </span>
                       </p>
                       <p>
                         5. Reference:{" "}
-                        <span className="font-bold text-blue-800">
+                        <span className="font-bold text-navy-950">
                           YPG-{receiptCode || "XXXX"}
                         </span>
                       </p>
@@ -568,7 +568,7 @@ export default function DonateSection() {
               type="submit"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full bg-white text-blue-600 py-4 px-6 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+              className="w-full bg-white text-gold-500 py-4 px-6 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -589,7 +589,7 @@ export default function DonateSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mt-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg"
+                  className="mt-4 p-4 bg-gold-100 border border-blue-400 text-navy-950 rounded-lg"
                 >
                   <div className="flex items-center">
                     <CheckCircle className="w-5 h-5 mr-2" />
@@ -628,7 +628,7 @@ export default function DonateSection() {
           </div>
 
           {/* Right Side - Hero Card with Impact */}
-          <div className="bg-gradient-to-b from-blue-500 to-blue-600 rounded-2xl p-8 text-white">
+          <div className="bg-gradient-to-b from-gold-500 to-gold-500 rounded-2xl p-8 text-white">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-4">
                 Give to the <span className="text-blue-100">Youth</span>

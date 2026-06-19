@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#1E88E5" />
+        <meta name="theme-color" content="#f59e0b" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         {/* <DefaultSeo {...SEO} /> */}
         {children}
@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
             success: {
               duration: 3000,
               iconTheme: {
-                primary: "#10B981",
+                primary: "#f59e0b",
                 secondary: "#fff",
               },
             },

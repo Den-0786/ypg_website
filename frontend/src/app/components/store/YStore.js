@@ -114,7 +114,7 @@ export default function YStoreSection() {
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading store items...</p>
           </div>
         </div>
@@ -135,8 +135,8 @@ export default function YStoreSection() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">
-              <span className="text-blue-600">Y-Store</span> Merchandise
+            <h2 className="text-2xl sm:text-4xl font-bold text-navy-950 mb-2">
+              <span className="text-gold-500">Y-Store</span> Merchandise
             </h2>
             <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
               No items available at the moment. Check back soon!
@@ -159,8 +159,8 @@ export default function YStoreSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">
-            <span className="text-blue-600">Y-Store</span> Merchandise
+          <h2 className="text-2xl sm:text-4xl font-bold text-navy-950 mb-2">
+            <span className="text-gold-500">Y-Store</span> Merchandise
           </h2>
           <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
             Official branded items for our youth community
@@ -173,7 +173,7 @@ export default function YStoreSection() {
             onClick={prevSlide}
             onMouseEnter={() => setAutoPlay(false)}
             onMouseLeave={() => setAutoPlay(true)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-blue-50 transition"
             aria-label="Previous items"
           >
             <span className="text-gray-700 text-xl">‹</span>
@@ -183,7 +183,7 @@ export default function YStoreSection() {
             onClick={nextSlide}
             onMouseEnter={() => setAutoPlay(false)}
             onMouseLeave={() => setAutoPlay(true)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-blue-50 transition"
             aria-label="Next items"
           >
             <span className="text-gray-700 text-xl">›</span>
@@ -240,14 +240,14 @@ export default function YStoreSection() {
                     <div className="p-5">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
-                          <h3 className="font-bold text-base text-gray-800">
+                          <h3 className="font-bold text-base text-navy-950">
                             {item.name}
                           </h3>
                           <p className="text-gray-600 text-sm text-center">
                             {item.description}
                           </p>
                         </div>
-                        <span className="text-blue-600 font-bold text-sm ml-2">
+                        <span className="text-gold-500 font-bold text-sm ml-2">
                           ₵{item.price}
                           {item.pricingUnit ? ` ${item.pricingUnit}` : ""}
                         </span>
@@ -276,7 +276,7 @@ export default function YStoreSection() {
                                 </svg>
                                 WhatsApp
                               </a>
-                              <div className="flex-1 bg-blue-500 text-white px-2 py-1.5 rounded-md flex items-center justify-center gap-1 text-xs">
+                              <div className="flex-1 bg-gold-500 text-white px-2 py-1.5 rounded-md flex items-center justify-center gap-1 text-xs">
                                 <svg
                                   className="w-3 h-3"
                                   viewBox="0 0 24 24"
@@ -317,7 +317,7 @@ export default function YStoreSection() {
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2.5 h-2.5 rounded-full transition ${currentIndex === index ? "bg-blue-600 w-6" : "bg-gray-300"}`}
+                className={`w-2.5 h-2.5 rounded-full transition ${currentIndex === index ? "bg-gold-500 w-6" : "bg-gray-300"}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

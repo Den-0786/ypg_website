@@ -37,101 +37,101 @@ export default function AboutSection() {
     const visionImage = visionMission?.vision_image_url || "/mission-vision/priscy.jpg";
 
     return (
-        <section id="about" className="bg-white py-12 px-4 md:px-12 lg:px-24">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
-            About Young People&apos;s Guild (YPG)
-        </h2>
+        <section id="about" className="bg-navy-950 py-20 lg:py-28 relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="text-center max-w-3xl mx-auto mb-16"
+                >
+                    <span className="inline-block text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">
+                        Who We Are
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+                        About Young Peoples&apos; Guild (YPG)
+                    </h2>
+                </motion.div>
 
-        {/* Combined Mission & Vision Container */}
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="border-4 border-yellow-700 rounded-2xl p-4 mb-10 shadow-lg"
-        >
-            <div className="flex flex-col lg:flex-row gap-8">
-            {/* Mission Card (Left) */}
-            <motion.div
-                whileHover={{ scale: 1.01 }}
-                className="lg:w-1/2 lg:pr-8 border-2 border-blue-50 rounded-2xl "
-            >
-                <div className="flex flex-col items-center gap-8">
-                <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-blue-200">
-                    <Image
-                    src={missionImage}
-                    alt="Mission"
-                    fill
-                    className="object-cover object-top"
-                    priority
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    style={{ objectPosition: 'center top' }}
-                    />
-                </div>
-                <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-4 text-blue-800">Our Mission</h3>
-                    <p className="text-gray-700 leading-relaxed text-lg">
-                    {missionText}
-                    </p>
-                </div>
-                </div>
-            </motion.div>
+                <div className="grid lg:grid-cols-2 gap-10">
+                    {/* Mission Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        whileHover={{ y: -6 }}
+                        className="bg-navy-900 border-t-4 border-gold-500 p-6 sm:p-8 shadow-xl transition-all duration-300"
+                    >
+                        <div className="relative h-64 mb-6 overflow-hidden border border-gold-500/30">
+                            <Image
+                                src={missionImage}
+                                alt="Mission"
+                                fill
+                                className="object-cover object-top"
+                                style={{ objectPosition: 'center top' }}
+                                priority
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                            />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-4">Our Mission</h3>
+                        <p className="text-gray-300 leading-relaxed text-lg">
+                            {missionText}
+                        </p>
+                    </motion.div>
 
-            {/* Vision Card (Right) */}
-            <motion.div
-                whileHover={{ scale: 1.01 }}
-                className="lg:w-1/2 lg:pl-8 border-2 border-blue-50 rounded-2xl"
-            >
-                <div className="flex flex-col items-center gap-8">
-                <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-4 text-blue-800">Our Vision</h3>
-                    <p className="text-gray-700 leading-relaxed text-lg">
-                    {visionText}
-                    </p>
+                    {/* Vision Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        whileHover={{ y: -6 }}
+                        className="bg-navy-900 border-t-4 border-gold-500 p-6 sm:p-8 shadow-xl transition-all duration-300"
+                    >
+                        <div className="relative h-64 mb-6 overflow-hidden border border-gold-500/30">
+                            <Image
+                                src={visionImage}
+                                alt="Vision"
+                                fill
+                                className="object-cover"
+                                priority
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                            />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-4">Our Vision</h3>
+                        <p className="text-gray-300 leading-relaxed text-lg">
+                            {visionText}
+                        </p>
+                    </motion.div>
                 </div>
-                <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-blue-200">
-                    <Image
-                    src={visionImage}
-                    alt="Vision"
-                    fill
-                    className="object-cover"
-                    priority
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    />
+
+                {/* Motto & Theme */}
+                <div className="grid md:grid-cols-2 gap-6 mt-10">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="bg-gold-500 p-6 text-center shadow-md"
+                    >
+                        <h3 className="text-xl font-bold text-navy-950 mb-2">Our Motto</h3>
+                        <p className="text-lg font-semibold text-navy-950">{motto}</p>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="bg-navy-900 border-2 border-gold-500 p-6 text-center shadow-md"
+                    >
+                        <h3 className="text-xl font-bold text-gold-500 mb-2">{themeTitle}</h3>
+                        <p className="text-lg text-white">{themeText}</p>
+                    </motion.div>
                 </div>
-                </div>
-            </motion.div>
             </div>
-        </motion.div>
-
-        {/* Bottom Row - Motto & Theme */}
-        <div className="flex flex-col md:flex-row gap-6">
-
-            <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex-1 border-2 border-yellow-700 rounded-xl p-6 bg-blue-50 text-center shadow-md"
-            >
-            <h3 className="text-xl font-bold mb-2 text-gray-800">Our Motto</h3>
-            <p className="text-lg italic text-blue-900">{motto}</p>
-            </motion.div>
-
-
-            <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex-1 border-2 border-yellow-700 rounded-xl p-6 bg-green-50 text-center shadow-md"
-            >
-            <h3 className="text-xl font-bold mb-2 text-gray-800">{themeTitle}</h3>
-            <p className="text-lg text-green-900">
-                {themeText}
-            </p>
-            </motion.div>
-        </div>
         </section>
     );
 }
