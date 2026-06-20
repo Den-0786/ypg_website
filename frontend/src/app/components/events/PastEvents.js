@@ -157,7 +157,7 @@ export default function PastEvents() {
             return (
               <motion.div
                 key={event.id}
-                className="flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[33.333%] xl:min-w-[25%] w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-t-4 border-gold-500"
+                className="flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-t-4 border-gold-500"
                 whileHover={{ y: -10 }}
               >
                 <div className="relative h-80 w-full overflow-hidden rounded-t-xl">

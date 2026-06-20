@@ -181,7 +181,7 @@ export default function TeamSection() {
                     damping: 10,
                   }}
                   whileHover={{ y: -10 }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] w-full max-w-80"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                 >
                   <div className="relative w-full h-80 sm:h-96">
                     <Image

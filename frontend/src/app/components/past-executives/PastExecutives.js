@@ -156,7 +156,7 @@ export default function PastExecutives() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[33.333%] xl:min-w-[25%] w-full"
+                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                   >
                     <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
                       {executive.image ? (

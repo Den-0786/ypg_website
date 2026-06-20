@@ -180,9 +180,9 @@ export default function CouncilSection() {
                   y: -8,
                   transition: { duration: 0.2 },
                 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] w-[260px]"
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
               >
-                <div className="relative h-[22rem] sm:h-[22rem] lg:h-[24rem] w-[260px]">
+                <div className="relative h-[22rem] sm:h-[22rem] lg:h-[24rem] w-full">
                   <img
                     src={getImageUrl(member.image)}
                     alt={member.name}
