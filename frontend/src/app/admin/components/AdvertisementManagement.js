@@ -49,6 +49,7 @@ export default function AdvertisementManagement({ theme }) {
   }, []);
 
   const fetchAdvertisements = async () => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/admin/`
@@ -59,6 +60,7 @@ export default function AdvertisementManagement({ theme }) {
       }
     } catch (error) {
       console.error("Error fetching advertisements:", error);
+      toast.error("Failed to refresh advertisements");
     } finally {
       setLoading(false);
     }
@@ -354,13 +356,14 @@ export default function AdvertisementManagement({ theme }) {
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-auto">
           <button
             onClick={fetchAdvertisements}
+            disabled={loading}
             className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
               theme === "dark"
-                ? "bg-gray-700 hover:bg-gray-600 text-white"
-                : "bg-blue-50 hover:bg-gray-100 text-gray-700"
+                ? "bg-gray-700 hover:bg-gray-600 text-white disabled:opacity-50"
+                : "bg-blue-50 hover:bg-gray-100 text-gray-700 disabled:opacity-50"
             }`}
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </button>
           <div className="relative">

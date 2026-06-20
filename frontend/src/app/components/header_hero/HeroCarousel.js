@@ -17,7 +17,7 @@ export default function HeroCarousel() {
         "Empowering young people aged 18-30 in faith, leadership, and community service. Join our vibrant community dedicated to spiritual growth and social impact.",
       cta: "Join Our Community",
       ctaLink: "#contact",
-      bgImage: "/hero/youth.jpeg",
+      bgImage: "/hero/youth1.jpg",
     },
     {
       eyebrow: "Our Tools",
@@ -37,7 +37,7 @@ export default function HeroCarousel() {
         "Streamlined attendance logging with instant reports and analytics to keep your congregation connected and engaged.",
       cta: "Open System",
       ctaLink: "https://ypg-markify.vercel.app/",
-      bgImage: "/hero/attendance.jpeg",
+      bgImage: "/hero/attendance1.JPG",
     },
   ];
 
