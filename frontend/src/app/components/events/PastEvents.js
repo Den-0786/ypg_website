@@ -146,7 +146,7 @@ export default function PastEvents() {
           </p>
         </motion.div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4 md:overflow-visible">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 scroll-smooth">
           {pastEvents.map((event) => {
             const isExpanded = expandedEvents.has(event.id);
             const shortDescription =
@@ -157,7 +157,7 @@ export default function PastEvents() {
             return (
               <motion.div
                 key={event.id}
-                className="min-w-full snap-start md:min-w-0 w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-t-4 border-gold-500"
+                className="flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[33.333%] xl:min-w-[25%] w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-t-4 border-gold-500"
                 whileHover={{ y: -10 }}
               >
                 <div className="relative h-80 w-full overflow-hidden rounded-t-xl">

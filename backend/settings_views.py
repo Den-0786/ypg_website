@@ -4,6 +4,55 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 import json
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+SETTINGS_FILE = BASE_DIR / 'site_settings.json'
+
+DEFAULT_PROFILE = {
+    'fullName': 'YPG Administrator',
+    'email': 'admin@ahinsanypg.com',
+    'phone': '+233 531427671',
+    'role': 'System Administrator',
+    'avatar': None
+}
+
+DEFAULT_WEBSITE = {
+    'websiteTitle': 'PCG Ahinsan District YPG',
+    'contactEmail': 'ahinsandistrictypg@gmail.com',
+    'phoneNumber': '+233 531427671',
+    'address': 'PCG, Emmanuel Congregation Ahinsan - Kumasi',
+    'description': "Presbyterian Young People's Guild - Ahinsan District",
+    'socialMedia': {
+        'facebook': '',
+        'twitter': '',
+        'instagram': '',
+        'youtube': ''
+    },
+    'theme': 'light',
+    'maintenanceMode': False
+}
+
+
+def load_settings():
+    """Load website settings from JSON file, falling back to defaults."""
+    if not SETTINGS_FILE.exists():
+        return DEFAULT_WEBSITE.copy()
+    try:
+        with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        merged = DEFAULT_WEBSITE.copy()
+        merged.update(data)
+        return merged
+    except Exception:
+        return DEFAULT_WEBSITE.copy()
+
+
+def save_settings(settings):
+    """Save website settings to JSON file."""
+    with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(settings, f, indent=2)
+
 
 @csrf_exempt
 @api_view(['GET', 'PUT'])
@@ -12,19 +61,11 @@ def api_settings_profile(request):
     """Get or update admin profile settings"""
     try:
         if request.method == 'GET':
-            # Return default profile data
             return Response({
                 'success': True,
-                'profile': {
-                    'fullName': 'YPG Administrator',
-                    'email': 'admin@ahinsanypg.com',
-                    'phone': '+233 531427671',
-                    'role': 'System Administrator',
-                    'avatar': None
-                }
+                'profile': DEFAULT_PROFILE
             })
         elif request.method == 'PUT':
-            # Update profile data
             data = json.loads(request.body)
             return Response({
                 'success': True,
@@ -37,6 +78,7 @@ def api_settings_profile(request):
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @csrf_exempt
 @api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
@@ -44,32 +86,19 @@ def api_settings_website(request):
     """Get or update website settings"""
     try:
         if request.method == 'GET':
-            # Return default website settings
             return Response({
                 'success': True,
-                'settings': {
-                    'siteName': 'Ahinsan District YPG',
-                    'siteDescription': 'Presbyterian Young People\'s Guild - Ahinsan District',
-                    'contactEmail': 'ahinsandistrictypg@gmail.com',
-                    'contactPhone': '+233 531427671',
-                    'address': 'PCG, Emmanuel Congregation Ahinsan - Kumasi',
-                    'socialMedia': {
-                        'facebook': '',
-                        'twitter': '',
-                        'instagram': '',
-                        'youtube': ''
-                    },
-                    'theme': 'light',
-                    'maintenanceMode': False
-                }
+                'settings': load_settings()
             })
         elif request.method == 'PUT':
-            # Update website settings
             data = json.loads(request.body)
+            current = load_settings()
+            current.update(data)
+            save_settings(current)
             return Response({
                 'success': True,
                 'message': 'Website settings updated successfully',
-                'settings': data
+                'settings': current
             })
     except Exception as e:
         return Response({

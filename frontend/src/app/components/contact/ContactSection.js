@@ -9,7 +9,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { contactAPI } from "../../../utils/api";
+import { contactAPI, settingsAPI } from "../../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function ContactSection() {
@@ -22,6 +22,23 @@ export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [errors, setErrors] = useState({});
+  const [siteSettings, setSiteSettings] = useState(null);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await settingsAPI.getWebsiteSettings();
+        setSiteSettings(settings);
+      } catch (error) {
+        console.error("Error loading site settings:", error);
+      }
+    };
+    loadSettings();
+  }, []);
+
+  const phoneNumber = siteSettings?.phoneNumber || "+233 531427671";
+  const contactEmail = siteSettings?.contactEmail || "ahinsandistrictypg@gmail.com";
+  const cleanPhone = phoneNumber.replace(/\D/g, "");
 
   // Reset submission status on component mount
   useEffect(() => {
@@ -333,10 +350,10 @@ export default function ContactSection() {
                 <div>
                   <h4 className="font-semibold text-navy-950">Phone</h4>
                   <a
-                    href="tel:+233541107445"
+                    href={`tel:+${cleanPhone}`}
                     className="text-gold-500 hover:underline flex items-center gap-1"
                   >
-                    +233531427671
+                    {phoneNumber}
                   </a>
                 </div>
               </div>
@@ -349,7 +366,7 @@ export default function ContactSection() {
                 <div>
                   <h4 className="font-semibold text-navy-950">WhatsApp</h4>
                   <a
-                    href="https://wa.me/233531427671"
+                    href={`https://wa.me/${cleanPhone}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition"
@@ -364,10 +381,10 @@ export default function ContactSection() {
                 <div>
                   <h4 className="font-semibold text-navy-950">Email</h4>
                   <a
-                    href="mailto:ypg.ahinsan@gmail.com"
+                    href={`mailto:${contactEmail}`}
                     className="text-gold-500 hover:underline"
                   >
-                    ahinsandistrictypg@gmail.com
+                    {contactEmail}
                   </a>
                 </div>
               </div>
@@ -407,7 +424,7 @@ export default function ContactSection() {
                   </svg>
                 </a>
                 <a
-                  href="https://wa.me/233541107445"
+                  href={`https://wa.me/${cleanPhone}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 bg-blue-50 rounded-full text-gray-700 hover:bg-green-100 hover:text-green-600 transition"

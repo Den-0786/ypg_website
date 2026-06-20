@@ -240,4 +240,18 @@ export const branchPresidentAPI = {
   },
 };
 
+// Settings API for public site contact info
+export const settingsAPI = {
+  getWebsiteSettings: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/settings/website`);
+      const data = await response.json();
+      return data.success ? data.settings : null;
+    } catch (error) {
+      console.error("Error fetching website settings:", error);
+      return null;
+    }
+  },
+};
+
 export default apiRequest;

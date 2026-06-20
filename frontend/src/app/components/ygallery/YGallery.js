@@ -130,7 +130,6 @@ export default function GallerySection() {
             <button
               onClick={() => {
                 setContentType("photos");
-                setCurrentIndex(0);
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 contentType === "photos"
@@ -143,7 +142,6 @@ export default function GallerySection() {
             <button
               onClick={() => {
                 setContentType("videos");
-                setCurrentIndex(0);
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 contentType === "videos"
@@ -178,14 +176,14 @@ export default function GallerySection() {
           </div>
         ) : (
           <>
-            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:overflow-visible pb-4">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-4 scroll-smooth">
               {filteredItems.map((item, index) => (
                   <motion.div
                     key={`${contentType}-${index}`}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 min-w-full snap-start md:min-w-0 w-full"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[33.333%] xl:min-w-[25%] w-full"
                   >
                     <div className="relative w-full h-80 sm:h-96">
                       {item.image ? (

@@ -2,23 +2,14 @@
 
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Users,
-  Phone,
-  Mail,
-  MapPin,
-} from "lucide-react";
+import { Users, Phone, Mail, MapPin } from "lucide-react";
 
 export default function CouncilSection() {
   const [councilMembers, setCouncilMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentSet, setCurrentSet] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const fetchCouncilMembers = async () => {
@@ -66,53 +57,10 @@ export default function CouncilSection() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Create sets based on screen size
-  const cardsPerSet = isMobile ? 1 : 4;
-  const totalSets = Math.ceil(councilMembers.length / cardsPerSet);
-  const sets = [];
-
-  for (let i = 0; i < councilMembers.length; i += cardsPerSet) {
-    sets.push(councilMembers.slice(i, i + cardsPerSet));
-  }
-
-  // Ensure currentSet is valid after layout/size changes
-  useEffect(() => {
-    if (totalSets > 0 && currentSet >= totalSets) {
-      setCurrentSet(0);
-    }
-  }, [totalSets, currentSet]);
 
   const getImageUrl = (url) => {
     if (!url) return "/placeholder-item.jpg";
     return buildImageSrc(url);
-  };
-
-  useEffect(() => {
-    if (totalSets > 1) {
-      const interval = setInterval(() => {
-        setCurrentSet((prev) => (prev + 1) % totalSets);
-      }, 8000); // 8 seconds per set
-
-      return () => clearInterval(interval);
-    }
-  }, [totalSets]);
-
-  const nextSet = () => {
-    setCurrentSet((prev) => (prev + 1) % totalSets);
-  };
-
-  const prevSet = () => {
-    setCurrentSet((prev) => (prev - 1 + totalSets) % totalSets);
   };
 
   if (loading) {
@@ -204,120 +152,69 @@ export default function CouncilSection() {
           </p>
         </motion.div>
 
-        {/* Navigation Controls */}
-        {totalSets > 1 && (
-          <div className="flex justify-center items-center mb-8 space-x-4">
-            <button
-              onClick={prevSet}
-              className="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:bg-blue-50"
-              aria-label="Previous set"
-            >
-              <ChevronLeft className="w-5 h-5 text-gold-500" />
-            </button>
-
-            <div className="flex space-x-2">
-              {[...Array(totalSets)].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSet(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                    index === currentSet
-                      ? "bg-gold-500 scale-110"
-                      : "bg-gray-300 hover:bg-gray-400"
-                  }`}
-                  aria-label={`Go to set ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={nextSet}
-              className="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200 hover:bg-blue-50"
-              aria-label="Next set"
-            >
-              <ChevronRight className="w-5 h-5 text-gold-500" />
-            </button>
-          </div>
-        )}
-
         {/* Council Members Cards */}
-        <div className="relative">
-          <AnimatePresence mode="wait">
-            {sets.map(
-              (set, setIndex) =>
-                currentSet === setIndex && (
-                  <motion.div
-                    key={setIndex}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{ duration: 0.5 }}
-                    className={`grid gap-2 px-2 ${set.length === 1 ? "grid-cols-1 place-items-center" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center"}`}
-                  >
-                    {set.map((member, index) => {
-                      const direction = index % 2 === 0 ? "left" : "right";
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-4 scroll-smooth">
+          {councilMembers.map((member, index) => {
+            const direction = index % 2 === 0 ? "left" : "right";
 
-                      return (
-                        <motion.div
-                          key={member.id}
-                          initial={{
-                            opacity: 0,
-                            x: direction === "left" ? -30 : 30,
-                            y: 20,
-                          }}
-                          animate={{
-                            opacity: 1,
-                            x: 0,
-                            y: 0,
-                          }}
-                          transition={{
-                            duration: 0.6,
-                            delay: index * 0.1,
-                            ease: "easeOut",
-                          }}
-                          whileHover={{
-                            y: -8,
-                            transition: { duration: 0.2 },
-                          }}
-                          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 w-[260px]"
-                        >
-                          <div className="relative h-[22rem] sm:h-[22rem] lg:h-[24rem] w-[260px]">
-                            <img
-                              src={getImageUrl(member.image)}
-                              alt={member.name}
-                              className="absolute inset-0 w-full h-full object-cover"
-                              loading="lazy"
-                            />
-                            {/* Color overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
+            return (
+              <motion.div
+                key={member.id}
+                initial={{
+                  opacity: 0,
+                  x: direction === "left" ? -30 : 30,
+                  y: 20,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.6,
+                  delay: index * 0.1,
+                  ease: "easeOut",
+                }}
+                whileHover={{
+                  y: -8,
+                  transition: { duration: 0.2 },
+                }}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] w-[260px]"
+              >
+                <div className="relative h-[22rem] sm:h-[22rem] lg:h-[24rem] w-[260px]">
+                  <img
+                    src={getImageUrl(member.image)}
+                    alt={member.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  {/* Color overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
-                            {/* Text overlay with background */}
-                            <div className="absolute bottom-0 top-[13rem] left-0 right-0 p-3 sm:p-4">
-                              <div className="bg-white/60 backdrop-blur-md rounded-xl p-2 sm:p-3 shadow-lg border border-white/70">
-                                <h3 className="text-sm sm:text-base font-bold text-navy-950 mb-1 line-clamp-1">
-                                  {member.name}
-                                </h3>
-                                <p className="text-gold-500 font-semibold mb-1 sm:mb-2 text-[11px] sm:text-sm">
-                                  {member.position}
-                                </p>
-                                <p className="text-gray-700 font-medium text-[11px] mb-2">
-                                  {member.congregation}
-                                </p>
-                                {member.description && (
-                                  <p className="text-gray-700 mb-2 italic text-[11px] sm:text-sm line-clamp-2">
-                                    &quot;{member.description}&quot;
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </motion.div>
-                )
-            )}
-          </AnimatePresence>
+                  {/* Text overlay with background */}
+                  <div className="absolute bottom-0 top-[13rem] left-0 right-0 p-3 sm:p-4">
+                    <div className="bg-white/60 backdrop-blur-md rounded-xl p-2 sm:p-3 shadow-lg border border-white/70">
+                      <h3 className="text-sm sm:text-base font-bold text-navy-950 mb-1 line-clamp-1">
+                        {member.name}
+                      </h3>
+                      <p className="text-gold-500 font-semibold mb-1 sm:mb-2 text-[11px] sm:text-sm">
+                        {member.position}
+                      </p>
+                      <p className="text-gray-700 font-medium text-[11px] mb-2">
+                        {member.congregation}
+                      </p>
+                      {member.description && (
+                        <p className="text-gray-700 mb-2 italic text-[11px] sm:text-sm line-clamp-2">
+                          &quot;{member.description}&quot;
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Bottom CTA removed per request */}

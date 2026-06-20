@@ -9,11 +9,30 @@ import {
   Youtube,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import FAQ from "../faq/FAQ";
+import { settingsAPI } from "../../../utils/api";
 
 export default function Footer() {
+  const [siteSettings, setSiteSettings] = useState(null);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await settingsAPI.getWebsiteSettings();
+        setSiteSettings(settings);
+      } catch (error) {
+        console.error("Error loading site settings:", error);
+      }
+    };
+    loadSettings();
+  }, []);
+
+  const phoneNumber = siteSettings?.phoneNumber || "+233 531427671";
+  const contactEmail = siteSettings?.contactEmail || "ahinsandistrictypg@gmail.com";
+  const cleanPhone = phoneNumber.replace(/\D/g, "");
+
   // Enhanced Tooltip component
   const Tooltip = ({ children, content, position = "top" }) => {
     const [showTooltip, setShowTooltip] = useState(false);
@@ -252,10 +271,10 @@ export default function Footer() {
                 <div>
                   <p className="font-medium">Call Us</p>
                   <a
-                    href="tel:+233531427671"
+                    href={`tel:+${cleanPhone}`}
                     className="hover:text-gold-300 transition"
                   >
-                    +233 531427671
+                    {phoneNumber}
                   </a>
                 </div>
               </li>
@@ -264,10 +283,10 @@ export default function Footer() {
                 <div>
                   <p className="font-medium">Email Us</p>
                   <a
-                    href="mailto:ypg@example.com"
+                    href={`mailto:${contactEmail}`}
                     className="hover:text-gold-300 transition"
                   >
-                    ahinsandistrictypg@gmail.com
+                    {contactEmail}
                   </a>
                 </div>
               </li>

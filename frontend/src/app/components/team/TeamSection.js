@@ -2,15 +2,13 @@
 
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function TeamSection() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentSet, setCurrentSet] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const fetchTeamMembers = async () => {
@@ -82,42 +80,6 @@ export default function TeamSection() {
       );
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (typeof window === "undefined") return;
-      setIsMobile(window.innerWidth < 768); // Changed to 768px for mobile
-    };
-
-    handleResize();
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }
-  }, []);
-
-  // Create sets based on screen size
-  const getCardsPerSet = () => {
-    if (typeof window === "undefined") return 4; // Default for SSR
-    if (window.innerWidth < 768) return 1; // Mobile: 1 card per slide
-    if (window.innerWidth < 1024) return 2; // Tablet: 2 cards per slide
-    return 4; // Desktop: 4 cards per slide
-  };
-
-  const cardsPerSet = getCardsPerSet();
-  const totalSets = Math.ceil(teamMembers.length / cardsPerSet);
-  const sets = [];
-
-  for (let i = 0; i < teamMembers.length; i += cardsPerSet) {
-    sets.push(teamMembers.slice(i, i + cardsPerSet));
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSet((prev) => (prev + 1) % totalSets);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [totalSets]);
 
   return (
     <section id="team" className="py-16 bg-white px-4 overflow-hidden">
@@ -196,131 +158,74 @@ export default function TeamSection() {
         )}
 
         {!loading && !error && teamMembers.length > 0 && (
-          <>
-            <div
-              className={`relative ${
-                cardsPerSet === 1
-                  ? "h-[400px] sm:h-[500px]"
-                  : "h-[300px] sm:h-[400px] lg:h-[400px]"
-              }`}
-            >
-              <AnimatePresence mode="wait">
-                {sets.map(
-                  (set, setIndex) =>
-                    currentSet === setIndex && (
-                      <motion.div
-                        key={`set-${setIndex}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className={`flex justify-center items-center gap-4 sm:gap-8 absolute inset-0 ${
-                          cardsPerSet === 1 ? "flex-col" : "flex-row"
-                        }`}
-                      >
-                        {set.map((member, index) => {
-                          const direction = index % 2 === 0 ? "left" : "right";
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-4 scroll-smooth">
+            {teamMembers.map((member, index) => {
+              const direction = index % 2 === 0 ? "left" : "right";
 
-                          return (
-                            <motion.div
-                              key={`${member.id}-${setIndex}`}
-                              initial={{
-                                x: direction === "left" ? -100 : 100,
-                                opacity: 0,
-                              }}
-                              animate={{
-                                x: 0,
-                                opacity: 1,
-                                transition: {
-                                  delay: index * 0.2,
-                                  type: "spring",
-                                  stiffness: 100,
-                                  damping: 10,
-                                },
-                              }}
-                              exit={{
-                                x: direction === "left" ? -100 : 100,
-                                opacity: 0,
-                                transition: { duration: 0.3 },
-                              }}
-                              whileHover={{ y: -10 }}
-                              className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 ${
-                                cardsPerSet === 1
-                                  ? "w-full max-w-80"
-                                  : "w-full max-w-64"
-                              }`}
-                            >
-                              <div
-                                className={`relative w-full ${
-                                  cardsPerSet === 1
-                                    ? "h-80 sm:h-96"
-                                    : "h-64 sm:h-72 lg:h-96"
-                                }`}
-                              >
-                                <Image
-                                  src={
-                                    member.image
-                                      ? buildImageSrc(member.image)
-                                      : "/placeholder-item.jpg"
-                                  }
-                                  alt={member.name}
-                                  fill
-                                  className="object-cover"
-                                  style={{ objectPosition: "center 10%" }}
-                                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
-                                  priority={index === 0}
-                                />
-                                {/* Color overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
+              return (
+                <motion.div
+                  key={member.id}
+                  initial={{
+                    x: direction === "left" ? -100 : 100,
+                    opacity: 0,
+                  }}
+                  whileInView={{
+                    x: 0,
+                    opacity: 1,
+                  }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: (index % 4) * 0.1,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 10,
+                  }}
+                  whileHover={{ y: -10 }}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 min-w-[85%] snap-start sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] w-full max-w-80"
+                >
+                  <div className="relative w-full h-80 sm:h-96">
+                    <Image
+                      src={
+                        member.image
+                          ? buildImageSrc(member.image)
+                          : "/placeholder-item.jpg"
+                      }
+                      alt={member.name}
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: "center 10%" }}
+                      sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 25vw"
+                      priority={index === 0}
+                    />
+                    {/* Color overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
-                                {/* Text overlay with background */}
-                                <div
-                                  className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 ${
-                                    cardsPerSet === 1
-                                      ? "top-[10rem] sm:top-[12rem]"
-                                      : "top-[8rem] sm:top-[10rem] lg:top-[12rem]"
-                                  }`}
-                                >
-                                  <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
-                                    <h3 className="text-sm sm:text-lg font-bold text-navy-950 mb-1">
-                                      {member.name}
-                                    </h3>
-                                    <p className="text-gold-500 font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
-                                      {member.position}
-                                    </p>
-                                    {member.congregation && (
-                                      <p className="text-gold-500 font-light text-xs mb-2">
-                                        {member.congregation}
-                                      </p>
-                                    )}
-                                    {member.quote && (
-                                      <p className="text-gray-700 mb-2 italic text-xs sm:text-sm">
-                                        &quot;{member.quote}&quot;
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })}
-                      </motion.div>
-                    )
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: totalSets }).map((_, index) => (
-                <button
-                  key={`dot-${index}`}
-                  onClick={() => setCurrentSet(index)}
-                  className={`w-3 h-3 rounded-full ${currentSet === index ? "bg-gold-500" : "bg-gray-300"}`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </>
+                    {/* Text overlay with background */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 top-[10rem] sm:top-[12rem]">
+                      <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
+                        <h3 className="text-sm sm:text-lg font-bold text-navy-950 mb-1">
+                          {member.name}
+                        </h3>
+                        <p className="text-gold-500 font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                          {member.position}
+                        </p>
+                        {member.congregation && (
+                          <p className="text-gold-500 font-light text-xs mb-2">
+                            {member.congregation}
+                          </p>
+                        )}
+                        {member.quote && (
+                          <p className="text-gray-700 mb-2 italic text-xs sm:text-sm">
+                            &quot;{member.quote}&quot;
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         )}
       </div>
     </section>
