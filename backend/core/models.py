@@ -34,29 +34,6 @@ class Supervisor(models.Model):
         verbose_name = "Supervisor"
         verbose_name_plural = "Supervisors"
 
-# Placeholder models - these will need to be properly defined later
-# For now, creating minimal models to prevent import errors
-
-class Quiz(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return self.title
-
-class QuizSubmission(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
-    congregation = models.CharField(max_length=100)
-    selected_answer = models.CharField(max_length=1)
-    is_correct = models.BooleanField(default=False)
-    submitted_at = models.DateTimeField(auto_now_add=True)
-
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -250,7 +227,6 @@ class Analytics(models.Model):
     date = models.DateField(unique=True)
     page_views = models.IntegerField(default=0)
     unique_visitors = models.IntegerField(default=0)
-    quiz_participants = models.IntegerField(default=0)
     donations_received = models.IntegerField(default=0)
     contact_submissions = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

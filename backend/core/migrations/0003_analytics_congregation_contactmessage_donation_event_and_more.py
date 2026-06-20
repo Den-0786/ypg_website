@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
                 ('date', models.DateField(unique=True)),
                 ('page_views', models.IntegerField(default=0)),
                 ('unique_visitors', models.IntegerField(default=0)),
-                ('quiz_participants', models.IntegerField(default=0)),
                 ('donations_received', models.IntegerField(default=0)),
                 ('contact_submissions', models.IntegerField(default=0)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
@@ -108,18 +107,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Quiz',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField(blank=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('start_time', models.DateTimeField()),
-                ('end_time', models.DateTimeField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-            ],
-        ),
-        migrations.CreateModel(
             name='TeamMember',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -158,19 +145,6 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='QuizSubmission',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('phone_number', models.CharField(max_length=20)),
-                ('congregation', models.CharField(max_length=100)),
-                ('selected_answer', models.CharField(max_length=1)),
-                ('is_correct', models.BooleanField(default=False)),
-                ('submitted_at', models.DateTimeField(auto_now_add=True)),
-                ('quiz', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.quiz')),
             ],
         ),
     ]

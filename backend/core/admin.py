@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Supervisor, Quiz, QuizSubmission, Event, TeamMember, Donation, ContactMessage,
+    Supervisor, Event, TeamMember, Donation, ContactMessage,
     MinistryRegistration, BlogPost, Testimonial, GalleryItem, 
     Congregation, Analytics
 )
@@ -11,20 +11,6 @@ class SupervisorAdmin(admin.ModelAdmin):
     list_filter = ['is_supervisor', 'created_at']
     search_fields = ['user__username', 'user__email']
     readonly_fields = ['session_token', 'created_at', 'updated_at']
-
-@admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
-    list_display = ['title', 'is_active', 'start_time', 'end_time', 'created_at']
-    list_filter = ['is_active', 'start_time', 'end_time']
-    search_fields = ['title', 'description']
-    readonly_fields = ['created_at']
-
-@admin.register(QuizSubmission)
-class QuizSubmissionAdmin(admin.ModelAdmin):
-    list_display = ['name', 'quiz', 'congregation', 'selected_answer', 'is_correct', 'submitted_at']
-    list_filter = ['is_correct', 'submitted_at', 'congregation']
-    search_fields = ['name', 'phone_number', 'congregation']
-    readonly_fields = ['submitted_at']
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -90,6 +76,6 @@ class CongregationAdmin(admin.ModelAdmin):
 
 @admin.register(Analytics)
 class AnalyticsAdmin(admin.ModelAdmin):
-    list_display = ['date', 'page_views', 'unique_visitors', 'quiz_participants', 'donations_received']
+    list_display = ['date', 'page_views', 'unique_visitors', 'donations_received']
     list_filter = ['date']
     readonly_fields = ['created_at']

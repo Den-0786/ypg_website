@@ -17,14 +17,13 @@ import re
 from datetime import datetime, timedelta
 from .models import Supervisor
 from .models import (
-    Quiz, QuizSubmission, Event, TeamMember, Donation,
+    Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive,
     Ministry, Sale, Expense, Contribution, VisionMission
 )
 from .serializers import (
-    QuizSerializer, QuizSubmissionSerializer, QuizCreateSerializer,
-    QuizResultsSerializer, EventSerializer, TeamMemberSerializer,
+    EventSerializer, TeamMemberSerializer,
     DonationSerializer, ContactMessageSerializer, MinistryRegistrationSerializer,
     BlogPostSerializer, TestimonialSerializer, GalleryItemSerializer,
     CongregationSerializer, AnalyticsSerializer, AdvertisementSerializer,
@@ -533,215 +532,6 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
-
-# Quiz API endpoints
-@csrf_exempt
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def api_active_quiz(request):
-    """Get the currently active quiz"""
-    try:
-        active_quiz = Quiz.objects.filter(
-            is_active=True,
-            start_time__lte=timezone.now(),
-            end_time__gte=timezone.now()
-        ).first()
-        
-        if not active_quiz:
-            return Response({
-                'success': False,
-                'error': 'No active quiz found'
-            }, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = QuizSerializer(active_quiz)
-        return Response({
-            'success': True,
-            'quiz': serializer.data
-        })
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@csrf_exempt
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def api_quizzes(request):
-    """Get all quizzes"""
-    try:
-        quizzes = Quiz.objects.all().order_by('-created_at')
-        serializer = QuizSerializer(quizzes, many=True)
-        return Response({
-            'success': True,
-            'quizzes': serializer.data
-        })
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@csrf_exempt
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def api_submit_quiz(request):
-    """Submit a quiz answer"""
-    try:
-        data = json.loads(request.body)
-        quiz_id = data.get('quiz_id')
-        name = data.get('name')
-        phone_number = data.get('phone_number')
-        congregation = data.get('congregation')
-        selected_answer = data.get('selected_answer')
-        
-        if not all([quiz_id, name, phone_number, congregation, selected_answer]):
-            return Response({
-                'success': False,
-                'error': 'All fields are required'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        quiz = get_object_or_404(Quiz, id=quiz_id)
-        
-        # Check if quiz is active
-        if not quiz.is_currently_active:
-            return Response({
-                'success': False,
-                'error': 'Quiz is not currently active'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Check if user already submitted
-        existing_submission = QuizSubmission.objects.filter(
-            quiz=quiz,
-            phone_number=phone_number
-        ).first()
-        
-        if existing_submission:
-            return Response({
-                'success': False,
-                'error': 'You have already submitted this quiz'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Check if answer is correct
-        is_correct = selected_answer.upper() == quiz.correct_answer.upper()
-        
-        # Create submission
-        submission = QuizSubmission.objects.create(
-            quiz=quiz,
-            name=name,
-            phone_number=phone_number,
-            congregation=congregation,
-            selected_answer=selected_answer.upper(),
-            is_correct=is_correct
-        )
-        
-        message = "Correct answer! Well done!" if is_correct else f"Wrong answer. The correct answer was {quiz.correct_answer}."
-        
-        return Response({
-            'success': True,
-            'message': message,
-            'is_correct': is_correct,
-            'submission_id': submission.id
-        })
-        
-    except Quiz.DoesNotExist:
-        return Response({
-            'success': False,
-            'error': 'Quiz not found'
-        }, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@csrf_exempt
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def api_quiz_results(request):
-    """Get quiz results"""
-    try:
-        # Get all quizzes that have ended
-        ended_quizzes = Quiz.objects.filter(
-            end_time__lt=timezone.now()
-        ).order_by('-end_time')
-        
-        serializer = QuizResultsSerializer(ended_quizzes, many=True)
-        return Response({
-            'success': True,
-            'results': serializer.data
-        })
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@csrf_exempt
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def api_create_quiz(request):
-    """Create a new quiz (Admin only)"""
-    try:
-        data = json.loads(request.body)
-        serializer = QuizCreateSerializer(data=data)
-        
-        if serializer.is_valid():
-            quiz = serializer.save()
-            return Response({
-                'success': True,
-                'message': 'Quiz created successfully',
-                'quiz_id': quiz.id
-            }, status=status.HTTP_201_CREATED)
-        else:
-            return Response({
-                'success': False,
-                'error': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@csrf_exempt
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def api_end_quiz(request, quiz_id):
-    """End a quiz (Admin only)"""
-    try:
-        quiz = get_object_or_404(Quiz, id=quiz_id)
-        quiz.is_active = False
-        quiz.save()
-        
-        return Response({
-            'success': True,
-            'message': 'Quiz ended successfully'
-        })
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@csrf_exempt
-@api_view(['DELETE'])
-@permission_classes([AllowAny])
-def api_delete_quiz(request, quiz_id):
-    """Delete a quiz (Admin only)"""
-    try:
-        quiz = get_object_or_404(Quiz, id=quiz_id)
-        quiz.delete()
-        
-        return Response({
-            'success': True,
-            'message': 'Quiz deleted successfully'
-        })
-    except Exception as e:
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Events API endpoints
 @csrf_exempt
@@ -2583,7 +2373,20 @@ def api_analytics(request):
         total_testimonials = Testimonial.objects.filter(is_active=True).count()
         total_ministry_registrations = MinistryRegistration.objects.count()
         total_contact_messages = ContactMessage.objects.count()
-        
+
+        # Build visitor history for the last 30 days
+        from datetime import timedelta
+        start_date = today - timedelta(days=29)
+        history_qs = Analytics.objects.filter(date__gte=start_date).order_by('date')
+        history = [
+            {
+                'date': h.date.strftime('%Y-%m-%d'),
+                'page_views': h.page_views,
+                'unique_visitors': h.unique_visitors,
+            }
+            for h in history_qs
+        ]
+
         serializer = AnalyticsSerializer(analytics)
         data = serializer.data
         data.update({
@@ -2594,6 +2397,7 @@ def api_analytics(request):
             'total_testimonials': total_testimonials,
             'total_ministry_registrations': total_ministry_registrations,
             'total_contact_messages': total_contact_messages,
+            'history': history,
         })
         
         return Response({
@@ -2622,8 +2426,6 @@ def api_track_analytics(request):
             analytics.page_views += 1
         elif event_type == 'unique_visitor':
             analytics.unique_visitors += 1
-        elif event_type == 'quiz_participant':
-            analytics.quiz_participants += 1
         elif event_type == 'donation':
             analytics.donations_received += 1
         elif event_type == 'contact_submission':

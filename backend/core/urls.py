@@ -21,15 +21,6 @@ urlpatterns = [
     path('api/debug/session/', views.api_debug_session, name='api_debug_session'),
     path('api/test/cookie/', views.api_test_cookie, name='api_test_cookie'),
     
-    # Quiz API endpoints
-    path('api/quizzes/active/', views.api_active_quiz, name='api_active_quiz'),
-    path('api/quizzes/', views.api_quizzes, name='api_quizzes'),
-    path('api/quizzes/submit/', views.api_submit_quiz, name='api_submit_quiz'),
-    path('api/quizzes/results/', views.api_quiz_results, name='api_quiz_results'),
-    path('api/quizzes/create/', views.api_create_quiz, name='api_create_quiz'),
-    path('api/quizzes/<int:quiz_id>/end/', views.api_end_quiz, name='api_end_quiz'),
-    path('api/quizzes/<int:quiz_id>/delete/', views.api_delete_quiz, name='api_delete_quiz'),
-    
     # Events API endpoints
     path('api/events/', views.api_events, name='api_events'),
     path('api/events/<int:event_id>/', views.api_event_detail, name='api_event_detail'),

@@ -50,3 +50,8 @@ venv/
 
 # data files
 /data/
+
+__pycache__/
+*.pyc
+*.pyo
+backend/media/

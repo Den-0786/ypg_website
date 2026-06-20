@@ -47,16 +47,6 @@ A comprehensive website for the Presbyterian Church of Ghana (PCG) Ahinsan Distr
 
 ### 🔧 **Backend API Endpoints**
 
-#### **Quiz System**
-
-- `GET /api/quizzes/active/` - Get active quiz
-- `GET /api/quizzes/` - Get all quizzes
-- `POST /api/quizzes/submit/` - Submit quiz answer
-- `GET /api/quizzes/results/` - Get quiz results
-- `POST /api/quizzes/create/` - Create new quiz
-- `POST /api/quizzes/{id}/end/` - End quiz
-- `DELETE /api/quizzes/{id}/delete/` - Delete quiz
-
 #### **Events Management**
 
 - `GET /api/events/` - Get all events
@@ -230,7 +220,6 @@ A comprehensive website for the Presbyterian Church of Ghana (PCG) Ahinsan Distr
 
 ### **Core Models**
 
-- **Quiz & QuizSubmission** - Interactive quizzes
 - **Event** - Event management
 - **TeamMember** - Team organization
 - **Donation** - Financial tracking

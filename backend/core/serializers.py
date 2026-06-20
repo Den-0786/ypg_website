@@ -1,30 +1,10 @@
 from rest_framework import serializers
 from .models import (
-    Quiz, QuizSubmission, Event, TeamMember, Donation,
+    Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem,
     Ministry, Sale, Expense, Contribution, VisionMission
 )
-
-class QuizSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Quiz
-        fields = '__all__'
-
-class QuizSubmissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuizSubmission
-        fields = '__all__'
-
-class QuizCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Quiz
-        fields = '__all__'
-
-class QuizResultsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Quiz
-        fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
