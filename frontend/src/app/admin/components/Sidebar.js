@@ -35,6 +35,8 @@ const Sidebar = ({
   sidebarCollapsed,
   setSidebarCollapsed,
 }) => {
+  const isDark = theme === "dark";
+
   const navigation = [
     { id: "overview", name: "Overview", icon: Home },
     { id: "team", name: "District Executives", icon: Users },
@@ -84,7 +86,11 @@ const Sidebar = ({
       <aside
         className={`fixed lg:relative lg:top-60px top-0 lg:translate-x-0 z-50 h-full transition-all duration-300 ease-in-out ${
           sidebarOpen ? "w-64" : sidebarCollapsed ? "w-16" : "w-64"
-        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} bg-navy-950/50 backdrop-blur-xl border-r border-white/10 shadow-xl lg:shadow-lg`}
+        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} backdrop-blur-xl border-r shadow-xl lg:shadow-lg ${
+          isDark
+            ? "bg-navy-950/50 border-white/10"
+            : "bg-white/90 border-gray-200"
+        }`}
         style={{
           height: "calc(100vh - 60px)",
           top: "10px",
@@ -92,10 +98,14 @@ const Sidebar = ({
         }}
       >
         <div className="flex flex-col h-full">
-          <div className="hidden lg:flex items-center justify-end p-2 border-b border-white/10">
+          <div className={`hidden lg:flex items-center justify-end p-2 border-b ${isDark ? "border-white/10" : "border-gray-200"}`}>
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-2 rounded-lg transition-colors text-blue-100 hover:text-gold-300 hover:bg-white/10"
+              className={`p-2 rounded-lg transition-colors ${
+                isDark
+                  ? "text-blue-100 hover:text-gold-300 hover:bg-white/10"
+                  : "text-gray-600 hover:text-gold-500 hover:bg-gray-100"
+              }`}
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {sidebarCollapsed ? (
@@ -128,8 +138,12 @@ const Sidebar = ({
                   }}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === item.id
-                      ? "bg-white/10 text-gold-300 border border-gold-500/50 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
-                      : "text-blue-100 hover:bg-white/10 hover:text-white"
+                      ? isDark
+                        ? "bg-white/10 text-gold-300 border border-gold-500/50 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                        : "bg-gold-100 text-navy-950 border border-gold-500/50"
+                      : isDark
+                        ? "text-blue-100 hover:bg-white/10 hover:text-white"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-navy-950"
                   }`}
                   title={sidebarCollapsed ? item.name : ""}
                 >
@@ -145,7 +159,11 @@ const Sidebar = ({
           </nav>
 
           {/* Bottom section */}
-          <div className="p-4 border-t border-white/10 space-y-3 flex-shrink-0 mt-auto bg-white/5 backdrop-blur-md"
+          <div className={`p-4 border-t space-y-3 flex-shrink-0 mt-auto backdrop-blur-md ${
+              isDark
+                ? "border-white/10 bg-white/5"
+                : "border-gray-200 bg-gray-50"
+            }`}
           >
             {/* Theme toggle */}
             <button
@@ -153,7 +171,11 @@ const Sidebar = ({
                 e.stopPropagation();
                 toggleTheme();
               }}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors shadow-sm bg-white/10 text-blue-100 hover:bg-white/15 hover:text-white"
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors shadow-sm ${
+                isDark
+                  ? "bg-white/10 text-blue-100 hover:bg-white/15 hover:text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-navy-950"
+              }`}
               title={sidebarCollapsed ? "Theme" : ""}
             >
               {(sidebarOpen || !sidebarCollapsed) && (
@@ -175,7 +197,11 @@ const Sidebar = ({
                   setSidebarOpen(false);
                 }
               }}
-              className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors shadow-sm bg-white/10 text-blue-100 hover:bg-white/15 hover:text-white"
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors shadow-sm ${
+                isDark
+                  ? "bg-white/10 text-blue-100 hover:bg-white/15 hover:text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-navy-950"
+              }`}
               title={sidebarCollapsed ? "Settings" : ""}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />

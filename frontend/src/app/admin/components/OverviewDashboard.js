@@ -89,6 +89,8 @@ export default function OverviewDashboard({
     },
   ];
 
+  const isDark = theme === "dark";
+
   const visitorHistory = analytics?.history || [];
   const dailyVisitors = analytics?.unique_visitors || 0;
   const weeklyVisitors = visitorHistory
@@ -190,7 +192,7 @@ export default function OverviewDashboard({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="rgba(255,255,255,0.12)"
+          stroke={isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}
           strokeWidth={stroke}
           fill="transparent"
         />
@@ -243,12 +245,16 @@ export default function OverviewDashboard({
       {/* Welcome Section */}
       <motion.div
         variants={cardVariants}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-md p-8 text-white shadow-2xl shadow-gold-500/10"
+        className={`rounded-3xl border backdrop-blur-md p-8 shadow-2xl ${
+          isDark
+            ? "border-white/10 bg-white/10 text-white shadow-gold-500/10"
+            : "border-gray-200 bg-white/80 text-navy-950 shadow-gray-200/50"
+        }`}
       >
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Welcome back! 👋</h1>
-            <p className="text-blue-100 text-lg">
+            <p className={`text-lg ${isDark ? "text-blue-100" : "text-gray-600"}`}>
               Here&apos;s what&apos;s happening with your YPG ministry today.
             </p>
           </div>
@@ -267,17 +273,21 @@ export default function OverviewDashboard({
             <motion.div
               key={card.title}
               variants={cardVariants}
-              className="rounded-2xl border border-white/10 bg-white/10 backdrop-blur-sm p-5 hover:bg-white/15 transition-all duration-300 group cursor-pointer shadow-lg shadow-gold-500/5"
+              className={`rounded-2xl border backdrop-blur-sm p-5 transition-all duration-300 group cursor-pointer shadow-lg ${
+                isDark
+                  ? "border-white/10 bg-white/10 hover:bg-white/15 shadow-gold-500/5"
+                  : "border-gray-200 bg-white/80 hover:bg-white text-navy-950 shadow-gray-200/50"
+              }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-blue-100">
+                <p className={`text-sm font-medium ${isDark ? "text-blue-100" : "text-gray-600"}`}>
                   {card.title}
                 </p>
                 <div className={`p-2 rounded-lg bg-gradient-to-r ${card.gradient} shadow-md`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
               </div>
-              <p className={`text-2xl font-bold text-white`}>
+              <p className={`text-2xl font-bold ${isDark ? "text-white" : "text-navy-950"}`}>
                 {card.value}
               </p>
             </motion.div>
@@ -288,14 +298,18 @@ export default function OverviewDashboard({
       {/* Visitor Analytics */}
       <motion.div
         variants={cardVariants}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-md p-6 sm:p-8 shadow-2xl shadow-gold-500/10"
+        className={`rounded-3xl border backdrop-blur-md p-6 sm:p-8 shadow-2xl ${
+          isDark
+            ? "border-white/10 bg-white/10 shadow-gold-500/10"
+            : "border-gray-200 bg-white/80 shadow-gray-200/50"
+        }`}
       >
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-navy-950"}`}>
               Visitor Analytics
             </h3>
-            <p className="text-blue-200 text-sm">
+            <p className={`text-sm ${isDark ? "text-blue-200" : "text-gray-600"}`}>
               Daily, weekly, and monthly visitor trends
             </p>
           </div>
@@ -311,23 +325,27 @@ export default function OverviewDashboard({
             return (
               <div
                 key={card.title}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/10 backdrop-blur-sm p-5 hover:bg-white/15 transition-colors group"
+                className={`relative overflow-hidden rounded-2xl border backdrop-blur-sm p-5 transition-colors group ${
+                  isDark
+                    ? "border-white/10 bg-white/10 hover:bg-white/15"
+                    : "border-gray-200 bg-white/80 hover:bg-white"
+                }`}
               >
                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gold-500/10 to-blue-500/10 rounded-bl-full -mr-6 -mt-6" />
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm font-medium text-blue-100">
+                  <p className={`text-sm font-medium ${isDark ? "text-blue-100" : "text-gray-600"}`}>
                     {card.title}
                   </p>
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-gold-500/20 to-blue-500/20 border border-white/10">
-                    <Icon className="w-5 h-5 text-gold-300" />
+                  <div className={`p-2 rounded-lg bg-gradient-to-br from-gold-500/20 to-blue-500/20 border ${isDark ? "border-white/10" : "border-gray-200"}`}>
+                    <Icon className="w-5 h-5 text-gold-500" />
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className={`text-2xl font-bold ${isDark ? "text-white" : "text-navy-950"}`}>
                       {card.value.toLocaleString()}
                     </p>
-                    <p className="text-xs text-blue-300 mt-1">
+                    <p className={`text-xs mt-1 ${isDark ? "text-blue-300" : "text-gray-500"}`}>
                       of {card.max.toLocaleString()} max
                     </p>
                   </div>
@@ -345,7 +363,7 @@ export default function OverviewDashboard({
           })}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 h-80 sm:h-96 w-full">
+        <div className={`rounded-2xl border p-4 h-80 sm:h-96 w-full ${isDark ? "border-white/10 bg-white/5" : "border-gray-200 bg-white/50"}`}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
               <defs>
@@ -368,18 +386,18 @@ export default function OverviewDashboard({
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.08)"
+                stroke={isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}
                 vertical={false}
               />
               <XAxis
                 dataKey="label"
-                stroke="rgba(191,219,254,0.5)"
+                stroke={isDark ? "rgba(191,219,254,0.5)" : "rgba(75,85,99,0.6)"}
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="rgba(191,219,254,0.5)"
+                stroke={isDark ? "rgba(191,219,254,0.5)" : "rgba(75,85,99,0.6)"}
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
@@ -387,12 +405,12 @@ export default function OverviewDashboard({
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "rgba(5,11,46,0.95)",
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  backgroundColor: isDark ? "rgba(5,11,46,0.95)" : "rgba(255,255,255,0.95)",
+                  border: isDark ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,0,0,0.1)",
                   borderRadius: "0.75rem",
-                  color: "#FFFFFF",
+                  color: isDark ? "#FFFFFF" : "#1a1a1a",
                 }}
-                itemStyle={{ color: "#D4AF37" }}
+                itemStyle={{ color: isDark ? "#D4AF37" : "#0F4C81" }}
               />
               <Area
                 type="monotone"
@@ -419,14 +437,18 @@ export default function OverviewDashboard({
       {/* Quick Actions */}
       <motion.div
         variants={cardVariants}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-md p-6 sm:p-8 shadow-2xl shadow-gold-500/10"
+        className={`rounded-3xl border backdrop-blur-md p-6 sm:p-8 shadow-2xl ${
+          isDark
+            ? "border-white/10 bg-white/10 shadow-gold-500/10"
+            : "border-gray-200 bg-white/80 shadow-gray-200/50"
+        }`}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-navy-950"}`}>
               Quick Actions
             </h3>
-            <p className="text-blue-100 text-sm">
+            <p className={`text-sm ${isDark ? "text-blue-100" : "text-gray-600"}`}>
               Common tasks to manage your ministry
             </p>
           </div>
@@ -441,20 +463,24 @@ export default function OverviewDashboard({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={action.action}
-                className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-6 hover:bg-white/15 transition-all duration-300 text-left"
+                className={`group relative overflow-hidden rounded-xl border p-6 transition-all duration-300 text-left ${
+                  isDark
+                    ? "border-white/10 bg-white/10 hover:bg-white/15"
+                    : "border-gray-200 bg-white/80 hover:bg-white"
+                }`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className={`p-3 rounded-xl bg-gradient-to-r ${action.gradient} shadow-lg`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowUpRight className="w-5 h-5 text-gold-300" />
+                    <ArrowUpRight className={`w-5 h-5 ${isDark ? "text-gold-300" : "text-gold-500"}`} />
                   </div>
                 </div>
-                <h4 className="text-lg font-semibold mb-2 text-white">
+                <h4 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-navy-950"}`}>
                   {action.title}
                 </h4>
-                <p className="text-sm text-blue-100">
+                <p className={`text-sm ${isDark ? "text-blue-100" : "text-gray-600"}`}>
                   {action.description}
                 </p>
               </motion.button>
@@ -466,14 +492,18 @@ export default function OverviewDashboard({
       {/* Recent Activity */}
       <motion.div
         variants={cardVariants}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-md p-6 sm:p-8 shadow-2xl shadow-gold-500/10"
+        className={`rounded-3xl border backdrop-blur-md p-6 sm:p-8 shadow-2xl ${
+          isDark
+            ? "border-white/10 bg-white/10 shadow-gold-500/10"
+            : "border-gray-200 bg-white/80 shadow-gray-200/50"
+        }`}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-navy-950"}`}>
               Recent Activity
             </h3>
-            <p className="text-blue-100 text-sm">
+            <p className={`text-sm ${isDark ? "text-blue-100" : "text-gray-600"}`}>
               Latest updates from your ministry
             </p>
           </div>
@@ -572,16 +602,18 @@ export default function OverviewDashboard({
             return (
               <div
                 key={index}
-                className="flex items-center space-x-4 p-4 rounded-xl transition-colors hover:bg-white/10"
+                className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${
+                  isDark ? "hover:bg-white/10" : "hover:bg-gray-50"
+                }`}
               >
                 <div className={`p-2 rounded-lg ${colorClass}`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-white">
+                  <p className={`font-medium ${isDark ? "text-white" : "text-navy-950"}`}>
                     {activity.text}
                   </p>
-                  <p className="text-sm text-blue-200">
+                  <p className={`text-sm ${isDark ? "text-blue-200" : "text-gray-500"}`}>
                     {activity.time}
                   </p>
                 </div>

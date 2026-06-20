@@ -178,18 +178,14 @@ export default function GallerySection() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <div
-                className="flex gap-4 sm:gap-6 pb-4"
-                style={{ minWidth: "max-content" }}
-              >
-                {filteredItems.map((item, index) => (
+            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:overflow-visible pb-4">
+              {filteredItems.map((item, index) => (
                   <motion.div
                     key={`${contentType}-${index}`}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-48 sm:w-56"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 min-w-full snap-start md:min-w-0 w-full"
                   >
                     <div className="relative w-full h-80 sm:h-96">
                       {item.image ? (
@@ -267,7 +263,6 @@ export default function GallerySection() {
                     </div>
                   </motion.div>
                 ))}
-              </div>
             </div>
           </>
         )}

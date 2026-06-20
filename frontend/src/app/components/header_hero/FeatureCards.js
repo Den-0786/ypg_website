@@ -75,7 +75,7 @@ export default function FeatureCards() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 md:overflow-visible pb-4"
         >
           {cards.map((card, index) => {
             const Icon = icons[card.title] || ArrowRight;
@@ -84,7 +84,7 @@ export default function FeatureCards() {
                 key={index}
                 variants={cardItem}
                 whileHover={{ y: -8 }}
-                className="bg-navy-950 p-6 sm:p-8 border-t-4 border-gold-500 shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                className="bg-navy-950 p-6 sm:p-8 min-w-full snap-start md:min-w-0 border-t-4 border-gold-500 shadow-xl hover:shadow-2xl transition-all duration-300 group"
               >
                 <div className="w-14 h-14 bg-gold-500/10 flex items-center justify-center mb-6">
                   <Icon className="w-7 h-7 text-gold-400" />

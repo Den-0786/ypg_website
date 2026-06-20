@@ -149,19 +149,14 @@ export default function PastExecutives() {
         </div>
 
         {pastExecutives.length > 0 && (
-          <div className="relative">
-            <div className="overflow-x-auto scrollbar-hide">
-              <div
-                className="flex gap-6 px-2 pb-4"
-                style={{ width: "max-content" }}
-              >
-                {pastExecutives.map((executive, index) => (
+          <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4 md:overflow-visible">
+            {pastExecutives.map((executive, index) => (
                   <motion.div
                     key={executive.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 w-64 flex-shrink-0"
+                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 min-w-full snap-start md:min-w-0 w-full"
                   >
                     <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
                       {executive.image ? (
@@ -207,10 +202,8 @@ export default function PastExecutives() {
                   </motion.div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
-        )}
-      </div>
-    </section>
+        </section>
   );
 }

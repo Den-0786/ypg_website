@@ -206,9 +206,8 @@ export default function AdvertisementSection() {
             </div>
           </div>
         ) : (
-          <div className="overflow-x-auto pb-4">
-            <div className="flex gap-4 md:gap-6 min-w-max items-start">
-              {filteredAdvertisements.map((ad, index) => {
+          <div className="flex overflow-x-auto snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 sm:overflow-visible items-start pb-4">
+            {filteredAdvertisements.map((ad, index) => {
                 const currentIndex = currentImageIndex[ad.id] || 0;
                 const hasImages = ad.images && ad.images.length > 0;
                 const isExpanded = expandedCard === ad.id;
@@ -219,11 +218,11 @@ export default function AdvertisementSection() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 w-[260px] flex-shrink-0 self-start h-fit"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 min-w-full snap-start sm:min-w-0 self-start h-fit"
                   >
                     {/* Image Carousel */}
                     <div
-                      className="relative h-64 bg-blue-50"
+                      className="relative h-48 sm:h-64 bg-blue-50"
                       onMouseEnter={() =>
                         setAutoPlay((prev) => ({ ...prev, [ad.id]: false }))
                       }
@@ -393,7 +392,6 @@ export default function AdvertisementSection() {
                   </motion.div>
                 );
               })}
-            </div>
           </div>
         )}
 

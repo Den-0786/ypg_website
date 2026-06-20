@@ -547,7 +547,13 @@ function AdminDashboardInner() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden bg-[#050b2e] text-white">
+    <div
+      className={`min-h-screen relative overflow-x-hidden transition-colors duration-300 ${
+        theme === "dark"
+          ? "bg-[#050b2e] text-white"
+          : "bg-gray-100 text-navy-950"
+      }`}
+    >
       {/* Ambient background shapes */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-24 -left-24 w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-[120px]" />

@@ -340,7 +340,7 @@ export default function AdvertisementManagement({ theme }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2
             className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}
@@ -351,7 +351,7 @@ export default function AdvertisementManagement({ theme }) {
             Manage member advertisements and submissions
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-auto">
           <button
             onClick={fetchAdvertisements}
             className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
@@ -396,7 +396,7 @@ export default function AdvertisementManagement({ theme }) {
         </div>
       </div>
 
-      <div className="flex justify-center items-start gap-4 sm:gap-8 overflow-x-auto pb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 pb-4">
         {filteredAds.map((ad, index) => {
           const currentIndex = currentImageIndex[ad.id] || 0;
           const hasImages = ad.images && ad.images.length > 0;
@@ -408,7 +408,7 @@ export default function AdvertisementManagement({ theme }) {
               key={ad.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`rounded-lg shadow-md border overflow-hidden w-full max-w-64 flex-shrink-0 self-start ${
+              className={`rounded-lg shadow-md border overflow-hidden w-full ${
                 theme === "dark"
                   ? "bg-gray-800 border-gray-700"
                   : "bg-white border-gray-200"
@@ -416,7 +416,7 @@ export default function AdvertisementManagement({ theme }) {
             >
               {/* Image Carousel */}
               <div
-                className="relative h-64 bg-blue-50"
+                className="relative h-48 sm:h-64 bg-blue-50"
                 onMouseEnter={() =>
                   setAutoPlay((prev) => ({ ...prev, [ad.id]: false }))
                 }
@@ -501,7 +501,7 @@ export default function AdvertisementManagement({ theme }) {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h3
