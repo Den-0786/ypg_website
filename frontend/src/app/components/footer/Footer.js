@@ -31,6 +31,7 @@ export default function Footer() {
 
   const phoneNumber = siteSettings?.phoneNumber || "+233 531427671";
   const contactEmail = siteSettings?.contactEmail || "ahinsandistrictypg@gmail.com";
+  const locationAddress = siteSettings?.address || "PCG, Emmanuel Congregation Ahinsan - Kumasi";
   const cleanPhone = phoneNumber.replace(/\D/g, "");
 
   // Enhanced Tooltip component
@@ -297,7 +298,7 @@ export default function Footer() {
                 />
                 <div>
                   <p className="font-medium">Location</p>
-                  <p>PCG, Emmanuel Congregation Ahinsan - Kumasi</p>
+                  <p>{locationAddress}</p>
                 </div>
               </li>
             </ul>

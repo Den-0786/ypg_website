@@ -38,6 +38,7 @@ export default function ContactSection() {
 
   const phoneNumber = siteSettings?.phoneNumber || "+233 531427671";
   const contactEmail = siteSettings?.contactEmail || "ahinsandistrictypg@gmail.com";
+  const locationAddress = siteSettings?.address || "PCG, Emmanuel Congregation Ahinsan - Kumasi";
   const cleanPhone = phoneNumber.replace(/\D/g, "");
 
   // Reset submission status on component mount
@@ -340,7 +341,7 @@ export default function ContactSection() {
                 <div>
                   <h4 className="font-semibold text-navy-950">Location</h4>
                   <p className="text-gray-600">
-                    Presbyterian Church Of Ghana, Ahinsan Kumasi
+                    {locationAddress}
                   </p>
                 </div>
               </div>
