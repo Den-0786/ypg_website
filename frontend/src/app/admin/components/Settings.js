@@ -264,6 +264,22 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         }
       } catch (error) {
         console.error("Failed to load website settings:", error);
+        const saved = localStorage.getItem("ypg_website_settings");
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            setGeneralSettings((prev) => ({
+              ...prev,
+              websiteTitle: data.websiteTitle || prev.websiteTitle,
+              contactEmail: data.contactEmail || prev.contactEmail,
+              phoneNumber: data.phoneNumber || prev.phoneNumber,
+              address: data.address || prev.address,
+              description: data.description || prev.description,
+            }));
+          } catch (e) {
+            console.error("Error parsing local website settings:", e);
+          }
+        }
       }
     };
     loadWebsiteSettings();
@@ -459,6 +475,11 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         return;
       }
 
+      // Keep a local copy of website settings so they survive reloads when the backend is offline
+      if (section === "website" && typeof window !== "undefined") {
+        localStorage.setItem("ypg_website_settings", JSON.stringify(generalSettings));
+      }
+
       // Make actual API calls
       let response;
       switch (section) {
@@ -597,6 +618,15 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         });
       }
     } catch (error) {
+      // If the backend is offline, website settings were already saved locally above
+      if (section === "website" && typeof window !== "undefined") {
+        setSaveStatus({
+          type: "success",
+          message: "Saved locally. Start the backend to sync online.",
+        });
+        addHistoryEntry("Website Content Updated", "Saved website settings locally");
+        return;
+      }
       setSaveStatus({
         type: "error",
         message: error.message || "Failed to save settings. Please try again.",
@@ -2078,16 +2108,16 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                                       : "bg-white hover:bg-gray-50"
                                   } transition-colors`}
                                 >
-                                  <td className={`px-4 py-3 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                                  <td className={`px-4 py-3 text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                                     {dateObj.toLocaleDateString()}
                                   </td>
-                                  <td className={`px-4 py-3 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                                  <td className={`px-4 py-3 text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                                     {dateObj.toLocaleTimeString()}
                                   </td>
-                                  <td className={`px-4 py-3 text-sm font-medium ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
+                                  <td className={`px-4 py-3 text-xs font-medium ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
                                     {item.username}
                                   </td>
-                                  <td className={`px-4 py-3 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                                  <td className={`px-4 py-3 text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                                     {item.action}
                                   </td>
                                 </tr>

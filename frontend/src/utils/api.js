@@ -246,9 +246,23 @@ export const settingsAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/api/settings/website`);
       const data = await response.json();
-      return data.success ? data.settings : null;
+      if (data.success && data.settings) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("ypg_website_settings", JSON.stringify(data.settings));
+        }
+        return data.settings;
+      }
+      return null;
     } catch (error) {
       console.error("Error fetching website settings:", error);
+      const saved = typeof window !== "undefined" ? localStorage.getItem("ypg_website_settings") : null;
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return null;
+        }
+      }
       return null;
     }
   },
