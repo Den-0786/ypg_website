@@ -191,14 +191,14 @@ export default function PastExecutives() {
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 flex-1 flex flex-col">
                       <h3 className="text-xl font-semibold text-navy-950 mb-1 group-hover:text-purple-600 transition-colors duration-300">
                         {executive.name}
                       </h3>
                       <p className="text-gray-600 mb-2">
                         {executive.position_display}
                       </p>
-                      <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-3 py-1.5 rounded-full text-sm font-medium border border-purple-200">
+                      <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-3 py-1.5 rounded-full text-sm font-medium border border-purple-200 mt-auto">
                         {executive.reign_period}
                       </div>
                     </div>

@@ -176,7 +176,7 @@ export default function PastEvents() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 flex-1 flex flex-col">
                   <div className="flex items-center text-xs sm:text-sm text-gray-500 mb-2">
                     <svg
                       className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gold-500"
@@ -245,7 +245,7 @@ export default function PastEvents() {
                     </p>
                   </div>
 
-                  <div className="flex items-center text-xs sm:text-sm text-gray-500">
+                  <div className="flex items-center text-xs sm:text-sm text-gray-500 mt-auto">
                     <svg
                       className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-gold-500"
                       fill="none"

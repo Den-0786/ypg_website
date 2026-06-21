@@ -221,7 +221,7 @@ export default function EventSection() {
                     </span>
                   </div>
 
-                  <div>
+                  <div className="mt-auto">
                     <p className="text-sm text-gray-600 leading-relaxed">
                       {isExpanded ? event.description : shortDescription}
                       {event.description.length > 40 && (

@@ -75,7 +75,7 @@ export default function FeatureCards() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory md:justify-center"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           {cards.map((card, index) => {
@@ -93,7 +93,7 @@ export default function FeatureCards() {
                 <h3 className="text-xl font-bold text-white mb-3">
                   {card.title}
                 </h3>
-                <p className="text-blue-100/80 text-sm leading-relaxed mb-5">
+                <p className="text-blue-100/80 text-sm leading-relaxed mb-5 flex-1">
                   {card.title === "YPG Anthem" && isAnthemExpanded
                     ? card.fullDescription.split("\n").map((line, idx) => (
                         <span key={idx}>
@@ -106,7 +106,7 @@ export default function FeatureCards() {
                 {card.title === "YPG Anthem" ? (
                   <button
                     onClick={() => setIsAnthemExpanded(!isAnthemExpanded)}
-                    className="inline-flex items-center text-gold-400 hover:text-gold-300 text-sm font-bold uppercase tracking-wide"
+                    className="inline-flex items-center text-gold-400 hover:text-gold-300 text-sm font-bold uppercase tracking-wide mt-auto"
                   >
                     {isAnthemExpanded ? "Read Less" : "Read More"}
                     <svg
@@ -131,7 +131,7 @@ export default function FeatureCards() {
                     target={card.link.startsWith("http") ? "_blank" : "_self"}
                     rel={card.link.startsWith("http") ? "noopener noreferrer" : ""}
                     whileHover={{ x: 5 }}
-                    className="inline-flex items-center text-gold-400 hover:text-gold-300 text-sm font-bold uppercase tracking-wide"
+                    className="inline-flex items-center text-gold-400 hover:text-gold-300 text-sm font-bold uppercase tracking-wide mt-auto"
                   >
                     {card.title === "Database Management"
                       ? "Access Database"
