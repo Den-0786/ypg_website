@@ -149,23 +149,26 @@ export default function PastExecutives() {
         </div>
 
         {pastExecutives.length > 0 && (
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 scroll-smooth">
+          <div
+            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {pastExecutives.map((executive, index) => (
                   <motion.div
                     key={executive.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
+                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
                   >
-                    <div className="relative h-52 bg-gradient-to-br from-purple-100 to-blue-100">
+                    <div className="relative h-40 sm:h-52 bg-gradient-to-br from-purple-100 to-blue-100">
                       {executive.image ? (
                         <Image
                           src={buildImageSrc(executive.image)}
                           alt={executive.name}
                           width={256}
                           height={208}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

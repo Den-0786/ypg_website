@@ -158,7 +158,10 @@ export default function TeamSection() {
         )}
 
         {!loading && !error && teamMembers.length > 0 && (
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-4 scroll-smooth">
+          <div
+            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {teamMembers.map((member, index) => {
               const direction = index % 2 === 0 ? "left" : "right";
 
@@ -181,9 +184,9 @@ export default function TeamSection() {
                     damping: 10,
                   }}
                   whileHover={{ y: -10 }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                 >
-                  <div className="relative w-full h-80 sm:h-96">
+                  <div className="relative w-full h-64 sm:h-80 md:h-96">
                     <Image
                       src={
                         member.image
@@ -192,8 +195,7 @@ export default function TeamSection() {
                       }
                       alt={member.name}
                       fill
-                      className="object-cover"
-                      style={{ objectPosition: "center 10%" }}
+                      className="object-cover object-top"
                       sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 25vw"
                       priority={index === 0}
                     />

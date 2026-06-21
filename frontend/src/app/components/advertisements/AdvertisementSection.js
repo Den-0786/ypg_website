@@ -206,7 +206,10 @@ export default function AdvertisementSection() {
             </div>
           </div>
         ) : (
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 items-start pb-4 scroll-smooth">
+          <div
+            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {filteredAdvertisements.map((ad, index) => {
                 const currentIndex = currentImageIndex[ad.id] || 0;
                 const hasImages = ad.images && ad.images.length > 0;
@@ -218,11 +221,11 @@ export default function AdvertisementSection() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] self-start h-fit"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
                   >
                     {/* Image Carousel */}
                     <div
-                      className="relative h-48 sm:h-64 bg-blue-50"
+                      className="relative h-40 sm:h-56 md:h-64 bg-blue-50"
                       onMouseEnter={() =>
                         setAutoPlay((prev) => ({ ...prev, [ad.id]: false }))
                       }
@@ -238,7 +241,7 @@ export default function AdvertisementSection() {
                               : "/placeholder-item.jpg"
                           }
                           alt={`${ad.title} - Image ${currentIndex + 1}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover object-top"
                         />
 
                         {/* Navigation Arrows */}

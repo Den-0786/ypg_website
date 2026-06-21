@@ -135,9 +135,10 @@ export default function EventSection() {
           </p>
         </motion.div>
 
-        <div className="relative">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-6 px-2 pb-4" style={{ width: 'max-content' }}>
+        <div
+          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
               {events.map((event) => {
             const isExpanded = expandedEvents.has(event.id);
             const shortDescription =
@@ -148,20 +149,19 @@ export default function EventSection() {
             return (
               <motion.div
                 key={event.id}
-                className="w-80 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border-t-4 border-gold-500 flex-shrink-0"
+                className="flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border-t-4 border-gold-500 h-full"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
                 whileHover={{ y: -3 }}
               >
-                <div className="relative w-full h-72 overflow-hidden rounded-t-2xl">
+                <div className="relative w-full h-64 sm:h-72 overflow-hidden rounded-t-2xl">
                   <Image
                     src={event.image ? buildImageSrc(event.image) : "/hero.jpg"}
                     alt={event.title}
                     width={400}
                     height={288}
-                    className="w-full h-full object-cover object-center"
-                    style={{ objectPosition: "center 25%" }}
+                    className="w-full h-full object-cover object-top"
                     sizes="(max-width: 768px) 100vw, 33vw"
                     priority={false}
                   />
@@ -246,8 +246,6 @@ export default function EventSection() {
               </motion.div>
             );
           })}
-            </div>
-          </div>
         </div>
       </div>
     </section>

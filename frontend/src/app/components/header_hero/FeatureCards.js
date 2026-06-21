@@ -75,7 +75,8 @@ export default function FeatureCards() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 scroll-smooth"
+          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           {cards.map((card, index) => {
             const Icon = icons[card.title] || ArrowRight;
@@ -84,7 +85,7 @@ export default function FeatureCards() {
                 key={index}
                 variants={cardItem}
                 whileHover={{ y: -8 }}
-                className="bg-navy-950 p-6 sm:p-8 flex-shrink-0 w-[85%] snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] border-t-4 border-gold-500 shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                className="bg-navy-950 p-6 sm:p-8 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] border-t-4 border-gold-500 shadow-xl hover:shadow-2xl transition-all duration-300 group flex flex-col h-full overflow-hidden"
               >
                 <div className="w-14 h-14 bg-gold-500/10 flex items-center justify-center mb-6">
                   <Icon className="w-7 h-7 text-gold-400" />
