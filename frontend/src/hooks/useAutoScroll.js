@@ -7,6 +7,10 @@ export default function useAutoScroll(containerRef, { interval = 3500, enabled =
     const container = containerRef.current;
     if (!container || !enabled) return;
 
+    // Disable auto-scroll on touch devices (mobile) to prevent shaking
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) return;
+
     let isPaused = false;
 
     const pause = () => {
@@ -19,8 +23,6 @@ export default function useAutoScroll(containerRef, { interval = 3500, enabled =
 
     container.addEventListener("mouseenter", pause);
     container.addEventListener("mouseleave", resume);
-    container.addEventListener("touchstart", pause, { passive: true });
-    container.addEventListener("touchend", resume);
 
     const getCardWidth = () => {
       const firstCard = container.firstElementChild;
@@ -66,8 +68,6 @@ export default function useAutoScroll(containerRef, { interval = 3500, enabled =
       clearInterval(timer);
       container.removeEventListener("mouseenter", pause);
       container.removeEventListener("mouseleave", resume);
-      container.removeEventListener("touchstart", pause);
-      container.removeEventListener("touchend", resume);
     };
   }, [containerRef, enabled, interval]);
 }
