@@ -18,8 +18,13 @@ export default function AnalyticsTracker() {
             event_type: "unique_visitor",
           }),
         });
-        const data = await response.json();
-        console.log("Analytics response:", data);
+        console.log("Response status:", response.status);
+        const text = await response.text();
+        console.log("Response text:", text);
+        if (text) {
+          const data = JSON.parse(text);
+          console.log("Analytics response:", data);
+        }
       } catch (error) {
         console.error("Failed to track visit:", error);
       }
