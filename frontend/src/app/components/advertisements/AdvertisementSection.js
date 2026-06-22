@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 import CarouselDots from "../shared/CarouselDots";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 import {
   Phone,
   Mail,
@@ -35,6 +36,8 @@ export default function AdvertisementSection() {
 
     return () => clearInterval(interval);
   }, []);
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: advertisements.length > 1 });
 
   const fetchAdvertisements = async () => {
     try {

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 import { Database, Music, Users, ArrowRight } from "lucide-react";
 import CarouselDots from "../shared/CarouselDots";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 
 const icons = {
   "Database Management": Database,
@@ -37,6 +38,8 @@ export default function FeatureCards() {
       link: "https://ypg-markify.vercel.app/",
     },
   ];
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: cards.length > 1 });
 
   const container = {
     hidden: { opacity: 0 },
