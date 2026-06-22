@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 
 export default function PastEvents() {
+  const containerRef = useRef(null);
   const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedEvents, setExpandedEvents] = useState(new Set());
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: pastEvents.length > 1 });
 
   useEffect(() => {
     const fetchPastEvents = async () => {
@@ -147,6 +151,7 @@ export default function PastEvents() {
         </motion.div>
 
         <div
+          ref={containerRef}
           className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
@@ -163,7 +168,7 @@ export default function PastEvents() {
                 className="flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-t-4 border-gold-500 flex flex-col h-full"
                 whileHover={{ y: -10 }}
               >
-                <div className="relative h-64 sm:h-80 w-full overflow-hidden rounded-t-xl">
+                <div className="relative h-80 sm:h-96 w-full overflow-hidden rounded-t-xl">
                   <Image
                     src={event.image ? buildImageSrc(event.image) : "/hero.jpg"}
                     alt={event.title}

@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { Play, Download, MapPin, Calendar, ImageIcon } from "lucide-react";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 
 export default function GallerySection() {
+  const containerRef = useRef(null);
   const [contentType, setContentType] = useState("photos");
   const [galleryItems, setGalleryItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +72,8 @@ export default function GallerySection() {
       return item.category === "video";
     }
   });
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: filteredItems.length > 1 });
 
   const handleDownload = (item) => {
     if (item.image) {
@@ -177,6 +181,7 @@ export default function GallerySection() {
         ) : (
           <>
             <div
+              ref={containerRef}
               className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
               style={{ WebkitOverflowScrolling: "touch" }}
             >
@@ -188,7 +193,7 @@ export default function GallerySection() {
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                   >
-                    <div className="relative w-full h-64 sm:h-80 md:h-96">
+                    <div className="relative w-full h-80 sm:h-96 md:h-[28rem]">
                       {item.image ? (
                         <Image
                           src={buildImageSrc(item.image)}

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { buildImageSrc } from "../../../utils/config";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 
 function formatEventDate(start, end) {
   const startDate = new Date(start);
@@ -29,9 +30,12 @@ function formatEventDate(start, end) {
 }
 
 export default function EventSection() {
+  const containerRef = useRef(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedEvents, setExpandedEvents] = useState(new Set());
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: events.length > 1 });
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -136,6 +140,7 @@ export default function EventSection() {
         </motion.div>
 
         <div
+          ref={containerRef}
           className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
@@ -155,7 +160,7 @@ export default function EventSection() {
                 transition={{ duration: 0.4 }}
                 whileHover={{ y: -3 }}
               >
-                <div className="relative w-full h-64 sm:h-72 overflow-hidden rounded-t-2xl">
+                <div className="relative w-full h-80 sm:h-96 overflow-hidden rounded-t-2xl">
                   <Image
                     src={event.image ? buildImageSrc(event.image) : "/hero.jpg"}
                     alt={event.title}

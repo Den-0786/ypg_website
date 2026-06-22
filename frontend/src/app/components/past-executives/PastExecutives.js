@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 
 export default function PastExecutives() {
+  const containerRef = useRef(null);
   const [pastExecutives, setPastExecutives] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: pastExecutives.length > 1 });
 
   useEffect(() => {
     fetchPastExecutives();
@@ -150,6 +154,7 @@ export default function PastExecutives() {
 
         {pastExecutives.length > 0 && (
           <div
+            ref={containerRef}
             className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
@@ -161,7 +166,7 @@ export default function PastExecutives() {
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
                   >
-                    <div className="relative h-40 sm:h-52 bg-gradient-to-br from-purple-100 to-blue-100">
+                    <div className="relative h-56 sm:h-72 bg-gradient-to-br from-purple-100 to-blue-100">
                       {executive.image ? (
                         <Image
                           src={buildImageSrc(executive.image)}

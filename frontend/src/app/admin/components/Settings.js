@@ -222,7 +222,8 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     const loadWebsiteSettings = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`,
+          { cache: "no-store" }
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

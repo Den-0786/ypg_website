@@ -244,7 +244,9 @@ export const branchPresidentAPI = {
 export const settingsAPI = {
   getWebsiteSettings: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/settings/website`);
+      const response = await fetch(`${API_BASE_URL}/api/settings/website`, {
+        cache: "no-store",
+      });
       const data = await response.json();
       if (data.success && data.settings) {
         if (typeof window !== "undefined") {

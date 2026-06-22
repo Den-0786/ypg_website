@@ -225,7 +225,7 @@ export default function AdvertisementSection() {
                   >
                     {/* Image Carousel */}
                     <div
-                      className="relative h-40 sm:h-56 md:h-64 bg-blue-50"
+                      className="relative h-56 sm:h-72 md:h-80 bg-blue-50"
                       onMouseEnter={() =>
                         setAutoPlay((prev) => ({ ...prev, [ad.id]: false }))
                       }

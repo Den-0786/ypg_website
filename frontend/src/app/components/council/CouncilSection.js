@@ -3,13 +3,17 @@
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Users, Phone, Mail, MapPin } from "lucide-react";
+import useAutoScroll from "../../../hooks/useAutoScroll";
 
 export default function CouncilSection() {
+  const containerRef = useRef(null);
   const [councilMembers, setCouncilMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useAutoScroll(containerRef, { interval: 3500, enabled: councilMembers.length > 1 });
 
   useEffect(() => {
     const fetchCouncilMembers = async () => {
@@ -154,6 +158,7 @@ export default function CouncilSection() {
 
         {/* Council Members Cards */}
         <div
+          ref={containerRef}
           className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
@@ -185,7 +190,7 @@ export default function CouncilSection() {
                 }}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
               >
-                <div className="relative h-[18rem] sm:h-[22rem] lg:h-[24rem] w-full">
+                <div className="relative h-[22rem] sm:h-[26rem] lg:h-[28rem] w-full">
                   <img
                     src={getImageUrl(member.image)}
                     alt={member.name}
