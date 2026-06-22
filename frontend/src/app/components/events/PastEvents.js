@@ -6,7 +6,7 @@ import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import useAutoScroll from "../../../hooks/useAutoScroll";
-import CarouselDots from "../../shared/CarouselDots";
+import CarouselDots from "../shared/CarouselDots";
 
 export default function PastEvents() {
   const containerRef = useRef(null);

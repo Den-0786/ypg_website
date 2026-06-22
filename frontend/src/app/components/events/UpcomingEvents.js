@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { buildImageSrc } from "../../../utils/config";
 import useAutoScroll from "../../../hooks/useAutoScroll";
-import CarouselDots from "../../shared/CarouselDots";
+import CarouselDots from "../shared/CarouselDots";
 
 function formatEventDate(start, end) {
   const startDate = new Date(start);
