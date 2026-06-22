@@ -86,10 +86,14 @@ def api_settings_website(request):
     """Get or update website settings"""
     try:
         if request.method == 'GET':
-            return Response({
+            response = Response({
                 'success': True,
                 'settings': load_settings()
             })
+            response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            return response
         elif request.method == 'PUT':
             data = json.loads(request.body)
             current = load_settings()
