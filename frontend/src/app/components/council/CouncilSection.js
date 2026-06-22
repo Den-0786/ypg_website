@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Users, Phone, Mail, MapPin } from "lucide-react";
 import useAutoScroll from "../../../hooks/useAutoScroll";
+import CarouselDots from "../shared/CarouselDots";
 
 export default function CouncilSection() {
   const containerRef = useRef(null);
@@ -159,7 +160,7 @@ export default function CouncilSection() {
         {/* Council Members Cards */}
         <div
           ref={containerRef}
-          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           {councilMembers.map((member, index) => {
@@ -188,7 +189,7 @@ export default function CouncilSection() {
                   y: -8,
                   transition: { duration: 0.2 },
                 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
               >
                 <div className="relative h-[22rem] sm:h-[26rem] lg:h-[28rem] w-full">
                   <img
@@ -224,6 +225,8 @@ export default function CouncilSection() {
             );
           })}
         </div>
+
+        <CarouselDots containerRef={containerRef} itemCount={councilMembers.length} />
 
         {/* Bottom CTA removed per request */}
       </div>

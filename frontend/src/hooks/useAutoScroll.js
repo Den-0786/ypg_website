@@ -2,13 +2,12 @@
 
 import { useEffect } from "react";
 
-export default function useAutoScroll(containerRef, { interval = 3000, enabled = true } = {}) {
+export default function useAutoScroll(containerRef, { interval = 3500, enabled = true } = {}) {
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !enabled) return;
 
     let isPaused = false;
-    let rafId = null;
 
     const pause = () => {
       isPaused = true;
@@ -23,32 +22,37 @@ export default function useAutoScroll(containerRef, { interval = 3000, enabled =
     container.addEventListener("touchstart", pause, { passive: true });
     container.addEventListener("touchend", resume);
 
-    const advance = () => {
-      if (isPaused) return;
+    const getCardWidth = () => {
       const firstCard = container.firstElementChild;
-      if (!firstCard) return;
-
+      if (!firstCard) return 0;
       const gap = parseInt(getComputedStyle(container).gap || "0", 10) || 0;
-      const cardWidth = firstCard.getBoundingClientRect().width + gap;
-      const maxScroll = container.scrollWidth - container.clientWidth;
+      return firstCard.getBoundingClientRect().width + gap;
+    };
 
-      if (maxScroll <= 0) return;
-
-      if (container.scrollLeft + cardWidth >= maxScroll - 2) {
-        container.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        container.scrollBy({ left: cardWidth, behavior: "smooth" });
-      }
+    const scrollToIndex = (index) => {
+      const cardWidth = getCardWidth();
+      if (cardWidth <= 0) return;
+      container.scrollTo({ left: index * cardWidth, behavior: "smooth" });
     };
 
     const timer = setInterval(() => {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(advance);
+      if (isPaused) return;
+      const itemCount = container.children.length;
+      if (itemCount <= 1) return;
+
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      if (maxScroll <= 0) return;
+
+      const cardWidth = getCardWidth();
+      if (cardWidth <= 0) return;
+
+      const currentIndex = Math.round(container.scrollLeft / cardWidth);
+      const nextIndex = (currentIndex + 1) % itemCount;
+      scrollToIndex(nextIndex);
     }, interval);
 
     return () => {
       clearInterval(timer);
-      if (rafId) cancelAnimationFrame(rafId);
       container.removeEventListener("mouseenter", pause);
       container.removeEventListener("mouseleave", resume);
       container.removeEventListener("touchstart", pause);

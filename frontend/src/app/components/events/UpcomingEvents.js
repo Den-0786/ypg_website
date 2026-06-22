@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { buildImageSrc } from "../../../utils/config";
 import useAutoScroll from "../../../hooks/useAutoScroll";
+import CarouselDots from "../../shared/CarouselDots";
 
 function formatEventDate(start, end) {
   const startDate = new Date(start);
@@ -141,7 +142,7 @@ export default function EventSection() {
 
         <div
           ref={containerRef}
-          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
               {events.map((event) => {
@@ -154,9 +155,10 @@ export default function EventSection() {
             return (
               <motion.div
                 key={event.id}
-                className="flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border-t-4 border-gold-500 h-full"
+                className="flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col border-t-4 border-gold-500 h-full"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.4 }}
                 whileHover={{ y: -3 }}
               >
@@ -252,6 +254,7 @@ export default function EventSection() {
             );
           })}
         </div>
+        <CarouselDots containerRef={containerRef} itemCount={events.length} />
       </div>
     </section>
   );

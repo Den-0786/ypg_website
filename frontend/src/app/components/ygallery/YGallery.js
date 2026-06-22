@@ -4,6 +4,7 @@ import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { Play, Download, MapPin, Calendar, ImageIcon } from "lucide-react";
 import useAutoScroll from "../../../hooks/useAutoScroll";
+import CarouselDots from "../shared/CarouselDots";
 
 export default function GallerySection() {
   const containerRef = useRef(null);
@@ -182,7 +183,7 @@ export default function GallerySection() {
           <>
             <div
               ref={containerRef}
-              className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+              className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
               style={{ WebkitOverflowScrolling: "touch" }}
             >
               {filteredItems.map((item, index) => (
@@ -191,7 +192,7 @@ export default function GallerySection() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                   >
                     <div className="relative w-full h-80 sm:h-96 md:h-[28rem]">
                       {item.image ? (
@@ -270,6 +271,7 @@ export default function GallerySection() {
                   </motion.div>
                 ))}
             </div>
+            <CarouselDots containerRef={containerRef} itemCount={filteredItems.length} />
           </>
         )}
       </div>

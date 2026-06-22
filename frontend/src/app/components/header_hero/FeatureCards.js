@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Database, Music, Users, ArrowRight } from "lucide-react";
+import CarouselDots from "../shared/CarouselDots";
 
 const icons = {
   "Database Management": Database,
@@ -11,6 +12,7 @@ const icons = {
 };
 
 export default function FeatureCards() {
+  const containerRef = useRef(null);
   const [isAnthemExpanded, setIsAnthemExpanded] = useState(false);
 
   const cards = [
@@ -71,11 +73,12 @@ export default function FeatureCards() {
           </h2>
         </div>
         <motion.div
+          ref={containerRef}
           variants={container}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory md:justify-center"
+          className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory md:justify-center scrollbar-hide"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           {cards.map((card, index) => {
@@ -85,7 +88,7 @@ export default function FeatureCards() {
                 key={index}
                 variants={cardItem}
                 whileHover={{ y: -8 }}
-                className="bg-navy-950 p-6 sm:p-8 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] border-t-4 border-gold-500 shadow-xl hover:shadow-2xl transition-all duration-300 group flex flex-col h-full overflow-hidden"
+                className="bg-navy-950 p-6 sm:p-8 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] border-t-4 border-gold-500 shadow-xl hover:shadow-2xl transition-all duration-300 group flex flex-col h-full overflow-hidden"
               >
                 <div className="w-14 h-14 bg-gold-500/10 flex items-center justify-center mb-6">
                   <Icon className="w-7 h-7 text-gold-400" />
@@ -145,6 +148,7 @@ export default function FeatureCards() {
             );
           })}
         </motion.div>
+        <CarouselDots containerRef={containerRef} itemCount={cards.length} />
       </div>
     </section>
   );

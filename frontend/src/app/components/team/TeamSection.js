@@ -5,6 +5,7 @@ import { buildImageSrc } from "../../../utils/config";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import useAutoScroll from "../../../hooks/useAutoScroll";
+import CarouselDots from "../shared/CarouselDots";
 
 export default function TeamSection() {
   const containerRef = useRef(null);
@@ -164,7 +165,7 @@ export default function TeamSection() {
         {!loading && !error && teamMembers.length > 0 && (
           <div
             ref={containerRef}
-            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             {teamMembers.map((member, index) => {
@@ -189,7 +190,7 @@ export default function TeamSection() {
                     damping: 10,
                   }}
                   whileHover={{ y: -10 }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                 >
                   <div className="relative w-full h-80 sm:h-96 md:h-[28rem]">
                     <Image
@@ -234,6 +235,7 @@ export default function TeamSection() {
             })}
           </div>
         )}
+        <CarouselDots containerRef={containerRef} itemCount={teamMembers.length} />
       </div>
     </section>
   );

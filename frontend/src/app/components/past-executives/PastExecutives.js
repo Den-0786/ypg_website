@@ -5,6 +5,7 @@ import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
 import { motion, AnimatePresence } from "framer-motion";
 import useAutoScroll from "../../../hooks/useAutoScroll";
+import CarouselDots from "../shared/CarouselDots";
 
 export default function PastExecutives() {
   const containerRef = useRef(null);
@@ -155,7 +156,7 @@ export default function PastExecutives() {
         {pastExecutives.length > 0 && (
           <div
             ref={containerRef}
-            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-8 scroll-smooth md:snap-x md:snap-mandatory"
+            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             {pastExecutives.map((executive, index) => (
@@ -163,8 +164,9 @@ export default function PastExecutives() {
                     key={executive.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-[85%] md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
+                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
                   >
                     <div className="relative h-56 sm:h-72 bg-gradient-to-br from-purple-100 to-blue-100">
                       {executive.image ? (
@@ -211,6 +213,7 @@ export default function PastExecutives() {
                 ))}
               </div>
             )}
+            <CarouselDots containerRef={containerRef} itemCount={pastExecutives.length} />
           </div>
         </section>
   );
