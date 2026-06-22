@@ -6,6 +6,13 @@ export default function AnalyticsTracker() {
   useEffect(() => {
     const trackVisit = async () => {
       try {
+        // Get or generate device ID
+        let deviceId = localStorage.getItem("ypg_device_id");
+        if (!deviceId) {
+          deviceId = crypto.randomUUID();
+          localStorage.setItem("ypg_device_id", deviceId);
+        }
+
         const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
         const url = `${apiUrl}/api/analytics/track/`;
         console.log("Tracking visit to:", url);
@@ -16,6 +23,7 @@ export default function AnalyticsTracker() {
           },
           body: JSON.stringify({
             event_type: "unique_visitor",
+            device_id: deviceId,
           }),
         });
         console.log("Response status:", response.status);
