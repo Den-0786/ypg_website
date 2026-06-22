@@ -163,28 +163,9 @@ export default function CouncilSection() {
           className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          {councilMembers.map((member, index) => {
-            const direction = index % 2 === 0 ? "left" : "right";
-
-            return (
+          {councilMembers.map((member) => (
               <motion.div
                 key={member.id}
-                initial={{
-                  opacity: 0,
-                  x: direction === "left" ? -30 : 30,
-                  y: 20,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  x: 0,
-                  y: 0,
-                }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.6,
-                  delay: index * 0.1,
-                  ease: "easeOut",
-                }}
                 whileHover={{
                   y: -8,
                   transition: { duration: 0.2 },
@@ -202,7 +183,7 @@ export default function CouncilSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
                   {/* Text overlay with background */}
-                  <div className="absolute bottom-0 top-[13rem] left-0 right-0 p-3 sm:p-4">
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
                     <div className="bg-white/60 backdrop-blur-md rounded-xl p-2 sm:p-3 shadow-lg border border-white/70">
                       <h3 className="text-sm sm:text-base font-bold text-navy-950 mb-1 line-clamp-1">
                         {member.name}
@@ -222,8 +203,7 @@ export default function CouncilSection() {
                   </div>
                 </div>
               </motion.div>
-            );
-          })}
+          ))}
         </div>
 
         <CarouselDots containerRef={containerRef} itemCount={councilMembers.length} />
