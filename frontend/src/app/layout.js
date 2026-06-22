@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import AnalyticsTracker from "./components/shared/AnalyticsTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
+        <AnalyticsTracker />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#f59e0b" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />

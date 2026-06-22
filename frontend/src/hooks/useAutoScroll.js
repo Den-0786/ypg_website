@@ -29,10 +29,18 @@ export default function useAutoScroll(containerRef, { interval = 3500, enabled =
       return firstCard.getBoundingClientRect().width + gap;
     };
 
-    const scrollToIndex = (index) => {
+    const getItemsPerView = () => {
+      const cardWidth = getCardWidth();
+      if (cardWidth <= 0) return 1;
+      return Math.max(1, Math.round(container.clientWidth / cardWidth));
+    };
+
+    const scrollToPage = (pageIdx) => {
+      const itemsPerView = getItemsPerView();
       const cardWidth = getCardWidth();
       if (cardWidth <= 0) return;
-      container.scrollTo({ left: index * cardWidth, behavior: "smooth" });
+      const pageWidth = itemsPerView * cardWidth;
+      container.scrollTo({ left: pageIdx * pageWidth, behavior: "smooth" });
     };
 
     const timer = setInterval(() => {
@@ -43,12 +51,15 @@ export default function useAutoScroll(containerRef, { interval = 3500, enabled =
       const maxScroll = container.scrollWidth - container.clientWidth;
       if (maxScroll <= 0) return;
 
+      const itemsPerView = getItemsPerView();
       const cardWidth = getCardWidth();
       if (cardWidth <= 0) return;
 
-      const currentIndex = Math.round(container.scrollLeft / cardWidth);
-      const nextIndex = (currentIndex + 1) % itemCount;
-      scrollToIndex(nextIndex);
+      const pageWidth = itemsPerView * cardWidth;
+      const currentPage = Math.round(container.scrollLeft / pageWidth);
+      const pageCount = Math.ceil(itemCount / itemsPerView);
+      const nextPage = (currentPage + 1) % pageCount;
+      scrollToPage(nextPage);
     }, interval);
 
     return () => {
