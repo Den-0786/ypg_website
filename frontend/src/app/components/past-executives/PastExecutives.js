@@ -168,7 +168,7 @@ export default function PastExecutives() {
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
                   >
-                    <div className="relative h-56 sm:h-72 bg-gradient-to-br from-purple-100 to-blue-100">
+                    <div className="relative h-72 sm:h-96 md:h-[28rem] bg-gradient-to-br from-purple-100 to-blue-100">
                       {executive.image ? (
                         <Image
                           src={buildImageSrc(executive.image)}

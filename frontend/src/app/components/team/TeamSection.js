@@ -168,31 +168,13 @@ export default function TeamSection() {
             className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {teamMembers.map((member, index) => {
-              const direction = index % 2 === 0 ? "left" : "right";
-
-              return (
+            {teamMembers.map((member) => (
                 <motion.div
                   key={member.id}
-                  initial={{
-                    x: direction === "left" ? -100 : 100,
-                    opacity: 0,
-                  }}
-                  whileInView={{
-                    x: 0,
-                    opacity: 1,
-                  }}
-                  viewport={{ once: true }}
-                  transition={{
-                    delay: (index % 4) * 0.1,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 10,
-                  }}
                   whileHover={{ y: -10 }}
                   className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                 >
-                  <div className="relative w-full h-80 sm:h-96 md:h-[28rem]">
+                  <div className="relative w-full h-96 sm:h-[28rem] md:h-[32rem]">
                     <Image
                       src={
                         member.image
@@ -209,7 +191,7 @@ export default function TeamSection() {
                     <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
                     {/* Text overlay with background */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 top-[10rem] sm:top-[12rem]">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 top-[14rem] sm:top-[16rem] md:top-[18rem]">
                       <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
                         <h3 className="text-sm sm:text-lg font-bold text-navy-950 mb-1">
                           {member.name}
@@ -231,8 +213,7 @@ export default function TeamSection() {
                     </div>
                   </div>
                 </motion.div>
-              );
-            })}
+            ))}
           </div>
         )}
         <CarouselDots containerRef={containerRef} itemCount={teamMembers.length} />

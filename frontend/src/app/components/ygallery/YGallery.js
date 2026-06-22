@@ -194,7 +194,7 @@ export default function GallerySection() {
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                   >
-                    <div className="relative w-full h-80 sm:h-96 md:h-[28rem]">
+                    <div className="relative w-full h-96 sm:h-[28rem] md:h-[32rem]">
                       {item.image ? (
                         <Image
                           src={buildImageSrc(item.image)}
