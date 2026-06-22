@@ -2418,21 +2418,32 @@ def api_track_analytics(request):
     try:
         data = json.loads(request.body)
         event_type = data.get('event_type', 'page_view')
-        
+        device_id = data.get('device_id')
+
         today = timezone.now().date()
         analytics, created = Analytics.objects.get_or_create(date=today)
-        
+
         if event_type == 'page_view':
             analytics.page_views += 1
         elif event_type == 'unique_visitor':
-            analytics.unique_visitors += 1
+            # Only count unique visitor if device hasn't visited today
+            if device_id:
+                daily_visit, visit_created = DailyVisit.objects.get_or_create(
+                    device_id=device_id,
+                    date=today
+                )
+                if visit_created:
+                    analytics.unique_visitors += 1
+            else:
+                # Fallback for requests without device_id
+                analytics.unique_visitors += 1
         elif event_type == 'donation':
             analytics.donations_received += 1
         elif event_type == 'contact_submission':
             analytics.contact_submissions += 1
-        
+
         analytics.save()
-        
+
         return Response({
             'success': True,
             'message': 'Analytics tracked successfully'

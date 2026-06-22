@@ -230,9 +230,20 @@ class Analytics(models.Model):
     donations_received = models.IntegerField(default=0)
     contact_submissions = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name_plural = "Analytics"
+
+
+class DailyVisit(models.Model):
+    """Track daily visits per device to prevent duplicate counting"""
+    device_id = models.CharField(max_length=255)
+    date = models.DateField()
+    visited_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('device_id', 'date')
+        verbose_name_plural = "Daily Visits"
 
 class BranchPresident(models.Model):
     """
