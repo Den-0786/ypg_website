@@ -168,7 +168,7 @@ export default function TeamSection() {
             className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {teamMembers.map((member) => (
+            {teamMembers.map((member, index) => (
                 <motion.div
                   key={member.id}
                   whileHover={{ y: -10 }}
