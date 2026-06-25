@@ -19,9 +19,9 @@ DEFAULT_PROFILE = {
 
 DEFAULT_WEBSITE = {
     'websiteTitle': 'PCG Ahinsan District YPG',
-    'contactEmail': 'ahinsandistrictypg@gmail.com',
-    'phoneNumber': '+233 531427671',
-    'address': 'PCG, Emmanuel Congregation Ahinsan - Kumasi',
+    'contactEmail': '',
+    'phoneNumber': '',
+    'address': '',
     'description': "Presbyterian Young People's Guild - Ahinsan District",
     'socialMedia': {
         'facebook': '',
@@ -49,9 +49,26 @@ def load_settings():
 
 
 def save_settings(settings):
-    """Save website settings to JSON file."""
-    with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(settings, f, indent=2)
+    """Save website settings to JSON file with atomic write."""
+    import os
+    import tempfile
+    
+    # Write to a temporary file first, then rename for atomic operation
+    temp_file = SETTINGS_FILE.with_suffix('.tmp')
+    
+    try:
+        with open(temp_file, 'w', encoding='utf-8') as f:
+            json.dump(settings, f, indent=2)
+            f.flush()  # Ensure data is written to disk
+            os.fsync(f.fileno())  # Force write to disk
+        
+        # Rename temp file to actual file (atomic operation)
+        os.replace(temp_file, SETTINGS_FILE)
+    except Exception as e:
+        # Clean up temp file if something went wrong
+        if temp_file.exists():
+            os.remove(temp_file)
+        raise e
 
 
 @csrf_exempt
@@ -99,12 +116,19 @@ def api_settings_website(request):
             current = load_settings()
             current.update(data)
             save_settings(current)
+            
+            # Verify the save was successful by reading it back
+            verification = load_settings()
+            
             return Response({
                 'success': True,
                 'message': 'Website settings updated successfully',
-                'settings': current
+                'settings': verification
             })
     except Exception as e:
+        import traceback
+        print(f"Error in api_settings_website: {str(e)}")
+        print(traceback.format_exc())
         return Response({
             'success': False,
             'error': str(e)

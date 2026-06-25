@@ -16,6 +16,7 @@ import { settingsAPI } from "../../../utils/api";
 
 export default function Footer() {
   const [siteSettings, setSiteSettings] = useState(null);
+  const [socialMediaLinks, setSocialMediaLinks] = useState([]);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -26,7 +27,26 @@ export default function Footer() {
         console.error("Error loading site settings:", error);
       }
     };
-    loadSettings();
+
+    const loadSocialMediaLinks = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/social-media/`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setSocialMediaLinks(data.social_media_links);
+        }
+      } catch (error) {
+        console.error("Error loading social media links:", error);
+      }
+    };
+
+    const loadData = async () => {
+      await Promise.all([loadSettings(), loadSocialMediaLinks()]);
+    };
+
+    loadData();
   }, []);
 
   const phoneNumber = siteSettings?.phoneNumber || "+233 531427671";
@@ -303,27 +323,56 @@ export default function Footer() {
               </li>
             </ul>
 
+            {socialMediaLinks.length > 0 && (
             <div className="mt-6">
               <h4 className="text-gold-300 mb-3">Follow Us</h4>
               <div className="flex gap-4">
-                {[
-                  { icon: Facebook, color: "hover:text-gold-300", href: "#" },
-                  { icon: Instagram, color: "hover:text-pink-400", href: "#" },
-                  { icon: Twitter, color: "hover:text-sky-400", href: "#" },
-                  { icon: Youtube, color: "hover:text-red-400", href: "#" },
-                ].map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`p-2 bg-navy-950/50 rounded-full ${social.color} transition`}
-                  >
-                    <social.icon size={20} />
-                  </a>
-                ))}
+                {socialMediaLinks.map((link) => {
+                  const getIcon = (platform) => {
+                    switch (platform) {
+                      case 'facebook':
+                        return Facebook;
+                      case 'instagram':
+                        return Instagram;
+                      case 'twitter':
+                        return Twitter;
+                      case 'youtube':
+                        return Youtube;
+                      default:
+                        return Facebook;
+                    }
+                  };
+
+                  const getColor = (platform) => {
+                    switch (platform) {
+                      case 'instagram':
+                        return 'hover:text-pink-400';
+                      case 'twitter':
+                        return 'hover:text-sky-400';
+                      case 'youtube':
+                        return 'hover:text-red-400';
+                      default:
+                        return 'hover:text-gold-300';
+                    }
+                  };
+
+                  const Icon = getIcon(link.platform_name);
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`p-2 bg-navy-950/50 rounded-full ${getColor(link.platform_name)} transition`}
+                      title={link.display_name}
+                    >
+                      <Icon size={20} />
+                    </a>
+                  );
+                })}
               </div>
             </div>
+            )}
           </motion.div>
         </div>
 
