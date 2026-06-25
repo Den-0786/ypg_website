@@ -205,14 +205,14 @@ export default function SocialMediaManagement() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">
                 {editingLink ? "Edit Social Media Link" : "Add Social Media Link"}
               </h3>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Platform
                 </label>
                 <select
@@ -220,7 +220,7 @@ export default function SocialMediaManagement() {
                   onChange={(e) =>
                     setFormData({ ...formData, platform_name: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="facebook">Facebook</option>
                   <option value="instagram">Instagram</option>
@@ -236,7 +236,7 @@ export default function SocialMediaManagement() {
 
               {formData.platform_name === "other" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Custom Platform Name
                   </label>
                   <input
@@ -248,14 +248,14 @@ export default function SocialMediaManagement() {
                         custom_platform_name: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g., Snapchat"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   URL
                 </label>
                 <input
@@ -264,14 +264,14 @@ export default function SocialMediaManagement() {
                   onChange={(e) =>
                     setFormData({ ...formData, url: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="https://facebook.com/yourpage"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Icon Name (Lucide icon name or custom identifier)
                 </label>
                 <input
@@ -280,13 +280,13 @@ export default function SocialMediaManagement() {
                   onChange={(e) =>
                     setFormData({ ...formData, icon_name: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., facebook, instagram"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Display Order
                 </label>
                 <input
@@ -298,7 +298,7 @@ export default function SocialMediaManagement() {
                       display_order: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   min="0"
                 />
               </div>
@@ -313,25 +313,25 @@ export default function SocialMediaManagement() {
                   }
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                <label htmlFor="is_active" className="text-xs font-medium text-gray-700">
                   Active (show on website)
                 </label>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 pt-2">
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                  <Save size={20} />
+                  <Save size={16} />
                   {editingLink ? "Update" : "Create"}
                 </button>
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
                 >
-                  <X size={20} />
+                  <X size={16} />
                   Cancel
                 </button>
               </div>
