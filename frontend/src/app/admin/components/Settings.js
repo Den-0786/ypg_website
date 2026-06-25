@@ -194,7 +194,8 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       setIsProfileLoading(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`,
+          { cache: "no-store" }
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -215,6 +216,19 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       }
     };
     loadProfile();
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadProfile();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   // Load website settings from database
@@ -265,6 +279,19 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       }
     };
     loadWebsiteSettings();
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadWebsiteSettings();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   const [generalSettings, setGeneralSettings] = useState({

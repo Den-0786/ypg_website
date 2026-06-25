@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 import json
 from pathlib import Path
+from core.models import ProfileSettings, WebsiteSettings
 
 BASE_DIR = Path(__file__).resolve().parent
 SETTINGS_FILE = BASE_DIR / 'site_settings.json'
@@ -36,73 +37,141 @@ DEFAULT_WEBSITE = {
 
 
 def load_settings():
-    """Load website settings from JSON file, falling back to defaults."""
-    if not SETTINGS_FILE.exists():
-        return DEFAULT_WEBSITE.copy()
+    """Load website settings from database, falling back to JSON file then defaults."""
     try:
-        with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        merged = DEFAULT_WEBSITE.copy()
-        merged.update(data)
-        return merged
+        # Try to load from database first
+        settings = WebsiteSettings.get_instance()
+        return settings.to_dict()
     except Exception:
-        return DEFAULT_WEBSITE.copy()
+        # Fallback to JSON file
+        if not SETTINGS_FILE.exists():
+            return DEFAULT_WEBSITE.copy()
+        try:
+            with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            merged = DEFAULT_WEBSITE.copy()
+            merged.update(data)
+            return merged
+        except Exception:
+            return DEFAULT_WEBSITE.copy()
 
 
 def save_settings(settings):
-    """Save website settings to JSON file with atomic write."""
-    import os
-    import tempfile
-    
-    # Write to a temporary file first, then rename for atomic operation
-    temp_file = SETTINGS_FILE.with_suffix('.tmp')
-    
+    """Save website settings to database."""
     try:
-        with open(temp_file, 'w', encoding='utf-8') as f:
-            json.dump(settings, f, indent=2)
-            f.flush()  # Ensure data is written to disk
-            os.fsync(f.fileno())  # Force write to disk
+        # Save to database
+        db_settings = WebsiteSettings.get_instance()
         
-        # Rename temp file to actual file (atomic operation)
-        os.replace(temp_file, SETTINGS_FILE)
+        # Update fields from the settings dict
+        db_settings.website_title = settings.get('websiteTitle', db_settings.website_title)
+        db_settings.contact_email = settings.get('contactEmail', db_settings.contact_email)
+        db_settings.phone_number = settings.get('phoneNumber', db_settings.phone_number)
+        db_settings.address = settings.get('address', db_settings.address)
+        db_settings.description = settings.get('description', db_settings.description)
+        
+        # Update appearance settings
+        appearance = settings.get('appearance', {})
+        db_settings.language = appearance.get('language', db_settings.language)
+        db_settings.border_radius = appearance.get('borderRadius', db_settings.border_radius)
+        
+        # Update other settings
+        db_settings.theme = settings.get('theme', db_settings.theme)
+        db_settings.maintenance_mode = settings.get('maintenanceMode', db_settings.maintenance_mode)
+        
+        db_settings.save()
+        
+        # Also save to JSON file as backup
+        import os
+        import tempfile
+        temp_file = SETTINGS_FILE.with_suffix('.tmp')
+        try:
+            with open(temp_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(temp_file, SETTINGS_FILE)
+        except Exception:
+            pass  # Ignore JSON backup errors
+            
     except Exception as e:
-        # Clean up temp file if something went wrong
-        if temp_file.exists():
-            os.remove(temp_file)
-        raise e
+        # Fallback to JSON file if database fails
+        import os
+        import tempfile
+        temp_file = SETTINGS_FILE.with_suffix('.tmp')
+        try:
+            with open(temp_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(temp_file, SETTINGS_FILE)
+        except Exception as backup_error:
+            raise e
 
 
 def load_profile_settings():
-    """Load profile settings from JSON file, falling back to defaults."""
-    if not PROFILE_FILE.exists():
-        return DEFAULT_PROFILE.copy()
+    """Load profile settings from database, falling back to JSON file then defaults."""
     try:
-        with open(PROFILE_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        merged = DEFAULT_PROFILE.copy()
-        merged.update(data)
-        return merged
+        # Try to load from database first
+        profile = ProfileSettings.get_instance()
+        return {
+            'fullName': profile.full_name,
+            'email': profile.email,
+            'phone': profile.phone,
+            'role': profile.role,
+            'avatar': profile.avatar
+        }
     except Exception:
-        return DEFAULT_PROFILE.copy()
+        # Fallback to JSON file
+        if not PROFILE_FILE.exists():
+            return DEFAULT_PROFILE.copy()
+        try:
+            with open(PROFILE_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            merged = DEFAULT_PROFILE.copy()
+            merged.update(data)
+            return merged
+        except Exception:
+            return DEFAULT_PROFILE.copy()
 
 
 def save_profile_settings(settings):
-    """Save profile settings to JSON file with atomic write."""
-    import os
-    
-    temp_file = PROFILE_FILE.with_suffix('.tmp')
-    
+    """Save profile settings to database."""
     try:
-        with open(temp_file, 'w', encoding='utf-8') as f:
-            json.dump(settings, f, indent=2)
-            f.flush()
-            os.fsync(f.fileno())
+        # Save to database
+        profile = ProfileSettings.get_instance()
         
-        os.replace(temp_file, PROFILE_FILE)
+        profile.full_name = settings.get('fullName', profile.full_name)
+        profile.email = settings.get('email', profile.email)
+        profile.phone = settings.get('phone', profile.phone)
+        profile.role = settings.get('role', profile.role)
+        profile.avatar = settings.get('avatar', profile.avatar)
+        
+        profile.save()
+        
+        # Also save to JSON file as backup
+        import os
+        temp_file = PROFILE_FILE.with_suffix('.tmp')
+        try:
+            with open(temp_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(temp_file, PROFILE_FILE)
+        except Exception:
+            pass  # Ignore JSON backup errors
+            
     except Exception as e:
-        if temp_file.exists():
-            os.remove(temp_file)
-        raise e
+        # Fallback to JSON file if database fails
+        import os
+        temp_file = PROFILE_FILE.with_suffix('.tmp')
+        try:
+            with open(temp_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(temp_file, PROFILE_FILE)
+        except Exception as backup_error:
+            raise e
 
 
 @csrf_exempt

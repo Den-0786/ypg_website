@@ -9,7 +9,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { contactAPI, settingsAPI } from "../../../utils/api";
+import { contactAPI } from "../../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function ContactSection() {
@@ -29,8 +29,14 @@ export default function ContactSection() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const settings = await settingsAPI.getWebsiteSettings();
-        setSiteSettings(settings);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`,
+          { cache: "no-store" }
+        );
+        const data = await response.json();
+        if (data.success && data.settings) {
+          setSiteSettings(data.settings);
+        }
       } catch (error) {
         console.error("Error loading site settings:", error);
       }
@@ -57,10 +63,22 @@ export default function ContactSection() {
 
     loadData();
 
-    // Auto-refresh settings every 60 seconds to get latest changes
-    const interval = setInterval(loadData, 60000);
+    // Refresh when page becomes visible (user switches back to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadData();
+      }
+    };
 
-    return () => clearInterval(interval);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Expose refresh function globally for manual refresh
+    window.refreshContactSettings = loadData;
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      delete window.refreshContactSettings;
+    };
   }, []);
 
   const phoneNumber = siteSettings?.phoneNumber || "";

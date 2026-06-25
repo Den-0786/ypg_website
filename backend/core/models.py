@@ -560,3 +560,84 @@ class SocialMediaLink(models.Model):
         verbose_name = "Social Media Link"
         verbose_name_plural = "Social Media Links"
         ordering = ['display_order', 'id']
+
+class ProfileSettings(models.Model):
+    """
+    Model for storing admin profile settings in the database
+    Replaces JSON file storage for better persistence
+    """
+    full_name = models.CharField(max_length=200, blank=True, default='')
+    email = models.EmailField(blank=True, default='')
+    phone = models.CharField(max_length=20, blank=True, default='')
+    role = models.CharField(max_length=200, blank=True, default='')
+    avatar = models.TextField(blank=True, null=True, help_text="Base64 encoded avatar image")
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Profile Settings - {self.full_name or 'Not set'}"
+    
+    class Meta:
+        verbose_name = "Profile Settings"
+        verbose_name_plural = "Profile Settings"
+    
+    @classmethod
+    def get_instance(cls):
+        """Get or create the singleton instance"""
+        instance, created = cls.objects.get_or_create(pk=1)
+        return instance
+
+class WebsiteSettings(models.Model):
+    """
+    Model for storing website settings in the database
+    Replaces JSON file storage for better persistence
+    Note: Social media links are handled by the separate SocialMediaLink model
+    """
+    website_title = models.CharField(max_length=200, default='PCG Ahinsan District YPG')
+    contact_email = models.EmailField(blank=True, default='')
+    phone_number = models.CharField(max_length=20, blank=True, default='')
+    address = models.TextField(blank=True, default='')
+    description = models.TextField(blank=True, default="Presbyterian Young People's Guild - Ahinsan District")
+    
+    # Appearance settings
+    language = models.CharField(max_length=50, default='English')
+    border_radius = models.CharField(max_length=50, default='medium')
+    theme = models.CharField(max_length=20, default='light')
+    maintenance_mode = models.BooleanField(default=False)
+    
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Website Settings - {self.website_title}"
+    
+    class Meta:
+        verbose_name = "Website Settings"
+        verbose_name_plural = "Website Settings"
+    
+    @classmethod
+    def get_instance(cls):
+        """Get or create the singleton instance"""
+        instance, created = cls.objects.get_or_create(pk=1)
+        return instance
+    
+    def to_dict(self):
+        """Convert model instance to dictionary for API responses"""
+        return {
+            'websiteTitle': self.website_title,
+            'contactEmail': self.contact_email,
+            'phoneNumber': self.phone_number,
+            'address': self.address,
+            'description': self.description,
+            'socialMedia': {
+                'facebook': '',
+                'instagram': '',
+                'twitter': '',
+                'youtube': '',
+                'linkedin': '',
+            },
+            'appearance': {
+                'language': self.language,
+                'borderRadius': self.border_radius,
+            },
+            'theme': self.theme,
+            'maintenanceMode': self.maintenance_mode,
+        }
