@@ -8,6 +8,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 SETTINGS_FILE = BASE_DIR / 'site_settings.json'
+PROFILE_FILE = BASE_DIR / 'profile_settings.json'
 
 DEFAULT_PROFILE = {
     'fullName': 'YPG Administrator',
@@ -71,6 +72,39 @@ def save_settings(settings):
         raise e
 
 
+def load_profile_settings():
+    """Load profile settings from JSON file, falling back to defaults."""
+    if not PROFILE_FILE.exists():
+        return DEFAULT_PROFILE.copy()
+    try:
+        with open(PROFILE_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        merged = DEFAULT_PROFILE.copy()
+        merged.update(data)
+        return merged
+    except Exception:
+        return DEFAULT_PROFILE.copy()
+
+
+def save_profile_settings(settings):
+    """Save profile settings to JSON file with atomic write."""
+    import os
+    
+    temp_file = PROFILE_FILE.with_suffix('.tmp')
+    
+    try:
+        with open(temp_file, 'w', encoding='utf-8') as f:
+            json.dump(settings, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        
+        os.replace(temp_file, PROFILE_FILE)
+    except Exception as e:
+        if temp_file.exists():
+            os.remove(temp_file)
+        raise e
+
+
 @csrf_exempt
 @api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
@@ -78,18 +112,32 @@ def api_settings_profile(request):
     """Get or update admin profile settings"""
     try:
         if request.method == 'GET':
-            return Response({
+            response = Response({
                 'success': True,
-                'profile': DEFAULT_PROFILE
+                'profile': load_profile_settings()
             })
+            response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            return response
         elif request.method == 'PUT':
             data = json.loads(request.body)
+            current = load_profile_settings()
+            current.update(data)
+            save_profile_settings(current)
+            
+            # Verify the save was successful by reading it back
+            verification = load_profile_settings()
+            
             return Response({
                 'success': True,
                 'message': 'Profile updated successfully',
-                'profile': data
+                'profile': verification
             })
     except Exception as e:
+        import traceback
+        print(f"Error in api_settings_profile: {str(e)}")
+        print(traceback.format_exc())
         return Response({
             'success': False,
             'error': str(e)
