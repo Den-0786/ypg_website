@@ -49,9 +49,9 @@ export default function Footer() {
     loadData();
   }, []);
 
-  const phoneNumber = siteSettings?.phoneNumber || "+233 531427671";
-  const contactEmail = siteSettings?.contactEmail || "ahinsandistrictypg@gmail.com";
-  const locationAddress = siteSettings?.address || "PCG, Emmanuel Congregation Ahinsan - Kumasi";
+  const phoneNumber = siteSettings?.phoneNumber || "";
+  const contactEmail = siteSettings?.contactEmail || "";
+  const locationAddress = siteSettings?.address || "";
   const cleanPhone = phoneNumber.replace(/\D/g, "");
 
   // Enhanced Tooltip component

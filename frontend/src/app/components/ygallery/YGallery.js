@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Play, Download, MapPin, Calendar, ImageIcon } from "lucide-react";
 import useAutoScroll from "../../../hooks/useAutoScroll";
 import CarouselDots from "../shared/CarouselDots";
+import CustomVideoPlayer from "../shared/CustomVideoPlayer";
 
 export default function GallerySection() {
   const containerRef = useRef(null);
@@ -205,11 +206,9 @@ export default function GallerySection() {
                           loading="lazy"
                         />
                       ) : item.video ? (
-                        <video
+                        <CustomVideoPlayer 
                           src={buildImageSrc(item.video)}
-                          className="w-full h-full object-cover"
-                          controls
-                          preload="metadata"
+                          poster={item.image ? buildImageSrc(item.image) : null}
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -226,9 +225,16 @@ export default function GallerySection() {
                       {contentType === "videos" &&
                         !item.video &&
                         (item.youtube_url || item.tiktok_url) && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition">
-                            <Play size={48} className="text-white" />
-                          </div>
+                          <a
+                            href={item.youtube_url || item.tiktok_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition z-30 cursor-pointer"
+                          >
+                            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition cursor-pointer">
+                              <Play size={48} className="text-white fill-white" />
+                            </div>
+                          </a>
                         )}
 
                       {/* Download button */}
