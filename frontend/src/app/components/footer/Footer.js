@@ -366,7 +366,15 @@ export default function Footer() {
                       className={`p-2 bg-navy-950/50 rounded-full ${getColor(link.platform_name)} transition`}
                       title={link.display_name}
                     >
-                      <Icon size={20} />
+                      {link.icon_file ? (
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${link.icon_file}`}
+                          alt={link.display_name}
+                          className="w-5 h-5 object-contain"
+                        />
+                      ) : (
+                        <Icon size={20} />
+                      )}
                     </a>
                   );
                 })}

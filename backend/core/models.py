@@ -541,6 +541,7 @@ class SocialMediaLink(models.Model):
     custom_platform_name = models.CharField(max_length=50, blank=True, help_text="Custom platform name if 'other' is selected")
     url = models.URLField(help_text="The URL to the social media profile")
     icon_name = models.CharField(max_length=50, blank=True, help_text="Lucide icon name or custom icon identifier")
+    icon_file = models.ImageField(upload_to='social_media_icons/', blank=True, null=True, help_text="Upload custom icon image")
     display_order = models.IntegerField(default=0, help_text="Order in which to display (lower numbers first)")
     is_active = models.BooleanField(default=True, help_text="Whether this link is displayed on the website")
     created_at = models.DateTimeField(auto_now_add=True)

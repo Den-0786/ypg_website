@@ -2796,6 +2796,7 @@ def api_social_media_links(request):
             'display_name': link.get_display_name(),
             'url': link.url,
             'icon_name': link.icon_name,
+            'icon_file': link.icon_file.url if link.icon_file else None,
             'display_order': link.display_order,
             'is_active': link.is_active,
         } for link in links]
@@ -2823,6 +2824,7 @@ def api_social_media_links_admin(request):
             'display_name': link.get_display_name(),
             'url': link.url,
             'icon_name': link.icon_name,
+            'icon_file': link.icon_file.url if link.icon_file else None,
             'display_order': link.display_order,
             'is_active': link.is_active,
             'created_at': link.created_at.isoformat(),
@@ -2844,15 +2846,36 @@ def api_social_media_links_admin(request):
 def api_social_media_create(request):
     """Create new social media link"""
     try:
-        data = json.loads(request.body)
-        link = SocialMediaLink.objects.create(
-            platform_name=data.get('platform_name', 'other'),
-            custom_platform_name=data.get('custom_platform_name', ''),
-            url=data.get('url'),
-            icon_name=data.get('icon_name', ''),
-            display_order=data.get('display_order', 0),
-            is_active=data.get('is_active', True)
-        )
+        # Check if this is a file upload (multipart/form-data)
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            platform_name = request.POST.get('platform_name', 'other')
+            custom_platform_name = request.POST.get('custom_platform_name', '')
+            url = request.POST.get('url')
+            icon_name = request.POST.get('icon_name', '')
+            display_order = request.POST.get('display_order', 0)
+            is_active = request.POST.get('is_active', 'true').lower() == 'true'
+            icon_file = request.FILES.get('icon_file')
+            
+            link = SocialMediaLink.objects.create(
+                platform_name=platform_name,
+                custom_platform_name=custom_platform_name,
+                url=url,
+                icon_name=icon_name,
+                icon_file=icon_file,
+                display_order=int(display_order),
+                is_active=is_active
+            )
+        else:
+            data = json.loads(request.body)
+            link = SocialMediaLink.objects.create(
+                platform_name=data.get('platform_name', 'other'),
+                custom_platform_name=data.get('custom_platform_name', ''),
+                url=data.get('url'),
+                icon_name=data.get('icon_name', ''),
+                display_order=data.get('display_order', 0),
+                is_active=data.get('is_active', True)
+            )
+        
         return Response({
             'success': True,
             'message': 'Social media link created successfully',
@@ -2870,15 +2893,30 @@ def api_social_media_create(request):
 def api_social_media_update(request, link_id):
     """Update social media link"""
     try:
-        data = json.loads(request.body)
         link = SocialMediaLink.objects.get(id=link_id)
         
-        link.platform_name = data.get('platform_name', link.platform_name)
-        link.custom_platform_name = data.get('custom_platform_name', link.custom_platform_name)
-        link.url = data.get('url', link.url)
-        link.icon_name = data.get('icon_name', link.icon_name)
-        link.display_order = data.get('display_order', link.display_order)
-        link.is_active = data.get('is_active', link.is_active)
+        # Check if this is a file upload (multipart/form-data)
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            link.platform_name = request.POST.get('platform_name', link.platform_name)
+            link.custom_platform_name = request.POST.get('custom_platform_name', link.custom_platform_name)
+            link.url = request.POST.get('url', link.url)
+            link.icon_name = request.POST.get('icon_name', link.icon_name)
+            link.display_order = int(request.POST.get('display_order', link.display_order))
+            link.is_active = request.POST.get('is_active', 'true').lower() == 'true'
+            
+            # Handle file upload
+            icon_file = request.FILES.get('icon_file')
+            if icon_file:
+                link.icon_file = icon_file
+        else:
+            data = json.loads(request.body)
+            link.platform_name = data.get('platform_name', link.platform_name)
+            link.custom_platform_name = data.get('custom_platform_name', link.custom_platform_name)
+            link.url = data.get('url', link.url)
+            link.icon_name = data.get('icon_name', link.icon_name)
+            link.display_order = data.get('display_order', link.display_order)
+            link.is_active = data.get('is_active', link.is_active)
+        
         link.save()
         
         return Response({
@@ -2891,6 +2929,7 @@ def api_social_media_update(request, link_id):
                 'display_name': link.get_display_name(),
                 'url': link.url,
                 'icon_name': link.icon_name,
+                'icon_file': link.icon_file.url if link.icon_file else None,
                 'display_order': link.display_order,
                 'is_active': link.is_active,
             }

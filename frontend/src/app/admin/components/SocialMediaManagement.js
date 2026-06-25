@@ -58,10 +58,22 @@ export default function SocialMediaManagement() {
       
       const method = editingLink ? "PUT" : "POST";
       
+      // Use FormData if there's a file upload
+      const formDataObj = new FormData();
+      formDataObj.append('platform_name', formData.platform_name);
+      formDataObj.append('custom_platform_name', formData.custom_platform_name);
+      formDataObj.append('url', formData.url);
+      formDataObj.append('icon_name', formData.icon_name);
+      formDataObj.append('display_order', formData.display_order);
+      formDataObj.append('is_active', formData.is_active);
+      
+      if (formData.icon_file) {
+        formDataObj.append('icon_file', formData.icon_file);
+      }
+      
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: formDataObj,
       });
       
       const data = await response.json();
@@ -112,6 +124,7 @@ export default function SocialMediaManagement() {
       custom_platform_name: "",
       url: "",
       icon_name: "",
+      icon_file: null,
       display_order: 0,
       is_active: true,
     });
@@ -154,7 +167,15 @@ export default function SocialMediaManagement() {
             >
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <Icon className="text-blue-600" size={24} />
+                  {link.icon_file ? (
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${link.icon_file}`}
+                      alt={link.display_name}
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <Icon className="text-blue-600" size={24} />
+                  )}
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">
@@ -283,6 +304,23 @@ export default function SocialMediaManagement() {
                   className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., facebook, instagram"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Upload Custom Icon
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setFormData({ ...formData, icon_file: e.target.files[0] })
+                  }
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Upload a custom icon image (PNG, JPG, SVG)
+                </p>
               </div>
 
               <div>
