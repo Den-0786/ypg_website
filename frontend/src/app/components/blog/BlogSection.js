@@ -57,8 +57,8 @@ export default function BlogSection() {
   useEffect(() => {
     fetchBlogPosts();
 
-    // Refresh blog posts every 30 seconds to catch new posts
-    const interval = setInterval(fetchBlogPosts, 30000);
+    // Auto-refresh disabled to prevent page shaking
+    // const interval = setInterval(fetchBlogPosts, 30000);
 
     // Refresh when page becomes visible (user switches back to tab)
     const handleVisibilityChange = () => {
@@ -70,7 +70,7 @@ export default function BlogSection() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
+      // clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
@@ -94,7 +94,7 @@ export default function BlogSection() {
 
   const totalSlides = Math.ceil(displayPosts.length / slidesPerView);
 
-  // Auto-play functionality
+  // Auto-play disabled to prevent page shaking
   useEffect(() => {
     if (!isAutoPlaying) return;
 
@@ -104,6 +104,11 @@ export default function BlogSection() {
 
     return () => clearInterval(interval);
   }, [isAutoPlaying, totalSlides]);
+  
+  // Set auto-play to false by default to prevent automatic sliding
+  useEffect(() => {
+    setIsAutoPlaying(false);
+  }, []);
 
   const handlePrevious = () => {
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
@@ -227,7 +232,7 @@ export default function BlogSection() {
                           alt={post.title}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
+                          priority={index === 0}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                         <span className="absolute top-4 right-4 px-3 py-1 text-xs font-medium rounded-full bg-gold-500 text-white">

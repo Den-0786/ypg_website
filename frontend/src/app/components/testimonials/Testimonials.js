@@ -35,8 +35,8 @@ export default function TestimonialsSection() {
   useEffect(() => {
     fetchTestimonials();
 
-    // Set up automatic refresh every 30 seconds
-    const interval = setInterval(fetchTestimonials, 30000);
+    // Auto-refresh disabled to prevent page shaking
+    // const interval = setInterval(fetchTestimonials, 30000);
 
     // Refresh when page becomes visible
     const handleVisibilityChange = () => {
@@ -51,7 +51,7 @@ export default function TestimonialsSection() {
     window.refreshTestimonials = fetchTestimonials;
 
     return () => {
-      clearInterval(interval);
+      // clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);

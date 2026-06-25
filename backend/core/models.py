@@ -519,3 +519,43 @@ class VisionMission(models.Model):
         """Get or create the singleton instance"""
         instance, created = cls.objects.get_or_create(pk=1)
         return instance
+
+class SocialMediaLink(models.Model):
+    """
+    Model for managing social media links displayed on the website
+    Admin can add, remove, and update social media platforms from the dashboard
+    """
+    PLATFORM_CHOICES = [
+        ('facebook', 'Facebook'),
+        ('instagram', 'Instagram'),
+        ('twitter', 'Twitter/X'),
+        ('whatsapp', 'WhatsApp'),
+        ('linkedin', 'LinkedIn'),
+        ('tiktok', 'TikTok'),
+        ('youtube', 'YouTube'),
+        ('telegram', 'Telegram'),
+        ('other', 'Other'),
+    ]
+    
+    platform_name = models.CharField(max_length=50, choices=PLATFORM_CHOICES, default='other')
+    custom_platform_name = models.CharField(max_length=50, blank=True, help_text="Custom platform name if 'other' is selected")
+    url = models.URLField(help_text="The URL to the social media profile")
+    icon_name = models.CharField(max_length=50, blank=True, help_text="Lucide icon name or custom icon identifier")
+    display_order = models.IntegerField(default=0, help_text="Order in which to display (lower numbers first)")
+    is_active = models.BooleanField(default=True, help_text="Whether this link is displayed on the website")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.get_platform_name_display() or self.custom_platform_name}"
+    
+    def get_display_name(self):
+        """Get the display name for the platform"""
+        if self.platform_name == 'other':
+            return self.custom_platform_name or 'Social Media'
+        return self.get_platform_name_display()
+    
+    class Meta:
+        verbose_name = "Social Media Link"
+        verbose_name_plural = "Social Media Links"
+        ordering = ['display_order', 'id']

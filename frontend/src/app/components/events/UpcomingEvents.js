@@ -36,7 +36,7 @@ export default function EventSection() {
   const [loading, setLoading] = useState(true);
   const [expandedEvents, setExpandedEvents] = useState(new Set());
 
-  useAutoScroll(containerRef, { interval: 3500, enabled: events.length > 1 });
+  useAutoScroll(containerRef, { interval: 3500, enabled: false });
 
   useEffect(() => {
     const fetchEvents = async () => {

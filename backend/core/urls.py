@@ -152,6 +152,13 @@ urlpatterns = [
     # Vision & Mission API endpoints
     path('api/vision-mission/', api_vision_mission, name='api_vision_mission'),
     path('api/vision-mission/update/', api_vision_mission_update, name='api_vision_mission_update'),
+    
+    # Social Media API endpoints
+    path('api/social-media/', views.api_social_media_links, name='api_social_media_links'),
+    path('api/social-media/admin/', views.api_social_media_links_admin, name='api_social_media_links_admin'),
+    path('api/social-media/create/', views.api_social_media_create, name='api_social_media_create'),
+    path('api/social-media/<int:link_id>/update/', views.api_social_media_update, name='api_social_media_update'),
+    path('api/social-media/<int:link_id>/delete/', views.api_social_media_delete, name='api_social_media_delete'),
 ]
 
 

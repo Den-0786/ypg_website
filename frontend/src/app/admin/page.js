@@ -30,6 +30,7 @@ import BranchPresidentsManagement from "./components/BranchPresidentsManagement"
 import CouncilManagement from "./components/CouncilManagement";
 import PastExecutivesManagement from "./components/PastExecutivesManagement";
 import AdvertisementManagement from "./components/AdvertisementManagement";
+import SocialMediaManagement from "./components/SocialMediaManagement";
 import PinGuard from "./components/PinGuard";
 
 function AdminDashboardInner() {
@@ -65,6 +66,7 @@ function AdminDashboardInner() {
     "branch-presidents",
     "council",
     "past-executives",
+    "social-media",
     "advertisements",
   ];
 
@@ -719,6 +721,10 @@ function AdminDashboardInner() {
               )}
               {activeTab === "advertisements" && (
                 <AdvertisementManagement theme={theme} />
+              )}
+
+              {activeTab === "social-media" && (
+                <SocialMediaManagement theme={theme} />
               )}
 
               {activeTab === "Settings" && (

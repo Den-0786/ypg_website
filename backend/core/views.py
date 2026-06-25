@@ -2780,5 +2780,156 @@ def api_past_executive_delete(request, executive_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# Social Media API endpoints
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_social_media_links(request):
+    """Get all active social media links for the website"""
+    try:
+        links = SocialMediaLink.objects.filter(is_active=True).order_by('display_order', 'id')
+        data = [{
+            'id': link.id,
+            'platform_name': link.platform_name,
+            'custom_platform_name': link.custom_platform_name,
+            'display_name': link.get_display_name(),
+            'url': link.url,
+            'icon_name': link.icon_name,
+            'display_order': link.display_order,
+            'is_active': link.is_active,
+        } for link in links]
+        return Response({
+            'success': True,
+            'social_media_links': data
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_social_media_links_admin(request):
+    """Get all social media links for admin (including inactive)"""
+    try:
+        links = SocialMediaLink.objects.all().order_by('display_order', 'id')
+        data = [{
+            'id': link.id,
+            'platform_name': link.platform_name,
+            'custom_platform_name': link.custom_platform_name,
+            'display_name': link.get_display_name(),
+            'url': link.url,
+            'icon_name': link.icon_name,
+            'display_order': link.display_order,
+            'is_active': link.is_active,
+            'created_at': link.created_at.isoformat(),
+            'updated_at': link.updated_at.isoformat(),
+        } for link in links]
+        return Response({
+            'success': True,
+            'social_media_links': data
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_social_media_create(request):
+    """Create new social media link"""
+    try:
+        data = json.loads(request.body)
+        link = SocialMediaLink.objects.create(
+            platform_name=data.get('platform_name', 'other'),
+            custom_platform_name=data.get('custom_platform_name', ''),
+            url=data.get('url'),
+            icon_name=data.get('icon_name', ''),
+            display_order=data.get('display_order', 0),
+            is_active=data.get('is_active', True)
+        )
+        return Response({
+            'success': True,
+            'message': 'Social media link created successfully',
+            'id': link.id
+        }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_social_media_update(request, link_id):
+    """Update social media link"""
+    try:
+        data = json.loads(request.body)
+        link = SocialMediaLink.objects.get(id=link_id)
+        
+        link.platform_name = data.get('platform_name', link.platform_name)
+        link.custom_platform_name = data.get('custom_platform_name', link.custom_platform_name)
+        link.url = data.get('url', link.url)
+        link.icon_name = data.get('icon_name', link.icon_name)
+        link.display_order = data.get('display_order', link.display_order)
+        link.is_active = data.get('is_active', link.is_active)
+        link.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Social media link updated successfully',
+            'link': {
+                'id': link.id,
+                'platform_name': link.platform_name,
+                'custom_platform_name': link.custom_platform_name,
+                'display_name': link.get_display_name(),
+                'url': link.url,
+                'icon_name': link.icon_name,
+                'display_order': link.display_order,
+                'is_active': link.is_active,
+            }
+        })
+    except SocialMediaLink.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Social media link not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_social_media_delete(request, link_id):
+    """Delete social media link"""
+    try:
+        link = SocialMediaLink.objects.get(id=link_id)
+        link.delete()
+        
+        return Response({
+            'success': True,
+            'message': 'Social media link deleted successfully'
+        })
+    except SocialMediaLink.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Social media link not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # Vision and Mission API endpoints
 

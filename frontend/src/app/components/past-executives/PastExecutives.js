@@ -12,13 +12,13 @@ export default function PastExecutives() {
   const [pastExecutives, setPastExecutives] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useAutoScroll(containerRef, { interval: 3500, enabled: pastExecutives.length > 1 });
+  useAutoScroll(containerRef, { interval: 3500, enabled: false });
 
   useEffect(() => {
     fetchPastExecutives();
 
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchPastExecutives, 30000);
+    // Auto-refresh disabled to prevent page shaking
+    // const interval = setInterval(fetchPastExecutives, 30000);
 
     // Refresh when page becomes visible
     const handleVisibilityChange = () => {
@@ -30,7 +30,7 @@ export default function PastExecutives() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
+      // clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);

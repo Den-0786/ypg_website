@@ -39,7 +39,7 @@ export default function FeatureCards() {
     },
   ];
 
-  useAutoScroll(containerRef, { interval: 3500, enabled: cards.length > 1 });
+  useAutoScroll(containerRef, { interval: 3500, enabled: false });
 
   const container = {
     hidden: { opacity: 0 },

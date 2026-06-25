@@ -13,7 +13,7 @@ export default function TeamSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useAutoScroll(containerRef, { interval: 3500, enabled: teamMembers.length > 1 });
+  useAutoScroll(containerRef, { interval: 3500, enabled: false });
 
   useEffect(() => {
     const fetchTeamMembers = async () => {
@@ -38,8 +38,8 @@ export default function TeamSection() {
 
     fetchTeamMembers();
 
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchTeamMembers, 30000);
+    // Auto-refresh disabled to prevent page shaking
+    // const interval = setInterval(fetchTeamMembers, 30000);
 
     // Refresh when page becomes visible
     const handleVisibilityChange = () => {
@@ -51,7 +51,7 @@ export default function TeamSection() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
+      // clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
