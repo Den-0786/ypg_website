@@ -230,17 +230,14 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         }
         const data = await response.json();
         if (data.success && data.settings) {
-          // Update general settings
-          if (data.settings.websiteTitle) {
-            setGeneralSettings((prev) => ({
-              ...prev,
-              websiteTitle: data.settings.websiteTitle,
-              contactEmail: data.settings.contactEmail || prev.contactEmail,
-              phoneNumber: data.settings.phoneNumber || prev.phoneNumber,
-              address: data.settings.address || prev.address,
-              description: data.settings.description || prev.description,
-            }));
-          }
+          // Update general settings - use API values directly even if empty
+          setGeneralSettings({
+            websiteTitle: data.settings.websiteTitle || "",
+            contactEmail: data.settings.contactEmail || "",
+            phoneNumber: data.settings.phoneNumber || "",
+            address: data.settings.address || "",
+            description: data.settings.description || "",
+          });
 
           // Update social media settings
           if (data.settings.socialMedia) {
@@ -271,12 +268,11 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
   }, []);
 
   const [generalSettings, setGeneralSettings] = useState({
-    websiteTitle: "PCG Ahinsan District YPG",
-    contactEmail: "youth@presbyterian.org",
-    phoneNumber: "+233 20 123 4567",
-    address: "Ahinsan District, Kumasi, Ghana",
-    description:
-      "Presbyterian Church of Ghana Youth Ministry - Ahinsan District",
+    websiteTitle: "",
+    contactEmail: "",
+    phoneNumber: "",
+    address: "",
+    description: "",
   });
 
   const [socialMedia, setSocialMedia] = useState({
@@ -464,6 +460,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       let response;
       switch (section) {
         case "profile":
+          console.log("Saving profile settings:", profile);
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
@@ -472,6 +469,17 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             },
             body: JSON.stringify(profile),
           });
+          console.log("Profile save response status:", response.status);
+          const profileResponseText = await response.text();
+          console.log("Profile save response:", profileResponseText);
+          if (profileResponseText) {
+            try {
+              const profileResponseData = JSON.parse(profileResponseText);
+              console.log("Parsed profile response:", profileResponseData);
+            } catch (e) {
+              console.log("Could not parse profile response");
+            }
+          }
           break;
 
         case "security":
@@ -492,22 +500,35 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           break;
 
         case "website":
+          const websiteData = {
+            websiteTitle: generalSettings.websiteTitle,
+            contactEmail: generalSettings.contactEmail,
+            phoneNumber: generalSettings.phoneNumber,
+            address: generalSettings.address,
+            description: generalSettings.description,
+            socialMedia,
+            appearance,
+          };
+          console.log("Saving website settings:", websiteData);
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              websiteTitle: generalSettings.websiteTitle,
-              contactEmail: generalSettings.contactEmail,
-              phoneNumber: generalSettings.phoneNumber,
-              address: generalSettings.address,
-              description: generalSettings.description,
-              socialMedia,
-              appearance,
-            }),
+            body: JSON.stringify(websiteData),
           });
+          console.log("Website settings save response status:", response.status);
+          const websiteResponseText = await response.text();
+          console.log("Website settings save response:", websiteResponseText);
+          if (websiteResponseText) {
+            try {
+              const websiteResponseData = JSON.parse(websiteResponseText);
+              console.log("Parsed website response:", websiteResponseData);
+            } catch (e) {
+              console.log("Could not parse website response");
+            }
+          }
           break;
 
         case "appearance":

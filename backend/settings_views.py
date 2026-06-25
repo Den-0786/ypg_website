@@ -112,9 +112,11 @@ def api_settings_profile(request):
     """Get or update admin profile settings"""
     try:
         if request.method == 'GET':
+            profile = load_profile_settings()
+            print(f"GET profile settings: {profile}")
             response = Response({
                 'success': True,
-                'profile': load_profile_settings()
+                'profile': profile
             })
             response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
             response['Pragma'] = 'no-cache'
@@ -122,12 +124,16 @@ def api_settings_profile(request):
             return response
         elif request.method == 'PUT':
             data = json.loads(request.body)
+            print(f"PUT profile request body: {data}")
             current = load_profile_settings()
+            print(f"Current profile before update: {current}")
             current.update(data)
+            print(f"Profile after update: {current}")
             save_profile_settings(current)
             
             # Verify the save was successful by reading it back
             verification = load_profile_settings()
+            print(f"Verification after profile save: {verification}")
             
             return Response({
                 'success': True,
@@ -151,9 +157,11 @@ def api_settings_website(request):
     """Get or update website settings"""
     try:
         if request.method == 'GET':
+            settings = load_settings()
+            print(f"GET website settings: {settings}")
             response = Response({
                 'success': True,
-                'settings': load_settings()
+                'settings': settings
             })
             response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
             response['Pragma'] = 'no-cache'
@@ -161,12 +169,16 @@ def api_settings_website(request):
             return response
         elif request.method == 'PUT':
             data = json.loads(request.body)
+            print(f"PUT request body: {data}")
             current = load_settings()
+            print(f"Current settings before update: {current}")
             current.update(data)
+            print(f"Settings after update: {current}")
             save_settings(current)
             
             # Verify the save was successful by reading it back
             verification = load_settings()
+            print(f"Verification after save: {verification}")
             
             return Response({
                 'success': True,
