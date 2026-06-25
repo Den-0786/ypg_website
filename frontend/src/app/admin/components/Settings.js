@@ -184,7 +184,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     fullName: "",
     email: "",
     phone: "",
-    role: "System Administrator",
+    role: "",
     avatar: null,
   });
 
@@ -470,8 +470,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             body: JSON.stringify(profile),
           });
           console.log("Profile save response status:", response.status);
-          const profileResponseData = await response.json();
-          console.log("Profile save response:", profileResponseData);
           break;
 
         case "security":
@@ -511,8 +509,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             body: JSON.stringify(websiteData),
           });
           console.log("Website settings save response status:", response.status);
-          const websiteResponseData = await response.json();
-          console.log("Website settings save response:", websiteResponseData);
           break;
 
         case "appearance":
@@ -532,10 +528,12 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           throw new Error("Invalid section");
       }
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.errors) {
-          setValidationErrors(errorData.errors);
+      const result = await response.json();
+      console.log(`${section} save result:`, result);
+      
+      if (!result.success) {
+        if (result.errors) {
+          setValidationErrors(result.errors);
           setSaveStatus({
             type: "error",
             message: "Please fix the validation errors",
@@ -544,7 +542,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         }
         // Show specific error message from server
         const errorMessage =
-          errorData.error || errorData.message || "Failed to save settings";
+          result.error || result.message || "Failed to save settings";
         setSaveStatus({
           type: "error",
           message: errorMessage,
@@ -552,7 +550,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         return;
       }
 
-      const result = await response.json();
       setSaveStatus({
         type: "success",
         message:
@@ -735,39 +732,24 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           fullName: backup.profile.fullName || "",
           email: backup.profile.email || "",
           phone: backup.profile.phone || "",
-          role: backup.profile.role || "System Administrator",
+          role: backup.profile.role || "",
           avatar: backup.profile.avatar || null,
         };
 
         const restoredGeneralSettings = {
-          websiteTitle:
-            backup.generalSettings.websiteTitle || "PCG Ahinsan District YPG",
-          contactEmail:
-            backup.generalSettings.contactEmail || "youth@presbyterian.org",
-          phoneNumber: backup.generalSettings.phoneNumber || "+233 20 123 4567",
-          address:
-            backup.generalSettings.address || "Ahinsan District, Kumasi, Ghana",
-          description:
-            backup.generalSettings.description ||
-            "Presbyterian Church of Ghana Youth Ministry - Ahinsan District",
+          websiteTitle: backup.generalSettings.websiteTitle || "",
+          contactEmail: backup.generalSettings.contactEmail || "",
+          phoneNumber: backup.generalSettings.phoneNumber || "",
+          address: backup.generalSettings.address || "",
+          description: backup.generalSettings.description || "",
         };
 
         const restoredSocialMedia = {
-          facebook:
-            backup.socialMedia?.facebook ||
-            "https://facebook.com/presbyterianyouth",
-          instagram:
-            backup.socialMedia?.instagram ||
-            "https://instagram.com/presbyterianyouth",
-          twitter:
-            backup.socialMedia?.twitter ||
-            "https://twitter.com/presbyterianyouth",
-          youtube:
-            backup.socialMedia?.youtube ||
-            "https://youtube.com/presbyterianyouth",
-          linkedin:
-            backup.socialMedia?.linkedin ||
-            "https://linkedin.com/company/presbyterianyouth",
+          facebook: backup.socialMedia?.facebook || "",
+          instagram: backup.socialMedia?.instagram || "",
+          twitter: backup.socialMedia?.twitter || "",
+          youtube: backup.socialMedia?.youtube || "",
+          linkedin: backup.socialMedia?.linkedin || "",
         };
 
         const restoredAppearance = {
@@ -897,16 +879,17 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           }
         );
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        const result = await response.json();
+        console.log("Profile picture upload result:", result);
+        
+        if (!result.success) {
           throw new Error(
-            errorData.error ||
-              errorData.message ||
+            result.error ||
+              result.message ||
               "Failed to save profile picture"
           );
         }
 
-        const result = await response.json();
         setProfile({ ...profile, avatar: avatarData });
         setSaveStatus({
           type: "success",

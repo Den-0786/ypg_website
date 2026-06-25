@@ -11,10 +11,10 @@ SETTINGS_FILE = BASE_DIR / 'site_settings.json'
 PROFILE_FILE = BASE_DIR / 'profile_settings.json'
 
 DEFAULT_PROFILE = {
-    'fullName': 'YPG Administrator',
-    'email': 'admin@ahinsanypg.com',
-    'phone': '+233 531427671',
-    'role': 'System Administrator',
+    'fullName': '',
+    'email': '',
+    'phone': '',
+    'role': '',
     'avatar': None
 }
 
