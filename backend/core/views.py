@@ -20,7 +20,7 @@ from .models import (
     Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive,
-    Ministry, Sale, Expense, Contribution, VisionMission
+    Ministry, Sale, Expense, Contribution, VisionMission, DailyVisit
 )
 from .serializers import (
     EventSerializer, TeamMemberSerializer,

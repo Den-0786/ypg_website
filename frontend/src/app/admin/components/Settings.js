@@ -470,16 +470,8 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             body: JSON.stringify(profile),
           });
           console.log("Profile save response status:", response.status);
-          const profileResponseText = await response.text();
-          console.log("Profile save response:", profileResponseText);
-          if (profileResponseText) {
-            try {
-              const profileResponseData = JSON.parse(profileResponseText);
-              console.log("Parsed profile response:", profileResponseData);
-            } catch (e) {
-              console.log("Could not parse profile response");
-            }
-          }
+          const profileResponseData = await response.json();
+          console.log("Profile save response:", profileResponseData);
           break;
 
         case "security":
@@ -519,16 +511,8 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             body: JSON.stringify(websiteData),
           });
           console.log("Website settings save response status:", response.status);
-          const websiteResponseText = await response.text();
-          console.log("Website settings save response:", websiteResponseText);
-          if (websiteResponseText) {
-            try {
-              const websiteResponseData = JSON.parse(websiteResponseText);
-              console.log("Parsed website response:", websiteResponseData);
-            } catch (e) {
-              console.log("Could not parse website response");
-            }
-          }
+          const websiteResponseData = await response.json();
+          console.log("Website settings save response:", websiteResponseData);
           break;
 
         case "appearance":
