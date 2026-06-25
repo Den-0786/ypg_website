@@ -253,14 +253,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             description: data.settings.description || "",
           });
 
-          // Update social media settings
-          if (data.settings.socialMedia) {
-            setSocialMedia((prev) => ({
-              ...prev,
-              ...data.settings.socialMedia,
-            }));
-          }
-
           // Update appearance settings
           if (data.settings.appearance) {
             setAppearance((prev) => ({
@@ -300,14 +292,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     phoneNumber: "",
     address: "",
     description: "",
-  });
-
-  const [socialMedia, setSocialMedia] = useState({
-    facebook: "https://facebook.com/presbyterianyouth",
-    instagram: "https://instagram.com/presbyterianyouth",
-    twitter: "https://twitter.com/presbyterianyouth",
-    youtube: "https://youtube.com/presbyterianyouth",
-    linkedin: "https://linkedin.com/company/presbyterianyouth",
   });
 
   const [security, setSecurity] = useState({
@@ -523,7 +507,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             phoneNumber: generalSettings.phoneNumber,
             address: generalSettings.address,
             description: generalSettings.description,
-            socialMedia,
             appearance,
           };
           console.log("Saving website settings:", websiteData);
@@ -670,7 +653,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       const backup = {
         profile,
         generalSettings,
-        socialMedia,
         security: {
           twoFactorAuth: security.twoFactorAuth,
           requirePinForActions: security.requirePinForActions,
@@ -771,14 +753,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           description: backup.generalSettings.description || "",
         };
 
-        const restoredSocialMedia = {
-          facebook: backup.socialMedia?.facebook || "",
-          instagram: backup.socialMedia?.instagram || "",
-          twitter: backup.socialMedia?.twitter || "",
-          youtube: backup.socialMedia?.youtube || "",
-          linkedin: backup.socialMedia?.linkedin || "",
-        };
-
         const restoredAppearance = {
           language: backup.appearance?.language || "English",
           borderRadius: backup.appearance?.borderRadius || "medium",
@@ -787,7 +761,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         // Update state with restored settings
         setProfile(restoredProfile);
         setGeneralSettings(restoredGeneralSettings);
-        setSocialMedia(restoredSocialMedia);
         setAppearance(restoredAppearance);
         setSecurity((prev) => ({
           ...prev,
@@ -820,7 +793,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               phoneNumber: restoredGeneralSettings.phoneNumber,
               address: restoredGeneralSettings.address,
               description: restoredGeneralSettings.description,
-              socialMedia: restoredSocialMedia,
               appearance: restoredAppearance,
             }),
           });
@@ -1776,107 +1748,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                           }
                           className={getInputClassName("description")}
                         />
-                      </div>
-                    </div>
-
-                    {/* Social Media */}
-                    <div>
-                      <h4
-                        className={`text-xs sm:text-sm font-medium mb-3 ${
-                          theme === "dark" ? "text-white" : "text-navy-950"
-                        }`}
-                      >
-                        Social Media
-                      </h4>
-                      <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                        <div>
-                          <label className={getLabelWithIconClassName()}>
-                            <Facebook className="w-4 h-4 mr-2 text-gold-500" />
-                            Facebook URL
-                          </label>
-                          <input
-                            type="url"
-                            value={socialMedia.facebook}
-                            onChange={(e) =>
-                              setSocialMedia({
-                                ...socialMedia,
-                                facebook: e.target.value,
-                              })
-                            }
-                            className={getInputClassName("facebook")}
-                          />
-                          {getFieldError("facebook") && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {getFieldError("facebook")}
-                            </p>
-                          )}
-                        </div>
-                        <div>
-                          <label className={getLabelWithIconClassName()}>
-                            <Instagram className="w-4 h-4 mr-2 text-pink-600" />
-                            Instagram URL
-                          </label>
-                          <input
-                            type="url"
-                            value={socialMedia.instagram}
-                            onChange={(e) =>
-                              setSocialMedia({
-                                ...socialMedia,
-                                instagram: e.target.value,
-                              })
-                            }
-                            className={getInputClassName("instagram")}
-                          />
-                          {getFieldError("instagram") && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {getFieldError("instagram")}
-                            </p>
-                          )}
-                        </div>
-                        <div>
-                          <label className={getLabelWithIconClassName()}>
-                            <Twitter className="w-4 h-4 mr-2 text-gold-300" />
-                            Twitter URL
-                          </label>
-                          <input
-                            type="url"
-                            value={socialMedia.twitter}
-                            onChange={(e) =>
-                              setSocialMedia({
-                                ...socialMedia,
-                                twitter: e.target.value,
-                              })
-                            }
-                            className={getInputClassName("twitter")}
-                          />
-                          {getFieldError("twitter") && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {getFieldError("twitter")}
-                            </p>
-                          )}
-                        </div>
-                        <div>
-                          <label className={getLabelWithIconClassName()}>
-                            <Youtube className="w-4 h-4 mr-2 text-red-600" />
-                            YouTube URL
-                          </label>
-                          <input
-                            type="url"
-                            value={socialMedia.youtube}
-                            onChange={(e) =>
-                              setSocialMedia({
-                                ...socialMedia,
-                                youtube: e.target.value,
-                              })
-                            }
-                            className={getInputClassName("youtube")}
-                          />
-                          {getFieldError("youtube") && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {getFieldError("youtube")}
-                            </p>
-                          )}
-                        </div>
                       </div>
                     </div>
 
