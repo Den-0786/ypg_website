@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import useAutoScroll from "../../../hooks/useAutoScroll";
-import CarouselDots from "../shared/CarouselDots";
 
 export default function PastExecutives() {
   const containerRef = useRef(null);
@@ -17,9 +16,6 @@ export default function PastExecutives() {
   useEffect(() => {
     fetchPastExecutives();
 
-    // Auto-refresh disabled to prevent page shaking
-    // const interval = setInterval(fetchPastExecutives, 30000);
-
     // Refresh when page becomes visible
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -30,7 +26,6 @@ export default function PastExecutives() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      // clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
@@ -42,7 +37,6 @@ export default function PastExecutives() {
       );
       const data = await response.json();
       if (data.success) {
-        // Backend already returns executives in correct hierarchy order
         setPastExecutives(data.pastExecutives);
       }
     } catch (error) {
@@ -51,6 +45,17 @@ export default function PastExecutives() {
       setLoading(false);
     }
   };
+
+  // Group executives by reign_period, preserving backend order (most recent first)
+  const groupedByTerm = pastExecutives.reduce((acc, executive) => {
+    const term = executive.reign_period || "Unknown Term";
+    if (!acc[term]) acc[term] = [];
+    acc[term].push(executive);
+    return acc;
+  }, {});
+
+  // Preserve insertion order (backend already sorted most recent first)
+  const termGroups = Object.entries(groupedByTerm);
 
   if (loading) {
     return (
@@ -153,68 +158,86 @@ export default function PastExecutives() {
           </p>
         </div>
 
-        {pastExecutives.length > 0 && (
-          <div
-            ref={containerRef}
-            className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 pe-0 md:pe-8 scroll-smooth md:snap-x md:snap-mandatory scrollbar-hide"
-            style={{ WebkitOverflowScrolling: "touch" }}
-          >
-            {pastExecutives.map((executive, index) => (
-                  <motion.div
-                    key={executive.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)] flex flex-col h-full"
-                  >
-                    <div className="relative h-72 sm:h-96 md:h-[28rem] bg-gradient-to-br from-purple-100 to-blue-100">
-                      {executive.image ? (
-                        <Image
-                          src={buildImageSrc(executive.image)}
-                          alt={executive.name}
-                          width={256}
-                          height={208}
-                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="w-20 h-20 bg-gradient-to-r from-purple-200 to-blue-200 rounded-full flex items-center justify-center">
-                            <svg
-                              className="h-10 w-10 text-gray-500"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
+        {termGroups.length > 0 && (() => {
+          const termColors = [
+            { bg: "bg-gradient-to-r from-purple-100 to-blue-100", text: "text-purple-800", border: "border-purple-200" },
+            { bg: "bg-gradient-to-r from-emerald-100 to-teal-100", text: "text-emerald-800", border: "border-emerald-200" },
+            { bg: "bg-gradient-to-r from-orange-100 to-rose-100", text: "text-orange-800", border: "border-orange-200" },
+            { bg: "bg-gradient-to-r from-sky-100 to-indigo-100", text: "text-sky-800", border: "border-sky-200" },
+            { bg: "bg-gradient-to-r from-pink-100 to-fuchsia-100", text: "text-pink-800", border: "border-pink-200" },
+          ];
+          const termColorMap = {};
+          termGroups.forEach(([term], i) => {
+            termColorMap[term] = termColors[i % termColors.length];
+          });
+
+          return (
+            <div
+              ref={containerRef}
+              className="flex overflow-x-auto overscroll-x-contain gap-4 sm:gap-6 pb-4 scroll-smooth scrollbar-hide"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              {termGroups.map(([term, executives]) =>
+                executives.map((executive, index) => {
+                  const { bg, text, border } = termColorMap[term];
+                  return (
+                    <motion.div
+                      key={executive.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: index * 0.08 }}
+                      className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/20 flex-shrink-0 w-[80vw] sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] flex flex-col"
+                    >
+                      <div className="relative h-72 sm:h-80 md:h-[22rem] bg-gradient-to-br from-purple-100 to-blue-100">
+                        {executive.image ? (
+                          <Image
+                            src={buildImageSrc(executive.image)}
+                            alt={executive.name}
+                            width={256}
+                            height={208}
+                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-20 h-20 bg-gradient-to-r from-purple-200 to-blue-200 rounded-full flex items-center justify-center">
+                              <svg
+                                className="h-10 w-10 text-gray-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                />
+                              </svg>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                    <div className="p-4 flex-1 flex flex-col">
-                      <h3 className="text-xl font-semibold text-navy-950 mb-1 group-hover:text-purple-600 transition-colors duration-300">
-                        {executive.name}
-                      </h3>
-                      <p className="text-gray-600 mb-2">
-                        {executive.position_display}
-                      </p>
-                      <div className="inline-block bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-3 py-1.5 rounded-full text-sm font-medium border border-purple-200 mt-auto">
-                        {executive.reign_period}
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-            <CarouselDots containerRef={containerRef} itemCount={pastExecutives.length} />
-          </div>
-        </section>
+                      <div className="p-4 flex-1 flex flex-col">
+                        <h3 className="text-xl font-semibold text-navy-950 mb-1 group-hover:text-purple-600 transition-colors duration-300">
+                          {executive.name}
+                        </h3>
+                        <p className="text-gray-600 mb-2">
+                          {executive.position_display}
+                        </p>
+                        <div className={`inline-block ${bg} ${text} px-3 py-1.5 rounded-full text-sm font-medium border ${border} mt-auto`}>
+                          {executive.reign_period}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })
+              )}
+            </div>
+          );
+        })()}
+      </div>
+    </section>
   );
 }

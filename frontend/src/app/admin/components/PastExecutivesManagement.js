@@ -141,14 +141,14 @@ export default function PastExecutivesManagement({ theme }) {
   const confirmDelete = async () => {
     if (!executiveToDelete) return;
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${executiveToDelete.id}/delete/`,
-        { method: "DELETE" }
-      );
+      const isHardDelete = executiveToDelete.is_deleted;
+      const endpoint = isHardDelete
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${executiveToDelete.id}/hard-delete/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${executiveToDelete.id}/delete/`;
+      const response = await fetch(endpoint, { method: "DELETE" });
       const data = await response.json();
 
       if (data.success) {
-        // refresh list
         fetchPastExecutives();
         toast.success(data.message || "Past executive deleted successfully");
         setShowDeleteModal(false);
@@ -547,7 +547,13 @@ export default function PastExecutivesManagement({ theme }) {
             <div
               className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-6`}
             >
-              Are you sure you want to delete "{executiveToDelete.name}"?
+              {executiveToDelete.is_deleted ? (
+                <span>
+                  This will <strong>permanently remove</strong> &quot;{executiveToDelete.name}&quot; from the database. This cannot be undone.
+                </span>
+              ) : (
+                <span>Are you sure you want to delete &quot;{executiveToDelete.name}&quot;?</span>
+              )}
             </div>
             <div className="flex space-x-3">
               <button

@@ -129,6 +129,7 @@ urlpatterns = [
     path('api/past-executives/create/', views.api_past_executive_create, name='api_past_executive_create'),
     path('api/past-executives/<int:executive_id>/update/', views.api_past_executive_update, name='api_past_executive_update'),
     path('api/past-executives/<int:executive_id>/delete/', views.api_past_executive_delete, name='api_past_executive_delete'),
+    path('api/past-executives/<int:executive_id>/hard-delete/', views.api_past_executive_hard_delete, name='api_past_executive_hard_delete'),
     
     # Finance Management API endpoints
     # Sales endpoints

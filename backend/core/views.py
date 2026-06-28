@@ -2608,11 +2608,19 @@ def api_past_executives(request):
         show_deleted = request.GET.get('deleted', 'false').lower() == 'true'
         
         if show_deleted:
-            executives = PastExecutive.objects.all()
+            executives = PastExecutive.objects.filter(is_deleted=True)
         else:
             executives = PastExecutive.objects.filter(is_deleted=False)
         
-        # Fixed order using position_order when available, else fallback mapping
+        # Sort: most recent term first (by end year in reign_period), then by position_order within each term
+        def get_end_year(executive):
+            period = getattr(executive, 'reign_period', '') or ''
+            parts = [p.strip() for p in period.replace('–', '-').split('-')]
+            try:
+                return -int(parts[-1])  # Negate so most recent sorts first
+            except (ValueError, IndexError):
+                return 0
+
         fallback_order = {
             'president': 1,
             "president's rep": 2,
@@ -2624,8 +2632,15 @@ def api_past_executives(request):
             'organizer': 8,
             'others': 99,
         }
+
+        def get_position_order(executive):
+            order = getattr(executive, 'position_order', 999)
+            if order != 999:
+                return order
+            return fallback_order.get(getattr(executive, 'position', '').lower(), 999)
+
         executives_list = list(executives)
-        executives_list.sort(key=lambda x: (getattr(x, 'position_order', 999) if getattr(x, 'position_order', 999) != 999 else fallback_order.get(getattr(x, 'position', '').lower(), 999), x.name))
+        executives_list.sort(key=lambda x: (get_end_year(x), get_position_order(x)))
         
         data = []
         for executive in executives_list:
@@ -2767,6 +2782,30 @@ def api_past_executive_delete(request, executive_id):
         return Response({
             'success': True,
             'message': 'Past executive deleted successfully'
+        })
+    except PastExecutive.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Past executive not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_past_executive_hard_delete(request, executive_id):
+    """Permanently delete past executive from database"""
+    try:
+        executive = PastExecutive.objects.get(id=executive_id)
+        executive.delete()
+        return Response({
+            'success': True,
+            'message': 'Past executive permanently deleted'
         })
     except PastExecutive.DoesNotExist:
         return Response({
