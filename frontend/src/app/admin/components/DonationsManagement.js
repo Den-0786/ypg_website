@@ -210,6 +210,22 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
   const [expenses, setExpenses] = useState([]);
   const [inventory, setInventory] = useState([]);
 
+  useEffect(() => {
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
+    fetch(`${base}/api/contributions/`)
+      .then(r => r.json())
+      .then(data => { if (data.success) setContributions(data.contributions); })
+      .catch(() => {});
+    fetch(`${base}/api/sales/`)
+      .then(r => r.json())
+      .then(data => { if (data.success) setSales(data.sales); })
+      .catch(() => {});
+    fetch(`${base}/api/expenses/`)
+      .then(r => r.json())
+      .then(data => { if (data.success) setExpenses(data.expenses); })
+      .catch(() => {});
+  }, []);
+
   // Calculate financial summary
   const calculateFinancialSummary = () => {
     // Total Donations (verified only)
