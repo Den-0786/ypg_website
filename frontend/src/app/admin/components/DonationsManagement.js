@@ -217,10 +217,15 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       .filter((d) => d.payment_status === "verified")
       .reduce((sum, donation) => sum + parseFloat(donation.amount || 0), 0);
 
-    // Total Contributions (Renewals + Offertories)
+    // Total Contributions (Renewals + Offertories + Congregation Contributions)
     const totalContributions = contributions
-      .filter((c) => c.status === "verified")
-      .reduce((sum, contrib) => sum + parseFloat(contrib.amount || 0), 0);
+      .filter((c) => c.status === "completed")
+      .reduce((sum, c) => {
+        if (c.type === "congregation_contribution") {
+          return sum + parseFloat(c.amount_paid || 0);
+        }
+        return sum + parseFloat(c.amount || 0);
+      }, 0);
 
     // Total Sales Revenue
     const totalSales = sales
@@ -1020,7 +1025,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <p className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"} truncate`}>
                 ₵{calculateFinancialSummary().totalContributions.toLocaleString()}
               </p>
-              <p className="text-xs text-gray-500 truncate">Renewals + Offertories</p>
+              <p className="text-xs text-gray-500 truncate">Renewals + Offertories + Contributions</p>
             </div>
           </div>
         </div>
