@@ -91,6 +91,11 @@ class ExpenseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ContributionSerializer(serializers.ModelSerializer):
+    amount_left = serializers.SerializerMethodField()
+
+    def get_amount_left(self, obj):
+        return float(obj.amount_left) if obj.amount_left is not None else None
+
     class Meta:
         model = Contribution
         fields = '__all__'

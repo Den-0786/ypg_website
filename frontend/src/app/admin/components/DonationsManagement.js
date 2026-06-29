@@ -58,6 +58,8 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRenewalsModal, setShowRenewalsModal] = useState(false);
   const [showOffertoryModal, setShowOffertoryModal] = useState(false);
+  const [showContributionModal, setShowContributionModal] = useState(false);
+  const [editingContribRecord, setEditingContribRecord] = useState(null);
   const [showSalesModal, setShowSalesModal] = useState(false);
   const [showExpensesModal, setShowExpensesModal] = useState(false);
   const [editingSale, setEditingSale] = useState(null);
@@ -94,6 +96,14 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     program_type: "",
     venue: "",
     amount: "",
+  });
+
+  const [contributionData, setContributionData] = useState({
+    congregation: "",
+    purpose: "",
+    amount_to_pay: "",
+    amount_paid: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
   const [salesData, setSalesData] = useState({
@@ -560,6 +570,69 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     }
   };
 
+  const handleAddContribution = async () => {
+    try {
+      const url = editingContribRecord
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${editingContribRecord.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/create/`;
+
+      const method = editingContribRecord ? "PUT" : "POST";
+      const amountPaid = parseFloat(contributionData.amount_paid) || 0;
+      const amountToPay = parseFloat(contributionData.amount_to_pay) || 0;
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "congregation_contribution",
+          congregation: contributionData.congregation,
+          purpose: contributionData.purpose,
+          amount_to_pay: amountToPay,
+          amount_paid: amountPaid,
+          amount: amountPaid,
+          date: contributionData.date,
+          status: "completed",
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (editingContribRecord) {
+          setContributions(prev => prev.map(c => c.id === editingContribRecord.id ? result.contribution : c));
+          toast.success("Contribution updated successfully!");
+        } else {
+          setContributions(prev => [...prev, result.contribution]);
+          toast.success("Contribution added successfully!");
+        }
+        setShowContributionModal(false);
+        setContributionData({ congregation: "", purpose: "", amount_to_pay: "", amount_paid: "", date: new Date().toISOString().split("T")[0] });
+        setEditingContribRecord(null);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to save contribution.");
+      }
+    } catch (error) {
+      console.error("Error saving contribution:", error);
+      toast.error("Failed to save contribution.");
+    }
+  };
+
+  const handleDeleteContribRecord = async (id) => {
+    if (!window.confirm("Delete this contribution record?")) return;
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${id}/delete/`,
+        { method: "DELETE" }
+      );
+      if (response.ok) {
+        setContributions(prev => prev.filter(c => c.id !== id));
+        toast.success("Contribution deleted.");
+      }
+    } catch (error) {
+      toast.error("Failed to delete contribution.");
+    }
+  };
+
   const handleAddSales = async () => {
     try {
       const url = editingSale 
@@ -1021,6 +1094,17 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               <Plus className="w-3 h-3" />
               Add Offertory
             </button>
+            <button
+              onClick={() => {
+                setEditingContribRecord(null);
+                setContributionData({ congregation: "", purpose: "", amount_to_pay: "", amount_paid: "", date: new Date().toISOString().split("T")[0] });
+                setShowContributionModal(true);
+              }}
+              className="flex items-center justify-center gap-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm whitespace-nowrap flex-1 sm:flex-none"
+            >
+              <Plus className="w-3 h-3" />
+              Add Contribution
+            </button>
           </div>
         </div>
 
@@ -1280,6 +1364,140 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
               })
           )}
         </div>
+      </div>
+
+      {/* Congregation Contributions Section */}
+      <div className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl shadow-sm border p-4 sm:p-6 mb-8`}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex-1 min-w-0">
+            <h3 className={`text-lg sm:text-xl font-semibold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
+              Congregation Contributions
+            </h3>
+            <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              Track per-purpose contributions from each local congregation
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setEditingContribRecord(null);
+              setContributionData({ congregation: "", purpose: "", amount_to_pay: "", amount_paid: "", date: new Date().toISOString().split("T")[0] });
+              setShowContributionModal(true);
+            }}
+            className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition w-full sm:w-auto whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            Add Contribution
+          </button>
+        </div>
+
+        {contributions.filter(c => c.type === "congregation_contribution").length === 0 ? (
+          <div className={`text-center py-10 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+            <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-40" />
+            <p className="text-lg font-medium mb-1">No Contributions Yet</p>
+            <p className="text-sm">Click &quot;Add Contribution&quot; to record a congregation contribution.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="min-w-full px-4 sm:px-0">
+              <table className="w-full min-w-[700px]">
+                <thead>
+                  <tr className={`${theme === "dark" ? "border-gray-700" : "border-gray-200"} border-b`}>
+                    {["Congregation", "Purpose", "Amount to Pay", "Amount Paid", "Amount Left", "Date", "Actions"].map(h => (
+                      <th key={h} className={`text-left py-3 px-4 text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {contributions
+                    .filter(c => c.type === "congregation_contribution")
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .map(c => {
+                      const toPay = parseFloat(c.amount_to_pay || 0);
+                      const paid = parseFloat(c.amount_paid || 0);
+                      const left = c.amount_left !== null && c.amount_left !== undefined ? parseFloat(c.amount_left) : Math.max(toPay - paid, 0);
+                      const pct = toPay > 0 ? Math.min((paid / toPay) * 100, 100) : 0;
+                      return (
+                        <tr key={c.id} className={`border-b ${theme === "dark" ? "border-gray-700 hover:bg-gray-700/50" : "border-gray-100 hover:bg-gray-50"} transition-colors`}>
+                          <td className={`py-3 px-4 font-medium text-sm ${theme === "dark" ? "text-white" : "text-navy-950"}`}>{c.congregation || "—"}</td>
+                          <td className={`py-3 px-4 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{c.purpose || "—"}</td>
+                          <td className={`py-3 px-4 text-sm font-semibold ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}>₵{toPay.toLocaleString()}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex flex-col gap-1">
+                              <span className={`text-sm font-semibold ${theme === "dark" ? "text-green-400" : "text-green-700"}`}>₵{paid.toLocaleString()}</span>
+                              <div className={`w-24 h-1.5 rounded-full ${theme === "dark" ? "bg-gray-600" : "bg-gray-200"}`}>
+                                <div className="h-1.5 rounded-full bg-green-500" style={{ width: `${pct}%` }} />
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`text-sm font-bold ${left === 0 ? (theme === "dark" ? "text-green-400" : "text-green-600") : (theme === "dark" ? "text-red-400" : "text-red-600")}`}>
+                              {left === 0 ? "✓ Cleared" : `₵${left.toLocaleString()}`}
+                            </span>
+                          </td>
+                          <td className={`py-3 px-4 text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{new Date(c.date).toLocaleDateString()}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setEditingContribRecord(c);
+                                  setContributionData({
+                                    congregation: c.congregation || "",
+                                    purpose: c.purpose || "",
+                                    amount_to_pay: c.amount_to_pay || "",
+                                    amount_paid: c.amount_paid || "",
+                                    date: c.date || new Date().toISOString().split("T")[0],
+                                  });
+                                  setShowContributionModal(true);
+                                }}
+                                className={`p-1.5 rounded ${theme === "dark" ? "text-blue-400 hover:bg-gray-600" : "text-blue-600 hover:bg-blue-50"}`}
+                                title="Edit"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteContribRecord(c.id)}
+                                className={`p-1.5 rounded ${theme === "dark" ? "text-red-400 hover:bg-gray-600" : "text-red-600 hover:bg-red-50"}`}
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Totals summary row */}
+        {contributions.filter(c => c.type === "congregation_contribution").length > 0 && (
+          <div className={`mt-4 p-4 rounded-lg flex flex-wrap gap-6 ${theme === "dark" ? "bg-gray-700/50" : "bg-purple-50"} border ${theme === "dark" ? "border-gray-600" : "border-purple-200"}`}>
+            <div>
+              <p className={`text-xs font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Expected</p>
+              <p className={`text-lg font-bold ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}>
+                ₵{contributions.filter(c => c.type === "congregation_contribution").reduce((s, c) => s + parseFloat(c.amount_to_pay || 0), 0).toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <p className={`text-xs font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Paid</p>
+              <p className={`text-lg font-bold ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
+                ₵{contributions.filter(c => c.type === "congregation_contribution").reduce((s, c) => s + parseFloat(c.amount_paid || 0), 0).toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <p className={`text-xs font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Outstanding</p>
+              <p className={`text-lg font-bold ${theme === "dark" ? "text-red-400" : "text-red-600"}`}>
+                ₵{contributions.filter(c => c.type === "congregation_contribution").reduce((s, c) => {
+                  const left = c.amount_left !== null && c.amount_left !== undefined ? parseFloat(c.amount_left) : Math.max(parseFloat(c.amount_to_pay || 0) - parseFloat(c.amount_paid || 0), 0);
+                  return s + left;
+                }, 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sales Section */}
@@ -2679,6 +2897,150 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
                     className="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
                   >
                     Add Expense
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Add / Edit Congregation Contribution Modal */}
+      <AnimatePresence>
+        {showContributionModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className={`w-full max-w-lg rounded-2xl shadow-2xl p-6 sm:p-8 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-navy-950"}`}>
+                  {editingContribRecord ? "Edit Contribution" : "Add Contribution"}
+                </h3>
+                <button
+                  onClick={() => { setShowContributionModal(false); setEditingContribRecord(null); }}
+                  className={`p-2 rounded-lg ${theme === "dark" ? "text-gray-400 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"}`}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form
+                onSubmit={(e) => { e.preventDefault(); handleAddContribution(); }}
+                className="space-y-4"
+              >
+                {/* Purpose */}
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                    Purpose <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Dennis&apos;s Wedding, District Conference..."
+                    value={contributionData.purpose}
+                    onChange={(e) => setContributionData({ ...contributionData, purpose: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-navy-950"}`}
+                  />
+                </div>
+
+                {/* Congregation */}
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                    Local Congregation <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    required
+                    value={contributionData.congregation}
+                    onChange={(e) => setContributionData({ ...contributionData, congregation: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
+                  >
+                    <option value="">— Select Congregation —</option>
+                    {CONGREGATIONS.map((cong) => (
+                      <option key={cong} value={cong}>{cong}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Amount to Pay */}
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                    Amount to Pay (₵) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={contributionData.amount_to_pay}
+                    onChange={(e) => setContributionData({ ...contributionData, amount_to_pay: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
+                  />
+                </div>
+
+                {/* Amount Paid */}
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                    Amount Paid (₵)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={contributionData.amount_paid}
+                    onChange={(e) => setContributionData({ ...contributionData, amount_paid: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
+                  />
+                </div>
+
+                {/* Amount Left — computed preview */}
+                {contributionData.amount_to_pay && (
+                  <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-purple-50"} border ${theme === "dark" ? "border-gray-600" : "border-purple-200"}`}>
+                    <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                      Amount Left:{" "}
+                      <span className={`font-bold ${Math.max(parseFloat(contributionData.amount_to_pay || 0) - parseFloat(contributionData.amount_paid || 0), 0) === 0 ? "text-green-500" : (theme === "dark" ? "text-red-400" : "text-red-600")}`}>
+                        ₵{Math.max(parseFloat(contributionData.amount_to_pay || 0) - parseFloat(contributionData.amount_paid || 0), 0).toLocaleString()}
+                      </span>
+                      {Math.max(parseFloat(contributionData.amount_to_pay || 0) - parseFloat(contributionData.amount_paid || 0), 0) === 0 && (
+                        <span className="ml-2 text-green-500 font-semibold">✓ Fully Paid</span>
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {/* Date */}
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={contributionData.date}
+                    onChange={(e) => setContributionData({ ...contributionData, date: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-navy-950"}`}
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setShowContributionModal(false); setEditingContribRecord(null); }}
+                    className={`px-6 py-2 border rounded-lg font-medium transition-colors ${theme === "dark" ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                  >
+                    {editingContribRecord ? "Update Contribution" : "Add Contribution"}
                   </button>
                 </div>
               </form>

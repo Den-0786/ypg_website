@@ -437,6 +437,7 @@ class Contribution(models.Model):
     TYPE_CHOICES = [
         ('renewal', 'Renewal'),
         ('offertory', 'Offertory'),
+        ('congregation_contribution', 'Congregation Contribution'),
     ]
     
     STATUS_CHOICES = [
@@ -445,8 +446,8 @@ class Contribution(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -459,10 +460,25 @@ class Contribution(models.Model):
     # For offertories
     program_type = models.CharField(max_length=200, blank=True, null=True)
     venue = models.CharField(max_length=200, blank=True, null=True)
-    
+
+    # For congregation contributions
+    purpose = models.CharField(max_length=300, blank=True, null=True)
+    amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0)
+
+    @property
+    def amount_left(self):
+        if self.amount_to_pay is not None:
+            paid = self.amount_paid or 0
+            left = self.amount_to_pay - paid
+            return max(left, 0)
+        return None
+
     def __str__(self):
         if self.type == 'renewal':
             return f"Renewal - {self.congregation} - {self.amount}"
+        elif self.type == 'congregation_contribution':
+            return f"Contribution - {self.congregation} - {self.purpose}"
         else:
             return f"Offertory - {self.program_type} - {self.amount}"
     
