@@ -37,8 +37,9 @@ export default function AboutSection() {
     const visionImage = visionMission?.vision_image_url || "/mission-vision/priscy.jpg";
 
     return (
-        <section id="about" className="bg-navy-950 py-20 lg:py-28 relative overflow-hidden">
+        <section id="about" className="bg-gray-50 py-20 lg:py-28 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Section Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -49,88 +50,69 @@ export default function AboutSection() {
                     <span className="inline-block text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">
                         Who We Are
                     </span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-navy-950">
                         About Young Peoples&apos; Guild (YPG)
                     </h2>
                 </motion.div>
 
-                <div className="grid lg:grid-cols-2 gap-10">
-                    {/* Mission Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        whileHover={{ y: -6 }}
-                        className="bg-navy-900 border-t-4 border-gold-500 p-6 sm:p-8 shadow-xl transition-all duration-300"
-                    >
-                        <div className="relative h-64 mb-6 overflow-hidden border border-gold-500/30">
-                            <Image
-                                src={missionImage}
-                                alt="Mission"
-                                fill
-                                className="object-cover object-top"
-                                style={{ objectPosition: 'center top' }}
-                                priority
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                            />
-                        </div>
-                        <h3 className="text-2xl font-bold text-white mb-4">Our Mission</h3>
-                        <p className="text-gray-300 leading-relaxed text-lg">
+                {/* Row 1: Image Left, Text Right */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-xl shadow-lg overflow-hidden mb-12"
+                >
+                    <div className="relative h-72 lg:h-auto min-h-[300px]">
+                        <Image
+                            src={missionImage}
+                            alt="Mission"
+                            fill
+                            className="object-cover object-top"
+                            priority
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                    </div>
+                    <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center">
+                        <h3 className="text-2xl md:text-3xl font-bold text-navy-950 mb-4">Our Mission</h3>
+                        <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
                             {missionText}
                         </p>
-                    </motion.div>
-
-                    {/* Vision Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        whileHover={{ y: -6 }}
-                        className="bg-navy-900 border-t-4 border-gold-500 p-6 sm:p-8 shadow-xl transition-all duration-300"
-                    >
-                        <div className="relative h-64 mb-6 overflow-hidden border border-gold-500/30">
-                            <Image
-                                src={visionImage}
-                                alt="Vision"
-                                fill
-                                className="object-cover"
-                                priority
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                            />
+                        <div className="border-l-4 border-gold-500 pl-4">
+                            <p className="text-navy-950 font-semibold italic">&ldquo;{motto}&rdquo;</p>
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-4">Our Vision</h3>
-                        <p className="text-gray-300 leading-relaxed text-lg">
+                    </div>
+                </motion.div>
+
+                {/* Row 2: Text Left, Image Right */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-xl shadow-lg overflow-hidden mb-12"
+                >
+                    <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
+                        <h3 className="text-2xl md:text-3xl font-bold text-navy-950 mb-4">Our Vision</h3>
+                        <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
                             {visionText}
                         </p>
-                    </motion.div>
-                </div>
-
-                {/* Motto & Theme */}
-                <div className="grid md:grid-cols-2 gap-6 mt-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="bg-gold-500 p-6 text-center shadow-md"
-                    >
-                        <h3 className="text-xl font-bold text-navy-950 mb-2">Our Motto</h3>
-                        <p className="text-lg font-semibold text-navy-950">{motto}</p>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                        className="bg-navy-900 border-2 border-gold-500 p-6 text-center shadow-md"
-                    >
-                        <h3 className="text-xl font-bold text-gold-500 mb-2">{themeTitle}</h3>
-                        <p className="text-lg text-white">{themeText}</p>
-                    </motion.div>
-                </div>
+                        <div className="bg-gold-500/10 border border-gold-500/30 rounded-lg p-4">
+                            <h4 className="text-sm font-bold text-gold-600 uppercase tracking-wide mb-1">{themeTitle}</h4>
+                            <p className="text-navy-950 font-medium text-sm">{themeText}</p>
+                        </div>
+                    </div>
+                    <div className="relative h-72 lg:h-auto min-h-[300px] order-1 lg:order-2">
+                        <Image
+                            src={visionImage}
+                            alt="Vision"
+                            fill
+                            className="object-cover"
+                            priority
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                    </div>
+                </motion.div>
             </div>
         </section>
     );
