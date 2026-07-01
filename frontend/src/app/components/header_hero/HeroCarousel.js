@@ -52,8 +52,31 @@ export default function HeroCarousel() {
 
   return (
     <section id="home" className="relative min-h-[600px] h-[85vh] md:h-screen bg-navy-950 overflow-hidden flex items-center">
-      {/* Background gradient accent */}
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-blue-950 to-navy-950 opacity-90" />
+      {/* Mobile/Tablet: Full background image with gradient overlay */}
+      <div className="absolute inset-0 lg:hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={slide.bgImage}
+              alt={slide.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          </motion.div>
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/40" />
+      </div>
+
+      {/* Desktop: Gradient background (no full-bleed image) */}
+      <div className="absolute inset-0 hidden lg:block bg-gradient-to-r from-navy-950 via-blue-950 to-navy-950 opacity-90" />
 
       {/* Diagonal gold slash decoration */}
       <div className="absolute top-0 right-[45%] w-1.5 h-full bg-gold-500 origin-top-left -skew-x-12 opacity-80 hidden lg:block" />
@@ -95,22 +118,10 @@ export default function HeroCarousel() {
             </AnimatePresence>
           </div>
 
-          {/* Hero image - mobile: rounded below text, desktop: geometric cut */}
-          <div className="relative h-[220px] sm:h-[280px] lg:h-[400px] xl:h-[520px] mt-8 lg:mt-0">
-            {/* Mobile/Tablet: rounded image */}
-            <div className="block lg:hidden relative w-full h-full rounded-xl overflow-hidden shadow-2xl">
-              <Image
-                src={slide.bgImage}
-                alt={slide.title}
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-navy-950/20" />
-            </div>
-            {/* Desktop: geometric clip */}
+          {/* Desktop only: geometric clip image */}
+          <div className="relative hidden lg:block h-[400px] xl:h-[520px]">
             <div
-              className="hidden lg:block absolute inset-0 shadow-2xl"
+              className="absolute inset-0 shadow-2xl"
               style={{
                 clipPath: "polygon(20% 0, 100% 0, 100% 100%, 0% 100%)",
               }}
