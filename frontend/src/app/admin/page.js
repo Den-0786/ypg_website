@@ -32,6 +32,7 @@ import PastExecutivesManagement from "./components/PastExecutivesManagement";
 import AdvertisementManagement from "./components/AdvertisementManagement";
 import SocialMediaManagement from "./components/SocialMediaManagement";
 import PinGuard from "./components/PinGuard";
+import autoLogout from "../../utils/autoLogout";
 
 function AdminDashboardInner() {
   const router = useRouter();
@@ -143,7 +144,25 @@ function AdminDashboardInner() {
 
   useEffect(() => {
     checkAuthentication();
+    return () => {
+      autoLogout.destroy();
+    };
   }, []);
+
+  // Initialize auto-logout when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      autoLogout.init(() => {
+        toast.error("Logged out due to inactivity.");
+        handleLogout();
+      });
+    }
+    return () => {
+      if (!isAuthenticated) {
+        autoLogout.destroy();
+      }
+    };
+  }, [isAuthenticated]);
 
   const checkAuthentication = () => {
     const authenticated = localStorage.getItem("ypg_admin_authenticated");

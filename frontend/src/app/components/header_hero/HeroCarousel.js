@@ -95,10 +95,22 @@ export default function HeroCarousel() {
             </AnimatePresence>
           </div>
 
-          {/* Hero image with geometric cut */}
-          <div className="hidden lg:block relative h-[400px] xl:h-[520px]">
+          {/* Hero image - mobile: rounded below text, desktop: geometric cut */}
+          <div className="relative h-[220px] sm:h-[280px] lg:h-[400px] xl:h-[520px] mt-8 lg:mt-0">
+            {/* Mobile/Tablet: rounded image */}
+            <div className="block lg:hidden relative w-full h-full rounded-xl overflow-hidden shadow-2xl">
+              <Image
+                src={slide.bgImage}
+                alt={slide.title}
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-navy-950/20" />
+            </div>
+            {/* Desktop: geometric clip */}
             <div
-              className="absolute inset-0 shadow-2xl"
+              className="hidden lg:block absolute inset-0 shadow-2xl"
               style={{
                 clipPath: "polygon(20% 0, 100% 0, 100% 100%, 0% 100%)",
               }}
