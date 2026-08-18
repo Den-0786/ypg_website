@@ -51,7 +51,7 @@ export default function FeatureCards() {
     <div className="relative z-10 -mt-24 sm:-mt-28 lg:-mt-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-end">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full sm:w-[85%] lg:w-[75%]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full sm:w-[85%] lg:w-[75%] items-start">
             {cards.map((card, index) => {
               const Icon = icons[card.title] || ArrowRight;
               const isExpanded = expandedCard === index;
