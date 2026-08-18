@@ -96,7 +96,7 @@ export default function AnnouncementBanner() {
   if (items.length === 0) return null;
 
   return (
-    <div className="w-full bg-navy-950 overflow-hidden border-y border-gold-500/10">
+    <div className="w-full bg-navy-950 overflow-hidden border-y border-gold-500/10 mt-6">
       <div className="ticker-wrap">
         <div className="ticker-track">
           {[...items, ...items, ...items].map((item, i) => (
