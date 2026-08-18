@@ -80,7 +80,7 @@ export default function FeatureCards() {
                       </h3>
                     </div>
 
-                    <p className="text-blue-100/70 text-xs leading-relaxed line-clamp-2">
+                    <p className={`text-blue-100/70 text-xs leading-relaxed ${!isExpanded ? "line-clamp-2" : ""}`}>
                       {isExpanded ? (
                         card.fullDesc.split("\n").map((line, idx) => (
                           <span key={idx}>
