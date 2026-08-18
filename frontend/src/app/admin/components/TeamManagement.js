@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { buildImageSrc } from "../../../utils/config";
-import { Users, Plus, Edit, Trash2, X, AlertTriangle } from "lucide-react";
+import { Users, Plus, Edit, Trash2, X, AlertTriangle, Flag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
@@ -27,6 +27,41 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
   const [error, setError] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
+  const [addImagePreview, setAddImagePreview] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState(null);
+
+  const [markModalOpen, setMarkModalOpen] = useState(false);
+  const [markMember, setMarkMember] = useState(null);
+  const [markForm, setMarkForm] = useState({
+    name: "",
+    position: "",
+    congregation: "",
+    quote: "",
+    startDate: "",
+    endDate: "",
+  });
+  const [markImagePreview, setMarkImagePreview] = useState(null);
+  const [markImageFile, setMarkImageFile] = useState(null);
+
+  const handleAddImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewMember({ ...newMember, image: file });
+      const reader = new FileReader();
+      reader.onload = (ev) => setAddImagePreview(ev.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditingMember({ ...editingMember, image: file });
+      const reader = new FileReader();
+      reader.onload = (ev) => setEditImagePreview(ev.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,10 +97,9 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
           quote: "",
           image: null,
         });
+        setAddImagePreview(null);
         setIsModalOpen(false);
         toast.success("District executive added successfully!");
-
-        // Dispatch custom event to refresh main website
         window.dispatchEvent(new CustomEvent("refreshTeamMembers"));
       } else {
         setError(data.error || "Failed to add district executive");
@@ -118,10 +152,9 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
           quote: "",
           image: null,
         });
+        setEditImagePreview(null);
         setIsEditModalOpen(false);
         toast.success("District executive updated successfully!");
-
-        // Dispatch custom event to refresh main website
         window.dispatchEvent(new CustomEvent("refreshTeamMembers"));
       } else {
         setError(data.error || "Failed to update district executive");
@@ -174,7 +207,108 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       quote: member.quote || "",
       image: null,
     });
+    setEditImagePreview(member.image ? buildImageSrc(member.image) : null);
     setIsEditModalOpen(true);
+  };
+
+  const closeAddModal = () => {
+    setIsModalOpen(false);
+    setAddImagePreview(null);
+    setNewMember({ name: "", position: "", congregation: "", quote: "", image: null });
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditImagePreview(null);
+    setEditingMember({ id: null, name: "", position: "", congregation: "", quote: "", image: null });
+  };
+
+  const openMarkModal = (member) => {
+    setMarkMember(member);
+    setMarkForm({
+      name: member.name,
+      position: member.position,
+      congregation: member.congregation || "",
+      quote: member.quote || "",
+      startDate: "",
+      endDate: "",
+    });
+    setMarkImagePreview(member.image ? buildImageSrc(member.image) : null);
+    setMarkImageFile(null);
+    setMarkModalOpen(true);
+  };
+
+  const closeMarkModal = () => {
+    setMarkModalOpen(false);
+    setMarkMember(null);
+    setMarkImagePreview(null);
+    setMarkImageFile(null);
+  };
+
+  const handleMarkImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMarkImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => setMarkImagePreview(ev.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const getYear = (dateStr) => new Date(dateStr).getFullYear();
+
+  const handleMarkSubmit = async (e) => {
+    e.preventDefault();
+    if (!markForm.startDate || !markForm.endDate) {
+      toast.error("Please select both start and end dates");
+      return;
+    }
+    setIsLoading(true);
+
+    const reignPeriod = `${getYear(markForm.startDate)} - ${getYear(markForm.endDate)}`;
+
+    try {
+      const formData = new FormData();
+      formData.append("name", markForm.name);
+      formData.append("position", markForm.position);
+      formData.append("reign_period", reignPeriod);
+      if (markImageFile) {
+        formData.append("image", markImageFile);
+      } else if (markMember.image) {
+        formData.append("image", markMember.image);
+      }
+
+      const createRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/create/`,
+        { method: "POST", body: formData }
+      );
+      const createData = await createRes.json();
+
+      if (!createData.success) {
+        toast.error(createData.error || "Failed to add to Past Executives");
+        setIsLoading(false);
+        return;
+      }
+
+      const deleteRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${markMember.id}/delete/`,
+        { method: "DELETE" }
+      );
+      const deleteData = await deleteRes.json();
+
+      if (deleteData.success) {
+        setTeamMembers(teamMembers.filter((m) => m.id !== markMember.id));
+        closeMarkModal();
+        toast.success(`${markForm.name} moved to Past Executives (${reignPeriod})`);
+        window.dispatchEvent(new CustomEvent("refreshTeamMembers"));
+      } else {
+        toast.error(deleteData.error || "Failed to remove from current executives");
+      }
+    } catch (error) {
+      toast.error("An error occurred while processing");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -240,7 +374,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
               <p
                 className={`text-sm mb-4 italic ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
               >
-                "{member.quote}"
+                &quot;{member.quote}&quot;
               </p>
             )}
 
@@ -254,6 +388,16 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 }`}
               >
                 Edit
+              </button>
+              <button
+                onClick={() => openMarkModal(member)}
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  theme === "dark"
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
+              >
+                Mark
               </button>
               <button
                 onClick={() => handleDeleteClick(member)}
@@ -283,13 +427,18 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
 
       {/* Add Member Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
-            className={`p-6 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto ${
+            className={`p-6 rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
               theme === "dark" ? "bg-gray-800" : "bg-white"
             }`}
           >
-            <h3 className="text-xl font-bold mb-4">Add District Executive</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Add District Executive</h3>
+              <button onClick={closeAddModal} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
@@ -376,15 +525,22 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) =>
-                      setNewMember({ ...newMember, image: e.target.files[0] })
-                    }
+                    onChange={handleAddImageChange}
                     className={`w-full p-2 border rounded ${
                       theme === "dark"
                         ? "bg-gray-700 border-gray-600 text-white"
                         : "bg-white border-gray-300"
                     }`}
                   />
+                  {addImagePreview && (
+                    <div className="mt-2">
+                      <img
+                        src={addImagePreview}
+                        alt="Preview"
+                        className="w-20 h-20 object-cover rounded-md"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -404,7 +560,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={closeAddModal}
                   className={`px-4 py-2 rounded font-medium transition-colors ${
                     theme === "dark"
                       ? "bg-gray-600 hover:bg-gray-700 text-white"
@@ -421,13 +577,18 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
 
       {/* Edit Member Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
-            className={`p-6 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto ${
+            className={`p-6 rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
               theme === "dark" ? "bg-gray-800" : "bg-white"
             }`}
           >
-            <h3 className="text-xl font-bold mb-4">Edit District Executive</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Edit District Executive</h3>
+              <button onClick={closeEditModal} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <form onSubmit={handleEdit}>
               <div className="space-y-4">
                 <div>
@@ -523,18 +684,22 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) =>
-                      setEditingMember({
-                        ...editingMember,
-                        image: e.target.files[0],
-                      })
-                    }
+                    onChange={handleEditImageChange}
                     className={`w-full p-2 border rounded ${
                       theme === "dark"
                         ? "bg-gray-700 border-gray-600 text-white"
                         : "bg-white border-gray-300"
                     }`}
                   />
+                  {editImagePreview && (
+                    <div className="mt-2">
+                      <img
+                        src={editImagePreview}
+                        alt="Preview"
+                        className="w-20 h-20 object-cover rounded-md"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -554,7 +719,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsEditModalOpen(false)}
+                  onClick={closeEditModal}
                   className={`px-4 py-2 rounded font-medium transition-colors ${
                     theme === "dark"
                       ? "bg-gray-600 hover:bg-gray-700 text-white"
@@ -571,9 +736,9 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && memberToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
-            className={`rounded-lg p-6 w-full max-w-md mx-4 ${
+            className={`rounded-lg p-6 w-full max-w-md ${
               theme === "dark" ? "bg-gray-800" : "bg-white"
             }`}
           >
@@ -602,7 +767,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
             <div
               className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-6`}
             >
-              Are you sure you want to delete "{memberToDelete.name}"?
+              Are you sure you want to delete &quot;{memberToDelete.name}&quot;?
             </div>
             <div className="flex space-x-3">
               <button
@@ -625,6 +790,121 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mark as Past Executive Modal */}
+      {markModalOpen && markMember && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
+          <div
+            className={`p-6 rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
+              theme === "dark" ? "bg-gray-800" : "bg-white"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Move to Past Executives</h3>
+              <button onClick={closeMarkModal} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className={`text-sm mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+              This will add <strong>{markMember.name}</strong> to Past Executives and remove them from current District Executives.
+            </p>
+            <form onSubmit={handleMarkSubmit}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <input
+                    type="text"
+                    value={markForm.name}
+                    onChange={(e) => setMarkForm({ ...markForm, name: e.target.value })}
+                    className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Position</label>
+                  <input
+                    type="text"
+                    value={markForm.position}
+                    onChange={(e) => setMarkForm({ ...markForm, position: e.target.value })}
+                    className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Congregation</label>
+                  <input
+                    type="text"
+                    value={markForm.congregation}
+                    onChange={(e) => setMarkForm({ ...markForm, congregation: e.target.value })}
+                    className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Quote</label>
+                  <textarea
+                    value={markForm.quote}
+                    onChange={(e) => setMarkForm({ ...markForm, quote: e.target.value })}
+                    rows="2"
+                    className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Start Date *</label>
+                    <input
+                      type="date"
+                      value={markForm.startDate}
+                      onChange={(e) => setMarkForm({ ...markForm, startDate: e.target.value })}
+                      className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">End Date *</label>
+                    <input
+                      type="date"
+                      value={markForm.endDate}
+                      onChange={(e) => setMarkForm({ ...markForm, endDate: e.target.value })}
+                      className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMarkImageChange}
+                    className={`w-full p-2 border rounded ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"}`}
+                  />
+                  {markImagePreview && (
+                    <div className="mt-2">
+                      <img src={markImagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-md" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex space-x-3 mt-6">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`px-4 py-2 rounded font-medium transition-colors ${isLoading ? "opacity-50 cursor-not-allowed" : ""} bg-blue-600 hover:bg-blue-700 text-white`}
+                >
+                  {isLoading ? "Processing..." : "Move to Past Executives"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeMarkModal}
+                  className={`px-4 py-2 rounded font-medium transition-colors ${theme === "dark" ? "bg-gray-600 hover:bg-gray-700 text-white" : "bg-gray-500 hover:bg-gray-600 text-white"}`}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Supervisor, Event, TeamMember, Donation, ContactMessage,
     MinistryRegistration, BlogPost, Testimonial, GalleryItem, 
-    Congregation, Analytics
+    Congregation, Analytics, Announcement
 )
 
 @admin.register(Supervisor)
@@ -79,3 +79,10 @@ class AnalyticsAdmin(admin.ModelAdmin):
     list_display = ['date', 'page_views', 'unique_visitors', 'donations_received']
     list_filter = ['date']
     readonly_fields = ['created_at']
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ['title', 'date', 'is_anticipated', 'created_at']
+    list_filter = ['is_anticipated', 'date']
+    search_fields = ['title']

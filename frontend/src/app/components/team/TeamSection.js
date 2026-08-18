@@ -192,15 +192,15 @@ export default function TeamSection() {
 
                     {/* Text overlay with background */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 top-[14rem] sm:top-[16rem] md:top-[18rem]">
-                      <div className="bg-white/50 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
+                      <div className="bg-white/70 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
                         <h3 className="text-sm sm:text-lg font-bold text-navy-950 mb-1">
                           {member.name}
                         </h3>
-                        <p className="text-gold-500 font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
+                        <p className="text-navy-950 font-semibold mb-1 sm:mb-2 text-xs sm:text-sm">
                           {member.position}
                         </p>
                         {member.congregation && (
-                          <p className="text-gold-500 font-light text-xs mb-2">
+                          <p className="text-gray-700 font-medium text-xs mb-2">
                             {member.congregation}
                           </p>
                         )}

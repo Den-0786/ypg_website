@@ -31,6 +31,7 @@ import CouncilManagement from "./components/CouncilManagement";
 import PastExecutivesManagement from "./components/PastExecutivesManagement";
 import AdvertisementManagement from "./components/AdvertisementManagement";
 import SocialMediaManagement from "./components/SocialMediaManagement";
+import AnnouncementManagement from "./components/AnnouncementManagement";
 import PinGuard from "./components/PinGuard";
 import autoLogout from "../../utils/autoLogout";
 
@@ -69,6 +70,7 @@ function AdminDashboardInner() {
     "past-executives",
     "social-media",
     "advertisements",
+    "announcements",
   ];
 
   // UI state - Initialize from URL parameter
@@ -361,6 +363,7 @@ function AdminDashboardInner() {
       finance: "finance record",
       content: "content item",
       vision: "vision/mission",
+      announcements: "announcement",
     };
     const label = resourceMap[resource] || resource;
     const actionMap = {
@@ -744,6 +747,10 @@ function AdminDashboardInner() {
 
               {activeTab === "social-media" && (
                 <SocialMediaManagement theme={theme} />
+              )}
+
+              {activeTab === "announcements" && (
+                <AnnouncementManagement theme={theme} />
               )}
 
               {activeTab === "Settings" && (

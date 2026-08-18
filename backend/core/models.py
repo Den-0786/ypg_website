@@ -487,6 +487,22 @@ class Contribution(models.Model):
         verbose_name_plural = "Contributions"
 
 
+class Announcement(models.Model):
+    title = models.CharField(max_length=200)
+    date = models.DateField()
+    is_anticipated = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.date}"
+
+    class Meta:
+        verbose_name = "Announcement"
+        verbose_name_plural = "Announcements"
+        ordering = ['-date']
+
+
 class VisionMission(models.Model):
     """
     Model to store Mission and Vision content with images

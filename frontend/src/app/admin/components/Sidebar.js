@@ -22,6 +22,7 @@ import {
   Tag,
   Eye,
   Share2,
+  Megaphone,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -52,6 +53,7 @@ const Sidebar = ({
     { id: "testimonials", name: "Testimonials", icon: MessageCircle },
     { id: "media", name: "Media", icon: Image },
     { id: "social-media", name: "Social Media", icon: Share2 },
+    { id: "announcements", name: "Announcements", icon: Megaphone },
     { id: "vision-mission", name: "Vision & Mission", icon: Eye },
     { id: "communication", name: "Contact Messages", icon: Mail },
     { id: "branch-presidents", name: "Branch Presidents", icon: UserCheck },

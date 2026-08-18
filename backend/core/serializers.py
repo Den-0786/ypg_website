@@ -3,7 +3,7 @@ from .models import (
     Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, Advertisement, YStoreItem,
-    Ministry, Sale, Expense, Contribution, VisionMission
+    Ministry, Sale, Expense, Contribution, VisionMission, Announcement
 )
 
 class EventSerializer(serializers.ModelSerializer):
@@ -125,3 +125,9 @@ class VisionMissionSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.vision_image.url)
             return obj.vision_image.url
         return None
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = '__all__'

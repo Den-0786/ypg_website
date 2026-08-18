@@ -2,6 +2,7 @@
 
 import HeroCarousel from "./components/header_hero/HeroCarousel";
 import FeatureCards from "./components/header_hero/FeatureCards";
+import AnnouncementBanner from "./components/header_hero/AnnouncementBanner";
 import NavigationBar from "./components/header_hero/NavigationBar";
 import AboutSection from "./components/about/AboutSection";
 import EventSection from "./components/events/UpcomingEvents";
@@ -28,6 +29,7 @@ export default function Home() {
       <div>
         <HeroCarousel />
         <FeatureCards />
+        <AnnouncementBanner />
         <AboutSection />
         <EventSection />
         <PastEvents />

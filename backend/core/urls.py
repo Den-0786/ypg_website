@@ -160,6 +160,12 @@ urlpatterns = [
     path('api/social-media/create/', views.api_social_media_create, name='api_social_media_create'),
     path('api/social-media/<int:link_id>/update/', views.api_social_media_update, name='api_social_media_update'),
     path('api/social-media/<int:link_id>/delete/', views.api_social_media_delete, name='api_social_media_delete'),
+    
+    # Announcement API endpoints
+    path('api/announcements/', views.api_announcements, name='api_announcements'),
+    path('api/announcements/create/', views.api_create_announcement, name='api_create_announcement'),
+    path('api/announcements/<int:announcement_id>/update/', views.api_update_announcement, name='api_update_announcement'),
+    path('api/announcements/<int:announcement_id>/delete/', views.api_delete_announcement, name='api_delete_announcement'),
 ]
 
 

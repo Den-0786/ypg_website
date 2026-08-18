@@ -20,7 +20,7 @@ from .models import (
     Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive,
-    Ministry, Sale, Expense, Contribution, VisionMission, DailyVisit
+    Ministry, Sale, Expense, Contribution, VisionMission, DailyVisit, Announcement
 )
 from .serializers import (
     EventSerializer, TeamMemberSerializer,
@@ -28,7 +28,7 @@ from .serializers import (
     BlogPostSerializer, TestimonialSerializer, GalleryItemSerializer,
     CongregationSerializer, AnalyticsSerializer, AdvertisementSerializer,
     MinistrySerializer, SaleSerializer, ExpenseSerializer, ContributionSerializer,
-    VisionMissionSerializer
+    VisionMissionSerializer, AnnouncementSerializer
 )
 import json
 
@@ -3010,4 +3010,96 @@ def api_social_media_delete(request, link_id):
 
 
 # Vision and Mission API endpoints
+
+
+# Announcement API endpoints
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_announcements(request):
+    """Get all announcements (public)"""
+    announcements = Announcement.objects.all().order_by('-date')
+    serializer = AnnouncementSerializer(announcements, many=True)
+    return Response({
+        'success': True,
+        'announcements': serializer.data
+    })
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_create_announcement(request):
+    """Create a new announcement"""
+    try:
+        data = json.loads(request.body)
+        announcement = Announcement.objects.create(
+            title=data.get('title', ''),
+            date=data.get('date'),
+            is_anticipated=data.get('is_anticipated', False)
+        )
+        serializer = AnnouncementSerializer(announcement)
+        return Response({
+            'success': True,
+            'announcement': serializer.data
+        }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def api_update_announcement(request, announcement_id):
+    """Update an announcement"""
+    try:
+        announcement = Announcement.objects.get(id=announcement_id)
+        data = json.loads(request.body)
+        announcement.title = data.get('title', announcement.title)
+        announcement.date = data.get('date', announcement.date)
+        announcement.is_anticipated = data.get('is_anticipated', announcement.is_anticipated)
+        announcement.save()
+        serializer = AnnouncementSerializer(announcement)
+        return Response({
+            'success': True,
+            'announcement': serializer.data
+        })
+    except Announcement.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Announcement not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def api_delete_announcement(request, announcement_id):
+    """Delete an announcement"""
+    try:
+        announcement = Announcement.objects.get(id=announcement_id)
+        announcement.delete()
+        return Response({
+            'success': True,
+            'message': 'Announcement deleted successfully'
+        })
+    except Announcement.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Announcement not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
