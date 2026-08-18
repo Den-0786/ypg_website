@@ -132,3 +132,34 @@
     box-sizing: border-box;
   }
 }
+
+/* Ticker / Marquee */
+.ticker-wrap {
+  overflow: hidden;
+  width: 100%;
+  padding: 6px 0;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-item {
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+.ticker-wrap:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
