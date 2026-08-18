@@ -27,8 +27,7 @@ export default function FeatureCards() {
       shortDesc: "To know His will, and to do it, this is the purpose of YPG.",
       fullDesc:
         "To know His will, and to do it, this is the purpose of YPG. God be our help, God bless our church under His banner may all youth unite. 2X\n\nRally round His banner its bids you one and all, with soul, with mind and body to serve the King of Kings, Join hands with YPG all youth within the church, to know His will and to do it. 2X",
-      link: "#main-website",
-      linkText: "Read Full Anthem",
+      isExpandable: true,
     },
     {
       title: "Attendance System",
@@ -40,64 +39,87 @@ export default function FeatureCards() {
     },
   ];
 
+  const handleCardInteraction = (index, card) => {
+    if (card.isExpandable) {
+      setExpandedCard(expandedCard === index ? null : index);
+    } else {
+      setExpandedCard(index);
+    }
+  };
+
   return (
     <div className="relative z-10 -mt-24 sm:-mt-28 lg:-mt-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-end">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full sm:w-[75%] lg:w-[65%]">
-          {cards.map((card, index) => {
-            const Icon = icons[card.title] || ArrowRight;
-            const isExpanded = expandedCard === index;
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full sm:w-[85%] lg:w-[75%]">
+            {cards.map((card, index) => {
+              const Icon = icons[card.title] || ArrowRight;
+              const isExpanded = expandedCard === index;
 
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onMouseEnter={() => setExpandedCard(index)}
-                onMouseLeave={() => setExpandedCard(null)}
-                className="bg-navy-950 border-t-3 border-gold-500 shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
-                style={{ borderTopWidth: "3px" }}
-              >
-                <div className="p-4">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-9 h-9 bg-gold-500/10 flex items-center justify-center flex-shrink-0 rounded">
-                      <Icon className="w-4.5 h-4.5 text-gold-400" />
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  onMouseEnter={() => handleCardInteraction(index, card)}
+                  onMouseLeave={() => {
+                    if (!card.isExpandable) setExpandedCard(null);
+                  }}
+                  className="bg-navy-950 border-t-3 border-gold-500 shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+                  style={{ borderTopWidth: "3px" }}
+                >
+                  <div className="p-4">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-9 h-9 bg-gold-500/10 flex items-center justify-center flex-shrink-0 rounded">
+                        <Icon className="w-4.5 h-4.5 text-gold-400" />
+                      </div>
+                      <h3 className="text-sm font-bold text-white truncate">
+                        {card.title}
+                      </h3>
                     </div>
-                    <h3 className="text-sm font-bold text-white truncate">
-                      {card.title}
-                    </h3>
-                  </div>
 
-                  <p className="text-blue-100/70 text-xs leading-relaxed line-clamp-2">
-                    {isExpanded ? (
-                      card.fullDesc.split("\n").map((line, idx) => (
-                        <span key={idx}>
-                          {line}
-                          {idx < card.fullDesc.split("\n").length - 1 && <br />}
-                        </span>
-                      ))
+                    <p className="text-blue-100/70 text-xs leading-relaxed line-clamp-2">
+                      {isExpanded ? (
+                        card.fullDesc.split("\n").map((line, idx) => (
+                          <span key={idx}>
+                            {line}
+                            {idx < card.fullDesc.split("\n").length - 1 && <br />}
+                          </span>
+                        ))
+                      ) : (
+                        card.shortDesc
+                      )}
+                    </p>
+
+                    {card.isExpandable ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedCard(isExpanded ? null : index);
+                        }}
+                        className="inline-flex items-center text-gold-400 hover:text-gold-300 text-[11px] font-bold uppercase tracking-wide mt-3"
+                      >
+                        {isExpanded ? "Show Less" : card.linkText}
+                        <ArrowRight className={`w-3 h-3 ml-1 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                      </button>
                     ) : (
-                      card.shortDesc
+                      <motion.a
+                        href={card.link}
+                        target={card.link.startsWith("http") ? "_blank" : "_self"}
+                        rel={card.link.startsWith("http") ? "noopener noreferrer" : ""}
+                        className="inline-flex items-center text-gold-400 hover:text-gold-300 text-[11px] font-bold uppercase tracking-wide mt-3"
+                        whileHover={{ x: 3 }}
+                      >
+                        {card.linkText}
+                        <ArrowRight className="w-3 h-3 ml-1" />
+                      </motion.a>
                     )}
-                  </p>
-
-                  <motion.a
-                    href={card.link}
-                    target={card.link.startsWith("http") ? "_blank" : "_self"}
-                    rel={card.link.startsWith("http") ? "noopener noreferrer" : ""}
-                    className="inline-flex items-center text-gold-400 hover:text-gold-300 text-[11px] font-bold uppercase tracking-wide mt-3"
-                    whileHover={{ x: 3 }}
-                  >
-                    {card.linkText}
-                    <ArrowRight className="w-3 h-3 ml-1" />
-                  </motion.a>
-                </div>
-              </motion.div>
-            );
-          })}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
