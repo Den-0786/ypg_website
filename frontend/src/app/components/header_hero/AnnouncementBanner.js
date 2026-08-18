@@ -98,9 +98,11 @@ export default function AnnouncementBanner() {
                       {current.title}
                     </span>
                     <div className="flex items-center space-x-2">
-                      <span className="text-gold-300/80 text-xs">
-                        {formatDate(current.date)}
-                      </span>
+                      {current.date && (
+                        <span className="text-gold-300/80 text-xs">
+                          {formatDate(current.date)}
+                        </span>
+                      )}
                       {current.is_anticipated && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gold-500/20 text-gold-400 font-bold uppercase tracking-wider">
                           Anticipate

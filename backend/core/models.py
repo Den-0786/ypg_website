@@ -489,18 +489,19 @@ class Contribution(models.Model):
 
 class Announcement(models.Model):
     title = models.CharField(max_length=200)
-    date = models.DateField()
+    date = models.DateField(null=True, blank=True)
     is_anticipated = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.title} - {self.date}"
+        date_str = str(self.date) if self.date else "No date"
+        return f"{self.title} - {date_str}"
 
     class Meta:
         verbose_name = "Announcement"
         verbose_name_plural = "Announcements"
-        ordering = ['-date']
+        ordering = ['-created_at']
 
 
 class VisionMission(models.Model):

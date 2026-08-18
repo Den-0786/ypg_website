@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { buildImageSrc } from "../../../utils/config";
 import { Users, Plus, Edit, Trash2, X, AlertTriangle, Flag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -426,7 +427,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       )}
 
       {/* Add Member Modal */}
-      {isModalOpen && (
+      {isModalOpen && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
             className={`p-6 rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
@@ -572,11 +573,12 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Edit Member Modal */}
-      {isEditModalOpen && (
+      {isEditModalOpen && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
             className={`p-6 rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
@@ -731,11 +733,12 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && memberToDelete && (
+      {showDeleteModal && memberToDelete && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
             className={`rounded-lg p-6 w-full max-w-md ${
@@ -791,11 +794,12 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Mark as Past Executive Modal */}
-      {markModalOpen && markMember && (
+      {markModalOpen && markMember && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
           <div
             className={`p-6 rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
@@ -906,7 +910,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

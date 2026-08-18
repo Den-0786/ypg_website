@@ -50,8 +50,8 @@ export default function AnnouncementManagement({ theme }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.date) {
-      toast.error("Please fill in all required fields");
+    if (!formData.title.trim()) {
+      toast.error("Please enter a program title");
       return;
     }
 
@@ -257,7 +257,7 @@ export default function AnnouncementManagement({ theme }) {
                     isDark ? "text-blue-200" : "text-gray-700"
                   }`}
                 >
-                  Date *
+                  Date (optional)
                 </label>
                 <input
                   type="date"
@@ -410,18 +410,22 @@ export default function AnnouncementManagement({ theme }) {
                     {announcement.title}
                   </h3>
                   <div className="flex items-center space-x-2 mt-0.5">
-                    <Calendar
-                      className={`w-3.5 h-3.5 ${
-                        isDark ? "text-blue-300/60" : "text-gray-400"
-                      }`}
-                    />
-                    <span
-                      className={`text-xs ${
-                        isDark ? "text-blue-200/60" : "text-gray-500"
-                      }`}
-                    >
-                      {formatDate(announcement.date)}
-                    </span>
+                    {announcement.date && (
+                      <>
+                        <Calendar
+                          className={`w-3.5 h-3.5 ${
+                            isDark ? "text-blue-300/60" : "text-gray-400"
+                          }`}
+                        />
+                        <span
+                          className={`text-xs ${
+                            isDark ? "text-blue-200/60" : "text-gray-500"
+                          }`}
+                        >
+                          {formatDate(announcement.date)}
+                        </span>
+                      </>
+                    )}
                     {announcement.is_anticipated && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400 font-medium">
                         Anticipated
