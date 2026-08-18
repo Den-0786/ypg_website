@@ -51,7 +51,7 @@ export default function HeroCarousel() {
   const slide = slides[currentSlide];
 
   return (
-    <section id="home" className="relative min-h-[600px] h-[85vh] md:h-screen bg-navy-950 overflow-hidden flex items-center">
+    <section id="home" className="relative min-h-[600px] h-[85vh] md:h-screen bg-navy-950 overflow-x-hidden overflow-y-visible flex items-center">
       {/* Mobile/Tablet: Full background image with gradient overlay */}
       <div className="absolute inset-0 lg:hidden">
         <AnimatePresence mode="wait">
