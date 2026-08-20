@@ -44,10 +44,20 @@ export default function DonateSection() {
   });
   const [paymentTab, setPaymentTab] = useState("momo");
   const [copiedText, setCopiedText] = useState("");
+  const [momoDetails, setMomoDetails] = useState({
+    number: "",
+    name: "",
+    networks: ["MTN", "Telecel", "AT"],
+  });
+  const [bankDetails, setBankDetails] = useState({
+    accountNumber: "",
+    accountName: "",
+  });
 
-  // Fetch impact statistics on component mount
+  // Fetch impact statistics and payment details on component mount
   useEffect(() => {
     fetchImpactStats();
+    fetchPaymentDetails();
   }, []);
 
   const fetchImpactStats = async () => {
@@ -115,17 +125,28 @@ export default function DonateSection() {
     "General Support",
   ];
 
-  const momoDetails = {
-    number: "0541107445",
-    name: "YPG District",
-    networks: ["MTN", "Telecel", "AT"],
-  };
-
-  const bankDetails = {
-    bank: "GCB Bank",
-    accountNumber: "1234567890",
-    accountName: "Youth Prayer Group",
-    branch: "Ahinsan",
+  const fetchPaymentDetails = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`,
+        { cache: "no-store" }
+      );
+      const data = await response.json();
+      if (data.success && data.settings?.paymentDetails) {
+        const pd = data.settings.paymentDetails;
+        setMomoDetails((prev) => ({
+          ...prev,
+          number: pd.momoNumber || prev.number,
+          name: pd.momoName || prev.name,
+        }));
+        setBankDetails({
+          accountNumber: pd.bankAccountNumber || "",
+          accountName: pd.bankAccountName || "",
+        });
+      }
+    } catch (error) {
+      // Keep defaults if fetch fails
+    }
   };
 
   const validatePhone = (phone) => {
@@ -288,15 +309,15 @@ export default function DonateSection() {
             </p>
 
             {/* Stepped Layout */}
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
 
               {/* Step 1 - Suggested Amounts */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-1">
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
                     1
                   </div>
-                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                  <div className="w-0.5 flex-1 border-l-2 border-dashed border-gold-300 my-1"></div>
                 </div>
                 <div className="pb-6 flex-1">
                   <h3 className="text-sm font-semibold text-navy-950 mb-3">Sample of amounts one can donate</h3>
@@ -314,39 +335,27 @@ export default function DonateSection() {
                 </div>
               </div>
 
-              {/* Step 2 - Custom Amount */}
-              <div className="flex gap-4">
+              {/* Step 2 - Custom Amount (display only) */}
+              <div className="flex gap-4 flex-1">
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
                     2
                   </div>
-                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                  <div className="w-0.5 flex-1 border-l-2 border-dashed border-gold-300 my-1"></div>
                 </div>
                 <div className="pb-6 flex-1">
                   <h3 className="text-sm font-semibold text-navy-950 mb-1">Custom Amount</h3>
-                  <p className="text-xs text-gray-400 mb-3">You can donate any amount of your choice</p>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400">GH₵</span>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={formData.amount}
-                      onChange={handleInputChange}
-                      placeholder="0.00"
-                      min="1"
-                      className="w-full pl-16 pr-4 py-3 border-2 border-gray-200 rounded-xl text-xl font-bold text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors"
-                    />
-                  </div>
+                  <p className="text-sm text-gray-500">You can donate any amount of your choice</p>
                 </div>
               </div>
 
               {/* Step 3 - Select Purpose */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-1">
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
                     3
                   </div>
-                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                  <div className="w-0.5 flex-1 border-l-2 border-dashed border-gold-300 my-1"></div>
                 </div>
                 <div className="pb-6 flex-1">
                   <h3 className="text-sm font-semibold text-navy-950 mb-3">Select Purpose</h3>
@@ -366,12 +375,12 @@ export default function DonateSection() {
               </div>
 
               {/* Step 4 - Transaction Type */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-1">
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
                     4
                   </div>
-                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                  <div className="w-0.5 flex-1 border-l-2 border-dashed border-gold-300 my-1"></div>
                 </div>
                 <div className="pb-6 flex-1">
                   <h3 className="text-sm font-semibold text-navy-950 mb-3">Transaction Type</h3>

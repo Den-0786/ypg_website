@@ -255,6 +255,14 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               ...data.settings.appearance,
             }));
           }
+
+          // Update payment details
+          if (data.settings.paymentDetails) {
+            setPaymentDetails((prev) => ({
+              ...prev,
+              ...data.settings.paymentDetails,
+            }));
+          }
         } else {
           console.error(
             "Failed to load website settings:",
@@ -287,6 +295,13 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     phoneNumber: "",
     address: "",
     description: "",
+  });
+
+  const [paymentDetails, setPaymentDetails] = useState({
+    momoNumber: "",
+    momoName: "",
+    bankAccountNumber: "",
+    bankAccountName: "",
   });
 
   const [security, setSecurity] = useState({
@@ -501,6 +516,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             address: generalSettings.address,
             description: generalSettings.description,
             appearance,
+            paymentDetails,
           };
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
@@ -1735,6 +1751,87 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                           }
                           className={getInputClassName("description")}
                         />
+                      </div>
+                    </div>
+
+                    {/* Payment Details */}
+                    <div>
+                      <h4
+                        className={`text-xs sm:text-sm font-medium mb-3 ${
+                          theme === "dark" ? "text-white" : "text-navy-950"
+                        }`}
+                      >
+                        Payment Details
+                      </h4>
+                      <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                        <div>
+                          <label className={getLabelClassName()}>
+                            MoMo Number
+                          </label>
+                          <input
+                            type="text"
+                            value={paymentDetails.momoNumber}
+                            onChange={(e) =>
+                              setPaymentDetails({
+                                ...paymentDetails,
+                                momoNumber: e.target.value,
+                              })
+                            }
+                            placeholder="e.g. 0541107445"
+                            className={getInputClassName("momoNumber")}
+                          />
+                        </div>
+                        <div>
+                          <label className={getLabelClassName()}>
+                            MoMo Account Name
+                          </label>
+                          <input
+                            type="text"
+                            value={paymentDetails.momoName}
+                            onChange={(e) =>
+                              setPaymentDetails({
+                                ...paymentDetails,
+                                momoName: e.target.value,
+                              })
+                            }
+                            placeholder="e.g. YPG District"
+                            className={getInputClassName("momoName")}
+                          />
+                        </div>
+                        <div>
+                          <label className={getLabelClassName()}>
+                            Bank Account Number
+                          </label>
+                          <input
+                            type="text"
+                            value={paymentDetails.bankAccountNumber}
+                            onChange={(e) =>
+                              setPaymentDetails({
+                                ...paymentDetails,
+                                bankAccountNumber: e.target.value,
+                              })
+                            }
+                            placeholder="e.g. 1234567890"
+                            className={getInputClassName("bankAccountNumber")}
+                          />
+                        </div>
+                        <div>
+                          <label className={getLabelClassName()}>
+                            Bank Account Name
+                          </label>
+                          <input
+                            type="text"
+                            value={paymentDetails.bankAccountName}
+                            onChange={(e) =>
+                              setPaymentDetails({
+                                ...paymentDetails,
+                                bankAccountName: e.target.value,
+                              })
+                            }
+                            placeholder="e.g. Youth Prayer Group"
+                            className={getInputClassName("bankAccountName")}
+                          />
+                        </div>
                       </div>
                     </div>
 
