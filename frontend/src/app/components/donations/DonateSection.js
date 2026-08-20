@@ -15,6 +15,7 @@ import {
   Copy,
   Check,
   AlertCircle,
+  ChevronDown,
 } from "lucide-react";
 
 export default function DonateSection() {
@@ -282,181 +283,212 @@ export default function DonateSection() {
             <h2 className="text-2xl sm:text-3xl font-bold text-navy-950 mb-2">
               Want to support YPG?
             </h2>
-            <p className="text-gray-500 text-sm sm:text-base mb-6">
+            <p className="text-gray-500 text-sm sm:text-base mb-8">
               Help power our programs, events and our outreach activities kindly follow the steps below:
             </p>
 
-            {/* Suggested Amounts */}
-            <div className="mb-6">
-              <h3 className="text-base font-semibold text-navy-950 mb-3">Suggested Amount</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {donationAmounts.map((item) => (
-                  <motion.div
-                    key={item.amount}
-                    whileHover={{ scale: 1.05, y: -4, boxShadow: "0 8px 30px rgba(212,175,55,0.2)" }}
-                    className="rounded-xl border-2 border-gray-200 bg-white p-4 text-center cursor-default transition-colors duration-200"
-                  >
-                    <span className="text-lg font-bold text-navy-950">GH₵ {item.amount}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+            {/* Stepped Layout */}
+            <div className="flex flex-col">
 
-            {/* Custom Amount */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-navy-950 mb-2">
-                You can also enter a custom amount
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400">GH₵</span>
-                <input
-                  type="number"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleInputChange}
-                  placeholder="0.00"
-                  min="1"
-                  className="w-full pl-16 pr-4 py-3 border-2 border-gray-200 rounded-xl text-xl font-bold text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Purpose Dropdown */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-navy-950 mb-1">
-                Select Purpose
-              </label>
-              <p className="text-xs text-gray-400 mb-2">use any of this as a payment purpose</p>
-              <select
-                value={formData.purpose}
-                onChange={(e) => setFormData((prev) => ({ ...prev, purpose: e.target.value }))}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors bg-white appearance-none cursor-pointer"
-              >
-                {purposeOptions.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Helper Note */}
-            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-              <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-700">
-                Please make sure to enter your selected purpose as the reference/reason when authorizing your MoMo or bank payment.
-              </p>
-            </div>
-
-            {/* Payment Method Tabs */}
-            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-              <button
-                type="button"
-                onClick={() => handlePaymentMethodChange("momo")}
-                className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all duration-300 ${paymentTab === "momo" ? "bg-white text-navy-950 shadow-md" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                <Smartphone className="w-4 h-4 inline mr-2" />
-                Mobile Money
-              </button>
-              <button
-                type="button"
-                onClick={() => handlePaymentMethodChange("bank")}
-                className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all duration-300 ${paymentTab === "bank" ? "bg-white text-navy-950 shadow-md" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                <Building className="w-4 h-4 inline mr-2" />
-                Bank Transfer
-              </button>
-            </div>
-
-            {/* Payment Details */}
-            <AnimatePresence mode="wait">
-              {paymentTab === "momo" && (
-                <motion.div
-                  key="momo"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="mb-6"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">MoMo Number</p>
-                        <p className="text-lg font-bold text-navy-950">{momoDetails.number}</p>
-                      </div>
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleCopyToClipboard(momoDetails.number, "momo")}
-                        className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gold-300 transition-colors"
-                      >
-                        {copiedText === "momo" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                      </motion.button>
-                    </div>
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">Account Name</p>
-                      <p className="text-base font-semibold text-navy-950">{momoDetails.name}</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-2">Supported Networks</p>
-                      <div className="flex gap-2">
-                        {momoDetails.networks.map((network) => (
-                          <span key={network} className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-navy-950">{network}</span>
-                        ))}
-                      </div>
-                    </div>
+              {/* Step 1 - Suggested Amounts */}
+              <div className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
+                    1
                   </div>
-                </motion.div>
-              )}
-
-              {paymentTab === "bank" && (
-                <motion.div
-                  key="bank"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="mb-6"
-                >
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">Bank Name</p>
-                      <p className="text-base font-semibold text-navy-950">{bankDetails.bank}</p>
-                    </div>
-                    <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Account Number</p>
-                        <p className="text-lg font-bold text-navy-950">{bankDetails.accountNumber}</p>
-                      </div>
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleCopyToClipboard(bankDetails.accountNumber, "bank")}
-                        className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gold-300 transition-colors"
+                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                </div>
+                <div className="pb-6 flex-1">
+                  <h3 className="text-sm font-semibold text-navy-950 mb-3">Sample of amounts one can donate</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {donationAmounts.map((item) => (
+                      <motion.div
+                        key={item.amount}
+                        whileHover={{ scale: 1.05, y: -4, boxShadow: "0 8px 30px rgba(212,175,55,0.2)" }}
+                        className="rounded-xl border-2 border-gray-200 bg-white p-4 text-center cursor-default transition-colors duration-200"
                       >
-                        {copiedText === "bank" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                      </motion.button>
-                    </div>
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">Account Name</p>
-                      <p className="text-base font-semibold text-navy-950">{bankDetails.accountName}</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">Branch</p>
-                      <p className="text-base font-semibold text-navy-950">{bankDetails.branch}</p>
-                    </div>
+                        <span className="text-lg font-bold text-navy-950">GH₵ {item.amount}</span>
+                      </motion.div>
+                    ))}
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              </div>
 
-            {/* Reference Callout */}
-            <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4 mt-auto">
-              <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-blue-700">
-                <span className="font-bold">Important:</span> Use <span className="font-bold text-navy-950">{formData.purpose}</span> in your reference field when confirming transfer.
-              </p>
+              {/* Step 2 - Custom Amount */}
+              <div className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
+                    2
+                  </div>
+                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                </div>
+                <div className="pb-6 flex-1">
+                  <h3 className="text-sm font-semibold text-navy-950 mb-1">Custom Amount</h3>
+                  <p className="text-xs text-gray-400 mb-3">You can donate any amount of your choice</p>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400">GH₵</span>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={formData.amount}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
+                      min="1"
+                      className="w-full pl-16 pr-4 py-3 border-2 border-gray-200 rounded-xl text-xl font-bold text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3 - Select Purpose */}
+              <div className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
+                    3
+                  </div>
+                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                </div>
+                <div className="pb-6 flex-1">
+                  <h3 className="text-sm font-semibold text-navy-950 mb-3">Select Purpose</h3>
+                  <div className="relative">
+                    <select
+                      value={formData.purpose}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, purpose: e.target.value }))}
+                      className="w-full px-4 py-3 pr-10 border-2 border-gray-200 rounded-xl text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors bg-white appearance-none cursor-pointer"
+                    >
+                      {purposeOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 4 - Transaction Type */}
+              <div className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
+                    4
+                  </div>
+                  <div className="w-0.5 h-full border-l-2 border-dashed border-gold-300 my-1"></div>
+                </div>
+                <div className="pb-6 flex-1">
+                  <h3 className="text-sm font-semibold text-navy-950 mb-3">Transaction Type</h3>
+                  {/* Payment Method Tabs */}
+                  <div className="flex bg-gray-100 rounded-xl p-1 mb-4">
+                    <button
+                      type="button"
+                      onClick={() => handlePaymentMethodChange("momo")}
+                      className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all duration-300 ${paymentTab === "momo" ? "bg-white text-navy-950 shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      <Smartphone className="w-4 h-4 inline mr-2" />
+                      Mobile Money
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePaymentMethodChange("bank")}
+                      className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all duration-300 ${paymentTab === "bank" ? "bg-white text-navy-950 shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      <Building className="w-4 h-4 inline mr-2" />
+                      Bank Transfer
+                    </button>
+                  </div>
+
+                  {/* Payment Details */}
+                  <AnimatePresence mode="wait">
+                    {paymentTab === "momo" && (
+                      <motion.div
+                        key="momo"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">MoMo Number</p>
+                              <p className="text-lg font-bold text-navy-950">{momoDetails.number}</p>
+                            </div>
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleCopyToClipboard(momoDetails.number, "momo")}
+                              className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gold-300 transition-colors"
+                            >
+                              {copiedText === "momo" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                            </motion.button>
+                          </div>
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-1">Account Name</p>
+                            <p className="text-base font-semibold text-navy-950">{momoDetails.name}</p>
+                          </div>
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-2">Supported Networks</p>
+                            <div className="flex gap-2">
+                              {momoDetails.networks.map((network) => (
+                                <span key={network} className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-navy-950">{network}</span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {paymentTab === "bank" && (
+                      <motion.div
+                        key="bank"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">Account Number</p>
+                              <p className="text-lg font-bold text-navy-950">{bankDetails.accountNumber}</p>
+                            </div>
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleCopyToClipboard(bankDetails.accountNumber, "bank")}
+                              className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gold-300 transition-colors"
+                            >
+                              {copiedText === "bank" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                            </motion.button>
+                          </div>
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-1">Account Name</p>
+                            <p className="text-base font-semibold text-navy-950">{bankDetails.accountName}</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Step 5 - Reference Reminder */}
+              <div className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-gold-500 text-white flex items-center justify-center text-sm font-bold shadow-md flex-shrink-0">
+                    5
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-blue-700">
+                      Please make sure to enter your selected purpose as the reference/reason when authorizing your MoMo or bank payment.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Success/Error Messages */}
