@@ -191,14 +191,9 @@ export default function CouncilSection() {
                       <p className="text-gold-500 font-semibold mb-1 sm:mb-2 text-[11px] sm:text-sm">
                         {member.position}
                       </p>
-                      <p className="text-gray-700 font-medium text-[11px] mb-2">
+                      <p className="text-gray-700 font-medium text-[11px]">
                         {member.congregation}
                       </p>
-                      {member.description && (
-                        <p className="text-gray-700 mb-2 italic text-[11px] sm:text-sm line-clamp-2">
-                          &quot;{member.description}&quot;
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>

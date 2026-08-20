@@ -732,41 +732,6 @@ export default function CouncilManagement({ theme }) {
                         : "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-100"
                     }`}
                   >
-                    <h3
-                      className={`text-lg font-semibold mb-3 flex items-center ${
-                        theme === "dark" ? "text-white" : "text-navy-950"
-                      }`}
-                    >
-                      <Edit
-                        className={`w-5 h-5 mr-2 ${
-                          theme === "dark" ? "text-amber-400" : "text-gold-500"
-                        }`}
-                      />
-                      Description & Quote
-                    </h3>
-                    <div>
-                      <label
-                        className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        💭 Personal Quote or Description
-                      </label>
-                      <textarea
-                        value={formData.description}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            description: e.target.value,
-                          })
-                        }
-                        placeholder="Share an inspiring quote or brief description..."
-                        rows={3}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm ${
-                          theme === "dark"
-                            ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                            : "border-gray-300 bg-white text-navy-950 placeholder-gray-500"
-                        }`}
-                      />
-                    </div>
                   </div>
 
                   {/* Image Upload Section */}
