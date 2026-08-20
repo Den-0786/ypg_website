@@ -252,12 +252,6 @@ export default function BlogSection() {
                             {post.title}
                           </a>
                         </h3>
-                        <p className="text-gray-600 mb-4">
-                          {getTruncatedExcerpt(
-                            post.excerpt,
-                            expandedPosts[post.id]
-                          )}
-                        </p>
                         <a
                           href={`/blog/${post.slug}`}
                           className="inline-flex items-center text-gold-500 font-medium group-hover:text-navy-950 transition-colors"

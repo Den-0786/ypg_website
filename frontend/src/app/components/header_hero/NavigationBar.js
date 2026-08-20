@@ -27,7 +27,8 @@ export default function NavigationBar() {
       const scrollY = window.scrollY;
       setScrolled(scrollY > 50);
       setVisible(scrollY > 0);
-      setShowTopBtn(scrollY > 300);
+      const nearBottom = scrollY + window.innerHeight > document.body.scrollHeight - 150;
+      setShowTopBtn(scrollY > 300 && !nearBottom);
 
       const sections = allNavLinks
         .map((link) => ({

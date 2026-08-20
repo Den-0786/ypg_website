@@ -162,7 +162,7 @@ export default function EventSection() {
                 transition={{ duration: 0.4 }}
                 whileHover={{ y: -3 }}
               >
-                <div className="relative w-full h-80 sm:h-96 overflow-hidden rounded-t-2xl">
+                <div className="relative w-full h-64 sm:h-72 overflow-hidden rounded-t-2xl">
                   <Image
                     src={event.image ? buildImageSrc(event.image) : "/hero.jpg"}
                     alt={event.title}

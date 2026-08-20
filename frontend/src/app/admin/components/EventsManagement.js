@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { buildImageSrc } from "../../../utils/config";
 import {
@@ -196,7 +197,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
   const handleRestoreEvent = async (id) => {
     try {
-      const response = await fetch(`/api/events/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -922,7 +923,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
                     </label>
                     <input
                       type="time"
-                      value={editingEvent.start_time}
+                      value={editingEvent.end_time}
                       onChange={(e) =>
                         setEditingEvent({
                           ...editingEvent,

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { buildImageSrc } from "../../../utils/config";
@@ -195,7 +196,7 @@ export default function GallerySection() {
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                   >
-                    <div className="relative w-full h-96 sm:h-[28rem] md:h-[32rem]">
+                    <div className="relative w-full h-[16rem] sm:h-[18rem] lg:h-[20rem]">
                       {item.image ? (
                         <Image
                           src={buildImageSrc(item.image)}
@@ -250,11 +251,11 @@ export default function GallerySection() {
 
                       {/* Gradient overlay for better text visibility - only for images */}
                       {item.image && (
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
                       )}
 
                       {/* Text overlay positioned at bottom */}
-                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
                         <h3 className="text-white font-semibold text-sm mb-1 line-clamp-1">
                           {item.title}
                         </h3>

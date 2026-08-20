@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -11,6 +11,7 @@ import {
   Users,
   MessageCircle,
   AlertTriangle,
+  X,
 } from "lucide-react";
 
 export default function PeopleManagement({
@@ -81,7 +82,7 @@ export default function PeopleManagement({
         formData.append("image", newTeamMember.image);
       }
 
-      const response = await fetch("http://localhost:8002/api/team", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team`, {
         method: "POST",
         body: formData,
       });
@@ -121,7 +122,7 @@ export default function PeopleManagement({
         formData.append("image", newTeamMember.image);
       }
 
-      const response = await fetch("http://localhost:8002/api/team", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team`, {
         method: "PUT",
         body: formData,
       });

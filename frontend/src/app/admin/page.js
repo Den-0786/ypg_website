@@ -421,10 +421,7 @@ function AdminDashboardInner() {
         fetchData(buildApiUrl("api/events"), setEvents);
         fetchData(buildApiUrl("api/donations"), setDonations);
         fetchData(buildApiUrl("api/ministry"), setMinistryRegistrations);
-        fetchData(buildApiUrl("api/blog/"), (data) => {
-          console.log("Blog posts data:", data);
-          setBlogPosts(data);
-        });
+        fetchData(buildApiUrl("api/blog/"), setBlogPosts);
         fetchData(buildApiUrl("api/testimonials"), setTestimonials);
         fetchData(buildApiUrl("api/gallery/"), setMedia);
         fetchData(buildApiUrl("api/contact"), (data) => {

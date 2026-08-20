@@ -116,7 +116,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           }
         } else if (response.status === 401) {
           // User is not authenticated, use default credentials
-          console.log("User not authenticated, using default credentials");
           setCurrentCredentials({
             username: "admin",
             hasPassword: true,
@@ -131,9 +130,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           return;
         } else {
           // Handle other error responses
-          console.log(
-            `API returned status ${response.status}, using default credentials`
-          );
           setCurrentCredentials({
             username: "admin",
             hasPassword: true,
@@ -161,7 +157,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           newUsername: "admin",
         }));
       } catch (error) {
-        console.log("Using default credentials:", error.message);
         // Set default credentials on error
         setCurrentCredentials({
           username: "admin",
@@ -471,7 +466,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       let response;
       switch (section) {
         case "profile":
-          console.log("Saving profile settings:", profile);
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
@@ -480,7 +474,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             },
             body: JSON.stringify(profile),
           });
-          console.log("Profile save response status:", response.status);
           break;
 
         case "security":
@@ -509,7 +502,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             description: generalSettings.description,
             appearance,
           };
-          console.log("Saving website settings:", websiteData);
           response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
@@ -518,7 +510,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             },
             body: JSON.stringify(websiteData),
           });
-          console.log("Website settings save response status:", response.status);
           break;
 
         case "appearance":
@@ -539,8 +530,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       }
 
       const result = await response.json();
-      console.log(`${section} save result:`, result);
-      
       if (!result.success) {
         if (result.errors) {
           setValidationErrors(result.errors);
@@ -879,8 +868,6 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         );
 
         const result = await response.json();
-        console.log("Profile picture upload result:", result);
-        
         if (!result.success) {
           throw new Error(
             result.error ||

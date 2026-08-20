@@ -2,23 +2,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { donationAPI } from "../../../utils/api";
+import { donationAPI, contactAPI } from "../../../utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart,
   Users,
   BookOpen,
-  Home,
-  GraduationCap,
-  Gift,
-  CreditCard,
   Smartphone,
-  Banknote,
   Building,
   CheckCircle,
   ArrowRight,
-  Star,
+  ArrowLeft,
   XCircle,
+  Copy,
+  Check,
+  AlertCircle,
 } from "lucide-react";
 
 export default function DonateSection() {
@@ -27,8 +25,8 @@ export default function DonateSection() {
     email: "",
     phone: "",
     amount: "",
-    paymentMethod: "",
-    purpose: "general",
+    paymentMethod: "momo",
+    purpose: "Youth Programs",
     message: "",
     isRecurring: false,
     recurringFrequency: "monthly",
@@ -37,12 +35,6 @@ export default function DonateSection() {
     organizationName: "",
   });
 
-  const [selectedAmount, setSelectedAmount] = useState("");
-  const [showMomoInstructions, setShowMomoInstructions] = useState(false);
-  const [momoTooltipPosition, setMomoTooltipPosition] = useState({
-    top: 0,
-    left: 0,
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [receiptCode, setReceiptCode] = useState("");
@@ -51,11 +43,9 @@ export default function DonateSection() {
     events_organized: 50,
     community_impact: 100,
   });
-  const [verificationFields, setVerificationFields] = useState({
-    momoTransactionId: "",
-    cashReceiptNumber: "",
-    bankReference: "",
-  });
+  const [currentStep, setCurrentStep] = useState(1);
+  const [paymentTab, setPaymentTab] = useState("momo");
+  const [copiedText, setCopiedText] = useState("");
 
   // Fetch impact statistics on component mount
   useEffect(() => {
@@ -114,66 +104,31 @@ export default function DonateSection() {
   const [emailError, setEmailError] = useState("");
 
   const donationAmounts = [
-    {
-      amount: 50,
-      label: "Can support 1 youth event",
-      impact: "Help organize monthly youth gatherings",
-    },
-    {
-      amount: 100,
-      label: "Can provide ministry materials",
-      impact: "Support Bible study and ministry resources",
-    },
-    {
-      amount: 250,
-      label: "Can fund welfare activities",
-      impact: "Help community outreach programs",
-    },
-    {
-      amount: 500,
-      label: "Can sponsor major events",
-      impact: "Support annual conferences and retreats",
-    },
+    { amount: 20 },
+    { amount: 50 },
+    { amount: 100 },
+    { amount: 200 },
   ];
 
   const purposeOptions = [
-    {
-      value: "general",
-      label: "General Fund",
-      icon: Heart,
-      description: "Support all YPG activities",
-    },
-    {
-      value: "events",
-      label: "Events & Activities",
-      icon: Users,
-      description: "Youth gatherings and conferences",
-    },
-    {
-      value: "welfare",
-      label: "Welfare Committee",
-      icon: Gift,
-      description: "Community outreach programs",
-    },
-    {
-      value: "ministry",
-      label: "Ministry Support",
-      icon: BookOpen,
-      description: "Bible study and ministry resources",
-    },
-    {
-      value: "building",
-      label: "Building Fund",
-      icon: Home,
-      description: "Facility improvements and maintenance",
-    },
-    {
-      value: "education",
-      label: "Education Fund",
-      icon: GraduationCap,
-      description: "Educational programs and scholarships",
-    },
+    "Youth Programs",
+    "Annual Events",
+    "Evangelism & Outreach",
+    "General Support",
   ];
+
+  const momoDetails = {
+    number: "0541107445",
+    name: "YPG District",
+    networks: ["MTN", "Telecel", "AT"],
+  };
+
+  const bankDetails = {
+    bank: "GCB Bank",
+    accountNumber: "1234567890",
+    accountName: "Youth Prayer Group",
+    branch: "Ahinsan",
+  };
 
   const validatePhone = (phone) => {
     if (!phone) {
@@ -230,23 +185,14 @@ export default function DonateSection() {
     }
   };
 
-  const handleAmountSelect = (amount) => {
-    setSelectedAmount(amount);
-    setFormData((prev) => ({ ...prev, amount: amount.toString() }));
+  const handlePaymentMethodChange = (method) => {
+    setPaymentTab(method);
   };
 
-  const handlePaymentMethodChange = (method, event) => {
-    setFormData((prev) => ({ ...prev, paymentMethod: method }));
-    if (method === "momo") {
-      const rect = event.currentTarget.getBoundingClientRect();
-      setMomoTooltipPosition({
-        top: rect.top - 200,
-        left: rect.left - 50,
-      });
-      setShowMomoInstructions(true);
-    } else {
-      setShowMomoInstructions(false);
-    }
+  const handleCopyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(label);
+    setTimeout(() => setCopiedText(""), 2000);
   };
 
   const handleSubmit = async (e) => {
@@ -278,9 +224,24 @@ export default function DonateSection() {
           if (formData.paymentMethod === "card") {
             // Process card payment
             await processCardPayment(donation.id);
-          } else if (formData.paymentMethod === "momo") {
-            // Show MoMo instructions
-            setShowMomoInstructions(true);
+          }
+
+          // Submit contact message to admin
+          if (formData.message) {
+            try {
+              await contactAPI.submitContact({
+                name: formData.donorName || "Anonymous",
+                email: formData.email || "",
+                subject: `Donation Message - ${formData.purpose}`,
+                message: `[Donation: GH₵ ${formData.amount}] ${formData.message}`,
+                date: new Date().toISOString(),
+              });
+              if (window.refreshContactMessages) {
+                window.refreshContactMessages();
+              }
+            } catch (err) {
+              // Contact message submission is non-critical
+            }
           }
 
           setReceiptCode(data.receipt_code);
@@ -291,7 +252,7 @@ export default function DonateSection() {
             phone: "",
             amount: "",
             paymentMethod: "",
-            purpose: "general",
+            purpose: "Youth Programs",
             message: "",
             isRecurring: false,
             recurringFrequency: "monthly",
@@ -299,7 +260,6 @@ export default function DonateSection() {
             dedicationType: "",
             organizationName: "",
           });
-          setSelectedAmount("");
           setPhoneError("");
           setEmailError("");
         } else {
@@ -320,267 +280,298 @@ export default function DonateSection() {
         {/* Main Donation Section - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Side - Donation Form */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10">
-            <h2 className="text-3xl font-bold text-navy-950 mb-8">
-              Make a Donation
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 sm:p-10">
+            {/* Header */}
+            <h2 className="text-2xl sm:text-3xl font-bold text-navy-950 mb-2">
+              Want to support YPG?
             </h2>
+            <p className="text-gray-500 text-sm sm:text-base mb-8">
+              Help power our programs, events and our outreach activities kindly follow the steps below:
+            </p>
 
-            {/* Donation Type */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-navy-950 mb-6">
-                Donation Type
-              </h3>
-              <div className="flex space-x-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData((prev) => ({ ...prev, isRecurring: false }))
-                  }
-                  className={`px-8 py-4 rounded-lg font-medium transition-all text-lg ${
-                    !formData.isRecurring
-                      ? "bg-gold-500 text-white shadow-md"
-                      : "bg-blue-50 text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  One-Time
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData((prev) => ({ ...prev, isRecurring: true }))
-                  }
-                  className={`px-8 py-4 rounded-lg font-medium transition-all text-lg ${
-                    formData.isRecurring
-                      ? "bg-gold-500 text-white shadow-md"
-                      : "bg-blue-50 text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  Monthly
-                </button>
+            {/* Stepper Bar */}
+            <div className="flex items-center mb-10">
+              <div className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${currentStep >= 1 ? "bg-gold-500 text-white shadow-md" : "bg-gray-200 text-gray-500"}`}>
+                  {currentStep > 1 ? <Check className="w-4 h-4" /> : "1"}
+                </div>
+                <span className={`ml-2 text-sm font-medium hidden sm:inline ${currentStep >= 1 ? "text-navy-950" : "text-gray-400"}`}>Amount & Purpose</span>
+              </div>
+              <div className={`flex-1 h-0.5 mx-3 sm:mx-4 transition-all duration-500 ${currentStep > 1 ? "bg-gold-500" : "bg-gray-200"}`} />
+              <div className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${currentStep >= 2 ? "bg-gold-500 text-white shadow-md" : "bg-gray-200 text-gray-500"}`}>
+                  2
+                </div>
+                <span className={`ml-2 text-sm font-medium hidden sm:inline ${currentStep >= 2 ? "text-navy-950" : "text-gray-400"}`}>Payment Details</span>
               </div>
             </div>
 
-            {/* Amount Selection */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-navy-950 mb-6">
-                Amount
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                {donationAmounts.map((item, index) => (
+            <AnimatePresence mode="wait">
+              {/* ========== STEP 1 ========== */}
+              {currentStep === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Suggested Amounts */}
+                  <div className="mb-8">
+                    <h3 className="text-base font-semibold text-navy-950 mb-4">Suggested Amount</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {donationAmounts.map((item) => (
+                        <motion.div
+                          key={item.amount}
+                          whileHover={{ scale: 1.05, y: -4, boxShadow: "0 8px 30px rgba(212,175,55,0.2)" }}
+                          className="rounded-xl border-2 border-gray-200 bg-white p-4 text-center cursor-default transition-colors duration-200"
+                        >
+                          <span className="text-lg font-bold text-navy-950">GH₵ {item.amount}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Custom Amount */}
+                  <div className="mb-8">
+                    <label className="block text-sm font-semibold text-navy-950 mb-2">
+                      Enter any amount you want to donate
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400">GH₵</span>
+                      <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleInputChange}
+                        placeholder="0.00"
+                        min="1"
+                        className="w-full pl-16 pr-4 py-3 border-2 border-gray-200 rounded-xl text-xl font-bold text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Purpose Dropdown */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-navy-950 mb-1">
+                      Select Purpose
+                    </label>
+                    <p className="text-xs text-gray-400 mb-2">use any of this as a payment purpose</p>
+                    <select
+                      value={formData.purpose}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, purpose: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-navy-950 focus:border-gold-500 focus:ring-0 outline-none transition-colors bg-white appearance-none cursor-pointer"
+                    >
+                      {purposeOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Helper Note */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8"
+                  >
+                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-amber-700">
+                      Please make sure to enter your selected purpose as the reference/reason when authorizing your MoMo or bank payment.
+                    </p>
+                  </motion.div>
+
+                  {/* Proceed Button */}
                   <motion.button
-                    key={index}
                     type="button"
-                    onClick={() => handleAmountSelect(item.amount)}
-                    className={`p-6 rounded-xl border-2 transition-all text-left ${
-                      selectedAmount === item.amount
-                        ? "border-gold-500 bg-blue-50 text-navy-950"
-                        : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                    }`}
+                    onClick={() => setCurrentStep(2)}
+                    disabled={!formData.amount || parseFloat(formData.amount) <= 0}
+                    className="w-full bg-gold-500 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:bg-gold-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    whileHover={{ scale: formData.amount ? 1.02 : 1 }}
+                    whileTap={{ scale: formData.amount ? 0.98 : 1 }}
+                  >
+                    Proceed to Payment Details
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </motion.div>
+              )}
+
+              {/* ========== STEP 2 ========== */}
+              {currentStep === 2 && (
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 30 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Purpose Reminder */}
+                  <div className="flex items-center gap-3 bg-gold-50 border border-gold-200 rounded-xl p-4 mb-8">
+                    <div className="w-10 h-10 bg-gold-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">You&apos;re donating to</p>
+                      <p className="text-sm font-bold text-navy-950">{formData.purpose}</p>
+                      <p className="text-xs text-gold-600 font-semibold">GH₵ {formData.amount}</p>
+                    </div>
+                  </div>
+
+                  {/* Payment Method Tabs */}
+                  <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
+                    <button
+                      type="button"
+                      onClick={() => handlePaymentMethodChange("momo")}
+                      className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all duration-300 ${paymentTab === "momo" ? "bg-white text-navy-950 shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      <Smartphone className="w-4 h-4 inline mr-2" />
+                      Mobile Money
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePaymentMethodChange("bank")}
+                      className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all duration-300 ${paymentTab === "bank" ? "bg-white text-navy-950 shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      <Building className="w-4 h-4 inline mr-2" />
+                      Bank Transfer
+                    </button>
+                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {/* MoMo Tab */}
+                    {paymentTab === "momo" && (
+                      <motion.div
+                        key="momo"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="mb-8"
+                      >
+                        <div className="space-y-4">
+                          {/* MoMo Number */}
+                          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">MoMo Number</p>
+                              <p className="text-lg font-bold text-navy-950">{momoDetails.number}</p>
+                            </div>
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleCopyToClipboard(momoDetails.number, "momo")}
+                              className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gold-300 transition-colors"
+                            >
+                              {copiedText === "momo" ? (
+                                <Check className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-gray-400" />
+                              )}
+                            </motion.button>
+                          </div>
+
+                          {/* Account Name */}
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-1">Account Name</p>
+                            <p className="text-base font-semibold text-navy-950">{momoDetails.name}</p>
+                          </div>
+
+                          {/* Networks */}
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-2">Supported Networks</p>
+                            <div className="flex gap-2">
+                              {momoDetails.networks.map((network) => (
+                                <span key={network} className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-navy-950">
+                                  {network}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Bank Tab */}
+                    {paymentTab === "bank" && (
+                      <motion.div
+                        key="bank"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="mb-8"
+                      >
+                        <div className="space-y-4">
+                          {/* Bank Name */}
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-1">Bank Name</p>
+                            <p className="text-base font-semibold text-navy-950">{bankDetails.bank}</p>
+                          </div>
+
+                          {/* Account Number */}
+                          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">Account Number</p>
+                              <p className="text-lg font-bold text-navy-950">{bankDetails.accountNumber}</p>
+                            </div>
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleCopyToClipboard(bankDetails.accountNumber, "bank")}
+                              className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gold-300 transition-colors"
+                            >
+                              {copiedText === "bank" ? (
+                                <Check className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-gray-400" />
+                              )}
+                            </motion.button>
+                          </div>
+
+                          {/* Account Name */}
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-1">Account Name</p>
+                            <p className="text-base font-semibold text-navy-950">{bankDetails.accountName}</p>
+                          </div>
+
+                          {/* Branch */}
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <p className="text-xs text-gray-500 mb-1">Branch</p>
+                            <p className="text-base font-semibold text-navy-950">{bankDetails.branch}</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Reference Callout */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8"
+                  >
+                    <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-blue-700">
+                      <span className="font-bold">Important:</span> Use <span className="font-bold text-navy-950">{formData.purpose}</span> in your reference field when confirming transfer.
+                    </p>
+                  </motion.div>
+
+                  {/* Back Button */}
+                  <motion.button
+                    type="button"
+                    onClick={() => setCurrentStep(1)}
+                    className="w-full border-2 border-gray-200 text-gray-600 py-3 px-6 rounded-xl font-semibold hover:border-gold-300 hover:text-navy-950 transition-all duration-200 flex items-center justify-center gap-2"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-xl font-bold mb-2">₵{item.amount}</div>
-                    <div className="text-sm text-gray-600">{item.label}</div>
+                    <ArrowLeft className="w-5 h-5" />
+                    Back to Step 1
                   </motion.button>
-                ))}
-              </div>
-
-              <div className="bg-white p-6 rounded-xl">
-                <div className="flex items-center space-x-3">
-                  <span className="text-xl font-bold text-gray-500">₵</span>
-                  <input
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleInputChange}
-                    placeholder="Custom amount"
-                    className="flex-1 text-xl font-bold bg-transparent border-none outline-none"
-                    min="1"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Purpose Selection */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-navy-950 mb-6">
-                Purpose
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {purposeOptions.map((option) => {
-                  const IconComponent = option.icon;
-                  return (
-                    <motion.button
-                      key={option.value}
-                      type="button"
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          purpose: option.value,
-                        }))
-                      }
-                      className={`p-4 rounded-xl border-2 transition-all text-left ${
-                        formData.purpose === option.value
-                          ? "border-gold-500 bg-blue-50 text-navy-950"
-                          : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div className="flex items-center space-x-3 mb-2">
-                        <IconComponent className="w-5 h-5" />
-                        <span className="text-base font-medium">
-                          {option.label}
-                        </span>
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Payment Method */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-navy-950 mb-6">
-                Payment Method
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  {
-                    method: "momo",
-                    label: "Mobile Money",
-                    icon: Smartphone,
-                    color: "bg-gold-500",
-                  },
-                  {
-                    method: "cash",
-                    label: "Cash",
-                    icon: Banknote,
-                    color: "bg-yellow-500",
-                  },
-                  {
-                    method: "bank",
-                    label: "Bank Transfer",
-                    icon: Building,
-                    color: "bg-gold-500",
-                  },
-                  {
-                    method: "card",
-                    label: "Credit Card",
-                    icon: CreditCard,
-                    color: "bg-purple-500",
-                  },
-                ].map((payment) => {
-                  const IconComponent = payment.icon;
-                  return (
-                    <motion.button
-                      key={payment.method}
-                      type="button"
-                      onClick={(e) =>
-                        handlePaymentMethodChange(payment.method, e)
-                      }
-                      className={`p-4 rounded-xl border-2 transition-all text-center ${
-                        formData.paymentMethod === payment.method
-                          ? "border-gold-500 bg-blue-50 text-navy-950"
-                          : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div
-                        className={`w-10 h-10 ${payment.color} rounded-full flex items-center justify-center mx-auto mb-2`}
-                      >
-                        <IconComponent className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-sm font-medium">
-                        {payment.label}
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              {/* MoMo Instructions Tooltip */}
-              <AnimatePresence>
-                {showMomoInstructions && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="fixed z-50 bg-white border border-blue-200 rounded-xl p-4 shadow-xl max-w-sm"
-                    style={{
-                      top: `${momoTooltipPosition.top}px`,
-                      left: `${momoTooltipPosition.left}px`,
-                    }}
-                  >
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="text-sm font-semibold text-navy-950">
-                        Mobile Money Instructions
-                      </h4>
-                      <button
-                        onClick={() => setShowMomoInstructions(false)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="space-y-2 text-sm text-navy-950">
-                      <p>1. Dial *170# on your phone</p>
-                      <p>2. Select &quot;Send Money&quot;</p>
-                      <p>
-                        3. Enter YPG number:{" "}
-                        <span className="font-bold text-navy-950">
-                          0541107445
-                        </span>
-                      </p>
-                      <p>
-                        4. Amount:{" "}
-                        <span className="font-bold text-navy-950">
-                          ₵{formData.amount || "___"}
-                        </span>
-                      </p>
-                      <p>
-                        5. Reference:{" "}
-                        <span className="font-bold text-navy-950">
-                          YPG-{receiptCode || "XXXX"}
-                        </span>
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Submit Button */}
-            <motion.button
-              type="submit"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full bg-white text-gold-500 py-4 px-6 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {isSubmitting ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
-                  Processing...
-                </div>
-              ) : (
-                "Complete Donation"
+                </motion.div>
               )}
-            </motion.button>
+            </AnimatePresence>
 
             {/* Success/Error Messages */}
             <AnimatePresence>
@@ -589,19 +580,14 @@ export default function DonateSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mt-4 p-4 bg-gold-100 border border-blue-400 text-navy-950 rounded-lg"
+                  className="mt-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl"
                 >
                   <div className="flex items-center">
                     <CheckCircle className="w-5 h-5 mr-2" />
                     <div>
-                      <p className="font-semibold">
-                        Donation Submitted Successfully!
-                      </p>
+                      <p className="font-semibold">Donation Submitted Successfully!</p>
                       <p className="text-sm">
-                        Receipt Code:{" "}
-                        <span className="font-mono font-bold">
-                          {receiptCode}
-                        </span>
+                        Receipt Code: <span className="font-mono font-bold">{receiptCode}</span>
                       </p>
                     </div>
                   </div>
@@ -613,14 +599,11 @@ export default function DonateSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"
+                  className="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl"
                 >
                   <div className="flex items-center">
                     <XCircle className="w-5 h-5 mr-2" />
-                    <div>
-                      <p className="font-semibold">Error</p>
-                      <p className="text-sm">{errorMessage}</p>
-                    </div>
+                    <p className="font-semibold">Something went wrong. Please try again.</p>
                   </div>
                 </motion.div>
               )}

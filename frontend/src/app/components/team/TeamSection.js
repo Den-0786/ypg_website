@@ -171,10 +171,10 @@ export default function TeamSection() {
             {teamMembers.map((member, index) => (
                 <motion.div
                   key={member.id}
-                  whileHover={{ y: -10 }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
+                  whileHover={{ y: -8 }}
+                  className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex-shrink-0 w-full md:snap-start sm:w-[calc(50%_-_0.75rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1.125rem)] xl:w-[calc(25%_-_1.125rem)]"
                 >
-                  <div className="relative w-full h-96 sm:h-[28rem] md:h-[32rem]">
+                  <div className="relative w-full h-[16rem] sm:h-[18rem] lg:h-[20rem]">
                     <Image
                       src={
                         member.image
@@ -183,33 +183,32 @@ export default function TeamSection() {
                       }
                       alt={member.name}
                       fill
-                      className="object-cover object-top"
+                      className="object-cover object-top transition-all duration-500 group-hover:scale-105 group-hover:blur-sm"
                       sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 25vw"
                       priority={index === 0}
                     />
-                    {/* Color overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-blue-800/40 to-gold-600/20" />
 
-                    {/* Text overlay with background */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 top-[14rem] sm:top-[16rem] md:top-[18rem]">
-                      <div className="bg-white/70 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
-                        <h3 className="text-sm sm:text-lg font-bold text-navy-950 mb-1">
-                          {member.name}
-                        </h3>
-                        <p className="text-navy-950 font-semibold mb-1 sm:mb-2 text-xs sm:text-sm">
-                          {member.position}
+                    {/* Dark gradient for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-navy-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    {/* Info - visible only on hover */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                      <h3 className="text-white text-base sm:text-lg font-bold mb-1 drop-shadow-lg">
+                        {member.name}
+                      </h3>
+                      <p className="text-gold-400 font-semibold text-xs sm:text-sm mb-1">
+                        {member.position}
+                      </p>
+                      {member.congregation && (
+                        <p className="text-white/80 font-medium text-xs mb-2">
+                          {member.congregation}
                         </p>
-                        {member.congregation && (
-                          <p className="text-gray-700 font-medium text-xs mb-2">
-                            {member.congregation}
-                          </p>
-                        )}
-                        {member.quote && (
-                          <p className="text-gray-700 mb-2 italic text-xs sm:text-sm">
-                            &quot;{member.quote}&quot;
-                          </p>
-                        )}
-                      </div>
+                      )}
+                      {member.quote && (
+                        <p className="text-white/70 italic text-xs sm:text-sm max-w-[90%]">
+                          &quot;{member.quote}&quot;
+                        </p>
+                      )}
                     </div>
                   </div>
                 </motion.div>

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import {
   DollarSign,
@@ -13,16 +14,11 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  TrendingUp,
   Users,
   Calendar,
-  Filter,
   Download,
   Search,
   BarChart3,
-  PieChart,
-  Target,
-  RefreshCw,
   Mail,
   Phone,
   MapPin,
@@ -32,10 +28,6 @@ import {
   GraduationCap,
   Gift,
   Building,
-  ShoppingCart,
-  FileText,
-  BarChart,
-  PieChart as PieChartIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -462,7 +454,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:8002/api/donations", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -866,7 +858,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
   const handleVerifyDonation = async (donation) => {
     try {
       const response = await fetch(
-        `http://localhost:8002/api/donations/${donation.id}/verify/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/${donation.id}/verify/`,
         {
           method: "POST",
           headers: {
@@ -894,7 +886,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     if (window.confirm("Are you sure you want to delete this donation?")) {
       try {
         const response = await fetch(
-          `http://localhost:8002/api/donations/${id}/delete/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/${id}/delete/`,
           {
             method: "DELETE",
           }

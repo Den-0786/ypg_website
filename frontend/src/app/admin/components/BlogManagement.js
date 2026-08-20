@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { buildImageSrc } from "../../../utils/config";
 import { FileText, Plus, Edit, Trash2, X, AlertTriangle } from "lucide-react";

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import {
   BookOpen,
@@ -149,8 +150,6 @@ const MinistryManagement = ({
       };
 
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/update/${registrationId}/`;
-      console.log("Updating registration URL:", url);
-      console.log("Updating registration with payload:", payload);
 
       const response = await fetch(url, {
         method: "PUT",
@@ -160,11 +159,8 @@ const MinistryManagement = ({
         body: JSON.stringify(payload),
       });
 
-      console.log("Response status:", response.status);
-
       if (response.ok) {
         const updatedRegistration = await response.json();
-        console.log("Updated registration:", updatedRegistration);
         setMinistryRegistrations(
           ministryRegistrations.map((reg) =>
             (reg.id ?? reg.registration_id) === registrationId
@@ -178,10 +174,9 @@ const MinistryManagement = ({
         let errorMsg = "Failed to update ministry registration";
         try {
           const errorData = await response.json();
-          console.log("Error response:", errorData);
           errorMsg = errorData.error || errorMsg;
         } catch (e) {
-          console.log("Error parsing error response:", e);
+          // Parse error
         }
         toast.error(errorMsg);
       }

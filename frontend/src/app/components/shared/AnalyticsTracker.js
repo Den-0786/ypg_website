@@ -25,8 +25,6 @@ export default function AnalyticsTracker() {
 
         const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
         const url = `${apiUrl}/api/analytics/track/`;
-        console.log("Tracking visit to:", url);
-        console.log("Device ID:", deviceId);
         
         const response = await fetch(url, {
           method: "POST",
@@ -38,19 +36,8 @@ export default function AnalyticsTracker() {
             device_id: deviceId,
           }),
         });
-        console.log("Response status:", response.status);
-        const text = await response.text();
-        console.log("Response text:", text);
-        if (text) {
-          try {
-            const data = JSON.parse(text);
-            console.log("Analytics response:", data);
-          } catch (e) {
-            console.log("Could not parse response as JSON");
-          }
-        }
       } catch (error) {
-        console.error("Failed to track visit:", error);
+        // Silently fail - analytics should not break the app
       }
     };
 
