@@ -26,7 +26,7 @@ export default function HeroCarousel() {
       description:
         "Efficiently manage member registrations, track attendance, and generate detailed analytics for your congregation with our advanced database system.",
       cta: "Access Database",
-      ctaLink: "https://ypgdatabasesystem.vercel.app/",
+      ctaLink: "https://database.ahinsandistrictypg.com/",
       bgImage: "/hero/database.jpeg",
     },
     {
@@ -36,7 +36,7 @@ export default function HeroCarousel() {
       description:
         "Streamlined attendance logging with instant reports and analytics to keep your congregation connected and engaged.",
       cta: "Open System",
-      ctaLink: "https://ypg-markify.vercel.app/",
+      ctaLink: "https://attendance.ahinsandistrictypg.com/",
       bgImage: "/hero/attendance1.JPG",
     },
   ];
