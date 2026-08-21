@@ -176,13 +176,15 @@ export default function CouncilManagement({ theme }) {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/${editingMember.id}/update/`,
           {
             method: "PUT",
-            body: formDataToSend,
+            credentials: "include",
+		  body: formDataToSend,
           }
         );
       } else {
         response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/create/`, {
           method: "POST",
-          body: formDataToSend,
+          credentials: "include",
+		  body: formDataToSend,
         });
       }
 

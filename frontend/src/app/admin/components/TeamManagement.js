@@ -84,7 +84,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/create/`,
         {
           method: "POST",
-          body: formData,
+          credentials: "include",
+		  body: formData,
         }
       );
 
@@ -134,7 +135,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${editingMember.id}/update/`,
         {
           method: "PUT",
-          body: formData,
+          credentials: "include",
+		  body: formData,
         }
       );
 
@@ -182,7 +184,8 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${memberToDelete.id}/delete/`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       const data = await response.json();
@@ -282,8 +285,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
 
       const createRes = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/create/`,
-        { method: "POST", body: formData }
-      );
+        { method: "POST", body: formData, credentials: "include" }      );
       const createData = await createRes.json();
 
       if (!createData.success) {

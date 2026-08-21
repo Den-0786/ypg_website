@@ -247,7 +247,8 @@ export default function YStoreManagement({ theme }) {
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${editingItem.id}`,
             {
               method: "PUT",
-              body: formDataToSend,
+              credentials: "include",
+		  body: formDataToSend,
             }
           );
         } else {
@@ -256,7 +257,8 @@ export default function YStoreManagement({ theme }) {
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${editingItem.id}`,
             {
               method: "PUT",
-              headers: {
+              credentials: "include",
+		  headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(apiData),
@@ -294,7 +296,8 @@ export default function YStoreManagement({ theme }) {
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`,
             {
               method: "POST",
-              body: formDataToSend,
+              credentials: "include",
+		  body: formDataToSend,
             }
           );
         } else {
@@ -303,7 +306,8 @@ export default function YStoreManagement({ theme }) {
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`,
             {
               method: "POST",
-              headers: {
+              credentials: "include",
+		  headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(apiData),
@@ -341,7 +345,8 @@ export default function YStoreManagement({ theme }) {
         `/api/ystore?id=${itemToDelete.id}&type=${deleteType}`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       if (response.ok) {
@@ -373,7 +378,8 @@ export default function YStoreManagement({ theme }) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${id}`,
         {
           method: "PUT",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -404,7 +410,8 @@ export default function YStoreManagement({ theme }) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${id}`,
         {
           method: "PUT",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

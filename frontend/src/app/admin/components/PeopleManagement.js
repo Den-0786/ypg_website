@@ -84,7 +84,8 @@ export default function PeopleManagement({
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team`, {
         method: "POST",
-        body: formData,
+        credentials: "include",
+		  body: formData,
       });
 
       const data = await response.json();
@@ -124,7 +125,8 @@ export default function PeopleManagement({
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team`, {
         method: "PUT",
-        body: formData,
+        credentials: "include",
+		  body: formData,
       });
 
       const data = await response.json();
@@ -166,7 +168,8 @@ export default function PeopleManagement({
         `/api/team?id=${teamMemberToDelete.id}&type=${deleteType}`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       const data = await response.json();
@@ -248,7 +251,8 @@ export default function PeopleManagement({
         `/api/testimonials?id=${testimonialToDelete.id}&type=${deleteType}`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       if (response.ok) {
@@ -325,7 +329,8 @@ export default function PeopleManagement({
         `/api/ministry?id=${registrationToDelete.id}&type=${deleteType}`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       if (response.ok) {

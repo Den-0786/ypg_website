@@ -41,7 +41,8 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/create/`,
           {
             method: "POST",
-            body: formData,
+            credentials: "include",
+		  body: formData,
           }
         );
       } else {
@@ -50,7 +51,8 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/create/`,
           {
             method: "POST",
-            headers: {
+            credentials: "include",
+		  headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -99,7 +101,8 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${editingPost.slug}/update/`,
         {
           method: "PUT",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -143,7 +146,8 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${postToDelete.slug}/delete/`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       if (response.ok) {

@@ -120,7 +120,8 @@ export default function TrashManagement({ theme }) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${item.id}/restore/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
         }
@@ -159,7 +160,8 @@ export default function TrashManagement({ theme }) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${item.id}/delete/`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       const result = await response.json();
@@ -204,7 +206,8 @@ export default function TrashManagement({ theme }) {
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${id}/restore/`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+		  headers: { "Content-Type": "application/json" },
             }
           );
         } else {
@@ -212,7 +215,8 @@ export default function TrashManagement({ theme }) {
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${id}/delete/`,
             {
               method: "DELETE",
-            }
+              credentials: "include",
+		  }
           );
         }
       });

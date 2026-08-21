@@ -54,7 +54,8 @@ const TestimonialsManagement = ({
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/approve/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
         }
@@ -97,7 +98,8 @@ const TestimonialsManagement = ({
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/deny/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ admin_notes: denyNotes }),
@@ -148,7 +150,8 @@ const TestimonialsManagement = ({
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/delete/`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       const result = await response.json();

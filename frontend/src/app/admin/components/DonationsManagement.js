@@ -456,7 +456,8 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations`, {
         method: "POST",
-        headers: {
+        credentials: "include",
+		  headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newDonation),
@@ -496,6 +497,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       
       const response = await fetch(url, {
         method: method,
+credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -546,6 +548,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       
       const response = await fetch(url, {
         method: method,
+credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -599,6 +602,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
 
       const response = await fetch(url, {
         method,
+credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "congregation_contribution",
@@ -661,6 +665,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       
       const response = await fetch(url, {
         method: method,
+credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -711,6 +716,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
       
       const response = await fetch(url, {
         method: method,
+credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -861,7 +867,8 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/${donation.id}/verify/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
         }
@@ -889,7 +896,8 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/${id}/delete/`,
           {
             method: "DELETE",
-          }
+            credentials: "include",
+		  }
         );
 
         if (response.ok) {

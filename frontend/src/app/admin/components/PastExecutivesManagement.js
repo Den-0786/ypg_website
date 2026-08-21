@@ -95,6 +95,7 @@ export default function PastExecutivesManagement({ theme }) {
 
         response = await fetch(url, {
           method,
+credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

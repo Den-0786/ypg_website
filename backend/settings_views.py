@@ -204,6 +204,11 @@ def api_settings_profile(request):
             response['Expires'] = '0'
             return response
         elif request.method == 'PUT':
+            if not request.user.is_authenticated:
+                return Response({
+                    'success': False,
+                    'error': 'Authentication required'
+                }, status=status.HTTP_401_UNAUTHORIZED)
             data = json.loads(request.body)
             current = load_profile_settings()
             current.update(data)
@@ -244,6 +249,11 @@ def api_settings_website(request):
             response['Expires'] = '0'
             return response
         elif request.method == 'PUT':
+            if not request.user.is_authenticated:
+                return Response({
+                    'success': False,
+                    'error': 'Authentication required'
+                }, status=status.HTTP_401_UNAUTHORIZED)
             data = json.loads(request.body)
             current = load_settings()
             current.update(data)

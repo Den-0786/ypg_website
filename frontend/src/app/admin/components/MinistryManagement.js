@@ -85,7 +85,8 @@ const MinistryManagement = ({
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/register/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -153,7 +154,8 @@ const MinistryManagement = ({
 
       const response = await fetch(url, {
         method: "PUT",
-        headers: {
+        credentials: "include",
+		  headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -249,7 +251,8 @@ const MinistryManagement = ({
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/create/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -328,7 +331,8 @@ const MinistryManagement = ({
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/${editingMinistry.id}/update/`,
         {
           method: "PUT",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

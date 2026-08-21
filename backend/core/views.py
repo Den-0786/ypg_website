@@ -317,6 +317,8 @@ def api_supervisor_status(request):
 @api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
 def api_supervisor_change_credentials(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get or change supervisor credentials"""
     try:
         # Debug: Check if there are any users and supervisors in the database
@@ -431,6 +433,8 @@ def api_supervisor_change_credentials(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_debug_session(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Debug session information"""
     try:
         return Response({
@@ -458,6 +462,8 @@ def api_debug_session(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_test_cookie(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Test cookie setting"""
     try:
         response = Response({
@@ -486,6 +492,8 @@ def api_test_cookie(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_supervisor(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a supervisor user if none exists"""
     try:
         from django.contrib.auth.models import User
@@ -593,6 +601,8 @@ def api_event_detail(request, event_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_event(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new event"""
     try:
         from datetime import datetime
@@ -656,6 +666,8 @@ def api_create_event(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_event(request, event_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update an event"""
     try:
         event = get_object_or_404(Event, id=event_id)
@@ -719,6 +731,8 @@ def api_update_event(request, event_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_event(request, event_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete an event"""
     try:
         event = get_object_or_404(Event, id=event_id)
@@ -854,6 +868,8 @@ def api_council_members(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_team_member_detail(request, member_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get team member detail"""
     try:
         member = get_object_or_404(TeamMember, id=member_id)
@@ -872,6 +888,8 @@ def api_team_member_detail(request, member_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_team_member(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new team member"""
     try:
         # Handle both JSON and FormData requests
@@ -917,6 +935,8 @@ def api_create_team_member(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_team_member(request, member_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update a team member"""
     try:
         member = get_object_or_404(TeamMember, id=member_id)
@@ -962,6 +982,8 @@ def api_update_team_member(request, member_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_team_member(request, member_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a team member"""
     try:
         member = get_object_or_404(TeamMember, id=member_id)
@@ -980,6 +1002,8 @@ def api_delete_team_member(request, member_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_council_member(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         # Use request.data for both JSON and multipart form data
         data = request.data.copy()
@@ -1018,6 +1042,8 @@ def api_create_council_member(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_council_member(request, member_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         member = get_object_or_404(TeamMember, id=member_id, is_council=True)
 
@@ -1050,6 +1076,8 @@ def api_update_council_member(request, member_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_council_member(request, member_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         member = get_object_or_404(TeamMember, id=member_id, is_council=True)
         member.delete()
@@ -1072,6 +1100,8 @@ def api_delete_council_member(request, member_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_donations(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get all donations with analytics"""
     try:
         # Trash support: donations are not soft-deleted; when deleted=true return empty
@@ -1230,6 +1260,8 @@ def api_submit_donation(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_verify_donation(request, donation_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Verify a donation"""
     try:
         donation = get_object_or_404(Donation, id=donation_id)
@@ -1259,6 +1291,8 @@ def api_verify_donation(request, donation_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_donation(request, donation_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a donation"""
     try:
         donation = get_object_or_404(Donation, id=donation_id)
@@ -1284,6 +1318,8 @@ def api_delete_donation(request, donation_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_donation_analytics(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get donation analytics"""
     try:
         from django.db.models import Sum, Count
@@ -1400,6 +1436,8 @@ def api_impact_statistics(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_process_payment(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Process payment through payment gateway (Paystack integration)"""
     try:
         data = json.loads(request.body)
@@ -1519,6 +1557,8 @@ YPG Ministry Team
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_contact_messages(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get all contact messages"""
     try:
         deleted_only = request.GET.get('deleted', 'false').lower() == 'true'
@@ -1568,6 +1608,8 @@ def api_submit_contact(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_mark_contact_read(request, message_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Mark contact message as read"""
     try:
         message = get_object_or_404(ContactMessage, id=message_id)
@@ -1588,6 +1630,8 @@ def api_mark_contact_read(request, message_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_contact(request, message_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a contact message"""
     try:
         message = get_object_or_404(ContactMessage, id=message_id)
@@ -1608,6 +1652,8 @@ def api_delete_contact(request, message_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_ministry_registrations(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get all ministry registrations"""
     try:
         # No soft-delete implemented; support deleted=true by returning empty
@@ -1658,6 +1704,8 @@ def api_submit_ministry_registration(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_ministry_registration(request, registration_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update a ministry registration"""
     try:
         registration = get_object_or_404(MinistryRegistration, id=registration_id)
@@ -1675,6 +1723,8 @@ def api_update_ministry_registration(request, registration_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_approve_ministry_registration(request, registration_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Approve a ministry registration"""
     try:
         registration = get_object_or_404(MinistryRegistration, id=registration_id)
@@ -1695,6 +1745,8 @@ def api_approve_ministry_registration(request, registration_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_ministry_registration(request, registration_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a ministry registration"""
     try:
         registration = get_object_or_404(MinistryRegistration, id=registration_id)
@@ -1729,6 +1781,8 @@ def api_ministries(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_ministry(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         data = json.loads(request.body)
         serializer = MinistrySerializer(data=data)
@@ -1743,6 +1797,8 @@ def api_create_ministry(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_ministry(request, ministry_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         item = get_object_or_404(Ministry, id=ministry_id)
         data = json.loads(request.body)
@@ -1758,6 +1814,8 @@ def api_update_ministry(request, ministry_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_ministry(request, ministry_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         delete_type = request.GET.get('type', 'both')
         item = get_object_or_404(Ministry, id=ministry_id)
@@ -1826,6 +1884,8 @@ def api_blog_post_detail(request, slug):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_blog_post(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new blog post"""
     try:
         if request.FILES:
@@ -1859,6 +1919,8 @@ def api_create_blog_post(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_blog_post(request, slug):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update a blog post"""
     try:
         post = get_object_or_404(BlogPost, slug=slug)
@@ -1886,6 +1948,8 @@ def api_update_blog_post(request, slug):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_blog_post(request, slug):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a blog post"""
     try:
         post = get_object_or_404(BlogPost, slug=slug)
@@ -1935,6 +1999,8 @@ def api_testimonials(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_testimonial(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new testimonial"""
     try:
         data = json.loads(request.body)
@@ -1962,6 +2028,8 @@ def api_create_testimonial(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_testimonial(request, testimonial_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update a testimonial"""
     try:
         testimonial = get_object_or_404(Testimonial, id=testimonial_id)
@@ -1989,6 +2057,8 @@ def api_update_testimonial(request, testimonial_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_testimonial(request, testimonial_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Soft delete a testimonial"""
     try:
         testimonial = get_object_or_404(Testimonial, id=testimonial_id)
@@ -2010,6 +2080,8 @@ def api_delete_testimonial(request, testimonial_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_restore_testimonial(request, testimonial_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Restore a soft deleted testimonial"""
     try:
         testimonial = get_object_or_404(Testimonial, id=testimonial_id)
@@ -2072,6 +2144,8 @@ def api_submit_testimonial(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_approve_testimonial(request, testimonial_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Approve a testimonial"""
     try:
         testimonial = get_object_or_404(Testimonial, id=testimonial_id)
@@ -2093,6 +2167,8 @@ def api_approve_testimonial(request, testimonial_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_deny_testimonial(request, testimonial_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Deny a testimonial"""
     try:
         data = json.loads(request.body)
@@ -2140,6 +2216,8 @@ def api_gallery_items(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_gallery_item(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new gallery item"""
     try:
         if request.FILES:
@@ -2193,6 +2271,8 @@ def api_create_gallery_item(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_gallery_item(request, item_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update a gallery item"""
     try:
         item = get_object_or_404(GalleryItem, id=item_id)
@@ -2244,6 +2324,8 @@ def api_update_gallery_item(request, item_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_gallery_item(request, item_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a gallery item"""
     try:
         item = get_object_or_404(GalleryItem, id=item_id)
@@ -2282,6 +2364,8 @@ def api_congregations(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_congregation(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new congregation"""
     try:
         data = json.loads(request.body)
@@ -2309,6 +2393,8 @@ def api_create_congregation(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_congregation(request, congregation_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update a congregation"""
     try:
         congregation = get_object_or_404(Congregation, id=congregation_id)
@@ -2336,6 +2422,8 @@ def api_update_congregation(request, congregation_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_congregation(request, congregation_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete a congregation"""
     try:
         congregation = get_object_or_404(Congregation, id=congregation_id)
@@ -2356,6 +2444,8 @@ def api_delete_congregation(request, congregation_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_analytics(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get analytics data"""
     try:
         # Get today's analytics or create new one
@@ -2489,6 +2579,8 @@ def api_branch_presidents(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_branch_presidents_admin(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get all branch presidents for admin dashboard"""
     try:
         presidents = BranchPresident.objects.all().order_by('created_at')
@@ -2520,6 +2612,8 @@ def api_branch_presidents_admin(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_branch_president_create(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create new branch president"""
     try:
         data = json.loads(request.body)
@@ -2547,6 +2641,8 @@ def api_branch_president_create(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_branch_president_update(request, president_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update branch president"""
     try:
         data = json.loads(request.body)
@@ -2578,6 +2674,8 @@ def api_branch_president_update(request, president_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_branch_president_delete(request, president_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete branch president"""
     try:
         president = BranchPresident.objects.get(id=president_id)
@@ -2670,6 +2768,8 @@ def api_past_executives(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_past_executive_create(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create new past executive"""
     try:
         # Handle both JSON and FormData requests
@@ -2718,6 +2818,8 @@ def api_past_executive_create(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_past_executive_update(request, executive_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update past executive"""
     try:
         # Handle both JSON and FormData requests
@@ -2773,6 +2875,8 @@ def api_past_executive_update(request, executive_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_past_executive_delete(request, executive_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete past executive (soft delete)"""
     try:
         executive = PastExecutive.objects.get(id=executive_id)
@@ -2799,6 +2903,8 @@ def api_past_executive_delete(request, executive_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_past_executive_hard_delete(request, executive_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Permanently delete past executive from database"""
     try:
         executive = PastExecutive.objects.get(id=executive_id)
@@ -2853,6 +2959,8 @@ def api_social_media_links(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_social_media_links_admin(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get all social media links for admin (including inactive)"""
     try:
         links = SocialMediaLink.objects.all().order_by('display_order', 'id')
@@ -2883,6 +2991,8 @@ def api_social_media_links_admin(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_social_media_create(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create new social media link"""
     try:
         # Check if this is a file upload (multipart/form-data)
@@ -2930,6 +3040,8 @@ def api_social_media_create(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_social_media_update(request, link_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update social media link"""
     try:
         link = SocialMediaLink.objects.get(id=link_id)
@@ -2988,6 +3100,8 @@ def api_social_media_update(request, link_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_social_media_delete(request, link_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete social media link"""
     try:
         link = SocialMediaLink.objects.get(id=link_id)
@@ -3031,6 +3145,8 @@ def api_announcements(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_create_announcement(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create a new announcement"""
     try:
         data = json.loads(request.body)
@@ -3057,6 +3173,8 @@ def api_create_announcement(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def api_update_announcement(request, announcement_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update an announcement"""
     try:
         announcement = Announcement.objects.get(id=announcement_id)
@@ -3087,6 +3205,8 @@ def api_update_announcement(request, announcement_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_announcement(request, announcement_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete an announcement"""
     try:
         announcement = Announcement.objects.get(id=announcement_id)

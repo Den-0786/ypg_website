@@ -64,6 +64,7 @@ export default function AnnouncementManagement({ theme }) {
 
       const response = await fetch(url, {
         method: editingId ? "PUT" : "POST",
+credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });

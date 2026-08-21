@@ -45,7 +45,8 @@ export default function CommunicationManagement({
 
         const response = await fetch(apiUrl, {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
         });
@@ -92,7 +93,8 @@ export default function CommunicationManagement({
 
       const response = await fetch(apiUrl, {
         method: "DELETE",
-      });
+        credentials: "include",
+		  });
 
       console.log("Delete response status:", response.status);
 

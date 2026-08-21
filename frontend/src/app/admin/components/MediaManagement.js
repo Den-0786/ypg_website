@@ -84,7 +84,8 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/create/`,
           {
             method: "POST",
-            body: formData,
+            credentials: "include",
+		  body: formData,
           }
         );
       } else {
@@ -93,7 +94,8 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/create/`,
           {
             method: "POST",
-            headers: {
+            credentials: "include",
+		  headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -159,7 +161,8 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
           {
             method: "PUT",
-            body: formData,
+            credentials: "include",
+		  body: formData,
           }
         );
       } else {
@@ -168,7 +171,8 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
           {
             method: "PUT",
-            headers: {
+            credentials: "include",
+		  headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -239,7 +243,8 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${itemToDelete.id}/delete/`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       if (response.ok) {

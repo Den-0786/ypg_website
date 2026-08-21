@@ -71,7 +71,8 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/create/`,
         {
           method: "POST",
-          body: formData,
+          credentials: "include",
+		  body: formData,
         }
       );
 
@@ -125,7 +126,8 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${editingEvent.id}/update/`,
         {
           method: "PUT",
-          body: formData,
+          credentials: "include",
+		  body: formData,
         }
       );
 
@@ -169,7 +171,8 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${eventToDelete.id}/delete/?type=${deleteType}`,
         {
           method: "DELETE",
-        }
+          credentials: "include",
+		  }
       );
 
       if (response.ok) {
@@ -199,7 +202,8 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${id}`, {
         method: "PUT",
-        headers: {
+        credentials: "include",
+		  headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ status: "active" }),

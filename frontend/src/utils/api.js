@@ -8,6 +8,7 @@ export const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
 
   const defaultOptions = {
+credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
@@ -37,7 +38,8 @@ export const contactAPI = {
   submitContact: (contactData) =>
     fetch(`${API_BASE_URL}/api/contact/submit/`, {
       method: "POST",
-      headers: {
+      credentials: "include",
+		  headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(contactData),
@@ -53,7 +55,8 @@ export const contactAPI = {
   updateMessage: (id, updateData) =>
     fetch(`${API_BASE_URL}/api/contact`, {
       method: "PUT",
-      headers: {
+      credentials: "include",
+		  headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ id, ...updateData }),
@@ -64,7 +67,8 @@ export const contactAPI = {
   deleteMessage: (id) =>
     fetch(`${API_BASE_URL}/api/contact?id=${id}`, {
       method: "DELETE",
-    })
+      credentials: "include",
+		  })
       .then((res) => res.json())
       .catch((error) => ({ success: false, error: error.message })),
 };
@@ -74,7 +78,8 @@ export const donationAPI = {
   submitDonation: (donationData) =>
     fetch(`${API_BASE_URL}/api/donations`, {
       method: "POST",
-      headers: {
+      credentials: "include",
+		  headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(donationData),
@@ -88,7 +93,8 @@ export const ministryAPI = {
   submitMinistryRegistration: (ministryData) =>
     fetch(`${API_BASE_URL}/api/ministry`, {
       method: "POST",
-      headers: {
+      credentials: "include",
+		  headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(ministryData),
@@ -117,7 +123,8 @@ export const ystoreAPI = {
   createItem: (itemData) =>
     fetch(`${API_BASE_URL}/api/ystore/`, {
       method: "POST",
-      headers: {
+      credentials: "include",
+		  headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(itemData),
@@ -129,7 +136,8 @@ export const ystoreAPI = {
   updateItem: (itemId, itemData) =>
     fetch(`${API_BASE_URL}/api/ystore/`, {
       method: "PUT",
-      headers: {
+      credentials: "include",
+		  headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ id: itemId, ...itemData }),
@@ -144,7 +152,8 @@ export const ystoreAPI = {
         `${API_BASE_URL}/api/ystore?id=${itemId}&type=${deleteType}`,
         {
           method: "DELETE",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
         }
@@ -189,7 +198,8 @@ export const branchPresidentAPI = {
         `${API_BASE_URL}/branch-presidents/create/`,
         {
           method: "POST",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
@@ -208,7 +218,8 @@ export const branchPresidentAPI = {
         `${API_BASE_URL}/branch-presidents/${presidentId}/update/`,
         {
           method: "PUT",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
@@ -227,7 +238,8 @@ export const branchPresidentAPI = {
         `${API_BASE_URL}/branch-presidents/${presidentId}/delete/`,
         {
           method: "DELETE",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
         }

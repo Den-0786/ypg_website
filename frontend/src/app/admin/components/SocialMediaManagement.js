@@ -36,7 +36,8 @@ export default function SocialMediaManagement() {
   const fetchSocialMediaLinks = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/admin/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/admin/`,
+        { credentials: "include" }
       );
       const data = await response.json();
       if (data.success) {
@@ -74,6 +75,7 @@ export default function SocialMediaManagement() {
       const response = await fetch(url, {
         method,
         body: formDataObj,
+        credentials: "include",
       });
       
       const data = await response.json();
@@ -107,7 +109,7 @@ export default function SocialMediaManagement() {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/${id}/delete/`,
-        { method: "DELETE" }
+        { method: "DELETE", credentials: "include" }
       );
       const data = await response.json();
       if (data.success) {

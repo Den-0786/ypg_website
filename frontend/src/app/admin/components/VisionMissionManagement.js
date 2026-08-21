@@ -100,7 +100,8 @@ export default function VisionMissionManagement() {
       const sessionToken = localStorage.getItem("ypg_admin_session_token");
       const response = await fetch(`${baseUrl}/api/vision-mission/update/`, {
         method: "PUT",
-        headers: {
+        credentials: "include",
+		  headers: {
           Authorization: sessionToken ? `Bearer ${sessionToken}` : "",
         },
         body: formDataToSend,

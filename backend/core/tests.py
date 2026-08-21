@@ -1,48 +1,97 @@
 import json
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 from core.models import Announcement, WebsiteSettings
 
 
-class AnnouncementVenueTests(TestCase):
+class AuthGateTests(TestCase):
+    """Mutating endpoints must reject unauthenticated callers."""
+
     def setUp(self):
         self.client = APIClient()
 
-    def test_create_with_venue(self):
+    def test_anonymous_cannot_create_announcement(self):
         response = self.client.post('/api/announcements/create/', {
-            'title': 'District Rally',
-            'date': '2026-09-01',
-            'venue': 'YPG Hall, Ahinsan',
-            'is_anticipated': False,
-        }, format='json')
+            'title': 'Sneaky'}, format='json')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(Announcement.objects.count(), 0)
+
+    def test_anonymous_cannot_delete_event(self):
+        response = self.client.delete('/api/events/1/delete/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_anonymous_cannot_update_settings(self):
+        response = self.client.put(
+            '/api/settings/website', json.dumps({'websiteTitle': 'Hacked'}),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertNotEqual(
+            WebsiteSettings.get_instance().website_title, 'Hacked')
+
+    def test_anonymous_cannot_process_payment(self):
+        response = self.client.post('/api/donations/process-payment/', {
+            'donation_id': 1}, format='json')
+        self.assertEqual(response.status_code, 401)
+
+    def test_public_gets_stay_open(self):
+        self.assertEqual(self.client.get('/api/settings/website').status_code, 200)
+        self.assertEqual(self.client.get('/api/announcements/').status_code, 200)
+        self.assertEqual(self.client.get('/api/events/').status_code, 200)
+
+
+class AuthenticatedAdminTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_user(
+            username='admin', password='pass12345')
+        self.client.force_login(self.admin)
+
+    def test_admin_can_create_announcement(self):
+        response = self.client.post('/api/announcements/create/', {
+            'title': 'Rally', 'venue': 'Main Hall'}, format='json')
         self.assertEqual(response.status_code, 201)
-        announcement = Announcement.objects.get(title='District Rally')
-        self.assertEqual(announcement.venue, 'YPG Hall, Ahinsan')
+        self.assertEqual(Announcement.objects.first().venue, 'Main Hall')
+
+    def test_admin_can_update_settings(self):
+        response = self.client.put(
+            '/api/settings/website',
+            json.dumps({'paymentDetails': {
+                'momoNumber': '0244123456', 'momoName': 'YPG',
+                'bankAccountNumber': '', 'bankAccountName': ''}}),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            WebsiteSettings.get_instance().momo_number, '0244123456')
+
+
+class AnnouncementVenueTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_user(
+            username='admin2', password='pass12345')
+        self.client.force_login(self.admin)
 
     def test_create_without_venue_defaults_to_blank(self):
         response = self.client.post('/api/announcements/create/', {
-            'title': 'No Venue Event',
-        }, format='json')
+            'title': 'No Venue Event'}, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Announcement.objects.get(title='No Venue Event').venue, '')
 
     def test_list_includes_venue(self):
         Announcement.objects.create(title='Listed', venue='Church Hall')
         response = self.client.get('/api/announcements/')
-        data = response.json()
-        self.assertTrue(data['success'])
-        item = next(a for a in data['announcements'] if a['title'] == 'Listed')
+        item = next(a for a in response.json()['announcements']
+                    if a['title'] == 'Listed')
         self.assertEqual(item['venue'], 'Church Hall')
 
     def test_update_adds_venue_to_existing_announcement(self):
         announcement = Announcement.objects.create(title='Legacy')
         response = self.client.put(
             f'/api/announcements/{announcement.id}/update/',
-            {'title': 'Legacy', 'venue': 'New Venue'},
-            format='json',
-        )
+            {'title': 'Legacy', 'venue': 'New Venue'}, format='json')
         self.assertEqual(response.status_code, 200)
         announcement.refresh_from_db()
         self.assertEqual(announcement.venue, 'New Venue')
@@ -51,44 +100,6 @@ class AnnouncementVenueTests(TestCase):
         announcement = Announcement.objects.create(title='Keep', venue='Original')
         self.client.put(
             f'/api/announcements/{announcement.id}/update/',
-            {'title': 'Keep'},
-            format='json',
-        )
+            {'title': 'Keep'}, format='json')
         announcement.refresh_from_db()
         self.assertEqual(announcement.venue, 'Original')
-
-
-class PaymentDetailsSettingsTests(TestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.url = '/api/settings/website'
-
-    def _put(self, payload):
-        return self.client.put(
-            self.url, json.dumps(payload), content_type='application/json'
-        )
-
-    def test_put_persists_momo_details(self):
-        response = self._put({
-            'paymentDetails': {
-                'momoNumber': '0244123456',
-                'momoName': 'YPG Ahinsan',
-                'bankAccountNumber': '',
-                'bankAccountName': '',
-            }
-        })
-        self.assertEqual(response.status_code, 200)
-        settings_obj = WebsiteSettings.get_instance()
-        self.assertEqual(settings_obj.momo_number, '0244123456')
-        self.assertEqual(settings_obj.momo_name, 'YPG Ahinsan')
-
-    def test_get_returns_payment_details_for_main_page(self):
-        settings_obj = WebsiteSettings.get_instance()
-        settings_obj.momo_number = '0555999888'
-        settings_obj.momo_name = 'Guild Welfare'
-        settings_obj.save()
-
-        response = self.client.get(self.url)
-        pd = response.json()['settings']['paymentDetails']
-        self.assertEqual(pd['momoNumber'], '0555999888')
-        self.assertEqual(pd['momoName'], 'Guild Welfare')

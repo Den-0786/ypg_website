@@ -218,7 +218,8 @@ function AdminDashboardInner() {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/logout`,
         {
           method: "POST",
-        }
+          credentials: "include",
+		  }
       );
     } catch (error) {
     } finally {

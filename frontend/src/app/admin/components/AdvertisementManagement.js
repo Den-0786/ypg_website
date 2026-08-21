@@ -72,7 +72,8 @@ export default function AdvertisementManagement({ theme }) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/update/`,
         {
           method: "PUT",
-          headers: {
+          credentials: "include",
+		  headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ status: newStatus }),
@@ -137,7 +138,8 @@ export default function AdvertisementManagement({ theme }) {
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/delete/`,
           {
             method: "DELETE",
-          }
+            credentials: "include",
+		  }
         );
         const data = await response.json();
         if (data.success) {
@@ -271,7 +273,8 @@ export default function AdvertisementManagement({ theme }) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${selectedAd.id}/update/`,
         {
           method: "PUT",
-          body: formData,
+          credentials: "include",
+		  body: formData,
         }
       );
       const data = await response.json();

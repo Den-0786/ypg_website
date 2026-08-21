@@ -26,6 +26,7 @@ export default function FinancialManagement({ donations, setDonations }) {
     try {
       const response = await fetch('/api/donations', {
         method: 'POST',
+credentials: "include",
         headers: {
           'Content-Type': 'application/json',
         },
@@ -65,6 +66,7 @@ export default function FinancialManagement({ donations, setDonations }) {
     try {
       const response = await fetch('/api/donations', {
         method: 'PUT',
+credentials: "include",
         headers: {
           'Content-Type': 'application/json',
         },

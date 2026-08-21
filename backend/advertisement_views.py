@@ -36,6 +36,8 @@ def api_advertisements(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_advertisements_admin(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get all advertisements for admin dashboard"""
     try:
         ads = Advertisement.objects.all().order_by('-created_at')
@@ -55,6 +57,8 @@ def api_advertisements_admin(request):
 @parser_classes([JSONParser, MultiPartParser, FormParser])
 @permission_classes([AllowAny])
 def api_create_advertisement(request):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Create new advertisement"""
     try:
         parsed = request.data
@@ -127,6 +131,8 @@ def _save_advertisement_image(file):
 @parser_classes([JSONParser, MultiPartParser, FormParser])
 @permission_classes([AllowAny])
 def api_update_advertisement(request, ad_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Update advertisement (admin only)"""
     try:
         ad = Advertisement.objects.get(id=ad_id)
@@ -202,6 +208,8 @@ def api_update_advertisement(request, ad_id):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def api_delete_advertisement(request, ad_id):
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Delete advertisement (admin only)"""
     try:
         ad = Advertisement.objects.get(id=ad_id)
