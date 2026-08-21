@@ -2348,6 +2348,8 @@ def api_delete_gallery_item(request, item_id):
 @permission_classes([AllowAny])
 def api_congregations(request):
     """Get all congregations"""
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         congregations = Congregation.objects.filter(is_active=True).order_by('name')
         serializer = CongregationSerializer(congregations, many=True)

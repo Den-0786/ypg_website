@@ -192,6 +192,8 @@ def save_profile_settings(settings):
 @permission_classes([AllowAny])
 def api_settings_profile(request):
     """Get or update admin profile settings"""
+    if not request.user.is_authenticated:
+        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         if request.method == 'GET':
             profile = load_profile_settings()
