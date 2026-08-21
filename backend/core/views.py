@@ -20,7 +20,8 @@ from .models import (
     Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
     Testimonial, GalleryItem, Congregation, Analytics, BranchPresident, Advertisement, PastExecutive,
-    Ministry, Sale, Expense, Contribution, VisionMission, DailyVisit, Announcement
+    Ministry, Sale, Expense, Contribution, VisionMission, DailyVisit, Announcement,
+    SocialMediaLink
 )
 from .serializers import (
     EventSerializer, TeamMemberSerializer,
@@ -1404,7 +1405,7 @@ def api_impact_statistics(request):
 
         # Get real statistics
         total_youth_reached = TeamMember.objects.count() + 450  # Team members + estimated reach
-        total_events = Event.objects.filter(status='published').count()
+        total_events = Event.objects.filter(is_deleted=False).count()
         total_donations = Donation.objects.filter(payment_status='verified').count()
         total_donation_amount = Donation.objects.filter(payment_status='verified').aggregate(
             total=Sum('amount')

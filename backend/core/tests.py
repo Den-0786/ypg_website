@@ -7,6 +7,38 @@ from rest_framework.test import APIClient
 from core.models import Announcement, WebsiteSettings
 
 
+class PublicEndpointsSmokeTests(TestCase):
+    """Every public GET endpoint must return 200 JSON, never a crash."""
+
+    PUBLIC_GETS = [
+        '/api/events/?forWebsite=true',
+        '/api/team/',
+        '/api/blog/',
+        '/api/testimonials/?forWebsite=true',
+        '/api/gallery/',
+        '/api/ministries/',
+        '/api/past-executives/',
+        '/api/announcements/',
+        '/api/vision-mission/',
+        '/api/advertisements/',
+        '/api/impact-statistics/',
+        '/api/social-media/',
+        '/api/settings/website',
+        '/branch-presidents/',
+    ]
+
+    def test_public_endpoints_return_200_json(self):
+        for url in self.PUBLIC_GETS:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200, url)
+                self.assertEqual(
+                    response['Content-Type'], 'application/json', url
+                )
+                body = response.json()
+                self.assertNotIn('traceback', str(body).lower(), url)
+
+
 class AuthGateTests(TestCase):
     """Mutating endpoints must reject unauthenticated callers."""
 
