@@ -27,7 +27,10 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-y!633ky5oj7*&@i0avh6d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = list(dict.fromkeys(
+    config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+    + ['api-website.ahinsandistrictypg.com', 'ypg-website.onrender.com']
+))
 
 
 # Application definition
@@ -181,9 +184,21 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:3002').split(',')
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(
+    config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:3002').split(',')
+    + ['https://website.ahinsandistrictypg.com']
+))
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all origins in development
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://website.ahinsandistrictypg.com',
+    'https://api-website.ahinsandistrictypg.com',
+]
+
+# Unique per project so sessions don't collide with the other YPG apps
+# sharing the ahinsandistrictypg.com domain.
+SESSION_COOKIE_NAME = 'ypgsite_sessionid'
 
 # REST Framework Settings
 REST_FRAMEWORK = {
