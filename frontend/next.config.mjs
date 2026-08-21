@@ -43,10 +43,11 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    const raw = process.env.NEXT_PUBLIC_API_BASE_URL;
     const backend =
-      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      (raw && /^https?:\/\//.test(raw) ? raw : null) ||
       (process.env.NODE_ENV === "production"
-        ? "https://ypg-website.onrender.com"
+        ? "https://api-website.ahinsandistrictypg.com"
         : "http://localhost:8000");
     return [
       {
