@@ -186,13 +186,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS Settings
 CORS_ALLOWED_ORIGINS = list(dict.fromkeys(
     config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:3002').split(',')
-    + ['https://website.ahinsandistrictypg.com']
+    + [
+        'https://ahinsandistrictypg.com',
+        'https://www.ahinsandistrictypg.com',
+        'https://website.ahinsandistrictypg.com',
+    ]
 ))
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all origins in development
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://website.ahinsandistrictypg.com',
+    'https://ahinsandistrictypg.com',
+    'https://www.ahinsandistrictypg.com',
     'https://api-website.ahinsandistrictypg.com',
 ]
 
