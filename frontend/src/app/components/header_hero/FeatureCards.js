@@ -19,7 +19,7 @@ export default function FeatureCards() {
       shortDesc: "Member registration & congregation management.",
       fullDesc:
         "Comprehensive member registration and congregation management system for tracking all YPG activities.",
-      link: "https://ypgdatabasesystem.vercel.app/",
+      link: "https://database.ahinsandistrictypg.com/",
       linkText: "Access Database",
     },
     {
@@ -34,7 +34,7 @@ export default function FeatureCards() {
       shortDesc: "Real-time attendance tracking & reporting.",
       fullDesc:
         "Real-time attendance tracking with analytics and reporting to keep your congregation connected and engaged.",
-      link: "https://ypg-markify.vercel.app/",
+      link: "https://attendance.ahinsandistrictypg.com/",
       linkText: "Open System",
     },
   ];
