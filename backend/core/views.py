@@ -177,6 +177,7 @@ def validate_donation_data(data):
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@rate_limit(max_requests=8, window_seconds=300)
 def api_supervisor_login(request):
     """Supervisor login endpoint"""
     try:
