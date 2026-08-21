@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ADYPG - Ahinsan District YPG",
+  title: "Ahinsan District YPG",
   description:
     "Empowering young people aged 18-30 in faith, leadership, and community service",
 };
