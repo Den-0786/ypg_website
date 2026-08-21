@@ -13,22 +13,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Supervisor',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_supervisor', models.BooleanField(default=True)),
-                ('last_login_ip', models.GenericIPAddressField(blank=True, null=True)),
-                ('session_token', models.CharField(blank=True, max_length=100, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='supervisor_profile', to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'verbose_name': 'Supervisor',
-                'verbose_name_plural': 'Supervisors',
-            },
-        ),
+        # Supervisor was already created in 0001_initial; this migration was
+        # an accidental duplicate and is kept only for migration-history continuity.
     ]
 
 

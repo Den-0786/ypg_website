@@ -119,6 +119,10 @@ urlpatterns = [
     # Settings API endpoints
     path('api/settings/profile/', api_settings_profile, name='api_settings_profile'),
     path('api/settings/website/', api_settings_website, name='api_settings_website'),
+    # Slash-less aliases: the frontend calls these without a trailing slash,
+    # and the automatic 301 redirect would convert PUT bodies into GETs.
+    path('api/settings/website', api_settings_website),
+    path('api/settings/profile', api_settings_profile),
     
     # Y-Store API endpoints
     path('api/ystore/', api_ystore_items, name='api_ystore_items'),

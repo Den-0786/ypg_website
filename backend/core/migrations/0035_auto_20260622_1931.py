@@ -3,6 +3,20 @@
 from django.db import migrations
 
 
+def drop_quiz_participants(apps, schema_editor):
+    # quiz_participants was a manually-added production column that never
+    # existed in model state, so it can only be dropped if physically present.
+    if schema_editor.connection.vendor == 'sqlite':
+        return
+    connection = schema_editor.connection
+    with connection.cursor() as cursor:
+        columns = [
+            c.name for c in connection.introspection.get_table_description(cursor, 'core_analytics')
+        ]
+    if 'quiz_participants' in columns:
+        schema_editor.execute('ALTER TABLE core_analytics DROP COLUMN quiz_participants;')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,8 +24,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="ALTER TABLE core_analytics DROP COLUMN IF EXISTS quiz_participants;",
-            reverse_sql="ALTER TABLE core_analytics ADD COLUMN quiz_participants INTEGER DEFAULT 0;",
-        ),
+        migrations.RunPython(drop_quiz_participants, migrations.RunPython.noop),
     ]

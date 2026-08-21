@@ -32,7 +32,13 @@ DEFAULT_WEBSITE = {
         'youtube': ''
     },
     'theme': 'light',
-    'maintenanceMode': False
+    'maintenanceMode': False,
+    'paymentDetails': {
+        'momoNumber': '',
+        'momoName': '',
+        'bankAccountNumber': '',
+        'bankAccountName': ''
+    }
 }
 
 
@@ -74,6 +80,13 @@ def save_settings(settings):
         db_settings.language = appearance.get('language', db_settings.language)
         db_settings.border_radius = appearance.get('borderRadius', db_settings.border_radius)
         
+        # Update payment details
+        payment = settings.get('paymentDetails', {})
+        db_settings.momo_number = payment.get('momoNumber', db_settings.momo_number)
+        db_settings.momo_name = payment.get('momoName', db_settings.momo_name)
+        db_settings.bank_account_number = payment.get('bankAccountNumber', db_settings.bank_account_number)
+        db_settings.bank_account_name = payment.get('bankAccountName', db_settings.bank_account_name)
+
         # Update other settings
         db_settings.theme = settings.get('theme', db_settings.theme)
         db_settings.maintenance_mode = settings.get('maintenanceMode', db_settings.maintenance_mode)
@@ -182,7 +195,6 @@ def api_settings_profile(request):
     try:
         if request.method == 'GET':
             profile = load_profile_settings()
-            print(f"GET profile settings: {profile}")
             response = Response({
                 'success': True,
                 'profile': profile
@@ -193,16 +205,12 @@ def api_settings_profile(request):
             return response
         elif request.method == 'PUT':
             data = json.loads(request.body)
-            print(f"PUT profile request body: {data}")
             current = load_profile_settings()
-            print(f"Current profile before update: {current}")
             current.update(data)
-            print(f"Profile after update: {current}")
             save_profile_settings(current)
             
             # Verify the save was successful by reading it back
             verification = load_profile_settings()
-            print(f"Verification after profile save: {verification}")
             
             return Response({
                 'success': True,
@@ -227,7 +235,6 @@ def api_settings_website(request):
     try:
         if request.method == 'GET':
             settings = load_settings()
-            print(f"GET website settings: {settings}")
             response = Response({
                 'success': True,
                 'settings': settings
@@ -238,16 +245,12 @@ def api_settings_website(request):
             return response
         elif request.method == 'PUT':
             data = json.loads(request.body)
-            print(f"PUT request body: {data}")
             current = load_settings()
-            print(f"Current settings before update: {current}")
             current.update(data)
-            print(f"Settings after update: {current}")
             save_settings(current)
             
             # Verify the save was successful by reading it back
             verification = load_settings()
-            print(f"Verification after save: {verification}")
             
             return Response({
                 'success': True,

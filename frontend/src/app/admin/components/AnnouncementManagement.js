@@ -11,6 +11,7 @@ import {
   X,
   Check,
   Clock,
+  MapPin,
 } from "lucide-react";
 
 export default function AnnouncementManagement({ theme }) {
@@ -21,6 +22,7 @@ export default function AnnouncementManagement({ theme }) {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
+    venue: "",
     is_anticipated: false,
   });
 
@@ -140,13 +142,14 @@ export default function AnnouncementManagement({ theme }) {
     setFormData({
       title: announcement.title,
       date: announcement.date,
+      venue: announcement.venue || "",
       is_anticipated: announcement.is_anticipated,
     });
     setShowForm(true);
   };
 
   const resetForm = () => {
-    setFormData({ title: "", date: "", is_anticipated: false });
+    setFormData({ title: "", date: "", venue: "", is_anticipated: false });
     setEditingId(null);
     setShowForm(false);
   };
@@ -268,6 +271,30 @@ export default function AnnouncementManagement({ theme }) {
                   className={`w-full px-4 py-2.5 rounded-lg border text-sm transition-colors ${
                     isDark
                       ? "bg-white/5 border-white/10 text-white focus:border-gold-500"
+                      : "bg-white border-gray-300 text-navy-950 focus:border-gold-500"
+                  } focus:outline-none focus:ring-1 focus:ring-gold-500`}
+                />
+              </div>
+
+              {/* Venue */}
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-1 ${
+                    isDark ? "text-blue-200" : "text-gray-700"
+                  }`}
+                >
+                  Venue (optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. YPG Hall, Ahinsan District"
+                  value={formData.venue}
+                  onChange={(e) =>
+                    setFormData({ ...formData, venue: e.target.value })
+                  }
+                  className={`w-full px-4 py-2.5 rounded-lg border text-sm transition-colors ${
+                    isDark
+                      ? "bg-white/5 border-white/10 text-white focus:border-gold-500 placeholder-blue-200/30"
                       : "bg-white border-gray-300 text-navy-950 focus:border-gold-500"
                   } focus:outline-none focus:ring-1 focus:ring-gold-500`}
                 />
@@ -423,6 +450,22 @@ export default function AnnouncementManagement({ theme }) {
                           }`}
                         >
                           {formatDate(announcement.date)}
+                        </span>
+                      </>
+                    )}
+                    {announcement.venue && (
+                      <>
+                        <MapPin
+                          className={`w-3.5 h-3.5 ${
+                            isDark ? "text-blue-300/60" : "text-gray-400"
+                          }`}
+                        />
+                        <span
+                          className={`text-xs truncate max-w-[180px] ${
+                            isDark ? "text-blue-200/60" : "text-gray-500"
+                          }`}
+                        >
+                          {announcement.venue}
                         </span>
                       </>
                     )}

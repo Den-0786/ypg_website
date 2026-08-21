@@ -490,6 +490,7 @@ class Contribution(models.Model):
 class Announcement(models.Model):
     title = models.CharField(max_length=200)
     date = models.DateField(null=True, blank=True)
+    venue = models.CharField(max_length=200, blank=True, default='')
     is_anticipated = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -630,6 +631,12 @@ class WebsiteSettings(models.Model):
     phone_number = models.CharField(max_length=20, blank=True, default='')
     address = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default="Presbyterian Young People's Guild - Ahinsan District")
+
+    # Payment details shown on the donation page
+    momo_number = models.CharField(max_length=30, blank=True, default='')
+    momo_name = models.CharField(max_length=100, blank=True, default='')
+    bank_account_number = models.CharField(max_length=50, blank=True, default='')
+    bank_account_name = models.CharField(max_length=100, blank=True, default='')
     
     # Appearance settings
     language = models.CharField(max_length=50, default='English')
@@ -670,6 +677,12 @@ class WebsiteSettings(models.Model):
             'appearance': {
                 'language': self.language,
                 'borderRadius': self.border_radius,
+            },
+            'paymentDetails': {
+                'momoNumber': self.momo_number,
+                'momoName': self.momo_name,
+                'bankAccountNumber': self.bank_account_number,
+                'bankAccountName': self.bank_account_name,
             },
             'theme': self.theme,
             'maintenanceMode': self.maintenance_mode,

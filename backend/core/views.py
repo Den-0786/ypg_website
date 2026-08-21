@@ -3038,6 +3038,7 @@ def api_create_announcement(request):
         announcement = Announcement.objects.create(
             title=data.get('title', ''),
             date=date_val,
+            venue=data.get('venue', ''),
             is_anticipated=data.get('is_anticipated', False)
         )
         serializer = AnnouncementSerializer(announcement)
@@ -3062,6 +3063,7 @@ def api_update_announcement(request, announcement_id):
         data = json.loads(request.body)
         announcement.title = data.get('title', announcement.title)
         announcement.date = data.get('date') or None
+        announcement.venue = data.get('venue', announcement.venue)
         announcement.is_anticipated = data.get('is_anticipated', announcement.is_anticipated)
         announcement.save()
         serializer = AnnouncementSerializer(announcement)

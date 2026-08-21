@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Megaphone, Clock, X, Zap } from "lucide-react";
+import { Megaphone, Clock, X, Zap, MapPin } from "lucide-react";
 
 export default function AnnouncementBanner() {
   const [announcements, setAnnouncements] = useState([]);
@@ -75,6 +75,12 @@ export default function AnnouncementBanner() {
       {a.date && (
         <span className="text-gold-300/70 text-[10px] whitespace-nowrap">
           {formatDate(a.date)}
+        </span>
+      )}
+      {a.venue && (
+        <span className="inline-flex items-center space-x-1 whitespace-nowrap">
+          <MapPin className="w-3 h-3 text-gold-400/70 flex-shrink-0" />
+          <span className="text-blue-200/60 text-[10px]">{a.venue}</span>
         </span>
       )}
       {a.is_anticipated && (
