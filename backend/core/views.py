@@ -186,7 +186,7 @@ def api_get_csrf_token(request):
     'CSRF token missing'.
     """
     get_token(request)
-    return JsonResponse({'success': True})
+    return Response({'success': True})
 
 
 @api_view(['POST'])
