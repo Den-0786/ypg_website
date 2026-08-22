@@ -1360,6 +1360,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       <div className="relative">
                         <input
                           type={showPassword ? "text" : "password"}
+                          autoComplete="current-password"
                           value={security.currentPassword}
                           onChange={(e) =>
                             setSecurity({
@@ -1394,6 +1395,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       <div className="relative">
                         <input
                           type={showPassword ? "text" : "password"}
+                          autoComplete="new-password"
                           value={security.newPassword}
                           onChange={(e) =>
                             setSecurity({
@@ -1429,6 +1431,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                       <div className="relative">
                         <input
                           type={showConfirmPassword ? "text" : "password"}
+                            autoComplete="new-password"
                           value={security.confirmPassword}
                           onChange={(e) =>
                             setSecurity({

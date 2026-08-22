@@ -87,6 +87,7 @@ const LoginScreen = ({ onLogin }) => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
                   value={credentials.password}
                   onChange={(e) =>
                     setCredentials({ ...credentials, password: e.target.value })
