@@ -6,7 +6,7 @@ export const getApiBaseUrl = () => {
 };
 
 export const getSiteUrl = () => {
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://ypg-website.vercel.app";
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://www.ahinsandistrictypg.com";
 };
 
 // Helper function to build API URLs
