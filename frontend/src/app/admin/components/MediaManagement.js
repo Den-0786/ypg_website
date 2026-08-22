@@ -81,7 +81,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         formData.append("file", newMedia.file); // Send as 'file' - backend will handle routing
 
         response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/create/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/gallery/create/`,
           {
             method: "POST",
             credentials: "include",
@@ -91,7 +91,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
       } else {
         // If no file, use JSON
         response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/create/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/gallery/create/`,
           {
             method: "POST",
             credentials: "include",
@@ -158,7 +158,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
         formData.append("file", editingMedia.file);
 
         response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/gallery/${editingMedia.id}/update/`,
           {
             method: "PUT",
             credentials: "include",
@@ -168,7 +168,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
       } else {
         // If no file, use JSON
         response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${editingMedia.id}/update/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/gallery/${editingMedia.id}/update/`,
           {
             method: "PUT",
             credentials: "include",
@@ -240,7 +240,7 @@ const MediaManagement = ({ media = [], setMedia, theme }) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/${itemToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/gallery/${itemToDelete.id}/delete/`,
         {
           method: "DELETE",
           credentials: "include",

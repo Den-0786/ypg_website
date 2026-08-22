@@ -1,7 +1,7 @@
 // Configuration utility for API endpoints
 export const getApiBaseUrl = () => {
   return (
-    process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"
+    process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"
   );
 };
 

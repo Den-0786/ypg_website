@@ -21,7 +21,7 @@ export default function BlogSection() {
   const fetchBlogPosts = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/?forWebsite=true`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/?forWebsite=true`,
         { cache: "no-store" }
       );
       if (response.ok) {

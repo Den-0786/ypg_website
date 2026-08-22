@@ -29,7 +29,7 @@ export default function PastExecutivesManagement({ theme }) {
   const fetchPastExecutives = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/?deleted=${showDeleted}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/?deleted=${showDeleted}`
       );
       const data = await response.json();
       if (data.success) {
@@ -59,8 +59,8 @@ export default function PastExecutivesManagement({ theme }) {
 
     try {
       const url = isEditMode
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${currentExecutive.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/${currentExecutive.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/create/`;
       const method = isEditMode ? "PUT" : "POST";
 
       let response;
@@ -144,8 +144,8 @@ credentials: "include",
     try {
       const isHardDelete = executiveToDelete.is_deleted;
       const endpoint = isHardDelete
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${executiveToDelete.id}/hard-delete/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/${executiveToDelete.id}/delete/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/${executiveToDelete.id}/hard-delete/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/${executiveToDelete.id}/delete/`;
       const response = await fetch(endpoint, { method: "DELETE" });
       const data = await response.json();
 

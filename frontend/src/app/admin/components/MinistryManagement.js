@@ -64,7 +64,7 @@ const MinistryManagement = ({
     const fetchMinistries = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministries/`
         );
         const data = await res.json();
         if (data.success && Array.isArray(data.ministries)) {
@@ -82,7 +82,7 @@ const MinistryManagement = ({
   const handleAddRegistration = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/register/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministry/register/`,
         {
           method: "POST",
           credentials: "include",
@@ -150,7 +150,7 @@ const MinistryManagement = ({
         ministry: editingRegistration.ministry,
       };
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/update/${registrationId}/`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministry/update/${registrationId}/`;
 
       const response = await fetch(url, {
         method: "PUT",
@@ -198,7 +198,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/${registrationToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministry/${registrationToDelete.id}/delete/`,
         { method: "DELETE" }
       );
 
@@ -248,7 +248,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/create/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministries/create/`,
         {
           method: "POST",
           credentials: "include",
@@ -328,7 +328,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/${editingMinistry.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministries/${editingMinistry.id}/update/`,
         {
           method: "PUT",
           credentials: "include",
@@ -399,7 +399,7 @@ const MinistryManagement = ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/${ministryToDelete.id}/delete/?type=${deleteType}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministries/${ministryToDelete.id}/delete/?type=${deleteType}`,
         { method: "DELETE" }
       );
 

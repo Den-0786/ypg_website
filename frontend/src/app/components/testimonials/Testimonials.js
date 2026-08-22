@@ -15,7 +15,7 @@ export default function TestimonialsSection() {
   const fetchTestimonials = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/?forWebsite=true`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/testimonials/?forWebsite=true`,
         {
           cache: "no-store",
         }

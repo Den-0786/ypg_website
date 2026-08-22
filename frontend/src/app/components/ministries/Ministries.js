@@ -31,7 +31,7 @@ export default function MinistriesSection() {
     const fetchMinistries = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministries/`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministries/`
         );
         const data = await res.json();
         if (data.success && Array.isArray(data.ministries)) {
@@ -131,7 +131,7 @@ export default function MinistriesSection() {
   const confirmRegistration = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry/register/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministry/register/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

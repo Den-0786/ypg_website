@@ -68,7 +68,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/create/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events/create/`,
         {
           method: "POST",
           credentials: "include",
@@ -123,7 +123,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${editingEvent.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events/${editingEvent.id}/update/`,
         {
           method: "PUT",
           credentials: "include",
@@ -135,7 +135,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
         const result = await response.json();
         if (result.success && result.event) {
           const eventsResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/`
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events/`
           );
           if (eventsResponse.ok) {
             const eventsData = await eventsResponse.json();
@@ -168,7 +168,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${eventToDelete.id}/delete/?type=${deleteType}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events/${eventToDelete.id}/delete/?type=${deleteType}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -200,7 +200,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
 
   const handleRestoreEvent = async (id) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events/${id}`, {
         method: "PUT",
         credentials: "include",
 		  headers: {

@@ -23,7 +23,7 @@ export default function AnalyticsTracker() {
           localStorage.setItem("ypg_device_id", deviceId);
         }
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com";
         const url = `${apiUrl}/api/analytics/track/`;
         
         const response = await fetch(url, {

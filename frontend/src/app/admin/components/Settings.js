@@ -92,7 +92,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/credentials/`,
           {
             signal: controller.signal,
             credentials: 'include', // Include cookies for session authentication
@@ -189,7 +189,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       setIsProfileLoading(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/profile`,
           { cache: "no-store" }
         );
         if (!response.ok) {
@@ -231,7 +231,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     const loadWebsiteSettings = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/website`,
           { cache: "no-store" }
         );
         if (!response.ok) {
@@ -481,7 +481,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       let response;
       switch (section) {
         case "profile":
-          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/profile`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
@@ -493,7 +493,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
         case "security":
           const sessionToken = localStorage.getItem("ypg_admin_session_token");
-          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/credentials`, {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/credentials`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
@@ -518,7 +518,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
             appearance,
             paymentDetails,
           };
-          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/website`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
@@ -529,7 +529,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           break;
 
         case "appearance":
-          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
+          response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/website`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
@@ -776,7 +776,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
         // Save restored settings to database
         try {
           // Save profile settings
-          await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`, {
+          await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/profile`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
@@ -786,7 +786,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           });
 
           // Save website settings
-          await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`, {
+          await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/website`, {
             method: "PUT",
             credentials: 'include', // Include cookies for session authentication
             headers: {
@@ -866,7 +866,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
 
         // Save the avatar to the database
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/profile`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/profile`,
           {
             method: "PUT",
             credentials: 'include',

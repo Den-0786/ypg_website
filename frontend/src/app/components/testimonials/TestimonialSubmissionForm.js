@@ -75,7 +75,7 @@ export default function TestimonialSubmissionForm({ onClose }) {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/submit/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/testimonials/submit/`,
         {
           method: "POST",
           body: formDataToSend,

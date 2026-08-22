@@ -51,7 +51,7 @@ const TestimonialsManagement = ({
     setIsProcessing(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/approve/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/testimonials/${testimonialId}/approve/`,
         {
           method: "POST",
           credentials: "include",
@@ -95,7 +95,7 @@ const TestimonialsManagement = ({
     setIsProcessing(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/deny/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/testimonials/${testimonialId}/deny/`,
         {
           method: "POST",
           credentials: "include",
@@ -147,7 +147,7 @@ const TestimonialsManagement = ({
     setIsProcessing(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/testimonials/${testimonialId}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/testimonials/${testimonialId}/delete/`,
         {
           method: "DELETE",
           credentials: "include",

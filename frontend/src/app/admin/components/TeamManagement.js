@@ -81,7 +81,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/create/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team/create/`,
         {
           method: "POST",
           credentials: "include",
@@ -132,7 +132,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${editingMember.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team/${editingMember.id}/update/`,
         {
           method: "PUT",
           credentials: "include",
@@ -181,7 +181,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
     if (!memberToDelete) return;
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${memberToDelete.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team/${memberToDelete.id}/delete/`,
         {
           method: "DELETE",
           credentials: "include",
@@ -284,7 +284,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       }
 
       const createRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/create/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/create/`,
         { method: "POST", body: formData, credentials: "include" }      );
       const createData = await createRes.json();
 
@@ -295,7 +295,7 @@ const TeamManagement = ({ teamMembers = [], setTeamMembers, theme }) => {
       }
 
       const deleteRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/${markMember.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team/${markMember.id}/delete/`,
         { method: "DELETE" }
       );
       const deleteData = await deleteRes.json();

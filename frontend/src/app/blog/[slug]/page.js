@@ -5,7 +5,7 @@ import { buildImageSrc } from "../../../utils/config";
 async function fetchPost(slug) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${slug}/`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/${slug}/`,
       {
         cache: "no-store",
       }

@@ -19,7 +19,7 @@ export default function GallerySection() {
     const fetchGalleryItems = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/gallery/`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/gallery/`
         );
         console.log("Gallery API response status:", response.status);
         if (response.ok) {
@@ -81,7 +81,7 @@ export default function GallerySection() {
   const handleDownload = (item) => {
     if (item.image) {
       const link = document.createElement("a");
-      link.href = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`;
+      link.href = `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}${item.image}`;
       link.download = item.title || "gallery-item";
       document.body.appendChild(link);
       link.click();

@@ -19,7 +19,7 @@ export default function TeamSection() {
     const fetchTeamMembers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team/`
         );
         const data = await response.json();
 
@@ -62,7 +62,7 @@ export default function TeamSection() {
       const fetchTeamMembers = async () => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team/`
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team/`
           );
           const data = await response.json();
 

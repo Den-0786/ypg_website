@@ -70,7 +70,7 @@ export default function TrashManagement({ theme }) {
       const promises = categories.map(async (category) => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${category}/?deleted=true`
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/${category}/?deleted=true`
           );
           const data = await response.json();
           return {
@@ -117,7 +117,7 @@ export default function TrashManagement({ theme }) {
       // Translate state category to API category where needed
       const apiCategory = category === "media" ? "gallery" : category;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${item.id}/restore/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/${apiCategory}/${item.id}/restore/`,
         {
           method: "POST",
           credentials: "include",
@@ -157,7 +157,7 @@ export default function TrashManagement({ theme }) {
     try {
       const apiCategory = category === "media" ? "gallery" : category;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${item.id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/${apiCategory}/${item.id}/delete/`,
         {
           method: "DELETE",
           credentials: "include",
@@ -203,7 +203,7 @@ export default function TrashManagement({ theme }) {
         const apiCategory = category === "media" ? "gallery" : category;
         if (action === "restore") {
           return fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${id}/restore/`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/${apiCategory}/${id}/restore/`,
             {
               method: "POST",
               credentials: "include",
@@ -212,7 +212,7 @@ export default function TrashManagement({ theme }) {
           );
         } else {
           return fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/${apiCategory}/${id}/delete/`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/${apiCategory}/${id}/delete/`,
             {
               method: "DELETE",
               credentials: "include",

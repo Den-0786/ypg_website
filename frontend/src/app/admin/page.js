@@ -215,7 +215,7 @@ function AdminDashboardInner() {
   const handleLogout = async () => {
     try {
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/logout`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/logout`,
         {
           method: "POST",
           credentials: "include",
@@ -258,7 +258,7 @@ function AdminDashboardInner() {
   useEffect(() => {
     const originalFetch = window.fetch;
     const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
+      process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com";
 
     window.fetch = async (input, init) => {
       const url = typeof input === "string" ? input : input.url;
@@ -465,7 +465,7 @@ function AdminDashboardInner() {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         fetchData(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contact`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contact`,
           (data) => {
             // Transform the data to match dashboard expectations
             const transformedData = data.map((message) => ({
@@ -511,7 +511,7 @@ function AdminDashboardInner() {
       channel.onmessage = (event) => {
         if (event?.data?.type === "registration_created") {
           fetchData(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ministry`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministry`,
             setMinistryRegistrations
           );
         }

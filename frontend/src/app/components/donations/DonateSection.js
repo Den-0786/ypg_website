@@ -63,7 +63,7 @@ export default function DonateSection() {
   const fetchImpactStats = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/impact-statistics/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/impact-statistics/`
       );
       const data = await response.json();
       if (data.success) {
@@ -78,7 +78,7 @@ export default function DonateSection() {
   const processCardPayment = async (donationId) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/process-payment/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/donations/process-payment/`,
         {
           method: "POST",
           headers: {
@@ -128,7 +128,7 @@ export default function DonateSection() {
   const fetchPaymentDetails = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/settings/website`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/website`,
         { cache: "no-store" }
       );
       const data = await response.json();

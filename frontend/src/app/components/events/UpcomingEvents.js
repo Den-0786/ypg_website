@@ -42,7 +42,7 @@ export default function EventSection() {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events?type=upcoming&excludeDeleted=true`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events?type=upcoming&excludeDeleted=true`
         );
         const data = await response.json();
 

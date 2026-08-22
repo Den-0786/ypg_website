@@ -48,7 +48,7 @@ export default function YStoreManagement({ theme }) {
   const fetchStoreItems = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/`
       );
       if (response.ok) {
         const data = await response.json();
@@ -244,7 +244,7 @@ export default function YStoreManagement({ theme }) {
           formDataToSend.append("image", formData.image);
 
           response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${editingItem.id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/item/?id=${editingItem.id}`,
             {
               method: "PUT",
               credentials: "include",
@@ -254,7 +254,7 @@ export default function YStoreManagement({ theme }) {
         } else {
           // If no new image file, use JSON
           response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${editingItem.id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/item/?id=${editingItem.id}`,
             {
               method: "PUT",
               credentials: "include",
@@ -293,7 +293,7 @@ export default function YStoreManagement({ theme }) {
           formDataToSend.append("image", formData.image);
 
           response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/`,
             {
               method: "POST",
               credentials: "include",
@@ -303,7 +303,7 @@ export default function YStoreManagement({ theme }) {
         } else {
           // If no image file, use JSON
           response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/`,
             {
               method: "POST",
               credentials: "include",
@@ -375,7 +375,7 @@ export default function YStoreManagement({ theme }) {
       const newStock = item.isOutOfStock ? 10 : 0; // Set to 10 if out of stock, 0 if in stock
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/item/?id=${id}`,
         {
           method: "PUT",
           credentials: "include",
@@ -407,7 +407,7 @@ export default function YStoreManagement({ theme }) {
       if (!item) return;
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/ystore/item/?id=${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/item/?id=${id}`,
         {
           method: "PUT",
           credentials: "include",

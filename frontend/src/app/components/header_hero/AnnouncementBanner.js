@@ -13,7 +13,7 @@ export default function AnnouncementBanner() {
       try {
         const baseUrl =
           process.env.NEXT_PUBLIC_API_BASE_URL ||
-          "https://ypg-website.onrender.com";
+          "https://api-website.ahinsandistrictypg.com";
         const response = await fetch(`${baseUrl}/api/announcements/`);
         const data = await response.json();
         if (data.success && data.announcements) {

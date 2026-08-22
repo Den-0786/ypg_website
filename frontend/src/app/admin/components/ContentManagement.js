@@ -582,7 +582,7 @@ export default function ContentManagement({
               <div className="aspect-video relative overflow-hidden">
                 {item.image ? (
                   <img
-                    src={item.image.startsWith("http") ? item.image : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${item.image}`}
+                    src={item.image.startsWith("http") ? item.image : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}${item.image}`}
                     alt={item.title}
                     className="w-full h-full object-cover"
                   />

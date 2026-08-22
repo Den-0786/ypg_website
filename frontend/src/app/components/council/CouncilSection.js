@@ -20,7 +20,7 @@ export default function CouncilSection() {
     const fetchCouncilMembers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/council/`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/council/`
         );
 
         if (!response.ok) {

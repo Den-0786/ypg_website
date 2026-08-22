@@ -52,7 +52,7 @@ export default function AdvertisementManagement({ theme }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/admin/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/advertisements/admin/`
       );
       const data = await response.json();
       if (data.success) {
@@ -69,7 +69,7 @@ export default function AdvertisementManagement({ theme }) {
   const handleStatusChange = async (adId, newStatus) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/advertisements/${adId}/update/`,
         {
           method: "PUT",
           credentials: "include",
@@ -135,7 +135,7 @@ export default function AdvertisementManagement({ theme }) {
     if (confirmed) {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${adId}/delete/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/advertisements/${adId}/delete/`,
           {
             method: "DELETE",
             credentials: "include",
@@ -270,7 +270,7 @@ export default function AdvertisementManagement({ theme }) {
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/${selectedAd.id}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/advertisements/${selectedAd.id}/update/`,
         {
           method: "PUT",
           credentials: "include",

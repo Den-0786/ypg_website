@@ -203,7 +203,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
   const [inventory, setInventory] = useState([]);
 
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com";
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com";
     fetch(`${base}/api/contributions/`)
       .then(r => r.json())
       .then(data => { if (data.success) setContributions(data.contributions); })
@@ -454,7 +454,7 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/donations`, {
         method: "POST",
         credentials: "include",
 		  headers: {
@@ -490,8 +490,8 @@ const DonationsManagement = ({ donations = [], setDonations, theme }) => {
   const handleAddRenewals = async () => {
     try {
       const url = editingContribution 
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${editingContribution.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/${editingContribution.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/create/`;
       
       const method = editingContribution ? "PUT" : "POST";
       
@@ -541,8 +541,8 @@ credentials: "include",
   const handleAddOffertory = async () => {
     try {
       const url = editingContribution 
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${editingContribution.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/${editingContribution.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/create/`;
       
       const method = editingContribution ? "PUT" : "POST";
       
@@ -592,8 +592,8 @@ credentials: "include",
   const handleAddContribution = async (resolvedPurpose) => {
     try {
       const url = editingContribRecord
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${editingContribRecord.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/${editingContribRecord.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/create/`;
 
       const method = editingContribRecord ? "PUT" : "POST";
       const amountPaid = parseFloat(contributionData.amount_paid) || 0;
@@ -641,7 +641,7 @@ credentials: "include",
   const handleDeleteContribRecord = async (id) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/${id}/delete/`,
         { method: "DELETE" }
       );
       if (response.ok) {
@@ -658,8 +658,8 @@ credentials: "include",
   const handleAddSales = async () => {
     try {
       const url = editingSale 
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/sales/${editingSale.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/sales/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/sales/${editingSale.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/sales/create/`;
       
       const method = editingSale ? "PUT" : "POST";
       
@@ -709,8 +709,8 @@ credentials: "include",
   const handleAddExpenses = async () => {
     try {
       const url = editingExpense 
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/expenses/${editingExpense.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/expenses/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/expenses/${editingExpense.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/expenses/create/`;
       
       const method = editingExpense ? "PUT" : "POST";
       
@@ -772,7 +772,7 @@ credentials: "include",
   const handleDeleteSale = async (saleId) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/sales/${saleId}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/sales/${saleId}/delete/`,
         { method: "DELETE" }
       );
       
@@ -803,7 +803,7 @@ credentials: "include",
   const handleDeleteExpense = async (expenseId) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/expenses/${expenseId}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/expenses/${expenseId}/delete/`,
         { method: "DELETE" }
       );
       
@@ -845,7 +845,7 @@ credentials: "include",
   const handleDeleteContribution = async (contributionId) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/contributions/${contributionId}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/contributions/${contributionId}/delete/`,
         { method: "DELETE" }
       );
       
@@ -864,7 +864,7 @@ credentials: "include",
   const handleVerifyDonation = async (donation) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/${donation.id}/verify/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/donations/${donation.id}/verify/`,
         {
           method: "POST",
           credentials: "include",
@@ -893,7 +893,7 @@ credentials: "include",
     if (window.confirm("Are you sure you want to delete this donation?")) {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations/${id}/delete/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/donations/${id}/delete/`,
           {
             method: "DELETE",
             credentials: "include",

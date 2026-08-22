@@ -38,7 +38,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
         formData.append("image", newPost.image);
 
         response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/create/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/create/`,
           {
             method: "POST",
             credentials: "include",
@@ -48,7 +48,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
       } else {
         // If no image, use JSON
         response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/create/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/create/`,
           {
             method: "POST",
             credentials: "include",
@@ -98,7 +98,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
     try {
       // Backend expects slug path and JSON body; image updates are not supported here
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${editingPost.slug}/update/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/${editingPost.slug}/update/`,
         {
           method: "PUT",
           credentials: "include",
@@ -143,7 +143,7 @@ const BlogManagement = ({ blogPosts = [], setBlogPosts, theme }) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/${postToDelete.slug}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/${postToDelete.slug}/delete/`,
         {
           method: "DELETE",
           credentials: "include",

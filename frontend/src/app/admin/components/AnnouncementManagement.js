@@ -36,7 +36,7 @@ export default function AnnouncementManagement({ theme }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/announcements/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/announcements/`
       );
       const data = await response.json();
       if (data.success) {
@@ -59,8 +59,8 @@ export default function AnnouncementManagement({ theme }) {
 
     try {
       const url = editingId
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/announcements/${editingId}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/announcements/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/announcements/${editingId}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/announcements/create/`;
 
       const response = await fetch(url, {
         method: editingId ? "PUT" : "POST",
@@ -125,7 +125,7 @@ credentials: "include",
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/announcements/${id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/announcements/${id}/delete/`,
         { method: "DELETE" }
       );
       const data = await response.json();

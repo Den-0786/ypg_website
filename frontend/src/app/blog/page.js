@@ -5,7 +5,7 @@ import Link from "next/link";
 async function fetchBlogPosts() {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/blog/?forWebsite=true`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/blog/?forWebsite=true`,
       {
         cache: "no-store",
       }

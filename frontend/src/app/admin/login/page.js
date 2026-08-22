@@ -45,13 +45,29 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
+      // A still-valid session makes the backend CSRF-check the login POST,
+      // so fetch a fresh csrftoken cookie first and send it along.
+      let csrfToken = "";
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/csrf/`,
+          { method: "GET", credentials: "include" }
+        );
+        csrfToken =
+          document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("csrftoken="))
+            ?.split("=")[1] || "";
+      } catch (_) {}
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/login/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/login/`,
         {
           method: "POST",
           credentials: 'include', // Include cookies for session authentication
           headers: {
             "Content-Type": "application/json",
+            ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
           },
           body: JSON.stringify(credentials),
         }

@@ -42,7 +42,7 @@ export default function AdvertisementSection() {
   const fetchAdvertisements = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/advertisements/`
       );
       const data = await response.json();
       if (data.success) {

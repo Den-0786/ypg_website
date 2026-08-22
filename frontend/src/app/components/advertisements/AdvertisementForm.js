@@ -185,7 +185,7 @@ export default function AdvertisementForm({ isOpen, onClose, onSubmit }) {
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/advertisements/create/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/advertisements/create/`,
         {
           method: "POST",
           body: formDataToSend,

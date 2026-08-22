@@ -31,7 +31,7 @@ export default function Footer() {
     const loadSocialMediaLinks = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/social-media/`
         );
         const data = await response.json();
         if (data.success) {
@@ -368,7 +368,7 @@ export default function Footer() {
                     >
                       {link.icon_file ? (
                         <img
-                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${link.icon_file}`}
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}${link.icon_file}`}
                           alt={link.display_name}
                           className="w-5 h-5 object-contain"
                         />

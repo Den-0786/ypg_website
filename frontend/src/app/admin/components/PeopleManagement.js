@@ -82,7 +82,7 @@ export default function PeopleManagement({
         formData.append("image", newTeamMember.image);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team`, {
         method: "POST",
         credentials: "include",
 		  body: formData,
@@ -123,7 +123,7 @@ export default function PeopleManagement({
         formData.append("image", newTeamMember.image);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/team`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/team`, {
         method: "PUT",
         credentials: "include",
 		  body: formData,

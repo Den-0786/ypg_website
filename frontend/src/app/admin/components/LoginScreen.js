@@ -17,7 +17,7 @@ const LoginScreen = ({ onLogin }) => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/auth/login/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/login/`,
         {
           method: "POST",
           credentials: 'include', // Include cookies for session authentication

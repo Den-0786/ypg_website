@@ -20,7 +20,7 @@ export default function PastEvents() {
     const fetchPastEvents = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/events?type=past&excludeDeleted=true`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events?type=past&excludeDeleted=true`
         );
         const data = await response.json();
 

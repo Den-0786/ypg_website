@@ -36,7 +36,7 @@ export default function SocialMediaManagement() {
   const fetchSocialMediaLinks = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/admin/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/social-media/admin/`,
         { credentials: "include" }
       );
       const data = await response.json();
@@ -54,8 +54,8 @@ export default function SocialMediaManagement() {
     e.preventDefault();
     try {
       const url = editingLink
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/${editingLink.id}/update/`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/create/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/social-media/${editingLink.id}/update/`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/social-media/create/`;
       
       const method = editingLink ? "PUT" : "POST";
       
@@ -108,7 +108,7 @@ export default function SocialMediaManagement() {
     
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/social-media/${id}/delete/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/social-media/${id}/delete/`,
         { method: "DELETE", credentials: "include" }
       );
       const data = await response.json();
@@ -171,7 +171,7 @@ export default function SocialMediaManagement() {
                 <div className="p-3 bg-blue-50 rounded-lg">
                   {link.icon_file ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}${link.icon_file}`}
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}${link.icon_file}`}
                       alt={link.display_name}
                       className="w-6 h-6 object-contain"
                     />

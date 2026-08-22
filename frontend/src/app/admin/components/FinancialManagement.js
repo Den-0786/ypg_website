@@ -108,7 +108,7 @@ credentials: "include",
   // Handle deleting a donation
   const handleDeleteDonation = async (id) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/donations?id=${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/donations?id=${id}`, {
         method: 'DELETE',
         credentials: "include",
       });

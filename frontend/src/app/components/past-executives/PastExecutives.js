@@ -33,7 +33,7 @@ export default function PastExecutives() {
   const fetchPastExecutives = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://ypg-website.onrender.com"}/api/past-executives/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/past-executives/`
       );
       const data = await response.json();
       if (data.success) {
