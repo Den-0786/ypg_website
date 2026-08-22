@@ -240,7 +240,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'resend'
 EMAIL_HOST_PASSWORD = os.getenv('RESEND_API_KEY')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'District YPG <noreply@ahinsandistrictypg.com>')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Ahinsan District YPG <noreply@ahinsandistrictypg.com>')
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'support@ahinsandistrictypg.com')
+SUPPORT_EMAIL = os.getenv('SUPPORT_EMAIL', 'support@ahinsandistrictypg.com')
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'ahinsandistrictypg@gmail.com')
 
 ARKESEL_API_KEY = os.getenv('ARKESEL_API_KEY')

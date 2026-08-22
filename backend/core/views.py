@@ -24,7 +24,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
+from django.contrib import messages
+import logging
+
+logger = logging.getLogger(__name__)
 from django.conf import settings
 import re
 from datetime import datetime, timedelta
@@ -1675,19 +1679,53 @@ def api_contact_messages(request):
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def _contact_category(subject):
+    s = (subject or '').lower()
+    if 'donat' in s or 'offering' in s or 'pledge' in s:
+        return 'Donation Inquiry'
+    if 'member' in s or 'join' in s or 'register' in s:
+        return 'Membership Inquiry'
+    return 'General Inquiry'
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_submit_contact(request):
-    """Submit a contact message"""
+    """Submit a contact message and forward it to the support inbox"""
     try:
         data = json.loads(request.body)
         serializer = ContactMessageSerializer(data=data)
         
         if serializer.is_valid():
             message = serializer.save()
+            category = _contact_category(message.subject)
+            email_sent = True
+            try:
+                body = (
+                    f"You have a new {category.lower()} from the website contact form.\n\n"
+                    f"Name: {message.name}\n"
+                    f"Email: {message.email}\n"
+                    f"Category: {category}\n"
+                    f"Subject: {message.subject}\n\n"
+                    f"Message:\n{message.message}\n\n"
+                    f"Received: {timezone.localtime(message.created_at).strftime('%d %b %Y, %I:%M %p')}"
+                )
+                email = EmailMessage(
+                    subject=f"[Website Contact] {category}: {message.subject}",
+                    body=body,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[settings.SUPPORT_EMAIL],
+                    reply_to=[message.email],
+                )
+                email.send(fail_silently=False)
+                messages.success(request, f"{category} from {message.name} forwarded to support.")
+            except Exception as mail_error:
+                email_sent = False
+                logger.error("Contact notification failed for message %s: %s", message.id, mail_error)
+                messages.error(request, "Message saved but support notification failed.")
             return Response({
                 'success': True,
+                'email_sent': email_sent,
                 'message': 'Contact message submitted successfully',
                 'message_id': message.id
             }, status=status.HTTP_201_CREATED)

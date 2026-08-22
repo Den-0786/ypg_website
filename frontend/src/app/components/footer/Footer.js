@@ -50,9 +50,9 @@ export default function Footer() {
   }, []);
 
   const phoneNumber = siteSettings?.phoneNumber || "";
-  const contactEmail = siteSettings?.contactEmail || "";
   const locationAddress = siteSettings?.address || "";
   const cleanPhone = phoneNumber.replace(/\D/g, "");
+  const SUPPORT_EMAIL = "support@ahinsandistrictypg.com";
 
   // Enhanced Tooltip component
   const Tooltip = ({ children, content, position = "top" }) => {
@@ -304,10 +304,28 @@ export default function Footer() {
                 <div>
                   <p className="font-medium">Email Us</p>
                   <a
-                    href={`mailto:${contactEmail}`}
+                    href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
+                      "Ahinsan District YPG - Website Inquiry"
+                    )}`}
                     className="hover:text-gold-300 transition"
                   >
-                    {contactEmail}
+                    {SUPPORT_EMAIL}
+                  </a>
+                  <a
+                    href="#contact"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const el = document.querySelector("#contact");
+                      if (el) {
+                        window.scrollTo({
+                          top: el.offsetTop - 80,
+                          behavior: "smooth",
+                        });
+                      }
+                    }}
+                    className="block mt-1 text-sm text-blue-100/80 hover:text-gold-300 transition"
+                  >
+                    Or use our contact form &rarr;
                   </a>
                 </div>
               </li>
