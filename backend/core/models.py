@@ -658,7 +658,7 @@ class WebsiteSettings(models.Model):
         """Get or create the singleton instance"""
         instance, created = cls.objects.get_or_create(pk=1)
         return instance
-    
+
     def to_dict(self):
         """Convert model instance to dictionary for API responses"""
         return {
@@ -687,3 +687,35 @@ class WebsiteSettings(models.Model):
             'theme': self.theme,
             'maintenanceMode': self.maintenance_mode,
         }
+
+
+class PasswordChangeOTP(models.Model):
+    """One-time SMS code required before a password/credential change is applied."""
+    PURPOSE_CHOICES = [
+        ('password_change', 'Password Change'),
+        ('password_reset', 'Password Reset'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='otp_codes'
+    )
+    identifier = models.CharField(max_length=150, blank=True, default='')
+    code_hash = models.CharField(max_length=64)
+    purpose = models.CharField(max_length=30, choices=PURPOSE_CHOICES, default='password_change')
+    attempts = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP for {self.identifier or self.user_id} ({self.purpose})"
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at

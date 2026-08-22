@@ -29,6 +29,7 @@ from django.conf import settings
 import re
 from datetime import datetime, timedelta
 from .models import Supervisor
+from .otp import issue_otp, verify_otp, masked_recipient
 from .models import (
     Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
@@ -411,6 +412,7 @@ def api_supervisor_change_credentials(request):
         current_password = data.get('currentPassword')
         new_username = data.get('newUsername')
         new_password = data.get('newPassword')
+        otp_code = data.get('otp_code')
         
         if not current_password:
             return Response({
@@ -424,6 +426,16 @@ def api_supervisor_change_credentials(request):
                 'success': False,
                 'error': 'Current password is incorrect'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Require SMS OTP verification before applying the change
+        is_valid, error_message = verify_otp(
+            supervisor.user.username, otp_code, purpose='password_change'
+        )
+        if not is_valid:
+            return Response({
+                'success': False,
+                'error': error_message
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Update username if provided
         if new_username and new_username.strip():
@@ -453,6 +465,62 @@ def api_supervisor_change_credentials(request):
             }
         })
         
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_request_password_change_otp(request):
+    """Sends an SMS OTP to the configured district phone number.
+
+    Accepts either a session cookie or a Bearer session_token header,
+    mirroring the auth resolution in api_supervisor_change_credentials.
+    """
+    try:
+        if not request.user.is_authenticated:
+            auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+            session_token = None
+            if auth_header.startswith('Bearer '):
+                session_token = auth_header.split(' ')[1]
+
+            if session_token:
+                try:
+                    supervisor = Supervisor.objects.get(session_token=session_token)
+                    login(request, supervisor.user)
+                    request.user = supervisor.user
+                except Supervisor.DoesNotExist:
+                    pass
+
+        if not request.user.is_authenticated:
+            return Response({
+                'success': False,
+                'error': 'Authentication required'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            supervisor = Supervisor.objects.get(user=request.user)
+        except Supervisor.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Supervisor access required'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        ok, error_message = issue_otp(supervisor.user.username, user=supervisor.user)
+        if not ok:
+            return Response({
+                'success': False,
+                'error': error_message
+            }, status=429 if 'wait' in (error_message or '') else 500)
+
+        return Response({
+            'success': True,
+            'message': f'A verification code was sent via SMS to {masked_recipient()}'
+        })
+
     except Exception as e:
         return Response({
             'success': False,

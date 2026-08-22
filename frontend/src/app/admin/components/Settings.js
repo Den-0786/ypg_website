@@ -316,6 +316,10 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     requirePinForActions: true,
   });
 
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+
   const [currentCredentials, setCurrentCredentials] = useState({
     username: "",
     hasPassword: false,
@@ -392,6 +396,10 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
   const validateSecurity = () => {
     const errors = {};
 
+    if (!/^\d{6}$/.test(otpCode)) {
+      errors.otpCode = "Enter the 6-digit SMS verification code";
+    }
+
     if (securityMethod === "password") {
       if (security.newPassword && !validatePassword(security.newPassword)) {
         errors.newPassword = "Password must be at least 8 characters long";
@@ -442,6 +450,37 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
     }
 
     return errors;
+  };
+
+  const handleSendOtp = async () => {
+    setOtpLoading(true);
+    try {
+      const sessionToken = localStorage.getItem("ypg_admin_session_token");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/auth/password-otp/request`, {
+        method: "POST",
+        credentials: 'include', // Include cookies for session authentication
+        headers: {
+          "Content-Type": "application/json",
+          ...(sessionToken && { "Authorization": `Bearer ${sessionToken}` }),
+        },
+      });
+      const result = await response.json();
+      if (!response.ok || result.success === false) {
+        throw new Error(result.error || result.message || "Failed to send verification code");
+      }
+      setOtpSent(true);
+      setSaveStatus({
+        type: "success",
+        message: result.message || "Verification code sent",
+      });
+    } catch (error) {
+      setSaveStatus({
+        type: "error",
+        message: error.message || "Failed to send verification code",
+      });
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   const handleSave = async (section) => {
@@ -504,6 +543,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
               currentPassword: security.currentPassword,
               newUsername: security.newUsername,
               newPassword: security.newPassword,
+              otp_code: otpCode,
             }),
           });
           break;
@@ -571,6 +611,11 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
           result.message ||
           `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully!`,
       });
+
+      if (section === "security") {
+        setOtpCode("");
+        setOtpSent(false);
+      }
 
       // Add history entry based on section
       switch (section) {
@@ -1413,6 +1458,43 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                           {getFieldError("confirmPassword")}
                         </p>
                       )}
+                    </div>
+                    <div>
+                      <label className="block text-xs sm:text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        SMS Verification Code
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={otpCode}
+                          onChange={(e) =>
+                            setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                          }
+                          className={getInputClassName("otpCode")}
+                          placeholder="6-digit code"
+                          maxLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleSendOtp}
+                          disabled={otpLoading}
+                          className={`px-3 py-2 whitespace-nowrap rounded-lg text-xs font-medium text-white transition ${
+                            otpSent
+                              ? "bg-green-600 hover:bg-green-700"
+                              : "bg-gold-500 hover:bg-gold-600"
+                          } disabled:opacity-50`}
+                        >
+                          {otpLoading ? "Sending..." : otpSent ? "Resend Code" : "Send Code"}
+                        </button>
+                      </div>
+                      {getFieldError("otpCode") && (
+                        <p className="mt-1 text-xs text-red-600">
+                          {getFieldError("otpCode")}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        A 6-digit code will be sent to the registered district phone.
+                      </p>
                     </div>
                     <button
                       onClick={() => handleSave("security")}
