@@ -478,6 +478,127 @@ def api_supervisor_change_credentials(request):
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
+def api_forgot_password(request):
+    """Emails a password reset link to the supervisor's registered address."""
+    try:
+        email = (request.data.get('email') or '').strip().lower()
+        if not email:
+            return Response({
+                'success': False,
+                'error': 'Email is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+
+        supervisor = Supervisor.objects.filter(user__email__iexact=email).select_related('user').first()
+
+        # Generic response so attackers can't probe which emails exist.
+        if not supervisor:
+            return Response({
+                'success': True,
+                'message': 'If that email is registered, a reset link has been sent'
+            })
+
+        uid = urlsafe_base64_encode(force_bytes(supervisor.user.pk))
+        token = default_token_generator.make_token(supervisor.user)
+        frontend_url = (getattr(settings, 'FRONTEND_URL', '') or 'https://ahinsandistrictypg.com').rstrip('/')
+        reset_link = f"{frontend_url}/admin/reset-password/{uid}/{token}"
+
+        recipient = supervisor.user.email or (getattr(settings, 'ADMIN_EMAIL', '') or settings.SUPPORT_EMAIL)
+        try:
+            send_mail(
+                'Reset your YPG website password',
+                'We received a request to reset your Ahinsan District YPG website password.\n\n'
+                f'Click the link below to set a new password:\n{reset_link}\n\n'
+                'This link expires shortly and can be used only once.\n'
+                'If you did not request this, you can safely ignore this email.\n\n'
+                '— Ahinsan District YPG Website',
+                settings.DEFAULT_FROM_EMAIL,
+                [recipient],
+                fail_silently=False,
+            )
+        except Exception:
+            logger.exception("Failed to send website reset email")
+            return Response({
+                'success': False,
+                'error': 'Could not send reset email. Please try again later.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        masked = recipient[:2] + '***' + recipient[recipient.find('@'):] if '@' in recipient else recipient
+        return Response({
+            'success': True,
+            'message': f'Reset link sent to {masked}'
+        })
+
+    except Exception as e:
+        logger.exception("Website forgot-password error")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_reset_password_confirm(request):
+    """Completes an emailed password reset: uid + token + new password."""
+    try:
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_decode
+        from django.utils.encoding import force_str
+
+        uid_b64 = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+
+        if not uid_b64 or not token or not new_password:
+            return Response({
+                'success': False,
+                'error': 'Invalid reset link'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(new_password) < 8:
+            return Response({
+                'success': False,
+                'error': 'Password must be at least 8 characters long'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid_b64))
+            user = User.objects.get(pk=user_id)
+            Supervisor.objects.get(user=user)
+        except (User.DoesNotExist, Supervisor.DoesNotExist, ValueError, TypeError, OverflowError):
+            return Response({
+                'success': False,
+                'error': 'Invalid reset link'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({
+                'success': False,
+                'error': 'This reset link is invalid or has expired. Please request a new one.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({
+            'success': True,
+            'message': 'Password reset successfully. You can now log in with your new password.'
+        })
+
+    except Exception as e:
+        logger.exception("Website reset-password-confirm error")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def api_request_password_change_otp(request):
     """Sends an SMS OTP to the configured district phone number.
 

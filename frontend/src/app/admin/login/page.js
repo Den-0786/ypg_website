@@ -2,6 +2,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -223,6 +224,15 @@ export default function AdminLogin() {
                 )}
               </button>
             </form>
+
+            <div className="mt-4 text-center">
+              <Link
+                href="/admin/forgot-password"
+                className="text-sm font-medium text-gray-500 hover:text-gold-500 transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 text-center">
               <a
