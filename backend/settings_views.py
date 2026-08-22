@@ -1,15 +1,41 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 import json
 from pathlib import Path
-from core.models import ProfileSettings, WebsiteSettings
+from core.models import ProfileSettings, WebsiteSettings, Supervisor
 
 BASE_DIR = Path(__file__).resolve().parent
 SETTINGS_FILE = BASE_DIR / 'site_settings.json'
 PROFILE_FILE = BASE_DIR / 'profile_settings.json'
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    """Session auth that skips CSRF enforcement, matching core.views pattern."""
+
+    def enforce_csrf(self, request):
+        return
+
+
+def authenticate_request(request):
+    """Authenticate via session cookie or Bearer Supervisor session_token."""
+    if request.user.is_authenticated:
+        return True
+    auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+    if auth_header.startswith('Bearer '):
+        session_token = auth_header.split(' ')[1]
+        try:
+            supervisor = Supervisor.objects.get(session_token=session_token)
+            from django.contrib.auth import login
+            login(request, supervisor.user)
+            request.user = supervisor.user
+            return True
+        except Supervisor.DoesNotExist:
+            pass
+    return False
 
 DEFAULT_PROFILE = {
     'fullName': '',
@@ -190,9 +216,10 @@ def save_profile_settings(settings):
 @csrf_exempt
 @api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
+@authentication_classes([CsrfExemptSessionAuthentication])
 def api_settings_profile(request):
     """Get or update admin profile settings"""
-    if not request.user.is_authenticated:
+    if not authenticate_request(request):
         return Response({'success': False, 'error': 'Authentication required'}, status=401)
     try:
         if request.method == 'GET':
@@ -206,11 +233,6 @@ def api_settings_profile(request):
             response['Expires'] = '0'
             return response
         elif request.method == 'PUT':
-            if not request.user.is_authenticated:
-                return Response({
-                    'success': False,
-                    'error': 'Authentication required'
-                }, status=status.HTTP_401_UNAUTHORIZED)
             data = json.loads(request.body)
             current = load_profile_settings()
             current.update(data)
@@ -237,6 +259,7 @@ def api_settings_profile(request):
 @csrf_exempt
 @api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
+@authentication_classes([CsrfExemptSessionAuthentication])
 def api_settings_website(request):
     """Get or update website settings"""
     try:
@@ -251,7 +274,7 @@ def api_settings_website(request):
             response['Expires'] = '0'
             return response
         elif request.method == 'PUT':
-            if not request.user.is_authenticated:
+            if not authenticate_request(request):
                 return Response({
                     'success': False,
                     'error': 'Authentication required'

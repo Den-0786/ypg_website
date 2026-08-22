@@ -352,8 +352,6 @@ def api_supervisor_status(request):
 @api_view(['GET', 'PUT'])
 @permission_classes([AllowAny])
 def api_supervisor_change_credentials(request):
-    if not request.user.is_authenticated:
-        return Response({'success': False, 'error': 'Authentication required'}, status=401)
     """Get or change supervisor credentials"""
     try:
         # Debug: Check if there are any users and supervisors in the database

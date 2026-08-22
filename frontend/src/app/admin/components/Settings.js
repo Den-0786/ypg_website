@@ -190,7 +190,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/settings/profile`,
-          { cache: "no-store" }
+          { cache: "no-store", credentials: "include" }
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
