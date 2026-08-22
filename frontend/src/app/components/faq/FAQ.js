@@ -55,7 +55,7 @@ export default function FAQ() {
     {
       question: "How can I contact the YPG?",
       answer:
-        "You can contact us through our website, email us at ahinsandistrictypg@gmail.com, call us at +233 531427671, or visit us at PCG Emmanuel Congregation in Ahinsan, Kumasi. You can also reach out to your local congregation's YPG president.",
+        "You can contact us through our website, email us at ypgahinsandistrict@gmail.com, call us at +233 531427671, or visit us at PCG Emmanuel Congregation in Ahinsan, Kumasi. You can also reach out to your local congregation's YPG president.",
     },
     {
       question: "Do you have online activities?",
@@ -170,7 +170,7 @@ export default function FAQ() {
                   </p>
                   <div className="flex gap-4 justify-center">
                     <a
-                      href="mailto:ahinsandistrictypg@gmail.com"
+                      href="mailto:ypgahinsandistrict@gmail.com"
                       className="px-6 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition"
                     >
                       Email Us

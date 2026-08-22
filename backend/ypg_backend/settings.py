@@ -243,7 +243,7 @@ EMAIL_HOST_PASSWORD = os.getenv('RESEND_API_KEY')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Ahinsan District YPG <noreply@ahinsandistrictypg.com>')
 SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'support@ahinsandistrictypg.com')
 SUPPORT_EMAIL = os.getenv('SUPPORT_EMAIL', 'support@ahinsandistrictypg.com')
-ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'ahinsandistrictypg@gmail.com')
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'ypgahinsandistrict@gmail.com')
 
 ARKESEL_API_KEY = os.getenv('ARKESEL_API_KEY')
 SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', 'DistYPG')

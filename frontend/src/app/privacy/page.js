@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
                 contact us at:
               </p>
               <p className="text-navy-950 mt-2">
-                Email: ahinsandistrictypg@gmail.com
+                Email: ypgahinsandistrict@gmail.com
                 <br />
                 Phone: +233 531427671
                 <br />

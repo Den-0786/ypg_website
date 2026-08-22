@@ -87,7 +87,7 @@ export default function TermsOfService() {
                 If you have any questions about these Terms of Service, please contact us at:
               </p>
               <p className="text-navy-950 mt-2">
-                Email: ahinsandistrictypg@gmail.com<br />
+                Email: ypgahinsandistrict@gmail.com<br />
                 Phone: +233 531427671<br />
                 Address: PCG, Emmanuel Congregation Ahinsan - Kumasi P.O Box AH 8224
               </p>

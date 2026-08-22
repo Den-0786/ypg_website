@@ -176,7 +176,7 @@ export default function Sitemap() {
                   Contact Information
                 </h3>
                 <ul className="space-y-2 text-purple-700">
-                  <li>Email: ahinsandistrictypg@gmail.com</li>
+                  <li>Email: ypgahinsandistrict@gmail.com</li>
                   <li>Phone: +233 531427671</li>
                   <li>Address: PCG, Emmanuel Congregation Ahinsan - Kumasi P.O Box AH 8224 </li>
                 </ul>
