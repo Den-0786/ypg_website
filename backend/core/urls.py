@@ -12,6 +12,7 @@ from .finance_views import (
 
 urlpatterns = [
     # Authentication API endpoints
+    path('api/auth/csrf/', views.api_get_csrf_token, name='api_get_csrf_token'),
     path('api/auth/login/', views.api_supervisor_login, name='api_supervisor_login'),
     path('api/auth/login', views.api_supervisor_login, name='api_supervisor_login_no_slash'),
     path('api/auth/logout/', views.api_supervisor_logout, name='api_supervisor_logout'),

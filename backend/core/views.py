@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie, get_token
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -175,6 +175,20 @@ def validate_donation_data(data):
 
 # Authentication API endpoints
 @csrf_exempt
+@ensure_csrf_cookie
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_get_csrf_token(request):
+    """Sets the csrftoken cookie so the login page can send X-CSRFToken.
+
+    Needed because a browser holding a still-valid session gets CSRF-checked
+    even on the login endpoint, which would otherwise reject with
+    'CSRF token missing'.
+    """
+    get_token(request)
+    return JsonResponse({'success': True})
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @rate_limit(max_requests=8, window_seconds=300)
