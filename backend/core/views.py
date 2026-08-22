@@ -1,7 +1,20 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    """Session auth that skips CSRF enforcement.
+
+    The login endpoint needs this: a browser returning with a still-valid
+    session gets CSRF-checked by DRF before credentials are even evaluated,
+    which made re-login impossible.
+    """
+
+    def enforce_csrf(self, request):
+        return
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie, get_token
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
@@ -191,6 +204,7 @@ def api_get_csrf_token(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @rate_limit(max_requests=8, window_seconds=300)
 def api_supervisor_login(request):
     """Supervisor login endpoint"""
