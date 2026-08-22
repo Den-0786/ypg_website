@@ -139,7 +139,7 @@ YPG Donation System
             )
             
             # Send to admin (you can configure admin email in settings)
-            admin_email = getattr(settings, 'ADMIN_EMAIL', 'admin@ypg.com')
+            admin_email = getattr(settings, 'ADMIN_EMAIL', 'ahinsandistrictypg@gmail.com')
             send_mail(
                 admin_subject,
                 admin_message,
