@@ -136,6 +136,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
         if (result.success && result.event) {
           const eventsResponse = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/events/`
+            , { credentials: "include" }
           );
           if (eventsResponse.ok) {
             const eventsData = await eventsResponse.json();

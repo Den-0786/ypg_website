@@ -71,6 +71,7 @@ export default function TrashManagement({ theme }) {
         try {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/${category}/?deleted=true`
+            , { credentials: "include" }
           );
           const data = await response.json();
           return {

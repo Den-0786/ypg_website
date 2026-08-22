@@ -49,6 +49,7 @@ export default function YStoreManagement({ theme }) {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ystore/`
+        , { credentials: "include" }
       );
       if (response.ok) {
         const data = await response.json();

@@ -262,7 +262,17 @@ function AdminDashboardInner() {
 
     window.fetch = async (input, init) => {
       const url = typeof input === "string" ? input : input.url;
-      const method = (init?.method || "GET").toUpperCase();
+
+      // All admin API calls must carry the session cookie.
+      let options = init;
+      if (url.startsWith(baseUrl)) {
+        options = { credentials: "include", ...(init || {}) };
+      }
+      const method = (
+        options?.method ||
+        (typeof input === "object" ? input.method : "GET") ||
+        "GET"
+      ).toUpperCase();
 
       if (
         ["POST", "PUT", "DELETE", "PATCH"].includes(method) &&
@@ -279,7 +289,7 @@ function AdminDashboardInner() {
         ];
         if (!excluded.some((e) => url.includes(e))) {
           const storedPin = localStorage.getItem("ypg_admin_pin");
-          const action = describeAction(url, method, init?.body);
+          const action = describeAction(url, method, options?.body);
           if (storedPin) {
             return new Promise((resolve, reject) => {
               setPinGuard({
@@ -287,7 +297,7 @@ function AdminDashboardInner() {
                 action,
                 onConfirm: () => {
                   setPinGuard((prev) => ({ ...prev, open: false }));
-                  originalFetch(input, init)
+                  originalFetch(input, options)
                     .then((res) => {
                       addAuditLog(action);
                       resolve(res);
@@ -301,7 +311,7 @@ function AdminDashboardInner() {
               });
             });
           }
-          const res = await originalFetch(input, init);
+          const res = await originalFetch(input, options);
           addAuditLog(action);
           return res;
         }
@@ -379,7 +389,7 @@ function AdminDashboardInner() {
 
   const fetchData = async (endpoint, setter) => {
     try {
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, { credentials: "include" });
 
       if (response.ok) {
         const data = await response.json();

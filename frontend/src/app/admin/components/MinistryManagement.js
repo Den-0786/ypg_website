@@ -65,6 +65,7 @@ const MinistryManagement = ({
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/ministries/`
+          , { credentials: "include" }
         );
         const data = await res.json();
         if (data.success && Array.isArray(data.ministries)) {
