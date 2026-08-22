@@ -147,6 +147,9 @@ export default function AdminLogin() {
                 </label>
                 <input
                   type="text"
+                  id="username"
+                  name="username"
+                  autoComplete="username"
                   value={credentials.username}
                   onChange={(e) =>
                     setCredentials({ ...credentials, username: e.target.value })
@@ -164,6 +167,9 @@ export default function AdminLogin() {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    autoComplete="current-password"
                     value={credentials.password}
                     onChange={(e) =>
                       setCredentials({ ...credentials, password: e.target.value })
