@@ -6,9 +6,20 @@
   "description": "Presbyterian Young People's Guild - Ahinsan District",
   "socialMedia": {
     "facebook": "",
-    "twitter": "",
     "instagram": "",
-    "youtube": ""
+    "twitter": "",
+    "youtube": "",
+    "linkedin": ""
+  },
+  "appearance": {
+    "language": "English",
+    "borderRadius": "medium"
+  },
+  "paymentDetails": {
+    "momoNumber": "0244123456",
+    "momoName": "YPG",
+    "bankAccountNumber": "",
+    "bankAccountName": ""
   },
   "theme": "light",
   "maintenanceMode": false
