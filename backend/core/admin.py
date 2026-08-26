@@ -7,9 +7,9 @@ from .models import (
 
 @admin.register(Supervisor)
 class SupervisorAdmin(admin.ModelAdmin):
-    list_display = ['user', 'is_supervisor', 'last_login_ip', 'created_at', 'updated_at']
+    list_display = ['user', 'is_supervisor', 'phone_number', 'email', 'last_login_ip', 'created_at', 'updated_at']
     list_filter = ['is_supervisor', 'created_at']
-    search_fields = ['user__username', 'user__email']
+    search_fields = ['user__username', 'user__email', 'phone_number', 'email']
     readonly_fields = ['session_token', 'created_at', 'updated_at']
 
 @admin.register(Event)

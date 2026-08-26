@@ -11,6 +11,8 @@ class Supervisor(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='supervisor_profile')
     is_supervisor = models.BooleanField(default=True)
+    phone_number = models.CharField(max_length=20, blank=True, default='')
+    email = models.EmailField(blank=True, default='')
     last_login_ip = models.GenericIPAddressField(null=True, blank=True)
     session_token = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

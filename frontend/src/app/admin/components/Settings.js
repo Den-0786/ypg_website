@@ -1496,7 +1496,7 @@ export default function SettingsComponent({ onClose, theme, setTheme }) {
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mt-1">
-                        A 6-digit code will be sent to the registered district phone.
+                        A 6-digit code will be sent to your registered phone number.
                       </p>
                     </div>
                     <button

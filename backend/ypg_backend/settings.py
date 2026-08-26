@@ -247,4 +247,4 @@ ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'ypgahinsandistrict@gmail.com')
 
 ARKESEL_API_KEY = os.getenv('ARKESEL_API_KEY')
 SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', 'DistYPG')
-OTP_RECIPIENT = os.getenv('OTP_RECIPIENT', '0245660786')
+OTP_RECIPIENT = os.getenv('OTP_RECIPIENT', '')

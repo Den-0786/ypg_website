@@ -33,7 +33,7 @@ from django.conf import settings
 import re
 from datetime import datetime, timedelta
 from .models import Supervisor
-from .otp import issue_otp, verify_otp, masked_recipient
+from .otp import issue_otp, verify_otp, masked_number
 from .models import (
     Event, TeamMember, Donation,
     ContactMessage, MinistryRegistration, BlogPost,
@@ -598,12 +598,23 @@ def api_reset_password_confirm(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_request_password_change_otp(request):
-    """Sends an SMS OTP to the configured district phone number.
+    """Sends an SMS OTP to the admin's phone number.
 
     Accepts either a session cookie or a Bearer session_token header,
     mirroring the auth resolution in api_supervisor_change_credentials.
     """
     try:
+        # Rate limit: max 5 OTP requests per IP per 10 minutes
+        from django.core.cache import cache
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
+        cache_key = f'otp_rate_{ip}'
+        otp_count = cache.get(cache_key, 0)
+        if otp_count >= 5:
+            return Response({
+                'success': False,
+                'error': 'Too many OTP requests. Please try again later.'
+            }, status=429)
+        cache.set(cache_key, otp_count + 1, 600)  # 10 minutes
         if not request.user.is_authenticated:
             auth_header = request.META.get('HTTP_AUTHORIZATION', '')
             session_token = None
@@ -632,16 +643,17 @@ def api_request_password_change_otp(request):
                 'error': 'Supervisor access required'
             }, status=status.HTTP_403_FORBIDDEN)
 
-        ok, error_message = issue_otp(supervisor.user.username, user=supervisor.user)
+        ok, error_message = issue_otp(supervisor.user.username, user=supervisor.user, phone=supervisor.phone_number or '')
         if not ok:
             return Response({
                 'success': False,
                 'error': error_message
             }, status=429 if 'wait' in (error_message or '') else 500)
 
+        masked = masked_number(supervisor.phone_number or '')
         return Response({
             'success': True,
-            'message': f'A verification code was sent via SMS to {masked_recipient()}'
+            'message': f'A verification code was sent via SMS to {masked}'
         })
 
     except Exception as e:

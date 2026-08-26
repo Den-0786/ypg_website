@@ -186,6 +186,21 @@ def save_profile_settings(settings):
         profile.avatar = settings.get('avatar', profile.avatar)
         
         profile.save()
+
+        # Also sync phone/email to the Supervisor model for OTP delivery
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            user = User.objects.filter(is_superuser=True).first()
+            if user and hasattr(user, 'supervisor_profile'):
+                sup = user.supervisor_profile
+                if settings.get('phone'):
+                    sup.phone_number = settings['phone']
+                if settings.get('email'):
+                    sup.email = settings['email']
+                sup.save(update_fields=['phone_number', 'email'])
+        except Exception:
+            pass
         
         # Also save to JSON file as backup
         import os
