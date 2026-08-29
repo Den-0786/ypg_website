@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { buildImageSrc } from "../../../utils/config";
 import {
   Calendar,
@@ -403,20 +404,21 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
       </div>
 
       {/* Add Event Modal */}
-      <AnimatePresence>
-        {showAddModal && (
+      {createPortal(
+        <AnimatePresence>
+          {showAddModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-start sm:items-center justify-center z-[100] p-4 overflow-y-auto"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className={`${theme === "dark" ? "bg-gray-800/95 border-gray-600" : "bg-white/95 border-gray-200"} rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] border backdrop-blur-sm overflow-hidden flex flex-col`}
+              className={`${theme === "dark" ? "bg-gray-800/95 border-gray-600" : "bg-white/95 border-gray-200"} rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] border backdrop-blur-sm overflow-hidden flex flex-col my-auto`}
             >
               {/* Header with gradient */}
               <div
@@ -795,16 +797,19 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Edit Event Modal */}
-      <AnimatePresence>
-        {editingEvent && (
+      {createPortal(
+        <AnimatePresence>
+          {editingEvent && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -1090,16 +1095,19 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
+      {createPortal(
+        <AnimatePresence>
         {showDeleteModal && eventToDelete && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[100]"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -1172,7 +1180,9 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };
