@@ -416,7 +416,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className={`${theme === "dark" ? "bg-gray-800/95 border-gray-600" : "bg-white/95 border-gray-200"} rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] border backdrop-blur-sm overflow-hidden`}
+              className={`${theme === "dark" ? "bg-gray-800/95 border-gray-600" : "bg-white/95 border-gray-200"} rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] border backdrop-blur-sm overflow-hidden flex flex-col`}
             >
               {/* Header with gradient */}
               <div
@@ -454,7 +454,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
               </div>
 
               {/* Form Content */}
-              <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
                 <div>
                   <label
                     className={`block text-sm font-semibold mb-2 flex items-center space-x-2 ${theme === "dark" ? "text-gray-200" : "text-gray-700"}`}
@@ -1126,7 +1126,7 @@ const EventsManagement = ({ events = [], setEvents, theme }) => {
               <div className="mb-6">
                 <p className="text-gray-700 mb-2">
                   Are you sure you want to delete{" "}
-                  <strong>"{eventToDelete.title}"</strong>?
+                  <strong>&quot;{eventToDelete.title}&quot;</strong>?
                 </p>
                 <p className="text-sm text-gray-500">
                   Choose your deletion option:
