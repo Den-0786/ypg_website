@@ -3401,8 +3401,15 @@ def api_social_media_delete(request, link_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_announcements(request):
-    """Get all announcements (public)"""
-    announcements = Announcement.objects.all().order_by('-date')
+    """Get announcements — public sees only future/undated, admin sees all"""
+    today = datetime.now().date()
+    cutoff = today - timedelta(days=1)
+    if request.query_params.get('include_past') == 'true':
+        announcements = Announcement.objects.all().order_by('-date')
+    else:
+        announcements = Announcement.objects.filter(
+            Q(date__gte=cutoff) | Q(date__isnull=True)
+        ).order_by('-date')
     serializer = AnnouncementSerializer(announcements, many=True)
     return Response({
         'success': True,

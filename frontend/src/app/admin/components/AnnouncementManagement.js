@@ -36,7 +36,7 @@ export default function AnnouncementManagement({ theme }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/announcements/`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-website.ahinsandistrictypg.com"}/api/announcements/?include_past=true`
         , { credentials: "include" }
       );
       const data = await response.json();
