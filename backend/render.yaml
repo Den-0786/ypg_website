@@ -18,7 +18,7 @@ services:
         fromDatabase:
           name: ypg-website-db
           property: connectionString
-    healthCheckPath: /admin/
+    healthCheckPath: /api/health/
 
 databases:
   - name: ypg-website-db
